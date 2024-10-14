@@ -24,6 +24,7 @@ import authConfig from 'src/configs/auth'
 import Modal from '../components/modal/Modal'
 import CommissionForm from 'src/layouts/components/student/CommissionForm'
 import CustomAvatar from 'src/@core/components/mui/avatar'
+import ActiveUsersTable from '../components/tables/UsersTable'
 
 const Home = () => {
 
@@ -145,6 +146,7 @@ const Home = () => {
       </ApexChartWrapper>
 
 
+      <ActiveUsersTable />
       {/* -----------------Modal Commission Edit--------------- */}
 
       <Modal handleClose={closeComissionModal} open={commissionModal} maxWidth="xs">
