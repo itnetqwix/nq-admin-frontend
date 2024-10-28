@@ -12,6 +12,7 @@ const defaultProvider = {
   moneyRequestList: [],
   writeByUsers: [],
   concernByUsers: [],
+  activeUsers: []
 }
 const CommonContext = createContext(defaultProvider)
 
@@ -35,6 +36,7 @@ const CommonProvider = ({ children }) => {
   const [moneyRequestList, setMoneyRequestList] = useState(defaultProvider.moneyRequestList);
   const [writeByUsers, setWriteByUsers] = useState(defaultProvider.writeByUsers);
   const [concernByUsers, setConcernByUsers] = useState(defaultProvider.concernByUsers);
+  const [activeUsers, setActiveUsers] = useState(defaultProvider.activeUsers);
 
   useEffect(() => {
     // getTrainersList()
@@ -198,6 +200,18 @@ const CommonProvider = ({ children }) => {
 
   }
 
+  const getActiveUsers = async () => {
+    console.log('get active users triggered');
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/connected-users`);
+      const data = await response.json();
+      return data;  // Return the data after successful fetch
+    } catch (error) {
+      console.error('Error fetching active users:', error);
+      throw error;  // Re-throw the error for external error handling if necessary
+    }
+  };
   const values = {
     trainerList,
     setTrainerList,
@@ -215,6 +229,7 @@ const CommonProvider = ({ children }) => {
     concernByUsers,
     getWriteByUsers,
     getConcernByUsers,
+    getActiveUsers
   }
 
   return <CommonContext.Provider value={values}>{children}</CommonContext.Provider>
