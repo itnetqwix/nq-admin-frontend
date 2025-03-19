@@ -3,21 +3,9 @@ import React, { useEffect, useState } from "react";
 import { DataGrid } from '@mui/x-data-grid';
 import styles from "styles/common.module.css";
 import { useCommon } from "src/hooks/useCommon";
+import { getImageUrl } from "src/utils/utils";
 
-const getImageUrl = (image) => {
-    const backendUrl = "https://data.netqwix.com/";
 
-    // Check if the image URL is already a full URL (starts with http or https)
-    if (
-        image &&
-        (image.startsWith("http://") || image.startsWith("https://"))
-    ) {
-        return image;
-    }
-
-    // If the image is just a filename, append the backend URL
-    return image ? `${backendUrl}${image}` : "/assets/images/demoUser.png";
-};
 
 export default function ActiveUsersTable() {
     const common = useCommon();

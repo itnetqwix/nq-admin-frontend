@@ -1,6 +1,6 @@
 import React from "react";
 import ClipsAndGamePlan from "./ClipsAndGamePlan";
-import { dynamicImageURL } from "src/utils/utils";
+import { getImageUrl } from "src/utils/utils";
 
 const StudentDetail = ({ data, isOpen }) => {
 
@@ -32,7 +32,7 @@ const StudentDetail = ({ data, isOpen }) => {
               <div className="col-12 d-flex justify-content-center align-items-center">
                 <img
                   className="card-img-top"
-                  src={dynamicImageURL(data?.profile_picture) ?? 'https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png'}
+                  src={getImageUrl(data?.profile_picture) ?? 'https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png'}
                   alt="Card image cap"
                   style={{
                     padding: "10px",

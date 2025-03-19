@@ -22,7 +22,7 @@ import { useAuth } from "src/hooks/useAuth";
 import { useCommon } from "src/hooks/useCommon";
 import authConfig from 'src/configs/auth'
 import StudentDetail from "src/layouts/components/student/StudentDetail";
-import { debouncedSearchMedicine, dynamicImageURL } from "src/utils/utils";
+import { debouncedSearchMedicine, getImageUrl } from "src/utils/utils";
 import ReactStrapModal from "src/pages/components/modal/ReactStrapModal";
 import { X } from "react-feather";
 
@@ -139,7 +139,7 @@ export default function ManageTrainer() {
           <Avatar
             alt='Alam'
             sx={{ width: 80, height: 80 }}
-            src={dynamicImageURL(params?.row?.profile_picture) ?? 'https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png'}
+            src={getImageUrl(params?.row?.profile_picture) ?? 'https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png'}
           />
         </Badge>
       )

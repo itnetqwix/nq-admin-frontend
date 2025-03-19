@@ -22,14 +22,35 @@ const searchMedicine = (query, data, key) => {
 
 export const debouncedSearchMedicine = debounce(searchMedicine, 300)
 
-export const dynamicImageURL = (url) => {
-    let updatedURL = url?.toString()?.split("public")[1]
-    if (updatedURL === undefined) {
-        return url
+// export const getImageUrl = (url) => {
+//     let updatedURL = url?.toString()?.split("public")[1]
+//     if (updatedURL === undefined) {
+//         return url
+//     }
+//     updatedURL = process?.env?.NEXT_PUBLIC_API_BASE_URL + "/public" + url?.toString()?.split("public")[1]
+//     return updatedURL
+// }
+
+export const getImageUrl = (image) => {
+    console.log("image", image)
+    const backendUrl = "https://data.netqwix.com/";
+
+    // Check if the image URL is already a full URL (starts with http or https)
+    if (
+        image &&
+        (image.startsWith("http://") || image.startsWith("https://"))
+    ) {
+        return image;
     }
-    updatedURL = process?.env?.NEXT_PUBLIC_API_BASE_URL + "/public" + url?.toString()?.split("public")[1]
-    return updatedURL
-}
+
+    // If the image is just a filename, append the backend URL
+    if (image) {
+        return `${backendUrl}${image}`
+    } else {
+        false
+    }
+
+};
 
 export const BookedSession = {
     confirm: "confirm",

@@ -19,7 +19,7 @@ import { useCommon } from "src/hooks/useCommon";
 import Modal from "src/pages/components/modal/Modal";
 import authConfig from 'src/configs/auth'
 import StudentDetail from "src/layouts/components/student/StudentDetail";
-import { debouncedSearchMedicine } from "src/utils/utils";
+import { debouncedSearchMedicine, getImageUrl } from "src/utils/utils";
 import ReactStrapModal from "src/pages/components/modal/ReactStrapModal";
 import { X } from "react-feather";
 
@@ -63,14 +63,7 @@ export default function ManageTrainee() {
     setTableData(searchResults)
   }
 
-  const dynamicImageURL = (url) => {
-    let updatedURL = url?.toString()?.split("public")[1]
-    if (updatedURL === undefined) {
-      return url
-    }
-    updatedURL = process?.env?.NEXT_PUBLIC_API_BASE_URL + "/public" + url?.toString()?.split("public")[1]
-    return updatedURL
-  }
+
 
   const columns = [
     {
@@ -91,7 +84,7 @@ export default function ManageTrainee() {
           <Avatar
             alt='Alam'
             sx={{ width: 80, height: 80 }}
-            src={dynamicImageURL(params?.row?.profile_picture) ?? 'https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png'}
+            src={getImageUrl(params?.row?.profile_picture) ?? 'https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png'}
           // src='https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png'
           />
         </Badge>
