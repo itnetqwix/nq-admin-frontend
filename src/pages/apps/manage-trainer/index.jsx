@@ -1,4 +1,4 @@
-import { Autocomplete, Avatar, Badge, Box, Button, CircularProgress, Container, Divider, FormControl, FormControlLabel, FormHelperText, Grid, IconButton, InputLabel, MenuItem, Radio, RadioGroup, TextField, Typography } from "@mui/material";
+import { Autocomplete, Avatar, Badge, Box, Button, CircularProgress, Container, Divider, FormControl, FormControlLabel, FormHelperText, Grid, IconButton, InputLabel, MenuItem, Radio, RadioGroup, TextField, Typography, useMediaQuery } from "@mui/material";
 import React, { useEffect, useMemo, useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -16,7 +16,8 @@ import Link from "next/link";
 import MenuIcon from '@mui/icons-material/Menu';
 import { CustomButton } from "src/pages/components/common";
 import DeletePopup from "src/pages/components/modal/DeletePopup";
-import Modal from "src/pages/components/modal/Modal";
+import Modal from "@mui/material/Modal";
+import MModal from "src/pages/components/modal/Modal";
 import AddEditCommision from "src/pages/components/add-edit-commision";
 import { useAuth } from "src/hooks/useAuth";
 import { useCommon } from "src/hooks/useCommon";
@@ -227,8 +228,43 @@ export default function ManageTrainer() {
     setTableData(searchResults)
   }
 
+  const width800 = useMediaQuery("(max-width:800px)")
+
   return (
     <React.Fragment>
+      <Modal
+        handleClose={() => { setIsOpen(false) }} open={isOpen}
+
+      >
+        <div className="container media-gallery portfolio-section grid-portfolio " style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: 'center',
+          flexDirection: "column",
+          minHeight: "100dvh"
+        }}>
+          <div className="theme-title" style={{
+            width: width800 ? "100%" : "80%",
+            minHeight: width800 ? "100%" : "auto",
+            background: "white",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: 'center',
+            flexDirection: "column"
+          }}>
+            <div className="media" style={{
+              marginLeft: "90%",
+              marginRight: 0,
+              marginTop: "10px"
+            }}>
+              <div className="media-body media-body text-right">
+                <div className="icon-btn btn-sm btn-outline-light close-apps pointer" onClick={() => { setIsOpen(false) }} > <X /> </div>
+              </div>
+            </div>
+            <StudentDetail data={selectedStudentData} recentStudentClips={recentStudentClips} isOpen={isOpen} />
+          </div>
+        </div>
+      </Modal>
       <Grid container spacing={3} sx={{ width: "100%" }}>
         <Grid item xs={12} md={12} lg={12} xl={12} >
           <form noValidate autoComplete="off" >
@@ -328,27 +364,13 @@ export default function ManageTrainer() {
 
       <DeletePopup handleClose={handleCloseDeletePopup} open={openDeletePopup} onConform={onConformDelete} />
 
-      <Modal handleClose={handleCloseCommisionModal} open={openCommisionModal} maxWidth="xs">
+      <MModal handleClose={handleCloseCommisionModal} open={openCommisionModal} maxWidth="xs">
         <AddEditCommision handleClose={handleCloseCommisionModal} trainer_id={SelectedId} />
-      </Modal>
+      </MModal>
 
       {/* ******************************************* */}
 
-      <ReactStrapModal
-        isOpen={isOpen}
-        element={
-          <div className="container media-gallery portfolio-section grid-portfolio ">
-            <div className="theme-title">
-              <div className="media">
-                <div className="media-body media-body text-right">
-                  <div className="icon-btn btn-sm btn-outline-light close-apps pointer" onClick={() => { setIsOpen(false) }} > <X /> </div>
-                </div>
-              </div>
-              <StudentDetail data={selectedStudentData} recentStudentClips={recentStudentClips} isOpen={isOpen} />
-            </div>
-          </div>
-        }
-      />
+
     </React.Fragment>
   )
 }

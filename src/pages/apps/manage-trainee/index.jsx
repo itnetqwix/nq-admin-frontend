@@ -1,4 +1,4 @@
-import { Autocomplete, Avatar, Badge, Box, Button, CircularProgress, Container, Divider, FormControl, FormControlLabel, FormHelperText, Grid, IconButton, InputLabel, MenuItem, Radio, RadioGroup, TextField, Typography } from "@mui/material";
+import { Autocomplete, Avatar, Badge, Box, Button, CircularProgress, Container, Divider, FormControl, FormControlLabel, FormHelperText, Grid, IconButton, InputLabel, MenuItem, Radio, RadioGroup, TextField, Typography, useMediaQuery } from "@mui/material";
 import React, { useEffect, useMemo, useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -16,7 +16,7 @@ import Link from "next/link";
 import MenuIcon from '@mui/icons-material/Menu';
 import { CustomButton } from "src/pages/components/common";
 import { useCommon } from "src/hooks/useCommon";
-import Modal from "src/pages/components/modal/Modal";
+import Modal from "@mui/material/Modal";
 import authConfig from 'src/configs/auth'
 import StudentDetail from "src/layouts/components/student/StudentDetail";
 import { debouncedSearchMedicine, getImageUrl } from "src/utils/utils";
@@ -175,6 +175,7 @@ export default function ManageTrainee() {
   };
 
   const getRowHeight = () => 100
+  const width800 = useMediaQuery("(max-width:800px)")
 
   return (
     <>
@@ -284,21 +285,41 @@ export default function ManageTrainee() {
         <StudentDetail data={selectedStudentData} recentStudentClips={recentStudentClips} />
       </Modal> */}
 
-      <ReactStrapModal
-        isOpen={isOpen}
-        element={
-          <div className="container media-gallery portfolio-section grid-portfolio ">
-            <div className="theme-title">
-              <div className="media">
-                <div className="media-body media-body text-right">
-                  <div className="icon-btn btn-sm btn-outline-light close-apps pointer" onClick={() => { setIsOpen(false) }} > <X /> </div>
-                </div>
+      <Modal
+        handleClose={() => { setIsOpen(false) }} open={isOpen}
+
+      >
+        <div className="container media-gallery portfolio-section grid-portfolio " style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: 'center',
+          flexDirection: "column",
+          minHeight: "100dvh"
+        }}>
+          <div className="theme-title" style={{
+            width: width800 ? "100%" : "80%",
+            minHeight: width800 ? "100%" : "auto",
+            background: "white",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: 'center',
+            flexDirection: "column"
+          }}>
+            <div className="media" style={{
+              marginLeft: "90%",
+              marginRight: 0,
+              marginTop: "10px"
+            }}>
+              <div className="media-body media-body text-right">
+                <div className="icon-btn btn-sm btn-outline-light close-apps pointer" onClick={() => { setIsOpen(false) }} > <X /> </div>
               </div>
-              <StudentDetail data={selectedStudentData} recentStudentClips={recentStudentClips} />
             </div>
+            <StudentDetail data={selectedStudentData} recentStudentClips={recentStudentClips} isOpen={isOpen} />
           </div>
-        }
-      />
+        </div>
+      </Modal>
+
+
     </>
   )
 }
