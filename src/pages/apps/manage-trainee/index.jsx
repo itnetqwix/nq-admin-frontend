@@ -22,6 +22,7 @@ import StudentDetail from "src/layouts/components/student/StudentDetail";
 import { debouncedSearchMedicine, getImageUrl } from "src/utils/utils";
 import ReactStrapModal from "src/pages/components/modal/ReactStrapModal";
 import { X } from "react-feather";
+import TrainerStatus from "src/pages/components/trainer-status";
 
 
 {/* <MenuItem value="xs">xs</MenuItem>
@@ -93,6 +94,18 @@ export default function ManageTrainee() {
     { field: 'fullname', headerName: 'Trainer Name', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 180 },
     { field: 'email', headerName: 'Trainer Email', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 200 },
     { field: 'mobile_no', headerName: 'Mobile Number', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
+    {
+      field: 'status',
+      headerName: 'Status',
+      headerClassName: styles['header-class'],
+      cellClassName: styles['cell-class'],
+      width: 200,
+      renderCell: params => (
+        <div className={styles["status-booking"]} >
+          <TrainerStatus params={params} />
+        </div>
+      )
+    },
     { field: 'category', headerName: 'Category', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 100 },
     { field: 'wallet_amount', headerName: 'Wallet Amount', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
     { field: 'login_type', headerName: 'Login Type', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
