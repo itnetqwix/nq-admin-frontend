@@ -84,3 +84,9 @@ export const statusColors = {
     in_progress: 'orange',
     close: 'red',
 };
+
+export const trainerStatusColors = {
+    pending: 'orange',
+    approved: 'green',
+    rejected: 'red',
+};
