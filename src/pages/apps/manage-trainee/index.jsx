@@ -1,4 +1,4 @@
-import { Autocomplete, Avatar, Badge, Box, Button, CircularProgress, Container, Divider, FormControl, FormControlLabel, FormHelperText, Grid, IconButton, InputLabel, MenuItem, Radio, RadioGroup, TextField, Typography } from "@mui/material";
+import { Autocomplete, Avatar, Badge, Box, Button, CircularProgress, Container, Divider, FormControl, FormControlLabel, FormHelperText, Grid, IconButton, InputLabel, MenuItem, Radio, RadioGroup, TextField, Typography, useMediaQuery } from "@mui/material";
 import React, { useEffect, useMemo, useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -16,12 +16,13 @@ import Link from "next/link";
 import MenuIcon from '@mui/icons-material/Menu';
 import { CustomButton } from "src/pages/components/common";
 import { useCommon } from "src/hooks/useCommon";
-import Modal from "src/pages/components/modal/Modal";
+import Modal from "@mui/material/Modal";
 import authConfig from 'src/configs/auth'
 import StudentDetail from "src/layouts/components/student/StudentDetail";
-import { debouncedSearchMedicine } from "src/utils/utils";
+import { debouncedSearchMedicine, getImageUrl } from "src/utils/utils";
 import ReactStrapModal from "src/pages/components/modal/ReactStrapModal";
 import { X } from "react-feather";
+import TrainerStatus from "src/pages/components/trainer-status";
 
 
 {/* <MenuItem value="xs">xs</MenuItem>
@@ -63,14 +64,7 @@ export default function ManageTrainee() {
     setTableData(searchResults)
   }
 
-  const dynamicImageURL = (url) => {
-    let updatedURL = url?.toString()?.split("public")[1]
-    if (updatedURL === undefined) {
-      return url
-    }
-    updatedURL = process?.env?.NEXT_PUBLIC_API_BASE_URL + "/public" + url?.toString()?.split("public")[1]
-    return updatedURL
-  }
+
 
   const columns = [
     {
@@ -91,7 +85,7 @@ export default function ManageTrainee() {
           <Avatar
             alt='Alam'
             sx={{ width: 80, height: 80 }}
-            src={dynamicImageURL(params?.row?.profile_picture) ?? 'https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png'}
+            src={getImageUrl(params?.row?.profile_picture) ?? 'https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png'}
           // src='https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png'
           />
         </Badge>
@@ -100,6 +94,18 @@ export default function ManageTrainee() {
     { field: 'fullname', headerName: 'Trainer Name', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 180 },
     { field: 'email', headerName: 'Trainer Email', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 200 },
     { field: 'mobile_no', headerName: 'Mobile Number', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
+    {
+      field: 'status',
+      headerName: 'Status',
+      headerClassName: styles['header-class'],
+      cellClassName: styles['cell-class'],
+      width: 200,
+      renderCell: params => (
+        <div className={styles["status-booking"]} >
+          <TrainerStatus params={params} />
+        </div>
+      )
+    },
     { field: 'category', headerName: 'Category', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 100 },
     { field: 'wallet_amount', headerName: 'Wallet Amount', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
     { field: 'login_type', headerName: 'Login Type', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
@@ -182,6 +188,7 @@ export default function ManageTrainee() {
   };
 
   const getRowHeight = () => 100
+  const width800 = useMediaQuery("(max-width:800px)")
 
   return (
     <>
@@ -291,21 +298,41 @@ export default function ManageTrainee() {
         <StudentDetail data={selectedStudentData} recentStudentClips={recentStudentClips} />
       </Modal> */}
 
-      <ReactStrapModal
-        isOpen={isOpen}
-        element={
-          <div className="container media-gallery portfolio-section grid-portfolio ">
-            <div className="theme-title">
-              <div className="media">
-                <div className="media-body media-body text-right">
-                  <div className="icon-btn btn-sm btn-outline-light close-apps pointer" onClick={() => { setIsOpen(false) }} > <X /> </div>
-                </div>
+      <Modal
+        handleClose={() => { setIsOpen(false) }} open={isOpen}
+
+      >
+        <div className="container media-gallery portfolio-section grid-portfolio " style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: 'center',
+          flexDirection: "column",
+          minHeight: "100dvh"
+        }}>
+          <div className="theme-title" style={{
+            width: width800 ? "100%" : "80%",
+            minHeight: width800 ? "100%" : "auto",
+            background: "white",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: 'center',
+            flexDirection: "column"
+          }}>
+            <div className="media" style={{
+              marginLeft: "90%",
+              marginRight: 0,
+              marginTop: "10px"
+            }}>
+              <div className="media-body media-body text-right">
+                <div className="icon-btn btn-sm btn-outline-light close-apps pointer" onClick={() => { setIsOpen(false) }} > <X /> </div>
               </div>
-              <StudentDetail data={selectedStudentData} recentStudentClips={recentStudentClips} />
             </div>
+            <StudentDetail data={selectedStudentData} recentStudentClips={recentStudentClips} isOpen={isOpen} />
           </div>
-        }
-      />
+        </div>
+      </Modal>
+
+
     </>
   )
 }

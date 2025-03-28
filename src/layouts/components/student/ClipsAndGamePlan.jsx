@@ -10,6 +10,8 @@ import {
 } from "reactstrap";
 import Clips from "./Clips";
 import Reports from "./Reports";
+import { width } from "@mui/system";
+import { useMediaQuery } from "@mui/material";
 
 const allTabs = [
   {
@@ -26,7 +28,7 @@ const allTabs = [
 
 const ClipsAndGamePlan = ({ accountType, trainee_id, isOpen }) => {
   const [activeTab, setActiveTab] = useState(allTabs[0]?.value);
-
+  const width600 = useMediaQuery('(max-width:600px)')
   const toggleTab = (tabValue) => {
     console.log('Toggle Tab:', tabValue);
     if (activeTab !== tabValue) {
@@ -62,7 +64,7 @@ const ClipsAndGamePlan = ({ accountType, trainee_id, isOpen }) => {
           style={{
             color: "black",
             minHeight: "auto",
-            height: "70vh",
+            height: width600 ? "40dvh" : "70dvh",
             overflow: "auto",
           }}
         >
