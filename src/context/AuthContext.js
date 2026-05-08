@@ -95,14 +95,14 @@ const AuthProvider = ({ children }) => {
           setLoading(false)
         })
         .catch(() => {
-          // localStorage.removeItem('userData')
+          localStorage.removeItem('userData')
           // localStorage.removeItem('refreshToken')
-          // localStorage.removeItem('accessToken')
+          localStorage.removeItem('accessToken')
           setLoading(false)
-          // if (authConfig.onTokenExpiration === 'logout' && !router.pathname.includes('login')) {
-          //   router.replace('/login')
-          // }
-        })
+          if (authConfig.onTokenExpiration === 'logout' && !router.pathname.includes('login')) {
+            router.replace('/login')
+          }
+      })
     } else {
       setLoading(false)
     }
