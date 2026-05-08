@@ -53,8 +53,8 @@ const AuthProvider = ({ children }) => {
           return;
         }
 
-        if (authConfig.storageTokenKeyName, response?.data?.result?.data.account_type === "Admin") {
-          getUserDetails(response?.data?.result?.data.access_token)
+        if (authConfig.storageTokenKeyName, response?.result?.data.account_type === "Admin") {
+          getUserDetails(response?.result?.data.access_token)
         }
         else {
           setLoading(false)
