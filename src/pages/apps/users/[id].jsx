@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import AdminUser360Tabs from 'src/pages/components/user360/AdminUser360Tabs'
-import { getAuditLogs, getUser360, getUserAssets, getUserLessons, getUserReviews } from 'src/services/user360Api'
+import { getUser360, getUserAssets, getUserLessons, getUserReviews, getUserTimeline } from 'src/services/user360Api'
 
 export default function User360Page() {
   const router = useRouter()
@@ -21,7 +21,7 @@ export default function User360Page() {
   const [lessonsLoading, setLessonsLoading] = useState(false)
   const [reviewsLoading, setReviewsLoading] = useState(false)
   const [assetsLoading, setAssetsLoading] = useState(false)
-  const [auditLoading, setAuditLoading] = useState(false)
+  const [timelineLoading, setTimelineLoading] = useState(false)
 
   const [userData, setUserData] = useState(null)
   const [lessons, setLessons] = useState({ items: [], pagination: { page: 1, limit: 20, total: 0 } })
@@ -31,13 +31,13 @@ export default function User360Page() {
     reports: { items: [], pagination: { page: 1, limit: 20, total: 0 } },
     savedSessions: { items: [], pagination: { page: 1, limit: 20, total: 0 } }
   })
-  const [auditLogs, setAuditLogs] = useState({ items: [], pagination: { page: 1, limit: 20, total: 0 } })
+  const [timeline, setTimeline] = useState({ items: [], pagination: { page: 1, limit: 30, total: 0 } })
 
   const [query, setQuery] = useState({
     lessons: { page: 1, limit: 20, sortBy: 'createdAt', sortOrder: 'desc', status: '', search: '' },
     reviews: { page: 1, limit: 20, sortBy: 'createdAt', sortOrder: 'desc', status: '', search: '' },
     assets: { page: 1, limit: 20, sortBy: 'createdAt', sortOrder: 'desc', search: '' },
-    activity: { page: 1, limit: 20, sortBy: 'createdAt', sortOrder: 'desc', search: '' }
+    activity: { page: 1, limit: 30, eventType: '' }
   })
 
   const updateSectionQuery = (section, nextPatch) => {
@@ -172,17 +172,17 @@ export default function User360Page() {
     if (!userId || tab !== 5) return
     let cancelled = false
     ;(async () => {
-      setAuditLoading(true)
+      setTimelineLoading(true)
       try {
-        const logs = await getAuditLogs(userId, query.activity)
-        if (!cancelled) setAuditLogs(logs)
+        const d = await getUserTimeline(userId, query.activity)
+        if (!cancelled) setTimeline(d)
       } catch (e) {
         if (!cancelled) {
-          setAuditLogs({ items: [], pagination: { page: 1, limit: 20, total: 0 } })
-          toast.error(e?.message || 'Failed to load audit log')
+          setTimeline({ items: [], pagination: { page: 1, limit: 30, total: 0 } })
+          toast.error(e?.message || 'Failed to load activity timeline')
         }
       } finally {
-        if (!cancelled) setAuditLoading(false)
+        if (!cancelled) setTimelineLoading(false)
       }
     })()
     return () => {
@@ -204,7 +204,7 @@ export default function User360Page() {
       } else if (tab === 4) {
         setAssets(await getUserAssets(userId, { ...query.assets, section: 'plans' }))
       } else if (tab === 5) {
-        setAuditLogs(await getAuditLogs(userId, query.activity))
+        setTimeline(await getUserTimeline(userId, query.activity))
       }
     } catch (e) {
       toast.error(e?.message || 'Refresh failed')
@@ -251,11 +251,11 @@ export default function User360Page() {
             lessons={lessons}
             reviews={reviews}
             assets={assets}
-            auditLogs={auditLogs}
+            timeline={timeline}
             loadingLessons={lessonsLoading}
             loadingReviews={reviewsLoading}
             loadingAssets={assetsLoading}
-            loadingAudit={auditLoading}
+            loadingTimeline={timelineLoading}
             onRefresh={refreshActiveTab}
             query={query}
             onQueryChange={updateSectionQuery}
