@@ -1,4 +1,18 @@
-import { Box, Button, CircularProgress, Container, Typography } from '@mui/material'
+import {
+  Box,
+  Breadcrumbs,
+  Button,
+  CircularProgress,
+  Container,
+  IconButton,
+  Link as MuiLink,
+  Stack,
+  Tooltip,
+  Typography
+} from '@mui/material'
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
+import PersonSearchOutlinedIcon from '@mui/icons-material/PersonSearchOutlined'
+import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -211,22 +225,32 @@ export default function User360Page() {
     }
   }, [userId, tab, query.lessons, query.reviews, query.assets, query.activity])
 
+  const copyText = (label, text) => {
+    if (!text) return
+    void navigator.clipboard.writeText(String(text)).then(() => toast.success(`${label} copied`))
+  }
+
+  const displayName =
+    userData?.overview?.identity?.fullname ||
+    userData?.user?.fullname ||
+    'User profile'
+
   if (!router.isReady) {
     return (
-      <Container maxWidth='xl'>
-        <Box sx={{ py: 8, display: 'flex', justifyContent: 'center' }}>
-          <CircularProgress />
-        </Box>
-      </Container>
+      <Box sx={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'grey.50' }}>
+        <CircularProgress />
+      </Box>
     )
   }
 
   if (!userId) {
     return (
-      <Container maxWidth='xl'>
-        <Box sx={{ p: 3 }}>
-          <Typography variant='h6' sx={{ mb: 2 }}>User not found</Typography>
-          <Typography variant='body2' sx={{ mb: 2 }}>The link may be invalid or the user id is missing.</Typography>
+      <Container maxWidth='md' sx={{ py: 6 }}>
+        <Box sx={{ p: 4, borderRadius: 2, bgcolor: 'background.paper', boxShadow: 1 }}>
+          <Typography variant='h6' sx={{ mb: 1 }}>User not found</Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ mb: 3 }}>
+            The link may be invalid or the user id is missing.
+          </Typography>
           <Button component={Link} href='/apps/manage-trainer' variant='contained'>
             Back to trainers
           </Button>
@@ -236,33 +260,93 @@ export default function User360Page() {
   }
 
   return (
-    <Container maxWidth='xl'>
-      <Box sx={{ p: 3, backgroundColor: '#fff', borderRadius: 2 }}>
-        <Typography variant='h5' sx={{ mb: 2 }}>Admin Full Access User Console</Typography>
-        {overviewLoading && !userData ? (
-          <Box sx={{ py: 8, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
+    <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh', pb: 6 }}>
+      <Container maxWidth='xl' sx={{ pt: 3 }}>
+        <Breadcrumbs sx={{ mb: 2 }} separator='/'>
+          <MuiLink component={Link} href='/home' underline='hover' color='inherit' sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <HomeOutlinedIcon sx={{ fontSize: 18 }} /> Home
+          </MuiLink>
+          <MuiLink component={Link} href='/apps/manage-trainer' underline='hover' color='inherit'>
+            Trainers
+          </MuiLink>
+          <Typography color='text.primary' sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <PersonSearchOutlinedIcon sx={{ fontSize: 18 }} /> User console
+          </Typography>
+        </Breadcrumbs>
+
+        <Stack
+          direction={{ xs: 'column', md: 'row' }}
+          spacing={2}
+          alignItems={{ xs: 'flex-start', md: 'center' }}
+          justifyContent='space-between'
+          sx={{ mb: 2 }}
+        >
+          <Box>
+            <Typography variant='h4' component='h1' sx={{ fontWeight: 700, letterSpacing: '-0.02em', mb: 0.5 }}>
+              {overviewLoading && !userData ? 'Loading…' : displayName}
+            </Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Full access view for support, moderation, and billing context.
+            </Typography>
           </Box>
-        ) : (
-          <AdminUser360Tabs
-            tab={tab}
-            onTabChange={setTab}
-            userData={userData}
-            lessons={lessons}
-            reviews={reviews}
-            assets={assets}
-            timeline={timeline}
-            loadingLessons={lessonsLoading}
-            loadingReviews={reviewsLoading}
-            loadingAssets={assetsLoading}
-            loadingTimeline={timelineLoading}
-            onRefresh={refreshActiveTab}
-            query={query}
-            onQueryChange={updateSectionQuery}
-            hardDeletePolicy={userData?.policy}
-          />
-        )}
-      </Box>
-    </Container>
+          <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
+            <Tooltip title='Copy MongoDB user id'>
+              <Button
+                size='small'
+                variant='outlined'
+                startIcon={<ContentCopyOutlinedIcon />}
+                onClick={() => copyText('User ID', userId)}
+                sx={{ textTransform: 'none' }}
+              >
+                Copy ID
+              </Button>
+            </Tooltip>
+            {userData?.user?.email ? (
+              <Tooltip title='Copy email'>
+                <IconButton size='small' onClick={() => copyText('Email', userData.user.email)} aria-label='copy email'>
+                  <ContentCopyOutlinedIcon fontSize='small' />
+                </IconButton>
+              </Tooltip>
+            ) : null}
+          </Stack>
+        </Stack>
+
+        <Box
+          sx={{
+            borderRadius: 2,
+            bgcolor: 'background.paper',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+            border: '1px solid',
+            borderColor: 'divider',
+            overflow: 'hidden'
+          }}
+        >
+          {overviewLoading && !userData ? (
+            <Box sx={{ py: 12, display: 'flex', justifyContent: 'center' }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <AdminUser360Tabs
+              userId={userId}
+              tab={tab}
+              onTabChange={setTab}
+              userData={userData}
+              lessons={lessons}
+              reviews={reviews}
+              assets={assets}
+              timeline={timeline}
+              loadingLessons={lessonsLoading}
+              loadingReviews={reviewsLoading}
+              loadingAssets={assetsLoading}
+              loadingTimeline={timelineLoading}
+              onRefresh={refreshActiveTab}
+              query={query}
+              onQueryChange={updateSectionQuery}
+              hardDeletePolicy={userData?.policy}
+            />
+          )}
+        </Box>
+      </Container>
+    </Box>
   )
 }

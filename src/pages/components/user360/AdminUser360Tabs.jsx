@@ -1,35 +1,80 @@
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import RefreshIcon from '@mui/icons-material/Refresh'
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined'
+import SearchIcon from '@mui/icons-material/Search'
+import CloseIcon from '@mui/icons-material/Close'
+import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined'
+import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined'
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  alpha,
   Avatar,
   Box,
   Button,
+  Card,
+  CardContent,
   Chip,
   CircularProgress,
+  Collapse,
   Dialog,
   DialogContent,
   DialogTitle,
+  Divider,
   Grid,
+  IconButton,
+  InputAdornment,
   MenuItem,
+  Paper,
   Stack,
   Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Tabs,
   TextField,
-  Typography
+  Typography,
+  useTheme
 } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import { deleteAdminEntity, getClipPlayUrl } from 'src/services/user360Api'
 import { getImageUrl } from 'src/utils/utils'
 
-const SectionCard = ({ title, children }) => (
-  <Box sx={{ border: '1px solid #e5e7eb', borderRadius: 2, p: { xs: 1.25, md: 2 }, mb: 2, backgroundColor: '#fff' }}>
-    <Typography variant='h6' sx={{ mb: 1 }}>{title}</Typography>
-    {children}
-  </Box>
-)
+const tabLabels = ['Overview', 'Lessons', 'Reviews', 'Clips', 'PDF & saved', 'Activity']
+
+const SectionShell = ({ title, subtitle, action, children }) => {
+  const theme = useTheme()
+  return (
+    <Box sx={{ p: { xs: 2, md: 3 } }}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ sm: 'flex-start' }} justifyContent='space-between' sx={{ mb: 2.5 }}>
+        <Box>
+          <Typography variant='h6' sx={{ fontWeight: 600 }}>{title}</Typography>
+          {subtitle ? (
+            <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5, maxWidth: 720 }}>
+              {subtitle}
+            </Typography>
+          ) : null}
+        </Box>
+        {action ? <Box sx={{ flexShrink: 0 }}>{action}</Box> : null}
+      </Stack>
+      <Box
+        sx={{
+          borderRadius: 2,
+          border: `1px solid ${theme.palette.divider}`,
+          bgcolor: alpha(theme.palette.primary.main, 0.02),
+          p: { xs: 1.5, md: 2 }
+        }}
+      >
+        {children}
+      </Box>
+    </Box>
+  )
+}
 
 const downloadCsv = (rows, filename) => {
   if (!rows?.length) {
@@ -55,6 +100,37 @@ const downloadCsv = (rows, filename) => {
   link.click()
   document.body.removeChild(link)
   URL.revokeObjectURL(url)
+}
+
+const lessonStatusColor = status => {
+  const s = String(status || '').toLowerCase()
+  if (s.includes('complete')) return 'success'
+  if (s.includes('cancel')) return 'error'
+  if (s.includes('confirm') || s.includes('book')) return 'info'
+  if (s.includes('pending') || s.includes('start')) return 'warning'
+  return 'default'
+}
+
+const timelineDotColor = type => {
+  const t = String(type || '').toLowerCase()
+  if (t.includes('admin')) return 'error'
+  if (t.includes('booking')) return 'primary'
+  if (t.includes('clip')) return 'secondary'
+  if (t.includes('login') || t.includes('user_activity')) return 'success'
+  if (t.includes('report') || t.includes('saved')) return 'info'
+  if (t.includes('online')) return 'warning'
+  return 'default'
+}
+
+const timelineDotBg = (type, theme) => {
+  const c = timelineDotColor(type)
+  if (c === 'error') return theme.palette.error.main
+  if (c === 'primary') return theme.palette.primary.main
+  if (c === 'secondary') return theme.palette.secondary.main
+  if (c === 'success') return theme.palette.success.main
+  if (c === 'info') return theme.palette.info.main
+  if (c === 'warning') return theme.palette.warning.main
+  return theme.palette.grey[500]
 }
 
 const DeleteActions = ({ entityType, entityId, onDeleted, hardDeletePolicy }) => {
@@ -86,22 +162,66 @@ const DeleteActions = ({ entityType, entityId, onDeleted, hardDeletePolicy }) =>
   }
 
   return (
-    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ width: { xs: '100%', sm: 'auto' } }}>
-      <Button size='small' color='warning' variant='outlined' fullWidth={true} disabled={loadingMode !== ''} onClick={() => handleDelete('soft')}>
-        {loadingMode === 'soft' ? 'Deleting...' : 'Delete (soft)'}
+    <Stack direction='row' spacing={0.75} flexWrap='wrap' useFlexGap>
+      <Button size='small' color='warning' variant='outlined' disabled={loadingMode !== ''} onClick={() => handleDelete('soft')}>
+        {loadingMode === 'soft' ? '…' : 'Soft delete'}
       </Button>
-      <Button size='small' color='error' variant='outlined' fullWidth={true} disabled={loadingMode !== ''} onClick={() => handleDelete('hard')}>
-        {loadingMode === 'hard' ? 'Deleting...' : 'Delete Permanently'}
+      <Button size='small' color='error' variant='outlined' disabled={loadingMode !== ''} onClick={() => handleDelete('hard')}>
+        {loadingMode === 'hard' ? '…' : 'Hard delete'}
       </Button>
     </Stack>
   )
 }
 
-const renderParty = party => (party ? `${party?.fullname || ''} (${party?.account_type || '-'})` : '-')
+const renderParty = party => (party ? `${party?.fullname || ''} (${party?.account_type || '—'})` : '—')
 
 const safeImg = path => {
   const u = getImageUrl(path)
   return typeof u === 'string' ? u : undefined
+}
+
+const EmptyHint = ({ icon: Icon, title, hint }) => (
+  <Box
+    sx={{
+      py: 6,
+      px: 2,
+      textAlign: 'center',
+      color: 'text.secondary',
+      borderRadius: 2,
+      border: '1px dashed',
+      borderColor: 'divider',
+      bgcolor: 'background.paper'
+    }}
+  >
+    {Icon ? <Icon sx={{ fontSize: 40, opacity: 0.35, mb: 1 }} /> : null}
+    <Typography variant='subtitle1' color='text.primary' sx={{ mb: 0.5 }}>{title}</Typography>
+    <Typography variant='body2'>{hint}</Typography>
+  </Box>
+)
+
+function StatTile({ label, value, emphasize }) {
+  const theme = useTheme()
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        p: 2,
+        height: '100%',
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: 2,
+        bgcolor: 'background.paper',
+        transition: 'box-shadow 0.2s',
+        '&:hover': { boxShadow: `0 4px 14px ${alpha(theme.palette.common.black, 0.06)}` }
+      }}
+    >
+      <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+        {label}
+      </Typography>
+      <Typography variant={emphasize ? 'h4' : 'h5'} sx={{ fontWeight: 700, mt: 0.5, lineHeight: 1.2 }}>
+        {value ?? 0}
+      </Typography>
+    </Paper>
+  )
 }
 
 function ClipPlayDialog({ clipId, open, onClose }) {
@@ -136,18 +256,23 @@ function ClipPlayDialog({ clipId, open, onClose }) {
   }, [open, clipId])
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth>
-      <DialogTitle>Play clip</DialogTitle>
+    <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth PaperProps={{ sx: { borderRadius: 2 } }}>
+      <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pr: 1 }}>
+        Preview clip
+        <IconButton aria-label='close' onClick={onClose} size='small'>
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
       <DialogContent>
         {loading ? (
-          <Box sx={{ py: 4, display: 'flex', justifyContent: 'center' }}><CircularProgress size={28} /></Box>
+          <Box sx={{ py: 6, display: 'flex', justifyContent: 'center' }}><CircularProgress size={32} /></Box>
         ) : null}
         {err ? <Typography color='error' sx={{ py: 2 }}>{err}</Typography> : null}
         {!loading && url ? (
           <video
             controls
             playsInline
-            style={{ width: '100%', maxHeight: '70vh', background: '#000' }}
+            style={{ width: '100%', maxHeight: '70vh', background: '#000', borderRadius: 8 }}
             src={url}
             poster={poster || undefined}
           />
@@ -158,6 +283,7 @@ function ClipPlayDialog({ clipId, open, onClose }) {
 }
 
 export default function AdminUser360Tabs({
+  userId,
   tab,
   onTabChange,
   userData,
@@ -178,6 +304,7 @@ export default function AdminUser360Tabs({
   onQueryChange,
   hardDeletePolicy
 }) {
+  const theme = useTheme()
   const summary = useMemo(() => userData?.summary || {}, [userData])
   const overview = userData?.overview || {}
   const profile = userData?.user || {}
@@ -194,6 +321,36 @@ export default function AdminUser360Tabs({
   const timelineItems = timeline?.items || []
 
   const [playClipId, setPlayClipId] = useState(null)
+  const [metaOpenId, setMetaOpenId] = useState(null)
+
+  const lastOnlineLabel = summary.lastOnlineAt || overview.lastOnlineAt
+    ? new Date(summary.lastOnlineAt || overview.lastOnlineAt).toLocaleString()
+    : 'Not recorded (user may be a trainee without socket presence)'
+
+  const ToolbarRefreshExport = ({ onExport, exportLabel = 'Export CSV', busy }) => (
+    <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
+      <Button
+        size='small'
+        variant='outlined'
+        startIcon={<RefreshIcon />}
+        onClick={() => onRefresh?.()}
+        disabled={busy}
+        sx={{ textTransform: 'none' }}
+      >
+        Refresh
+      </Button>
+      <Button
+        size='small'
+        variant='contained'
+        startIcon={<FileDownloadOutlinedIcon />}
+        onClick={onExport}
+        disabled={busy}
+        sx={{ textTransform: 'none' }}
+      >
+        {exportLabel}
+      </Button>
+    </Stack>
+  )
 
   const QueryToolbar = ({ section, sectionQuery, lessonSortOptions = true }) => {
     const [searchDraft, setSearchDraft] = useState(sectionQuery?.search ?? '')
@@ -210,27 +367,34 @@ export default function AdminUser360Tabs({
       // eslint-disable-next-line react-hooks/exhaustive-deps -- debounce search only
     }, [searchDraft])
     return (
-    <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} sx={{ mb: 2, flexWrap: 'wrap' }} alignItems={{ md: 'center' }} useFlexGap>
+    <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mb: 0, flexWrap: 'wrap' }} alignItems={{ md: 'center' }} useFlexGap>
       {'search' in (sectionQuery || {}) ? (
         <TextField
           size='small'
-          label='Search (server)'
+          placeholder='Search…'
           value={searchDraft}
           onChange={e => setSearchDraft(e.target.value)}
-          sx={{ minWidth: { xs: '100%', md: 220 } }}
+          sx={{ minWidth: { xs: '100%', md: 240 } }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position='start'>
+                <SearchIcon fontSize='small' color='action' />
+              </InputAdornment>
+            )
+          }}
         />
       ) : null}
       {'sortBy' in (sectionQuery || {}) ? (
         <TextField
           size='small'
           select
-          label='Sort By'
+          label='Sort by'
           value={sectionQuery?.sortBy || 'createdAt'}
           onChange={e => onQueryChange(section, { sortBy: e.target.value })}
-          sx={{ minWidth: { xs: '100%', md: 140 } }}
+          sx={{ minWidth: 140 }}
         >
           <MenuItem value='createdAt'>Created</MenuItem>
-          {lessonSortOptions ? <MenuItem value='booked_date'>Booked Date</MenuItem> : null}
+          {lessonSortOptions ? <MenuItem value='booked_date'>Booked date</MenuItem> : null}
           {lessonSortOptions ? <MenuItem value='status'>Status</MenuItem> : null}
           {!lessonSortOptions ? <MenuItem value='title'>Title</MenuItem> : null}
         </TextField>
@@ -242,29 +406,29 @@ export default function AdminUser360Tabs({
           label='Order'
           value={sectionQuery?.sortOrder || 'desc'}
           onChange={e => onQueryChange(section, { sortOrder: e.target.value })}
-          sx={{ minWidth: { xs: '100%', md: 120 } }}
+          sx={{ minWidth: 120 }}
         >
-          <MenuItem value='desc'>Desc</MenuItem>
-          <MenuItem value='asc'>Asc</MenuItem>
+          <MenuItem value='desc'>Newest first</MenuItem>
+          <MenuItem value='asc'>Oldest first</MenuItem>
         </TextField>
       ) : null}
       {'status' in (sectionQuery || {}) ? (
         <TextField
           size='small'
-          label='Status'
+          label='Status contains'
           value={sectionQuery?.status || ''}
           onChange={e => onQueryChange(section, { status: e.target.value, page: 1 })}
-          sx={{ minWidth: { xs: '100%', md: 140 } }}
+          sx={{ minWidth: 160 }}
         />
       ) : null}
       {'limit' in (sectionQuery || {}) ? (
         <TextField
           size='small'
           select
-          label='Limit'
+          label='Rows'
           value={sectionQuery?.limit || 20}
           onChange={e => onQueryChange(section, { limit: Number(e.target.value), page: 1 })}
-          sx={{ minWidth: { xs: '100%', md: 110 } }}
+          sx={{ minWidth: 100 }}
         >
           <MenuItem value={10}>10</MenuItem>
           <MenuItem value={20}>20</MenuItem>
@@ -291,28 +455,58 @@ export default function AdminUser360Tabs({
       return () => clearTimeout(tid)
       // eslint-disable-next-line react-hooks/exhaustive-deps -- debounce filter only
     }, [typeDraft])
+
+    const quick = [
+      { label: 'All', value: '' },
+      { label: 'Bookings', value: 'booking' },
+      { label: 'Clips', value: 'clip' },
+      { label: 'Admin', value: 'admin' },
+      { label: 'Logins', value: 'login' },
+      { label: 'Reports', value: 'report' }
+    ]
+
     return (
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} sx={{ mb: 2, flexWrap: 'wrap' }} alignItems={{ md: 'center' }} useFlexGap>
-        <TextField
-          size='small'
-          label='Filter by type (substring)'
-          placeholder='booking, clip, admin_audit, login…'
-          value={typeDraft}
-          onChange={e => setTypeDraft(e.target.value)}
-          sx={{ minWidth: { xs: '100%', md: 280 } }}
-        />
-        <TextField
-          size='small'
-          select
-          label='Limit'
-          value={aq.limit || 30}
-          onChange={e => onQueryChange('activity', { limit: Number(e.target.value), page: 1 })}
-          sx={{ minWidth: { xs: '100%', md: 110 } }}
-        >
-          <MenuItem value={20}>20</MenuItem>
-          <MenuItem value={30}>30</MenuItem>
-          <MenuItem value={50}>50</MenuItem>
-        </TextField>
+      <Stack spacing={2}>
+        <Stack direction='row' flexWrap='wrap' useFlexGap spacing={1} alignItems='center'>
+          {quick.map(q => {
+            const selected = q.value === '' ? !aq.eventType : String(aq.eventType) === q.value
+            return (
+              <Chip
+                key={q.label}
+                label={q.label}
+                onClick={() => {
+                  setTypeDraft(q.value)
+                  onQueryChange('activity', { eventType: q.value, page: 1 })
+                }}
+                color={selected ? 'primary' : 'default'}
+                variant={selected ? 'filled' : 'outlined'}
+                sx={{ fontWeight: 500 }}
+              />
+            )
+          })}
+        </Stack>
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems={{ md: 'center' }} flexWrap='wrap' useFlexGap>
+          <TextField
+            size='small'
+            label='Custom filter (matches event type)'
+            placeholder='e.g. booking_updated, user_activity…'
+            value={typeDraft}
+            onChange={e => setTypeDraft(e.target.value)}
+            sx={{ minWidth: { xs: '100%', md: 320 }, flex: 1 }}
+          />
+          <TextField
+            size='small'
+            select
+            label='Rows'
+            value={aq.limit || 30}
+            onChange={e => onQueryChange('activity', { limit: Number(e.target.value), page: 1 })}
+            sx={{ minWidth: 100 }}
+          >
+            <MenuItem value={20}>20</MenuItem>
+            <MenuItem value={30}>30</MenuItem>
+            <MenuItem value={50}>50</MenuItem>
+          </TextField>
+        </Stack>
       </Stack>
     )
   }
@@ -323,259 +517,506 @@ export default function AdminUser360Tabs({
     const limit = pagination?.limit || 20
     const maxPage = Math.max(1, Math.ceil(total / limit))
     return (
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ xs: 'stretch', sm: 'center' }} sx={{ mt: 2 }}>
-        <Typography variant='body2'>Page {page} of {maxPage} (Total: {total})</Typography>
-        <Button size='small' variant='outlined' fullWidth={true} disabled={page <= 1} onClick={() => onQueryChange(section, { page: page - 1 })}>
-          Prev
-        </Button>
-        <Button size='small' variant='outlined' fullWidth={true} disabled={page >= maxPage} onClick={() => onQueryChange(section, { page: page + 1 })}>
-          Next
-        </Button>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent='space-between' sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: 'divider' }}>
+        <Typography variant='body2' color='text.secondary'>
+          Page <strong>{page}</strong> of <strong>{maxPage}</strong>
+          <Box component='span' sx={{ mx: 1, opacity: 0.4 }}>|</Box>
+          {total} total rows
+        </Typography>
+        <Stack direction='row' spacing={1}>
+          <Button size='small' variant='outlined' disabled={page <= 1} onClick={() => onQueryChange(section, { page: page - 1 })}>
+            Previous
+          </Button>
+          <Button size='small' variant='outlined' disabled={page >= maxPage} onClick={() => onQueryChange(section, { page: page + 1 })}>
+            Next
+          </Button>
+        </Stack>
       </Stack>
     )
   }
 
   const kv = (label, value) => (
     <Grid item xs={12} sm={6} md={4}>
-      <Typography variant='caption' color='text.secondary'>{label}</Typography>
-      <Typography variant='body2' sx={{ wordBreak: 'break-word' }}>{value ?? '—'}</Typography>
+      <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 600 }}>{label}</Typography>
+      <Typography variant='body2' sx={{ wordBreak: 'break-word', mt: 0.25 }}>{value ?? '—'}</Typography>
     </Grid>
   )
 
   return (
-    <Box sx={{ mt: 2, width: '100%', overflowX: 'hidden' }}>
-      <Tabs value={tab} onChange={(_, value) => onTabChange(value)} variant='scrollable' scrollButtons='auto'>
-        <Tab label='Overview' />
-        <Tab label='Lessons' />
-        <Tab label='Reviews' />
-        <Tab label='Clips' />
-        <Tab label='PDF Plans' />
-        <Tab label='Activity' />
-      </Tabs>
+    <Box sx={{ width: '100%', overflowX: 'hidden' }}>
+      <Box
+        sx={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 10,
+          bgcolor: alpha(theme.palette.background.paper, 0.92),
+          backdropFilter: 'blur(8px)',
+          borderBottom: 1,
+          borderColor: 'divider'
+        }}
+      >
+        <Tabs
+          value={tab}
+          onChange={(_, value) => onTabChange(value)}
+          variant='scrollable'
+          scrollButtons='auto'
+          sx={{
+            px: { xs: 1, md: 2 },
+            minHeight: 48,
+            '& .MuiTab-root': { textTransform: 'none', fontWeight: 600, minHeight: 48 }
+          }}
+        >
+          {tabLabels.map((label, i) => (
+            <Tab key={label} label={label} id={`user360-tab-${i}`} />
+          ))}
+        </Tabs>
+      </Box>
 
-      <Box sx={{ mt: 2 }}>
+      <Box>
         {tab === 0 && (
-          <SectionCard title='User overview'>
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 2 }} alignItems={{ md: 'flex-start' }}>
-              <Avatar src={media.profile_picture_url || safeImg(profile?.profile_picture)} sx={{ width: 88, height: 88 }} />
-              <Box sx={{ flex: 1 }}>
-                <Typography variant='h6'>{identity.fullname || profile?.fullname || '—'}</Typography>
-                <Typography variant='body2' color='text.secondary'>{identity.email || profile?.email}</Typography>
-                <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mt: 1 }}>
-                  <Chip size='small' label={`Type: ${identity.account_type || profile?.account_type || '—'}`} />
-                  <Chip size='small' label={`Status: ${identity.status || profile?.status || '—'}`} />
-                  <Chip size='small' label={`Last online: ${summary.lastOnlineAt || overview.lastOnlineAt ? new Date(summary.lastOnlineAt || overview.lastOnlineAt).toLocaleString() : '—'}`} />
-                </Stack>
+          <SectionShell
+            title='Profile & account snapshot'
+            subtitle='High-signal fields for identity, wallet, and engagement counts. Expand JSON for full notification prefs and extraInfo.'
+          >
+            <Stack direction={{ xs: 'column', lg: 'row' }} spacing={3} alignItems={{ lg: 'flex-start' }}>
+              <Stack alignItems='center' spacing={1.5} sx={{ minWidth: { lg: 200 } }}>
+                <Avatar
+                  src={media.profile_picture_url || safeImg(profile?.profile_picture)}
+                  sx={{ width: 112, height: 112, boxShadow: 2, border: `3px solid ${theme.palette.background.paper}` }}
+                />
+                <Chip
+                  label={identity.account_type || profile?.account_type || '—'}
+                  color='primary'
+                  variant='outlined'
+                  size='small'
+                />
+                <Chip
+                  label={`Account: ${identity.status || profile?.status || '—'}`}
+                  size='small'
+                  variant='outlined'
+                />
+              </Stack>
+              <Box sx={{ flex: 1, width: '100%' }}>
+                <Typography variant='h5' sx={{ fontWeight: 700, mb: 0.5 }}>
+                  {identity.fullname || profile?.fullname || '—'}
+                </Typography>
+                <Typography variant='body1' color='primary' sx={{ mb: 2 }}>
+                  {identity.email || profile?.email || '—'}
+                </Typography>
+
+                <Paper elevation={0} sx={{ p: 2, mb: 3, borderRadius: 2, bgcolor: alpha(theme.palette.info.main, 0.06), border: `1px solid ${alpha(theme.palette.info.main, 0.2)}` }}>
+                  <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700 }}>Last activity</Typography>
+                  <Typography variant='body1' sx={{ mt: 0.5, fontWeight: 600 }}>{lastOnlineLabel}</Typography>
+                </Paper>
+
+                <Typography variant='subtitle2' sx={{ mb: 1.5, fontWeight: 700 }}>Engagement</Typography>
+                <Grid container spacing={1.5} sx={{ mb: 3 }}>
+                  <Grid item xs={6} sm={4} md={2}>
+                    <StatTile label='Lessons' value={summary.lessonsCount} />
+                  </Grid>
+                  <Grid item xs={6} sm={4} md={2}>
+                    <StatTile label='Completed' value={summary.completedLessonsCount} />
+                  </Grid>
+                  <Grid item xs={6} sm={4} md={2}>
+                    <StatTile label='Reviews' value={summary.reviewsCount} />
+                  </Grid>
+                  <Grid item xs={6} sm={4} md={2}>
+                    <StatTile label='Clips' value={summary.clipsCount} />
+                  </Grid>
+                  <Grid item xs={6} sm={4} md={2}>
+                    <StatTile label='PDF / plans' value={summary.reportsCount} />
+                  </Grid>
+                  <Grid item xs={6} sm={4} md={2}>
+                    <StatTile label='Friends' value={summary.friendsCount} />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <StatTile label='In-app notifications (rows)' value={summary.notificationsCount} />
+                  </Grid>
+                </Grid>
+
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant='subtitle2' sx={{ mb: 1, fontWeight: 700 }}>Identity</Typography>
+                    <Grid container spacing={1.5}>
+                      {kv('User ID', userId || profile?._id)}
+                      {kv('Mobile', identity.mobile_no)}
+                      {kv('Login type', identity.login_type)}
+                      {kv('Category', identity.category)}
+                      {kv('Created', identity.createdAt ? new Date(identity.createdAt).toLocaleString() : null)}
+                      {kv('Updated', identity.updatedAt ? new Date(identity.updatedAt).toLocaleString() : null)}
+                    </Grid>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant='subtitle2' sx={{ mb: 1, fontWeight: 700 }}>Wallet & compliance</Typography>
+                    <Grid container spacing={1.5}>
+                      {kv('Wallet balance', money.wallet_amount != null ? String(money.wallet_amount) : null)}
+                      {kv('Stripe account', money.stripe_account_id)}
+                      {kv('KYC', money.is_kyc_completed != null ? (money.is_kyc_completed ? 'Yes' : 'No') : null)}
+                      {kv('Stripe onboarding', money.is_registered_with_stript != null ? (money.is_registered_with_stript ? 'Yes' : 'No') : null)}
+                      {kv('Commission', money.commission)}
+                    </Grid>
+                  </Grid>
+                </Grid>
+
+                <Accordion sx={{ mt: 3, borderRadius: '8px !important', '&:before': { display: 'none' }, boxShadow: 'none', border: 1, borderColor: 'divider' }} disableGutters>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography fontWeight={600}>Notification preferences &amp; extraInfo (raw JSON)</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Box
+                      component='pre'
+                      sx={{
+                        p: 2,
+                        borderRadius: 1,
+                        bgcolor: alpha(theme.palette.common.black, 0.04),
+                        overflow: 'auto',
+                        maxHeight: 360,
+                        fontSize: 12,
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+                      }}
+                    >
+                      {JSON.stringify({ notifications: preferences.notifications, extraInfo: preferences.extraInfo }, null, 2)}
+                    </Box>
+                  </AccordionDetails>
+                </Accordion>
               </Box>
             </Stack>
-
-            <Typography variant='subtitle2' sx={{ mt: 2, mb: 1 }}>Counts</Typography>
-            <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
-              <Chip label={`Lessons: ${summary.lessonsCount ?? 0}`} />
-              <Chip label={`Completed: ${summary.completedLessonsCount ?? 0}`} />
-              <Chip label={`Reviews: ${summary.reviewsCount ?? 0}`} />
-              <Chip label={`Clips: ${summary.clipsCount ?? 0}`} />
-              <Chip label={`Plans: ${summary.reportsCount ?? 0}`} />
-              <Chip label={`Friends: ${summary.friendsCount ?? 0}`} />
-              <Chip label={`Notifications (inbox rows): ${summary.notificationsCount ?? 0}`} />
-            </Stack>
-
-            <Typography variant='subtitle2' sx={{ mb: 1 }}>Identity</Typography>
-            <Grid container spacing={1.5}>
-              {kv('Mobile', identity.mobile_no)}
-              {kv('Login type', identity.login_type)}
-              {kv('Category', identity.category)}
-              {kv('Created', identity.createdAt ? new Date(identity.createdAt).toLocaleString() : null)}
-              {kv('Updated', identity.updatedAt ? new Date(identity.updatedAt).toLocaleString() : null)}
-            </Grid>
-
-            <Typography variant='subtitle2' sx={{ mt: 2, mb: 1 }}>Wallet &amp; compliance</Typography>
-            <Grid container spacing={1.5}>
-              {kv('Wallet', money.wallet_amount != null ? String(money.wallet_amount) : null)}
-              {kv('Stripe account', money.stripe_account_id)}
-              {kv('KYC completed', money.is_kyc_completed != null ? String(money.is_kyc_completed) : null)}
-              {kv('Registered with Stripe', money.is_registered_with_stript != null ? String(money.is_registered_with_stript) : null)}
-              {kv('Commission', money.commission)}
-            </Grid>
-
-            <Accordion sx={{ mt: 2 }}>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Notification preferences &amp; extra profile (JSON)</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography component='pre' variant='caption' sx={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', mb: 2 }}>
-                  {JSON.stringify({ notifications: preferences.notifications, extraInfo: preferences.extraInfo }, null, 2)}
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-          </SectionCard>
+          </SectionShell>
         )}
 
         {tab === 1 && (
-          <SectionCard title='Lessons and Requests'>
+          <SectionShell
+            title='Lessons & bookings'
+            subtitle='Sessions where this user is trainer or trainee. Use filters to narrow; actions support soft/hard delete per policy.'
+            action={<ToolbarRefreshExport busy={loadingLessons} onExport={() => downloadCsv(lessonsItems, 'admin-lessons.csv')} />}
+          >
             <QueryToolbar section='lessons' sectionQuery={query?.lessons} lessonSortOptions={true} />
+            <Divider sx={{ my: 2 }} />
             {loadingLessons ? (
-              <Box sx={{ py: 4, display: 'flex', justifyContent: 'center' }}><CircularProgress size={28} /></Box>
+              <Box sx={{ py: 8, display: 'flex', justifyContent: 'center' }}><CircularProgress /></Box>
             ) : null}
-            <Button size='small' sx={{ mb: 2, width: { xs: '100%', sm: 'auto' } }} onClick={() => downloadCsv(lessonsItems, 'admin-lessons.csv')}>Export CSV</Button>
-            {!loadingLessons && lessonsItems.length ? lessonsItems.map(lesson => (
-              <Box key={lesson?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5, wordBreak: 'break-word' }}>
-                <Typography variant='body2'>Date: {lesson?.booked_date ? new Date(lesson.booked_date).toLocaleString() : '-'}</Typography>
-                <Typography variant='body2'>Time: {lesson?.session_start_time || '-'} - {lesson?.session_end_time || '-'}</Typography>
-                <Typography variant='body2'>Status: {lesson?.status || '-'}</Typography>
-                <Typography variant='body2'>Trainer: {renderParty(lesson?.trainer_id)}</Typography>
-                <Typography variant='body2'>Trainee: {renderParty(lesson?.trainee_id)}</Typography>
-                <Box sx={{ mt: 1 }}>
-                  <DeleteActions entityType='booked_session' entityId={lesson?._id} onDeleted={onRefresh} hardDeletePolicy={hardDeletePolicy} />
-                </Box>
-              </Box>
-            )) : null}
-            {!loadingLessons && !lessonsItems.length ? <Typography>No lessons found.</Typography> : null}
+            {!loadingLessons && lessonsItems.length ? (
+              <TableContainer component={Paper} elevation={0} sx={{ border: 1, borderColor: 'divider', borderRadius: 2 }}>
+                <Table size='small' stickyHeader>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Booked</TableCell>
+                      <TableCell>Window</TableCell>
+                      <TableCell>Status</TableCell>
+                      <TableCell>Trainer</TableCell>
+                      <TableCell>Trainee</TableCell>
+                      <TableCell align='right'>Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {lessonsItems.map(lesson => (
+                      <TableRow key={lesson?._id} hover>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{lesson?.booked_date ? new Date(lesson.booked_date).toLocaleDateString() : '—'}</TableCell>
+                        <TableCell>{lesson?.session_start_time || '—'} – {lesson?.session_end_time || '—'}</TableCell>
+                        <TableCell>
+                          <Chip size='small' label={lesson?.status || '—'} color={lessonStatusColor(lesson?.status)} variant='outlined' />
+                        </TableCell>
+                        <TableCell sx={{ maxWidth: 200 }}>{renderParty(lesson?.trainer_id)}</TableCell>
+                        <TableCell sx={{ maxWidth: 200 }}>{renderParty(lesson?.trainee_id)}</TableCell>
+                        <TableCell align='right'>
+                          <DeleteActions entityType='booked_session' entityId={lesson?._id} onDeleted={onRefresh} hardDeletePolicy={hardDeletePolicy} />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            ) : null}
+            {!loadingLessons && !lessonsItems.length ? (
+              <EmptyHint icon={EventNoteOutlinedIcon} title='No lessons in this view' hint='Clear search or status filters, or check the other user role (trainer vs trainee).' />
+            ) : null}
             <PaginationBar section='lessons' pagination={lessons?.pagination} />
-          </SectionCard>
+          </SectionShell>
         )}
 
         {tab === 2 && (
-          <SectionCard title='Reviews'>
+          <SectionShell
+            title='Reviews'
+            subtitle='Derived from booked sessions that include ratings.'
+            action={<ToolbarRefreshExport busy={loadingReviews} onExport={() => downloadCsv(reviewsItems, 'admin-reviews.csv')} />}
+          >
             <QueryToolbar section='reviews' sectionQuery={query?.reviews} lessonSortOptions={true} />
+            <Divider sx={{ my: 2 }} />
             {loadingReviews ? (
-              <Box sx={{ py: 4, display: 'flex', justifyContent: 'center' }}><CircularProgress size={28} /></Box>
+              <Box sx={{ py: 8, display: 'flex', justifyContent: 'center' }}><CircularProgress /></Box>
             ) : null}
-            <Button size='small' sx={{ mb: 2, width: { xs: '100%', sm: 'auto' } }} onClick={() => downloadCsv(reviewsItems, 'admin-reviews.csv')}>Export CSV</Button>
-            {!loadingReviews && reviewsItems.length ? reviewsItems.map(review => (
-              <Box key={review?.session_id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5, wordBreak: 'break-word' }}>
-                <Typography variant='body2'>Session: {String(review?.session_id)}</Typography>
-                <Typography variant='body2'>Date: {review?.booked_date ? new Date(review.booked_date).toLocaleString() : '-'}</Typography>
-                <Typography variant='body2'>Status: {review?.status || '-'}</Typography>
-                <Typography variant='body2'>Trainer: {renderParty(review?.trainer)}</Typography>
-                <Typography variant='body2'>Trainee: {renderParty(review?.trainee)}</Typography>
-                <Typography variant='body2'>Ratings: {review?.ratings ? JSON.stringify(review.ratings) : '-'}</Typography>
-              </Box>
-            )) : null}
-            {!loadingReviews && !reviewsItems.length ? <Typography>No reviews found.</Typography> : null}
+            {!loadingReviews && reviewsItems.length ? (
+              <TableContainer component={Paper} elevation={0} sx={{ border: 1, borderColor: 'divider', borderRadius: 2 }}>
+                <Table size='small' stickyHeader>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Session</TableCell>
+                      <TableCell>Date</TableCell>
+                      <TableCell>Status</TableCell>
+                      <TableCell>Trainer</TableCell>
+                      <TableCell>Trainee</TableCell>
+                      <TableCell>Ratings</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {reviewsItems.map(review => (
+                      <TableRow key={String(review?.session_id)} hover>
+                        <TableCell sx={{ fontFamily: 'monospace', fontSize: 12 }}>{String(review?.session_id)}</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{review?.booked_date ? new Date(review.booked_date).toLocaleString() : '—'}</TableCell>
+                        <TableCell>
+                          <Chip size='small' label={review?.status || '—'} color={lessonStatusColor(review?.status)} variant='outlined' />
+                        </TableCell>
+                        <TableCell sx={{ maxWidth: 180 }}>{renderParty(review?.trainer)}</TableCell>
+                        <TableCell sx={{ maxWidth: 180 }}>{renderParty(review?.trainee)}</TableCell>
+                        <TableCell sx={{ maxWidth: 280, fontSize: 12, wordBreak: 'break-word' }}>
+                          {review?.ratings ? JSON.stringify(review.ratings) : '—'}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            ) : null}
+            {!loadingReviews && !reviewsItems.length ? (
+              <EmptyHint icon={EventNoteOutlinedIcon} title='No reviews' hint='This user may not have completed dual-sided ratings yet.' />
+            ) : null}
             <PaginationBar section='reviews' pagination={reviews?.pagination} />
-          </SectionCard>
+          </SectionShell>
         )}
 
         {tab === 3 && (
-          <SectionCard title='Clips'>
+          <SectionShell
+            title='Video clips'
+            subtitle='Thumbnails use the same CDN rules as the main product. Play opens a signed or public stream.'
+            action={<ToolbarRefreshExport busy={loadingAssets} onExport={() => downloadCsv(clipsItems, 'admin-clips.csv')} />}
+          >
             <QueryToolbar section='assets' sectionQuery={query?.assets} lessonSortOptions={false} />
+            <Divider sx={{ my: 2 }} />
             {loadingAssets ? (
-              <Box sx={{ py: 4, display: 'flex', justifyContent: 'center' }}><CircularProgress size={28} /></Box>
+              <Box sx={{ py: 8, display: 'flex', justifyContent: 'center' }}><CircularProgress /></Box>
             ) : null}
-            <Button size='small' sx={{ mb: 2, width: { xs: '100%', sm: 'auto' } }} onClick={() => downloadCsv(clipsItems, 'admin-clips.csv')}>Export CSV</Button>
-            {!loadingAssets && clipsItems.length ? clipsItems.map(item => (
-              <Box key={item?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5, wordBreak: 'break-word' }}>
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'flex-start' }}>
-                  {item?.thumbnail ? (
-                    <Box
-                      component='img'
-                      src={safeImg(item.thumbnail)}
-                      alt=''
-                      sx={{ width: 120, height: 68, objectFit: 'cover', borderRadius: 1, bgcolor: '#f3f4f6' }}
-                    />
-                  ) : null}
-                  <Box sx={{ flex: 1 }}>
-                    <Typography variant='body2'>Title: {item?.title || '-'}</Typography>
-                    <Typography variant='body2'>Category: {item?.category || '-'}</Typography>
-                    <Typography variant='body2'>File: {item?.file_name || '-'}</Typography>
-                    <Typography variant='body2'>Type: {item?.file_type || '-'}</Typography>
-                    <Stack direction='row' spacing={1} sx={{ mt: 1 }} flexWrap='wrap' useFlexGap>
-                      <Button size='small' variant='contained' onClick={() => setPlayClipId(String(item._id))}>Play</Button>
-                      <DeleteActions entityType='clip' entityId={item?._id} onDeleted={onRefresh} hardDeletePolicy={hardDeletePolicy} />
-                    </Stack>
-                  </Box>
-                </Stack>
-              </Box>
-            )) : null}
-            {!loadingAssets && !clipsItems.length ? <Typography>No clips found.</Typography> : null}
+            {!loadingAssets && clipsItems.length ? (
+              <Grid container spacing={2}>
+                {clipsItems.map(item => (
+                  <Grid item xs={12} sm={6} lg={4} key={item?._id}>
+                    <Card variant='outlined' sx={{ height: '100%', borderRadius: 2, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                      <Box
+                        sx={{
+                          position: 'relative',
+                          pt: '56.25%',
+                          bgcolor: 'grey.100',
+                          backgroundImage: item?.thumbnail ? `url(${safeImg(item.thumbnail)})` : undefined,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center'
+                        }}
+                      />
+                      <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <Typography variant='subtitle1' sx={{ fontWeight: 700, lineHeight: 1.3 }}>{item?.title || 'Untitled'}</Typography>
+                        <Typography variant='caption' color='text.secondary'>{item?.category || '—'} · {item?.file_type || '—'}</Typography>
+                        <Typography variant='caption' sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{item?.file_name || '—'}</Typography>
+                        <Stack direction='row' spacing={1} sx={{ mt: 'auto', pt: 1 }} flexWrap='wrap' useFlexGap>
+                          <Button size='small' variant='contained' onClick={() => setPlayClipId(String(item._id))} sx={{ textTransform: 'none' }}>
+                            Play
+                          </Button>
+                          <DeleteActions entityType='clip' entityId={item?._id} onDeleted={onRefresh} hardDeletePolicy={hardDeletePolicy} />
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            ) : null}
+            {!loadingAssets && !clipsItems.length ? (
+              <EmptyHint icon={InboxOutlinedIcon} title='No clips' hint='Try clearing search or confirm clips are not soft-deleted.' />
+            ) : null}
             <PaginationBar section='assets' pagination={assets?.clips?.pagination} />
-          </SectionCard>
+          </SectionShell>
         )}
 
         {tab === 4 && (
-          <SectionCard title='PDF Plans and Session Reports'>
+          <SectionShell
+            title='PDF plans & saved sessions'
+            subtitle='Reports and saved session files for this user. Pagination applies to both lists together.'
+            action={(
+              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                <ToolbarRefreshExport
+                  busy={loadingAssets}
+                  exportLabel='Export reports'
+                  onExport={() => downloadCsv(reportItems, 'admin-pdf-reports.csv')}
+                />
+                <Button size='small' variant='outlined' startIcon={<FileDownloadOutlinedIcon />} onClick={() => downloadCsv(savedItems, 'admin-saved-sessions.csv')} disabled={loadingAssets} sx={{ textTransform: 'none' }}>
+                  Export saved
+                </Button>
+              </Stack>
+            )}
+          >
             <QueryToolbar section='assets' sectionQuery={query?.assets} lessonSortOptions={false} />
+            <Divider sx={{ my: 2 }} />
             {loadingAssets ? (
-              <Box sx={{ py: 4, display: 'flex', justifyContent: 'center' }}><CircularProgress size={28} /></Box>
+              <Box sx={{ py: 8, display: 'flex', justifyContent: 'center' }}><CircularProgress /></Box>
             ) : null}
-            <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 1 }}>
-              Pagination applies to both reports and saved sessions (same page size).
-            </Typography>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mb: 2 }}>
-              <Button size='small' fullWidth={true} onClick={() => downloadCsv(reportItems, 'admin-pdf-reports.csv')}>Export Reports CSV</Button>
-              <Button size='small' fullWidth={true} onClick={() => downloadCsv(savedItems, 'admin-saved-sessions.csv')}>Export Sessions CSV</Button>
-            </Stack>
-            {!loadingAssets && reportItems.length ? reportItems.map(item => (
-              <Box key={item?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5, wordBreak: 'break-word' }}>
-                <Typography variant='body2'>Title: {item?.title || '-'}</Typography>
-                <Typography variant='body2'>Session: {item?.sessions?._id || '-'}</Typography>
-                <Typography variant='body2'>Trainer: {item?.trainer?.fullname || '-'}</Typography>
-                <Typography variant='body2'>Trainee: {item?.trainee?.fullname || '-'}</Typography>
-                <Typography variant='body2'>Recording: {item?.sessionRecordingUrl || '-'}</Typography>
-                <Box sx={{ mt: 1 }}>
-                  <DeleteActions entityType='report' entityId={item?._id} onDeleted={onRefresh} hardDeletePolicy={hardDeletePolicy} />
-                </Box>
-              </Box>
-            )) : null}
-            {!loadingAssets && !reportItems.length ? <Typography>No plans/reports found.</Typography> : null}
+            <Typography variant='subtitle2' sx={{ mb: 1, fontWeight: 700 }}>Session reports</Typography>
+            {!loadingAssets && reportItems.length ? (
+              <TableContainer component={Paper} elevation={0} sx={{ border: 1, borderColor: 'divider', borderRadius: 2, mb: 3 }}>
+                <Table size='small'>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Title</TableCell>
+                      <TableCell>Session</TableCell>
+                      <TableCell>Trainer</TableCell>
+                      <TableCell>Trainee</TableCell>
+                      <TableCell>Recording key</TableCell>
+                      <TableCell align='right'>Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {reportItems.map(item => (
+                      <TableRow key={item?._id} hover>
+                        <TableCell sx={{ fontWeight: 600 }}>{item?.title || '—'}</TableCell>
+                        <TableCell sx={{ fontFamily: 'monospace', fontSize: 12 }}>{item?.sessions?._id || '—'}</TableCell>
+                        <TableCell>{item?.trainer?.fullname || '—'}</TableCell>
+                        <TableCell>{item?.trainee?.fullname || '—'}</TableCell>
+                        <TableCell sx={{ maxWidth: 220, wordBreak: 'break-all', fontSize: 12 }}>{item?.sessionRecordingUrl || '—'}</TableCell>
+                        <TableCell align='right'>
+                          <DeleteActions entityType='report' entityId={item?._id} onDeleted={onRefresh} hardDeletePolicy={hardDeletePolicy} />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            ) : null}
+            {!loadingAssets && !reportItems.length ? (
+              <EmptyHint title='No reports' hint='No PDF / session reports for this filter.' />
+            ) : null}
 
-            <Typography variant='subtitle1' sx={{ mt: 2, mb: 1 }}>Saved Sessions</Typography>
-            {!loadingAssets && savedItems.length ? savedItems.map(item => (
-              <Box key={item?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5, wordBreak: 'break-word' }}>
-                <Typography variant='body2'>File: {item?.file_name || '-'}</Typography>
-                <Typography variant='body2'>Trainer: {item?.trainer_name || '-'}</Typography>
-                <Typography variant='body2'>Trainee: {item?.trainee_name || '-'}</Typography>
-                <Box sx={{ mt: 1 }}>
-                  <DeleteActions entityType='saved_session' entityId={item?._id} onDeleted={onRefresh} hardDeletePolicy={hardDeletePolicy} />
-                </Box>
-              </Box>
-            )) : null}
-            {!loadingAssets && !savedItems.length ? <Typography>No saved sessions found.</Typography> : null}
+            <Typography variant='subtitle2' sx={{ mb: 1, fontWeight: 700 }}>Saved sessions</Typography>
+            {!loadingAssets && savedItems.length ? (
+              <TableContainer component={Paper} elevation={0} sx={{ border: 1, borderColor: 'divider', borderRadius: 2 }}>
+                <Table size='small'>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>File</TableCell>
+                      <TableCell>Trainer</TableCell>
+                      <TableCell>Trainee</TableCell>
+                      <TableCell align='right'>Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {savedItems.map(item => (
+                      <TableRow key={item?._id} hover>
+                        <TableCell sx={{ fontWeight: 500 }}>{item?.file_name || '—'}</TableCell>
+                        <TableCell>{item?.trainer_name || '—'}</TableCell>
+                        <TableCell>{item?.trainee_name || '—'}</TableCell>
+                        <TableCell align='right'>
+                          <DeleteActions entityType='saved_session' entityId={item?._id} onDeleted={onRefresh} hardDeletePolicy={hardDeletePolicy} />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            ) : null}
+            {!loadingAssets && !savedItems.length ? (
+              <EmptyHint title='No saved sessions' hint='Saved session files will appear here when present.' />
+            ) : null}
             <PaginationBar section='assets' pagination={assets?.reports?.pagination} />
-          </SectionCard>
+          </SectionShell>
         )}
 
         {tab === 5 && (
-          <SectionCard title='Activity timeline'>
-            <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
-              Merged history: bookings, clips, reports, saved sessions, admin actions, trainer online snapshot, and recorded user events (login, profile, etc.).
-            </Typography>
+          <SectionShell
+            title='Unified activity timeline'
+            subtitle='Newest first: bookings, clips, reports, admin actions, online snapshots, and instrumented user events. Use quick filters or a custom substring.'
+            action={(
+              <ToolbarRefreshExport
+                busy={loadingTimeline}
+                exportLabel='Export timeline'
+                onExport={() =>
+                  downloadCsv(
+                    timelineItems.map(row => ({
+                      type: row.type,
+                      at: row.at,
+                      title: row.title,
+                      meta: JSON.stringify(row.meta || {})
+                    })),
+                    'admin-user-timeline.csv'
+                  )
+                }
+              />
+            )}
+          >
             <ActivityToolbar />
+            <Divider sx={{ my: 2 }} />
             {loadingTimeline ? (
-              <Box sx={{ py: 4, display: 'flex', justifyContent: 'center' }}><CircularProgress size={28} /></Box>
+              <Box sx={{ py: 8, display: 'flex', justifyContent: 'center' }}><CircularProgress /></Box>
             ) : null}
-            <Button
-              size='small'
-              sx={{ mb: 2, width: { xs: '100%', sm: 'auto' } }}
-              onClick={() =>
-                downloadCsv(
-                  timelineItems.map(row => ({
-                    type: row.type,
-                    at: row.at,
-                    title: row.title,
-                    meta: JSON.stringify(row.meta || {})
-                  })),
-                  'admin-user-timeline.csv'
-                )}
-            >
-              Export CSV
-            </Button>
-            {!loadingTimeline && timelineItems.length ? timelineItems.map((item, idx) => (
-              <Box key={`${item.at}-${item.type}-${idx}`} sx={{ borderBottom: '1px dashed #ddd', py: 1.5, wordBreak: 'break-word' }}>
-                <Typography variant='caption' color='text.secondary'>{item.at ? new Date(item.at).toLocaleString() : '—'}</Typography>
-                <Typography variant='body2' sx={{ fontWeight: 600 }}>{item.type}</Typography>
-                <Typography variant='body2'>{item.title}</Typography>
-                {item.meta && Object.keys(item.meta).length ? (
-                  <Typography variant='caption' component='pre' sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', mt: 0.5 }}>
-                    {JSON.stringify(item.meta, null, 2)}
-                  </Typography>
-                ) : null}
-              </Box>
-            )) : null}
-            {!loadingTimeline && !timelineItems.length ? <Typography>No activity in this view.</Typography> : null}
+            {!loadingTimeline && timelineItems.length ? (
+              <Stack spacing={0} sx={{ position: 'relative' }}>
+                {timelineItems.map((item, idx) => {
+                  const dot = timelineDotColor(item.type)
+                  const rowKey = `${item.at}-${item.type}-${idx}`
+                  const hasMeta = item.meta && Object.keys(item.meta).length > 0
+                  return (
+                    <Stack key={rowKey} direction='row' spacing={2} sx={{ pb: 2.5 }}>
+                      <Stack alignItems='center' sx={{ width: 24, flexShrink: 0 }}>
+                        <Box
+                          sx={{
+                            width: 12,
+                            height: 12,
+                            borderRadius: '50%',
+                            bgcolor: timelineDotBg(item.type, theme),
+                            mt: 0.75,
+                            boxShadow: 1
+                          }}
+                        />
+                        {idx < timelineItems.length - 1 ? (
+                          <Box sx={{ width: 2, flex: 1, minHeight: 24, bgcolor: 'divider', mt: 0.5 }} />
+                        ) : null}
+                      </Stack>
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 600 }}>
+                          {item.at ? new Date(item.at).toLocaleString() : '—'}
+                        </Typography>
+                        <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap sx={{ mt: 0.5 }}>
+                          <Chip label={item.type} size='small' color={dot === 'default' ? 'default' : dot} variant='outlined' sx={{ fontWeight: 600 }} />
+                          <Typography variant='body1' sx={{ fontWeight: 600 }}>{item.title}</Typography>
+                        </Stack>
+                        {hasMeta ? (
+                          <>
+                            <Button size='small' onClick={() => setMetaOpenId(metaOpenId === rowKey ? null : rowKey)} sx={{ mt: 1, textTransform: 'none', p: 0, minWidth: 0 }}>
+                              {metaOpenId === rowKey ? 'Hide details' : 'Show details'}
+                            </Button>
+                            <Collapse in={metaOpenId === rowKey}>
+                              <Box
+                                component='pre'
+                                sx={{
+                                  p: 1.5,
+                                  mt: 1,
+                                  borderRadius: 1,
+                                  bgcolor: alpha(theme.palette.common.black, 0.04),
+                                  fontSize: 12,
+                                  overflow: 'auto',
+                                  maxHeight: 280,
+                                  fontFamily: 'ui-monospace, Menlo, monospace'
+                                }}
+                              >
+                                {JSON.stringify(item.meta, null, 2)}
+                              </Box>
+                            </Collapse>
+                          </>
+                        ) : null}
+                      </Box>
+                    </Stack>
+                  )
+                })}
+              </Stack>
+            ) : null}
+            {!loadingTimeline && !timelineItems.length ? (
+              <EmptyHint title='Nothing in this view' hint='Clear filters or widen the event type. New events appear after user actions are instrumented.' />
+            ) : null}
             <PaginationBar section='activity' pagination={timeline?.pagination} />
-          </SectionCard>
+          </SectionShell>
         )}
       </Box>
 
