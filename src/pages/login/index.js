@@ -24,7 +24,6 @@ import MuiFormControlLabel from '@mui/material/FormControlLabel'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
-import Alert from '@mui/material/Alert'
 import { isAdminRegisterEnabled, showAdminMfaNotice } from 'src/configs/adminEnv'
 
 // ** Third Party Imports
