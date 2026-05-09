@@ -20,16 +20,27 @@ import AnalyticsOverview from 'src/views/dashboards/analytics/AnalyticsOverview'
 import AnalyticsTotalRevenue from 'src/views/dashboards/analytics/AnalyticsTotalRevenue'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 import authConfig from 'src/configs/auth'
 import Modal from '../components/modal/Modal'
 import CommissionForm from 'src/layouts/components/student/CommissionForm'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import ActiveUsersTable from '../components/tables/UsersTable'
+import { useAdminRealtime } from 'src/context/AdminRealtimeContext'
 
 const Home = () => {
+  const router = useRouter()
+  const { metrics, socketConnected } = useAdminRealtime()
 
   const [comission, setComission] = useState([]);
   const [commissionModal, setComissionModal] = useState(false);
+
+  const fmtMoney = v =>
+    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(
+      Number(v) || 0
+    )
+  const fmtInt = v => new Intl.NumberFormat('en-US').format(Number(v) || 0)
+  const liveHint = socketConnected ? 'Live' : '…'
 
   useEffect(() => {
     getGlobalCommission()
@@ -101,7 +112,13 @@ const Home = () => {
 
           <Grid item xs={12} md={8} container spacing={6}>
             <Grid item xs={6}>
-              <AnalyticsTotalRevenue />
+              <AnalyticsTotalRevenue
+                valueText={metrics ? fmtMoney(metrics.totalRevenue) : '—'}
+                trendText={liveHint}
+                trendPositive={socketConnected}
+                chipSubtext='Paid bookings (excl. canceled)'
+                onClick={() => router.push('/apps/booking')}
+              />
             </Grid>
             {/* <Grid item xs={3}>
               <CardStatisticsVertical
@@ -118,29 +135,49 @@ const Home = () => {
             <Grid item xs={3}>
               <CardStatisticsVertical
                 color='info'
-                stats='142.8k'
-                trendNumber='+62%'
-                chipText='Last One Year'
+                stats={metrics ? fmtInt(metrics.totalImpressions) : '—'}
+                trendNumber={liveHint}
+                trend='positive'
+                chipText='Published clips (live)'
                 title='Total Impressions'
                 icon={<Icon icon='mdi:link' />}
+                onCardClick={() => router.push('/apps/manage-trainer')}
               />
             </Grid>
             <Grid item xs={3}>
-              <AnalyticsOverview />
+              <AnalyticsOverview
+                valueText={
+                  metrics
+                    ? `${fmtInt(metrics.trainersCount)} / ${fmtInt(metrics.traineesCount)}`
+                    : '—'
+                }
+                trendText={liveHint}
+                trendPositive={socketConnected}
+                radialPercent={metrics?.overviewCompletionPercent ?? 0}
+                caption='Session completion rate'
+                onClick={() => router.push('/apps/booking')}
+              />
             </Grid>
           </Grid>
           <Grid item xs={6} md={2}>
             <CardStatisticsVertical
-              stats='155k'
+              stats={metrics ? fmtInt(metrics.totalOrders) : '—'}
               color='primary'
-              trendNumber='+22%'
+              trendNumber={liveHint}
+              trend='positive'
               title='Total Orders'
-              chipText='Last 4 Month'
+              chipText='Paid bookings (live)'
               icon={<Icon icon='mdi:cart-plus' />}
+              onCardClick={() => router.push('/apps/booking')}
             />
           </Grid>
           <Grid item xs={6} md={2}>
-            <AnalyticsSessions />
+            <AnalyticsSessions
+              valueText={metrics ? fmtInt(metrics.totalSessions) : '—'}
+              trendText={liveHint}
+              trendPositive={socketConnected}
+              onClick={() => router.push('/apps/booking')}
+            />
           </Grid>
         </Grid>
       </ApexChartWrapper>

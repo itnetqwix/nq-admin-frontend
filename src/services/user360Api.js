@@ -1,4 +1,5 @@
 import authConfig from 'src/configs/auth'
+import { requireApiBaseUrl } from 'src/utils/apiBase'
 
 const getAuthHeaders = () => {
   const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
@@ -8,8 +9,11 @@ const getAuthHeaders = () => {
   }
 }
 
+const apiUrl = path => `${requireApiBaseUrl()}${path.startsWith('/') ? path : `/${path}`}`
+
 export const getUser360 = async userId => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/user-360/${userId}`, {
+  if (!userId || userId === 'undefined') throw new Error('Invalid user id')
+  const response = await fetch(apiUrl(`/admin/user-360/${userId}`), {
     method: 'GET',
     headers: getAuthHeaders()
   })
@@ -28,7 +32,8 @@ const toQueryString = query => {
 }
 
 export const getUserLessons = async (userId, query = {}) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/user-lessons/${userId}${toQueryString(query)}`, {
+  if (!userId || userId === 'undefined') throw new Error('Invalid user id')
+  const response = await fetch(apiUrl(`/admin/user-lessons/${userId}${toQueryString(query)}`), {
     method: 'GET',
     headers: getAuthHeaders()
   })
@@ -38,7 +43,8 @@ export const getUserLessons = async (userId, query = {}) => {
 }
 
 export const getUserReviews = async (userId, query = {}) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/user-reviews/${userId}${toQueryString(query)}`, {
+  if (!userId || userId === 'undefined') throw new Error('Invalid user id')
+  const response = await fetch(apiUrl(`/admin/user-reviews/${userId}${toQueryString(query)}`), {
     method: 'GET',
     headers: getAuthHeaders()
   })
@@ -48,7 +54,8 @@ export const getUserReviews = async (userId, query = {}) => {
 }
 
 export const getUserAssets = async (userId, query = {}) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/user-assets/${userId}${toQueryString(query)}`, {
+  if (!userId || userId === 'undefined') throw new Error('Invalid user id')
+  const response = await fetch(apiUrl(`/admin/user-assets/${userId}${toQueryString(query)}`), {
     method: 'GET',
     headers: getAuthHeaders()
   })
@@ -67,20 +74,19 @@ export const deleteAdminEntity = async ({ entityType, entityId, mode = 'soft', r
   const params = new URLSearchParams()
   if (mode) params.set('mode', mode)
   if (reason) params.set('reason', reason)
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/entity/${entityType}/${entityId}?${params.toString()}`,
-    {
-      method: 'DELETE',
-      headers: getAuthHeaders()
-    }
-  )
+  const response = await fetch(apiUrl(`/admin/entity/${entityType}/${entityId}?${params.toString()}`), {
+    method: 'DELETE',
+    headers: getAuthHeaders()
+  })
   const data = await response.json()
   if (!response.ok || data?.status === 'fail') throw new Error(data?.error || 'Delete failed')
   return data?.result
 }
 
 export const getAuditLogs = async (userId, query = {}) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/audit-logs${toQueryString({ userId, ...query })}`, {
+  const q = { ...query }
+  if (userId && userId !== 'undefined') q.userId = userId
+  const response = await fetch(apiUrl(`/admin/audit-logs${toQueryString(q)}`), {
     method: 'GET',
     headers: getAuthHeaders()
   })

@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import axios from 'axios'
 import authConfig from 'src/configs/auth'
 import { useAuth } from 'src/hooks/useAuth'
+import { getApiBaseUrl } from 'src/utils/apiBase'
 // import { useAuth } from 'src/hooks/useAuth'
 
 const defaultProvider = {
@@ -47,11 +48,18 @@ const CommonProvider = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?._id])
 
-  const getTrainersList = async () => {
+  const getTrainersList = async (search = '') => {
+    const base = getApiBaseUrl()
     const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+    if (!base) {
+      console.error('NEXT_PUBLIC_API_BASE_URL is missing; cannot load trainers.')
+      setTrainerList([])
+      return
+    }
     if (storedToken) {
       // setLoading(true);
-      await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + '/user/get-all-trainer', {
+      const qs = search && String(search).trim() ? `?search=${encodeURIComponent(String(search).trim())}` : ''
+      await fetch(`${base}/user/get-all-trainer${qs}`, {
         headers: {
           'Authorization': `Bearer ${storedToken}`
         }
@@ -75,11 +83,18 @@ const CommonProvider = ({ children }) => {
     }
   }
 
-  const getTraineesList = async () => {
+  const getTraineesList = async (search = '') => {
+    const base = getApiBaseUrl()
     const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+    if (!base) {
+      console.error('NEXT_PUBLIC_API_BASE_URL is missing; cannot load trainees.')
+      setTraineeList([])
+      return
+    }
     if (storedToken) {
       // setLoading(true)
-      await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + '/user/get-all-trainee', {
+      const qs = search && String(search).trim() ? `?search=${encodeURIComponent(String(search).trim())}` : ''
+      await fetch(`${base}/user/get-all-trainee${qs}`, {
         headers: {
           'Authorization': `Bearer ${storedToken}`
         }

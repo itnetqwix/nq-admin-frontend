@@ -13,14 +13,21 @@ import Icon from 'src/@core/components/icon'
 
 const CardStatsVertical = props => {
   // ** Props
-  const { title, color, icon, stats, chipText, trendNumber, trend = 'positive' } = props
+  const { title, color, icon, stats, chipText, trendNumber, trend = 'positive', onCardClick } = props
 
   function handleOnClickIcon() {
     if (props?.isCommission) props.onClick()
   }
 
   return (
-    <Card>
+    <Card
+      onClick={onCardClick}
+      sx={
+        onCardClick
+          ? { cursor: 'pointer', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 6 } }
+          : undefined
+      }
+    >
       <CardContent sx={{ display: 'flex', flexDirection: 'column' }}>
         <Box sx={{ mb: 6, width: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
           <CustomAvatar skin='light' variant='rounded' color={color} onClick={handleOnClickIcon}>

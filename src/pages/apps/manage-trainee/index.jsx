@@ -1,5 +1,6 @@
 import { Autocomplete, Avatar, Badge, Box, Button, CircularProgress, Container, Divider, FormControl, FormControlLabel, FormHelperText, Grid, IconButton, InputLabel, MenuItem, Radio, RadioGroup, TextField, Typography, useMediaQuery } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/router";
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -16,7 +17,7 @@ import Link from "next/link";
 import MenuIcon from '@mui/icons-material/Menu';
 import { CustomButton } from "src/pages/components/common";
 import { useCommon } from "src/hooks/useCommon";
-import { debouncedSearchMedicine, getImageUrl } from "src/utils/utils";
+import { getImageUrl } from "src/utils/utils";
 import TrainerStatus from "src/pages/components/trainer-status";
 import toast from "react-hot-toast";
 import UserQuickPreviewModal from "src/pages/components/user360/UserQuickPreviewModal";
@@ -31,6 +32,8 @@ import { getUser360 } from "src/services/user360Api";
 
 
 export default function ManageTrainee() {
+  const router = useRouter();
+  const searchTimerRef = useRef(null);
 
   const common = useCommon();
 
@@ -47,6 +50,7 @@ export default function ManageTrainee() {
   const [isQuickPreviewOpen, setIsQuickPreviewOpen] = useState(false)
   const [selectedStudentData, setSelectedStudentData] = useState({})
   const [isQuickPreviewLoading, setIsQuickPreviewLoading] = useState(false);
+  const [previewUserId, setPreviewUserId] = useState(null);
 
 
   const [tableData, setTableData] = useState([]);
@@ -57,9 +61,11 @@ export default function ManageTrainee() {
     }
   }, [traineeList])
 
-  async function getSearchValue(searchText) {
-    const searchResults = await debouncedSearchMedicine(searchText, traineeList, "fullname")
-    setTableData(searchResults)
+  function scheduleTraineeSearch(searchText) {
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
+    searchTimerRef.current = setTimeout(() => {
+      getTraineesList(searchText || "")
+    }, 400)
   }
 
 
@@ -152,11 +158,13 @@ export default function ManageTrainee() {
 
 
   const handleCourseClick = async (id) => {
+    if (id == null || id === "undefined") return
+    setPreviewUserId(String(id))
     setIsQuickPreviewOpen(true)
     setIsQuickPreviewLoading(true)
     try {
       const data = await getUser360(id)
-      setSelectedStudentData(data)
+      setSelectedStudentData(data || {})
     } catch (error) {
       toast.error(error?.message || "Unable to load user preview")
       setSelectedStudentData({})
@@ -175,10 +183,13 @@ export default function ManageTrainee() {
     <>
       <UserQuickPreviewModal
         open={isQuickPreviewOpen}
-        handleClose={() => setIsQuickPreviewOpen(false)}
+        handleClose={() => {
+          setIsQuickPreviewOpen(false)
+          setPreviewUserId(null)
+        }}
         loading={isQuickPreviewLoading}
         user360Data={selectedStudentData}
-        userId={selectedStudentData?.user?._id || selectedStudentData?._id}
+        userId={previewUserId || selectedStudentData?.user?._id || selectedStudentData?.user?.id}
       />
       <Grid container spacing={3} sx={{ width: "100%" }}>
         <Grid item xs={12} md={12} lg={12} xl={12} >
@@ -215,7 +226,7 @@ export default function ManageTrainee() {
                       </InputLabel>
                       <TextField
                         size="small"
-                        onChange={(e) => getSearchValue(e.target.value)}
+                        onChange={(e) => scheduleTraineeSearch(e.target.value)}
                       // sx={{ borderRadius: "0px", border: "none" }}
                       />
                     </Box>
@@ -224,6 +235,12 @@ export default function ManageTrainee() {
 
                   <div style={{ height: "71vh", width: '100%' }}>
                     <DataGrid
+                      disableSelectionOnClick
+                      onRowClick={(params) => {
+                        const rid = params?.row?.id || params?.row?._id
+                        if (rid) router.push(`/apps/users/${rid}`)
+                      }}
+                      sx={{ '& .MuiDataGrid-row': { cursor: 'pointer' } }}
                       // rows={rows}
                       // columns={columns}
                       // headerClassName={styles['header-class']}

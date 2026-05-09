@@ -1,5 +1,5 @@
-import { Box, Button, Chip, MenuItem, Stack, Tab, Tabs, TextField, Typography } from '@mui/material'
-import { useMemo, useState } from 'react'
+import { Box, Button, Chip, CircularProgress, MenuItem, Stack, Tab, Tabs, TextField, Typography } from '@mui/material'
+import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import { deleteAdminEntity } from 'src/services/user360Api'
 
@@ -79,6 +79,8 @@ const DeleteActions = ({ entityType, entityId, onDeleted, hardDeletePolicy }) =>
 const renderParty = party => party ? `${party?.fullname || ''} (${party?.account_type || '-'})` : '-'
 
 export default function AdminUser360Tabs({
+  tab,
+  onTabChange,
   userData,
   lessons = { items: [], pagination: { page: 1, limit: 20, total: 0 } },
   reviews = { items: [], pagination: { page: 1, limit: 20, total: 0 } },
@@ -88,13 +90,15 @@ export default function AdminUser360Tabs({
     savedSessions: { items: [], pagination: { page: 1, limit: 20, total: 0 } }
   },
   auditLogs = { items: [], pagination: { page: 1, limit: 20, total: 0 } },
+  loadingLessons = false,
+  loadingReviews = false,
+  loadingAssets = false,
+  loadingAudit = false,
   onRefresh,
   query,
   onQueryChange,
   hardDeletePolicy
 }) {
-  const [tab, setTab] = useState(0)
-
   const overview = useMemo(() => userData?.summary || {}, [userData])
   const profile = userData?.user || {}
   const lessonsItems = lessons?.items || []
@@ -104,13 +108,27 @@ export default function AdminUser360Tabs({
   const savedItems = assets?.savedSessions?.items || []
   const auditItems = auditLogs?.items || []
 
-  const QueryToolbar = ({ section, sectionQuery }) => (
-    <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} sx={{ mb: 2, flexWrap: 'wrap' }} useFlexGap>
+  const QueryToolbar = ({ section, sectionQuery }) => {
+    const [searchDraft, setSearchDraft] = useState(sectionQuery?.search ?? '')
+    useEffect(() => {
+      setSearchDraft(sectionQuery?.search ?? '')
+    }, [section, sectionQuery?.search])
+    useEffect(() => {
+      const tid = setTimeout(() => {
+        if (searchDraft !== (sectionQuery?.search ?? '')) {
+          onQueryChange(section, { search: searchDraft, page: 1 })
+        }
+      }, 450)
+      return () => clearTimeout(tid)
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- debounce search input only
+    }, [searchDraft])
+    return (
+    <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} sx={{ mb: 2, flexWrap: 'wrap' }} alignItems={{ md: 'center' }} useFlexGap>
       <TextField
         size='small'
-        label='Search'
-        value={sectionQuery?.search || ''}
-        onChange={e => onQueryChange(section, { search: e.target.value, page: 1 })}
+        label='Search (server)'
+        value={searchDraft}
+        onChange={e => setSearchDraft(e.target.value)}
         sx={{ minWidth: { xs: '100%', md: 220 } }}
       />
       <TextField
@@ -158,7 +176,8 @@ export default function AdminUser360Tabs({
         <MenuItem value={50}>50</MenuItem>
       </TextField>
     </Stack>
-  )
+    )
+  }
 
   const PaginationBar = ({ section, pagination }) => {
     const page = pagination?.page || 1
@@ -180,7 +199,7 @@ export default function AdminUser360Tabs({
 
   return (
     <Box sx={{ mt: 2, width: '100%', overflowX: 'hidden' }}>
-      <Tabs value={tab} onChange={(_, value) => setTab(value)} variant='scrollable' scrollButtons='auto'>
+      <Tabs value={tab} onChange={(_, value) => onTabChange(value)} variant='scrollable' scrollButtons='auto'>
         <Tab label='Overview' />
         <Tab label='Lessons' />
         <Tab label='Reviews' />
@@ -209,8 +228,11 @@ export default function AdminUser360Tabs({
         {tab === 1 && (
           <SectionCard title='Lessons and Requests'>
             <QueryToolbar section='lessons' sectionQuery={query?.lessons} />
+            {loadingLessons ? (
+              <Box sx={{ py: 4, display: 'flex', justifyContent: 'center' }}><CircularProgress size={28} /></Box>
+            ) : null}
             <Button size='small' sx={{ mb: 2, width: { xs: '100%', sm: 'auto' } }} onClick={() => downloadCsv(lessonsItems, 'admin-lessons.csv')}>Export CSV</Button>
-            {lessonsItems.length ? lessonsItems.map(lesson => (
+            {!loadingLessons && lessonsItems.length ? lessonsItems.map(lesson => (
               <Box key={lesson?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5, wordBreak: 'break-word' }}>
                 <Typography variant='body2'>Date: {lesson?.booked_date ? new Date(lesson.booked_date).toLocaleString() : '-'}</Typography>
                 <Typography variant='body2'>Time: {lesson?.session_start_time || '-'} - {lesson?.session_end_time || '-'}</Typography>
@@ -221,7 +243,8 @@ export default function AdminUser360Tabs({
                   <DeleteActions entityType='booked_session' entityId={lesson?._id} onDeleted={onRefresh} hardDeletePolicy={hardDeletePolicy} />
                 </Box>
               </Box>
-            )) : <Typography>No lessons found.</Typography>}
+            )) : null}
+            {!loadingLessons && !lessonsItems.length ? <Typography>No lessons found.</Typography> : null}
             <PaginationBar section='lessons' pagination={lessons?.pagination} />
           </SectionCard>
         )}
@@ -229,8 +252,11 @@ export default function AdminUser360Tabs({
         {tab === 2 && (
           <SectionCard title='Reviews'>
             <QueryToolbar section='reviews' sectionQuery={query?.reviews} />
+            {loadingReviews ? (
+              <Box sx={{ py: 4, display: 'flex', justifyContent: 'center' }}><CircularProgress size={28} /></Box>
+            ) : null}
             <Button size='small' sx={{ mb: 2, width: { xs: '100%', sm: 'auto' } }} onClick={() => downloadCsv(reviewsItems, 'admin-reviews.csv')}>Export CSV</Button>
-            {reviewsItems.length ? reviewsItems.map(review => (
+            {!loadingReviews && reviewsItems.length ? reviewsItems.map(review => (
               <Box key={review?.session_id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5, wordBreak: 'break-word' }}>
                 <Typography variant='body2'>Session: {String(review?.session_id)}</Typography>
                 <Typography variant='body2'>Date: {review?.booked_date ? new Date(review.booked_date).toLocaleString() : '-'}</Typography>
@@ -239,7 +265,8 @@ export default function AdminUser360Tabs({
                 <Typography variant='body2'>Trainee: {renderParty(review?.trainee)}</Typography>
                 <Typography variant='body2'>Ratings: {review?.ratings ? JSON.stringify(review.ratings) : '-'}</Typography>
               </Box>
-            )) : <Typography>No reviews found.</Typography>}
+            )) : null}
+            {!loadingReviews && !reviewsItems.length ? <Typography>No reviews found.</Typography> : null}
             <PaginationBar section='reviews' pagination={reviews?.pagination} />
           </SectionCard>
         )}
@@ -247,8 +274,11 @@ export default function AdminUser360Tabs({
         {tab === 3 && (
           <SectionCard title='Clips'>
             <QueryToolbar section='assets' sectionQuery={query?.assets} />
+            {loadingAssets ? (
+              <Box sx={{ py: 4, display: 'flex', justifyContent: 'center' }}><CircularProgress size={28} /></Box>
+            ) : null}
             <Button size='small' sx={{ mb: 2, width: { xs: '100%', sm: 'auto' } }} onClick={() => downloadCsv(clipsItems, 'admin-clips.csv')}>Export CSV</Button>
-            {clipsItems.length ? clipsItems.map(item => (
+            {!loadingAssets && clipsItems.length ? clipsItems.map(item => (
               <Box key={item?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5, wordBreak: 'break-word' }}>
                 <Typography variant='body2'>Title: {item?.title || '-'}</Typography>
                 <Typography variant='body2'>Category: {item?.category || '-'}</Typography>
@@ -258,7 +288,8 @@ export default function AdminUser360Tabs({
                   <DeleteActions entityType='clip' entityId={item?._id} onDeleted={onRefresh} hardDeletePolicy={hardDeletePolicy} />
                 </Box>
               </Box>
-            )) : <Typography>No clips found.</Typography>}
+            )) : null}
+            {!loadingAssets && !clipsItems.length ? <Typography>No clips found.</Typography> : null}
             <PaginationBar section='assets' pagination={assets?.clips?.pagination} />
           </SectionCard>
         )}
@@ -266,11 +297,17 @@ export default function AdminUser360Tabs({
         {tab === 4 && (
           <SectionCard title='PDF Plans and Session Reports'>
             <QueryToolbar section='assets' sectionQuery={query?.assets} />
+            {loadingAssets ? (
+              <Box sx={{ py: 4, display: 'flex', justifyContent: 'center' }}><CircularProgress size={28} /></Box>
+            ) : null}
+            <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 1 }}>
+              Pagination applies to both reports and saved sessions (same page size).
+            </Typography>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mb: 2 }}>
               <Button size='small' fullWidth={true} onClick={() => downloadCsv(reportItems, 'admin-pdf-reports.csv')}>Export Reports CSV</Button>
               <Button size='small' fullWidth={true} onClick={() => downloadCsv(savedItems, 'admin-saved-sessions.csv')}>Export Sessions CSV</Button>
             </Stack>
-            {reportItems.length ? reportItems.map(item => (
+            {!loadingAssets && reportItems.length ? reportItems.map(item => (
               <Box key={item?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5, wordBreak: 'break-word' }}>
                 <Typography variant='body2'>Title: {item?.title || '-'}</Typography>
                 <Typography variant='body2'>Session: {item?.sessions?._id || '-'}</Typography>
@@ -281,10 +318,11 @@ export default function AdminUser360Tabs({
                   <DeleteActions entityType='report' entityId={item?._id} onDeleted={onRefresh} hardDeletePolicy={hardDeletePolicy} />
                 </Box>
               </Box>
-            )) : <Typography>No plans/reports found.</Typography>}
+            )) : null}
+            {!loadingAssets && !reportItems.length ? <Typography>No plans/reports found.</Typography> : null}
 
             <Typography variant='subtitle1' sx={{ mt: 2, mb: 1 }}>Saved Sessions</Typography>
-            {savedItems.length ? savedItems.map(item => (
+            {!loadingAssets && savedItems.length ? savedItems.map(item => (
               <Box key={item?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5, wordBreak: 'break-word' }}>
                 <Typography variant='body2'>File: {item?.file_name || '-'}</Typography>
                 <Typography variant='body2'>Trainer: {item?.trainer_name || '-'}</Typography>
@@ -293,7 +331,8 @@ export default function AdminUser360Tabs({
                   <DeleteActions entityType='saved_session' entityId={item?._id} onDeleted={onRefresh} hardDeletePolicy={hardDeletePolicy} />
                 </Box>
               </Box>
-            )) : <Typography>No saved sessions found.</Typography>}
+            )) : null}
+            {!loadingAssets && !savedItems.length ? <Typography>No saved sessions found.</Typography> : null}
             <PaginationBar section='assets' pagination={assets?.reports?.pagination} />
           </SectionCard>
         )}
@@ -301,8 +340,11 @@ export default function AdminUser360Tabs({
         {tab === 5 && (
           <SectionCard title='Admin Activity / Audit'>
             <QueryToolbar section='activity' sectionQuery={query?.activity} />
+            {loadingAudit ? (
+              <Box sx={{ py: 4, display: 'flex', justifyContent: 'center' }}><CircularProgress size={28} /></Box>
+            ) : null}
             <Button size='small' sx={{ mb: 2, width: { xs: '100%', sm: 'auto' } }} onClick={() => downloadCsv(auditItems, 'admin-activity.csv')}>Export CSV</Button>
-            {auditItems.length ? auditItems.map(item => (
+            {!loadingAudit && auditItems.length ? auditItems.map(item => (
               <Box key={item?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5, wordBreak: 'break-word' }}>
                 <Typography variant='body2'>Action: {item?.action || '-'}</Typography>
                 <Typography variant='body2'>Entity: {item?.entity_type || '-'} / {item?.entity_id || '-'}</Typography>
@@ -311,7 +353,8 @@ export default function AdminUser360Tabs({
                 <Typography variant='body2'>When: {item?.createdAt ? new Date(item.createdAt).toLocaleString() : '-'}</Typography>
                 <Typography variant='body2'>Reason: {item?.reason || '-'}</Typography>
               </Box>
-            )) : <Typography>No activity found.</Typography>}
+            )) : null}
+            {!loadingAudit && !auditItems.length ? <Typography>No activity found.</Typography> : null}
             <PaginationBar section='activity' pagination={auditLogs?.pagination} />
           </SectionCard>
         )}

@@ -1,5 +1,6 @@
 import { Autocomplete, Avatar, Badge, Box, Button, CircularProgress, Container, Divider, FormControl, FormControlLabel, FormHelperText, Grid, IconButton, InputLabel, MenuItem, Radio, RadioGroup, TextField, Typography, useMediaQuery } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/router";
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -21,7 +22,7 @@ import AddEditCommision from "src/pages/components/add-edit-commision";
 import { useAuth } from "src/hooks/useAuth";
 import { useCommon } from "src/hooks/useCommon";
 import authConfig from 'src/configs/auth'
-import { debouncedSearchMedicine, getImageUrl } from "src/utils/utils";
+import { getImageUrl } from "src/utils/utils";
 import TicketStatusComponent from "src/pages/components/ticket-status";
 import TrainerStatus from "src/pages/components/trainer-status";
 import toast from "react-hot-toast";
@@ -61,6 +62,8 @@ function CustomPagination() {
 }
 
 export default function ManageTrainer() {
+  const router = useRouter();
+  const searchTimerRef = useRef(null);
 
   const auth = useAuth();
   const common = useCommon();
@@ -88,13 +91,16 @@ export default function ManageTrainer() {
   const [isQuickPreviewOpen, setIsQuickPreviewOpen] = useState(false)
   const [selectedStudentData, setSelectedStudentData] = useState({})
   const [isQuickPreviewLoading, setIsQuickPreviewLoading] = useState(false)
+  const [previewUserId, setPreviewUserId] = useState(null)
 
   const handleCourseClick = async (id) => {
+    if (id == null || id === "undefined") return
+    setPreviewUserId(String(id))
     setIsQuickPreviewOpen(true)
     setIsQuickPreviewLoading(true)
     try {
       const data = await getUser360(id)
-      setSelectedStudentData(data)
+      setSelectedStudentData(data || {})
     } catch (error) {
       toast.error(error?.message || "Unable to load user preview")
       setSelectedStudentData({})
@@ -193,7 +199,6 @@ export default function ManageTrainer() {
     { field: 'fullname', headerName: 'Trainer Name', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 180 },
     { field: 'email', headerName: 'Trainer Email', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 200 },
     { field: 'mobile_no', headerName: 'Mobile Number', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
-    ,
     {
       field: 'status',
       headerName: 'Status',
@@ -279,19 +284,24 @@ export default function ManageTrainer() {
     }
   }, [trainerList])
 
-  async function getSearchValue(searchText) {
-    const searchResults = await debouncedSearchMedicine(searchText, trainerList, "fullname")
-    setTableData(searchResults)
+  function scheduleTrainerSearch(searchText) {
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
+    searchTimerRef.current = setTimeout(() => {
+      getTrainersList(searchText || "")
+    }, 400)
   }
 
   return (
     <React.Fragment>
       <UserQuickPreviewModal
         open={isQuickPreviewOpen}
-        handleClose={() => setIsQuickPreviewOpen(false)}
+        handleClose={() => {
+          setIsQuickPreviewOpen(false)
+          setPreviewUserId(null)
+        }}
         loading={isQuickPreviewLoading}
         user360Data={selectedStudentData}
-        userId={selectedStudentData?.user?._id || selectedStudentData?._id}
+        userId={previewUserId || selectedStudentData?.user?._id || selectedStudentData?.user?.id}
       />
       <Grid container spacing={3} sx={{ width: "100%" }}>
         <Grid item xs={12} md={12} lg={12} xl={12} >
@@ -325,7 +335,7 @@ export default function ManageTrainer() {
                       </InputLabel>
                       <TextField
                         size="small"
-                        onChange={(e) => getSearchValue(e.target.value)}
+                        onChange={(e) => scheduleTrainerSearch(e.target.value)}
                       />
                     </Box>
 
@@ -333,6 +343,12 @@ export default function ManageTrainer() {
 
                   <div style={{ height: "71vh", width: '100%' }}>
                     <DataGrid
+                      disableSelectionOnClick
+                      onRowClick={(params) => {
+                        const rid = params?.row?.id || params?.row?._id
+                        if (rid) router.push(`/apps/users/${rid}`)
+                      }}
+                      sx={{ '& .MuiDataGrid-row': { cursor: 'pointer' } }}
                       // rows={rows}
                       // columns={columns}
                       // headerClassName={styles['header-class']}

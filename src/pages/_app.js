@@ -35,6 +35,7 @@ import Spinner from 'src/@core/components/spinner'
 
 // ** Contexts
 import { AuthProvider } from 'src/context/AuthContext'
+import { AdminRealtimeProvider } from 'src/context/AdminRealtimeContext'
 import { CommonProvider } from 'src/context/CommonContext'
 import { SettingsConsumer, SettingsProvider } from 'src/@core/context/settingsContext'
 
@@ -112,6 +113,7 @@ const App = props => {
       </Head>
 
       <AuthProvider>
+        <AdminRealtimeProvider>
         <CommonProvider>
           <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>
             <SettingsConsumer>
@@ -132,6 +134,7 @@ const App = props => {
             </SettingsConsumer>
           </SettingsProvider>
         </CommonProvider>
+        </AdminRealtimeProvider>
       </AuthProvider>
     </CacheProvider>
 
