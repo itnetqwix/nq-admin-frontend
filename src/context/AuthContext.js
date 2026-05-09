@@ -34,6 +34,11 @@ const AuthProvider = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const isAdminAccount = accountType => {
+    if (!accountType) return false
+    return String(accountType).trim().toLowerCase() === 'admin'
+  }
+
   const handleLogin = (params, errorCallback) => {
     setLoading(true)
     const options = {
@@ -47,24 +52,31 @@ const AuthProvider = ({ children }) => {
       .then(data => {
         return data.json();
       }).then(response => {
-        if (response.code === 400) {
+        if (response?.code === 400 || response?.status === 'fail') {
           setLoading(false)
-          if (errorCallback) errorCallback(response.error)
+          if (errorCallback) errorCallback(response?.error || 'Email or Password is invalid')
           return;
         }
 
-        if (authConfig.storageTokenKeyName, response?.result?.data.account_type === "Admin") {
-          getUserDetails(response?.result?.data.access_token)
-        }
-        else {
+        const accountType = response?.result?.data?.account_type
+        const accessToken = response?.result?.data?.access_token
+
+        if (!accessToken) {
           setLoading(false)
-          if (errorCallback) errorCallback("Please login with admin account")
-          return;
+          if (errorCallback) errorCallback('Login failed: access token not found.')
+          return
         }
 
+        if (isAdminAccount(accountType)) {
+          getUserDetails(accessToken)
+        } else {
+          setLoading(false)
+          if (errorCallback) errorCallback('Please login with admin account')
+          return;
+        }
       }).catch(e => {
         setLoading(false)
-        if (errorCallback) errorCallback(e.error)
+        if (errorCallback) errorCallback(e?.error || e?.message || 'Unable to login right now.')
       });
 
   }
