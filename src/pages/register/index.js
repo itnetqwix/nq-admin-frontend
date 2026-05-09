@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 // ** MUI Components
 import Button from '@mui/material/Button'
@@ -35,6 +36,7 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 // ** Demo Imports
 import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
 import Image from 'next/image'
+import toast from 'react-hot-toast'
 
 // ** Styled Components
 const RegisterIllustrationWrapper = styled(Box)(({ theme }) => ({
@@ -95,15 +97,70 @@ const LinkStyled = styled(Link)(({ theme }) => ({
 const Register = () => {
   // ** States
   const [showPassword, setShowPassword] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+  const [formValues, setFormValues] = useState({
+    fullname: '',
+    email: '',
+    mobile_no: '',
+    password: ''
+  })
 
   // ** Hooks
   const theme = useTheme()
   const { settings } = useSettings()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
+  const router = useRouter()
 
   // ** Vars
   const { skin } = settings
   const imageSource = skin === 'bordered' ? 'auth-v2-register-illustration-bordered' : 'auth-v2-register-illustration'
+
+  const handleInputChange = event => {
+    const { name, value } = event.target
+    setFormValues(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleRegister = async event => {
+    event.preventDefault()
+    setErrorMessage('')
+
+    const payload = {
+      fullname: formValues.fullname?.trim(),
+      email: formValues.email?.trim(),
+      mobile_no: formValues.mobile_no?.trim(),
+      password: formValues.password,
+      account_type: 'Admin'
+    }
+
+    if (!payload.fullname || !payload.email || !payload.mobile_no || !payload.password) {
+      setErrorMessage('All fields are required.')
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+
+      const responseData = await response.json()
+      if (!response.ok || responseData?.status === 'fail') {
+        throw new Error(responseData?.error || responseData?.message || 'Unable to create admin account right now.')
+      }
+
+      toast.success('Admin account created successfully. Please login.')
+      router.push('/login')
+    } catch (error) {
+      setErrorMessage(error?.message || 'Unable to create admin account right now.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <Box className='content-right'>
@@ -219,14 +276,43 @@ const Register = () => {
               <TypographyStyled variant='h5'>Adventure starts here 🚀</TypographyStyled>
               <Typography variant='body2'>Make your app management easy and fun!</Typography>
             </Box>
-            <form noValidate autoComplete='off' onSubmit={e => e.preventDefault()}>
-              <TextField autoFocus fullWidth sx={{ mb: 4 }} label='Username' placeholder='johndoe' />
-              <TextField fullWidth label='Email' sx={{ mb: 4 }} placeholder='user@email.com' />
+            <form noValidate autoComplete='off' onSubmit={handleRegister}>
+              <TextField
+                autoFocus
+                fullWidth
+                sx={{ mb: 4 }}
+                label='Full Name'
+                name='fullname'
+                value={formValues.fullname}
+                onChange={handleInputChange}
+                placeholder='John Doe'
+              />
+              <TextField
+                fullWidth
+                label='Email'
+                name='email'
+                value={formValues.email}
+                onChange={handleInputChange}
+                sx={{ mb: 4 }}
+                placeholder='admin@email.com'
+              />
+              <TextField
+                fullWidth
+                label='Mobile Number'
+                name='mobile_no'
+                value={formValues.mobile_no}
+                onChange={handleInputChange}
+                sx={{ mb: 4 }}
+                placeholder='+1 555 123 4567'
+              />
               <FormControl fullWidth>
                 <InputLabel htmlFor='auth-login-v2-password'>Password</InputLabel>
                 <OutlinedInput
                   label='Password'
                   id='auth-login-v2-password'
+                  name='password'
+                  value={formValues.password}
+                  onChange={handleInputChange}
                   type={showPassword ? 'text' : 'password'}
                   endAdornment={
                     <InputAdornment position='end'>
@@ -241,6 +327,11 @@ const Register = () => {
                   }
                 />
               </FormControl>
+              {errorMessage ? (
+                <Typography color='error' variant='body2' sx={{ mt: 2 }}>
+                  {errorMessage}
+                </Typography>
+              ) : null}
 
               <FormControlLabel
                 control={<Checkbox />}
@@ -256,7 +347,7 @@ const Register = () => {
                   </>
                 }
               />
-              <Button fullWidth size='large' type='submit' variant='contained' sx={{ mb: 7 }}>
+              <Button fullWidth size='large' type='submit' variant='contained' sx={{ mb: 7 }} disabled={isSubmitting}>
                 Sign up
               </Button>
               <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>

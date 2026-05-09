@@ -1,7 +1,7 @@
 export default {
   meEndpoint: '/auth/me',
   loginEndpoint: '/jwt/login',
-  registerEndpoint: '/jwt/register',
+  registerEndpoint: '/auth/signup',
   storageTokenKeyName: 'accessToken',
   onTokenExpiration: 'refreshToken' // logout | refreshToken
 }
