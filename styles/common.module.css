@@ -1,18 +1,20 @@
 .row-class {
-    color: black !important;
+    color: #334155;
 }
 
 .header-class {
-    color: black !important;
-    border-right: 1px solid #ccc;
+    color: #475569;
+    font-weight: 600;
+    border-right: 1px solid #e2e8f0;
 }
 
 .header-class-last {
-    color: black !important;
+    color: #475569;
+    font-weight: 600;
 }
 
 .cell-class {
-    border-right: 1px solid #ccc;
+    border-right: 1px solid #e2e8f0;
 }
 
 .cell-class-last {
@@ -20,11 +22,11 @@
 }
 
 .even-row {
-    background-color: white;
+    background-color: #ffffff;
 }
 
 .odd-row {
-    background-color: #f4f4f5;
+    background-color: #f8fafc;
 }
 
 .configured-row {
@@ -169,15 +171,13 @@
     width: 100% !important;
 }
 
-.css-1ko8w3y-MuiButtonBase-root-MuiListItemButton-root.active {
-    background-color: #28a745 !important;
-}
+/* Nav active state is styled in VerticalNavLink (theme); remove legacy green override */
 
 .css-1xk1i05-MuiDataGrid-columnHeaderTitle {
     text-transform: capitalize !important;
-    font-size: 0.8rem !important;
+    font-size: 0.8125rem !important;
     font-weight: 600 !important;
-    color: black !important;
+    color: #475569 !important;
 }
 
 .css-10te5fh-MuiModal-root-MuiDialog-root {

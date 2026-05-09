@@ -4,6 +4,7 @@ import Card from '@mui/material/Card'
 import Typography from '@mui/material/Typography'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
+import Box from '@mui/material/Box'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -89,7 +90,7 @@ const Home = () => {
   return (
     <>
       <ApexChartWrapper>
-        <Grid container spacing={6} className='match-height' sx={{ mb: 2 }}>
+        <Grid container spacing={4} className='match-height' sx={{ mb: 2 }}>
           <Grid item xs={12}>
             <Alert severity='info' icon={false} sx={{ py: 0.5 }}>
               <strong>API:</strong> {getAdminApiEnvLabel()}
@@ -104,28 +105,30 @@ const Home = () => {
           </Grid>
         </Grid>
 
-        <Grid container spacing={6} className='match-height'>
+        <Grid container spacing={4} className='match-height'>
 
           <Grid item xs={12}>
-            <Card>
-              <Grid container alignItems="center">
-                <Grid item xs={10}>
-                  <CardHeader title='Netqwix Global Commission 🚀' />
-                  <CardContent>
-                    <Typography sx={{ mb: 2 }}>The commission will apply from all trainers.</Typography>
+            <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+              <Grid container alignItems='center' spacing={2} sx={{ px: 2, py: 1 }}>
+                <Grid item xs={12} sm={10}>
+                  <CardHeader title='Global commission' sx={{ px: 0, py: 1 }} titleTypographyProps={{ variant: 'h6', fontWeight: 600 }} />
+                  <CardContent sx={{ pt: 0, px: 0, pb: 2 }}>
+                    <Typography variant='body2' color='text.secondary'>
+                      Applies to all trainers. Use the edit control to update the rate.
+                    </Typography>
                   </CardContent>
                 </Grid>
-                <Grid item xs={2} container >
-                  <Typography variant="body1">{comission?.commission ?? 0}%</Typography>
-                  {/* <IconButton aria-label="edit commission">
-                    <EditIcon />
-                  </IconButton> */}
-                  {canEditCommission ? (
-                    <CustomAvatar skin='light' variant='rounded' color='success' onClick={openComissionModal}>
-                      <Icon icon='tabler:edit' />
-                    </CustomAvatar>
-                  ) : null}
-
+                <Grid item xs={12} sm={2}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', sm: 'flex-end' }, gap: 1 }}>
+                    <Typography variant='h6' fontWeight={600}>
+                      {comission?.commission ?? 0}%
+                    </Typography>
+                    {canEditCommission ? (
+                      <CustomAvatar skin='light' variant='rounded' color='primary' onClick={openComissionModal}>
+                        <Icon icon='tabler:edit' />
+                      </CustomAvatar>
+                    ) : null}
+                  </Box>
                 </Grid>
               </Grid>
             </Card>

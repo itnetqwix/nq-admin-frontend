@@ -1,10 +1,12 @@
-import { Box, Button, Container, Divider, Grid, TextField, Typography } from '@mui/material'
+import { Box, Button, Grid, TextField } from '@mui/material'
+import Stack from '@mui/material/Stack'
 import { DataGrid } from '@mui/x-data-grid'
 import { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import styles from 'styles/common.module.css'
 import { getAuditLogs } from 'src/services/user360Api'
 import moment from 'moment'
+import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 
 export default function AuditLogsPage() {
   const [rows, setRows] = useState([])
@@ -89,56 +91,51 @@ export default function AuditLogsPage() {
   ]
 
   return (
-    <Container maxWidth='xl' sx={{ py: 4 }}>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Typography variant='h5' fontWeight={600}>
-            Audit log
-          </Typography>
-          <Typography variant='body2' color='text.secondary'>
-            Admin actions (deletes, refunds, etc.) with filters and CSV export.
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Divider />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <TextField
-            size='small'
-            fullWidth
-            label='Search (reason, action, entity type, id)'
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && void load()}
-          />
-        </Grid>
-        <Grid item xs={12} md={6} sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', alignItems: 'center' }}>
+    <AdminPageShell
+      title='Audit log'
+      subtitle='Admin actions (deletes, refunds, and more). Search, refresh, or export CSV.'
+      actions={
+        <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
           <Button variant='outlined' onClick={() => void load()}>
             Refresh
           </Button>
           <Button variant='contained' onClick={exportCsv} disabled={!rows.length}>
             Export CSV
           </Button>
-        </Grid>
-        <Grid item xs={12}>
-          <Box sx={{ height: 640, width: '100%' }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              loading={loading}
-              paginationMode='server'
-              rowCount={total}
-              paginationModel={{ page, pageSize }}
-              onPaginationModelChange={m => {
-                setPage(m.page)
-                setPageSize(m.pageSize)
-              }}
-              pageSizeOptions={[25, 50, 100]}
-              disableRowSelectionOnClick
+        </Stack>
+      }
+      contentSx={{ p: 0 }}
+    >
+      <AdminPageSection>
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={12} md={8}>
+            <TextField
+              size='small'
+              fullWidth
+              label='Search (reason, action, entity type, id)'
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && void load()}
             />
-          </Box>
+          </Grid>
         </Grid>
-      </Grid>
-    </Container>
+        <Box className='admin-data-grid' sx={{ height: 640, width: '100%' }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            loading={loading}
+            paginationMode='server'
+            rowCount={total}
+            paginationModel={{ page, pageSize }}
+            onPaginationModelChange={m => {
+              setPage(m.page)
+              setPageSize(m.pageSize)
+            }}
+            pageSizeOptions={[25, 50, 100]}
+            disableRowSelectionOnClick
+          />
+        </Box>
+      </AdminPageSection>
+    </AdminPageShell>
   )
 }

@@ -65,6 +65,27 @@ const GlobalStyles = theme => {
         position: 'fixed',
         backgroundColor: theme.palette.primary.main
       }
+    },
+    '.admin-data-grid .MuiDataGrid-root': {
+      border: 'none',
+      borderRadius: '12px',
+      fontSize: '0.875rem'
+    },
+    '.admin-data-grid .MuiDataGrid-columnHeaders': {
+      backgroundColor: theme.palette.mode === 'light' ? '#F8FAFC' : theme.palette.action.hover,
+      borderBottom: `1px solid ${theme.palette.divider}`
+    },
+    '.admin-data-grid .MuiDataGrid-cell': {
+      borderColor: theme.palette.divider
+    },
+    '.admin-data-grid .MuiDataGrid-footerContainer': {
+      borderTop: `1px solid ${theme.palette.divider}`
+    },
+    '.admin-data-grid .MuiDataGrid-columnHeaderTitle': {
+      fontWeight: 600,
+      fontSize: '0.8125rem',
+      letterSpacing: '0.01em',
+      color: theme.palette.mode === 'light' ? '#475569' : theme.palette.text.secondary
     }
   }
 }

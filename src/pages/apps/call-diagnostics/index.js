@@ -1,10 +1,11 @@
-import { Box, Button, Container, Divider, Grid, TextField, Typography } from '@mui/material'
+import { Box, Button, Grid, TextField } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import styles from 'styles/common.module.css'
 import { getCallDiagnostics } from 'src/services/user360Api'
 import moment from 'moment'
+import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 
 export default function CallDiagnosticsPage() {
   const [rows, setRows] = useState([])
@@ -56,43 +57,36 @@ export default function CallDiagnosticsPage() {
   ]
 
   return (
-    <Container maxWidth='xl' sx={{ py: 4 }}>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Typography variant='h5' fontWeight={600}>
-            Call diagnostics
-          </Typography>
-          <Typography variant='body2' color='text.secondary'>
-            Video / session quality events (filter by session or user Mongo id).
-          </Typography>
+    <AdminPageShell
+      title='Call diagnostics'
+      subtitle='Video and session quality events. Filter by session id or user Mongo id, then apply.'
+      actions={
+        <Button variant='contained' onClick={() => void load()}>
+          Apply filters
+        </Button>
+      }
+      contentSx={{ p: 0 }}
+    >
+      <AdminPageSection>
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={12} md={5}>
+            <TextField size='small' fullWidth label='Session id' value={sessionId} onChange={e => setSessionId(e.target.value)} />
+          </Grid>
+          <Grid item xs={12} md={5}>
+            <TextField size='small' fullWidth label='User id' value={userId} onChange={e => setUserId(e.target.value)} />
+          </Grid>
         </Grid>
-        <Grid item xs={12}>
-          <Divider />
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <TextField size='small' fullWidth label='Session id' value={sessionId} onChange={e => setSessionId(e.target.value)} />
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <TextField size='small' fullWidth label='User id' value={userId} onChange={e => setUserId(e.target.value)} />
-        </Grid>
-        <Grid item xs={12} md={4} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Button variant='contained' onClick={() => void load()}>
-            Apply filters
-          </Button>
-        </Grid>
-        <Grid item xs={12}>
-          <Box sx={{ height: 560, width: '100%' }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              loading={loading}
-              pageSizeOptions={[25, 50]}
-              initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
-              disableRowSelectionOnClick
-            />
-          </Box>
-        </Grid>
-      </Grid>
-    </Container>
+        <Box className='admin-data-grid' sx={{ height: 560, width: '100%' }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            loading={loading}
+            pageSizeOptions={[25, 50]}
+            initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
+            disableRowSelectionOnClick
+          />
+        </Box>
+      </AdminPageSection>
+    </AdminPageShell>
   )
 }

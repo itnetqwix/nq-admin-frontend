@@ -1,9 +1,10 @@
-import { Box, Button, Chip, Divider, Grid, InputLabel, TextField, Typography } from "@mui/material";
+import { Box, Button, Chip, InputLabel, Stack, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { DataGrid } from '@mui/x-data-grid';
 import styles from "styles/common.module.css";
 import { getImageUrl } from "src/utils/utils";
 import { useAdminRealtime } from "src/context/AdminRealtimeContext";
+import AdminPageShell, { AdminPageSection } from "src/layouts/components/AdminPageShell";
 
 
 
@@ -68,46 +69,43 @@ export default function ActiveUsersTable() {
     };
 
     return (
-        <Box sx={{ background: "white", padding: 4, marginTop: '24px' }}>
-            <Grid container spacing={3}>
-                <Grid item xs={12}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 }}>
-                        <Typography sx={{ color: "black", fontSize: "18px", fontWeight: "600" }}>
-                            Active User List (Trainers and Trainees)
-                        </Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                            <Chip
-                                size='small'
-                                label={socketConnected ? 'Live · WebSocket' : 'Connecting…'}
-                                color={socketConnected ? 'success' : 'default'}
-                                variant={socketConnected ? 'filled' : 'outlined'}
-                            />
-                            <Button size='small' variant='outlined' onClick={() => void refreshOnlineUsers()}>
-                                Refresh from API
-                            </Button>
-                        </Box>
-                    </Box>
-                    <Divider sx={{ margin: "10px 0" }} />
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mb: 2 }}>
-                        <InputLabel sx={{ color: "black", fontSize: "14px", marginRight: 1 }}>Search</InputLabel>
-                        <TextField
-                            size="small"
-                            onChange={(e) => handleSearch(e.target.value)}
-                        />
-                    </Box>
-                    <div style={{ height: "71vh", width: '100%' }}>
-                        <DataGrid
-                            rows={tableData ?? []}
-                            columns={columns}
-                            headerClassName={styles['header-class']}
-                            pagination
-                            pageSizeOptions={[25, 50]}
-                            disableSelectionOnClick
-                            autoHeight
-                        />
-                    </div>
-                </Grid>
-            </Grid>
+        <Box sx={{ mt: 4, width: '100%' }}>
+        <AdminPageShell
+            title='Who is online now'
+            subtitle='Trainers and trainees currently connected. Data refreshes over the admin realtime channel.'
+            actions={
+                <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
+                    <Chip
+                        size='small'
+                        label={socketConnected ? 'Live · WebSocket' : 'Connecting…'}
+                        color={socketConnected ? 'success' : 'default'}
+                        variant={socketConnected ? 'filled' : 'outlined'}
+                    />
+                    <Button size='small' variant='outlined' onClick={() => void refreshOnlineUsers()}>
+                        Refresh from API
+                    </Button>
+                </Stack>
+            }
+            contentSx={{ p: 0 }}
+        >
+            <AdminPageSection>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                    <InputLabel sx={{ color: 'text.secondary', fontSize: '0.875rem', mr: 0.5 }}>Search</InputLabel>
+                    <TextField size='small' placeholder='Name…' onChange={e => handleSearch(e.target.value)} />
+                </Box>
+                <div className='admin-data-grid' style={{ height: '71vh', width: '100%' }}>
+                    <DataGrid
+                        rows={tableData ?? []}
+                        columns={columns}
+                        headerClassName={styles['header-class']}
+                        pagination
+                        pageSizeOptions={[25, 50]}
+                        disableSelectionOnClick
+                        autoHeight
+                    />
+                </div>
+            </AdminPageSection>
+        </AdminPageShell>
         </Box>
     );
 }

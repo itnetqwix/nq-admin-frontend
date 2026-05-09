@@ -1,4 +1,4 @@
-import { Autocomplete, Avatar, Badge, Box, Button, CircularProgress, Container, Divider, FormControl, FormControlLabel, FormHelperText, Grid, IconButton, InputLabel, MenuItem, Radio, RadioGroup, TextField, Typography, useMediaQuery } from "@mui/material";
+import { Autocomplete, Avatar, Badge, Box, Button, CircularProgress, FormControl, FormControlLabel, FormHelperText, Grid, IconButton, InputLabel, MenuItem, Radio, RadioGroup, TextField, Typography, useMediaQuery } from "@mui/material";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import AddIcon from '@mui/icons-material/Add';
@@ -22,6 +22,7 @@ import TrainerStatus from "src/pages/components/trainer-status";
 import toast from "react-hot-toast";
 import UserQuickPreviewModal from "src/pages/components/user360/UserQuickPreviewModal";
 import { getUser360 } from "src/services/user360Api";
+import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell';
 
 
 {/* <MenuItem value="xs">xs</MenuItem>
@@ -191,49 +192,23 @@ export default function ManageTrainee() {
         user360Data={selectedStudentData}
         userId={previewUserId || selectedStudentData?.user?._id || selectedStudentData?.user?.id}
       />
-      <Grid container spacing={3} sx={{ width: "100%" }}>
-        <Grid item xs={12} md={12} lg={12} xl={12} >
-          <form noValidate autoComplete="off" >
-            <Container maxWidth="xl">
-              <Box sx={{ background: "white", padding: 4 }}>
-                <Grid container spacing={3}>
-                  <Grid item xs={6} lg={6}>
-                    <Typography sx={{ color: "black", fontSize: "18px", fontWeight: "600" }} >Trainee User List</Typography>
-                  </Grid>
-
-                  <Grid item xs={6} lg={6} sx={{ textAlign: "right" }}>
-                    <CustomButton
-                      component={Link}
-                      variant='contained'
-                      href='/apps/manage-trainer'
-                      startIcon={<MenuIcon />} sx={{ backgroundColor: "#14328d", color: "white" }}>
-                      Setting
-                    </CustomButton>
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Divider
-
-                    // sx={{ my: 2 }}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-
-
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', m: 2 }}>
-                      <InputLabel sx={{ color: "black", fontSize: "14px", textAlign: "right" }}>Search
-                      </InputLabel>
-                      <TextField
-                        size="small"
-                        onChange={(e) => scheduleTraineeSearch(e.target.value)}
-                      // sx={{ borderRadius: "0px", border: "none" }}
-                      />
-                    </Box>
-
-                  </Grid>
-
-                  <div style={{ height: "71vh", width: '100%' }}>
+      <form noValidate autoComplete='off'>
+        <AdminPageShell
+          title='Trainees'
+          subtitle='Search and open any trainee in User 360 from a row click.'
+          actions={
+            <CustomButton component={Link} variant='contained' href='/apps/manage-trainer' startIcon={<MenuIcon />}>
+              Settings
+            </CustomButton>
+          }
+          contentSx={{ p: 0 }}
+        >
+          <AdminPageSection>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+              <InputLabel sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>Search</InputLabel>
+              <TextField size='small' placeholder='Name or email…' onChange={e => scheduleTraineeSearch(e.target.value)} />
+            </Box>
+            <div className='admin-data-grid' style={{ height: '71vh', width: '100%' }}>
                     <DataGrid
                       disableSelectionOnClick
                       onRowClick={(params) => {
@@ -288,14 +263,10 @@ export default function ManageTrainee() {
                       getRowHeight={getRowHeight}
                       columnHeaderHeight={80}
                     />
-                  </div>
-
-                </Grid>
-              </Box>
-            </Container>
-          </form>
-        </Grid>
-      </Grid>
+            </div>
+          </AdminPageSection>
+        </AdminPageShell>
+      </form>
 
     </>
   )

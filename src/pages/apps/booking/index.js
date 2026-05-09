@@ -1,11 +1,11 @@
-import { Avatar, Badge, Box, Container, Divider, Grid, IconButton, InputLabel, TextField, Typography } from "@mui/material";
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import { Box, InputLabel, TextField } from "@mui/material";
+import React, { useContext, useEffect, useState } from "react";
 import { AbilityContext } from 'src/layouts/components/acl/Can'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 import styles from "styles/common.module.css";
 
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
+import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
 import Link from "next/link";
 import MenuIcon from '@mui/icons-material/Menu';
@@ -383,67 +383,41 @@ export default function Booking() {
 
   return (
     <>
-      <Grid container spacing={3} sx={{ width: "100%" }}>
-        <Grid item xs={12} md={12} lg={12} xl={12} >
-          <form noValidate autoComplete="off" >
-            <Container maxWidth="xl">
-              <Box sx={{ background: "white", padding: 4 }}>
-                <Grid container spacing={3}>
-                  <Grid item xs={6} lg={6}>
-                    <Typography sx={{ color: "black", fontSize: "18px", fontWeight: "600" }} >Booking List</Typography>
-                  </Grid>
-
-                  <Grid item xs={6} lg={6} sx={{ textAlign: "right" }}>
-                    <CustomButton
-                      component={Link}
-                      variant='contained'
-                      href='/apps/booking'
-                      startIcon={<MenuIcon />} sx={{ backgroundColor: "#14328d", color: "white" }}>
-                      Setting
-                    </CustomButton>
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Divider />
-                  </Grid>
-
-                  <Grid item xs={12}>
-
-
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', m: 2 }}>
-                      <InputLabel sx={{ color: "black", fontSize: "14px", textAlign: "right" }}>Search
-                      </InputLabel>
-                      <TextField
-                        size="small"
-                        onChange={(e) => getSearchValue(e.target.value)}
-                      />
-                    </Box>
-
-                  </Grid>
-
-                  <div style={{ height: "71vh", width: '100%' }}>
-                    <DataGrid
-                      rows={tableData ?? []}
-                      columns={columns}
-                      headerClassName={styles['header-class']}
-                      getRowClassName={getRowClassName}
-                      initialState={{
-                        pagination: {
-                          paginationModel: { page: 0, pageSize: 25 },
-                        },
-                      }}
-                      pageSizeOptions={[25, 50]}
-                      getRowHeight={getRowHeight}
-                      columnHeaderHeight={50}
-                    />
-                  </div>
-
-                </Grid>
-              </Box>
-            </Container>
-          </form>
-        </Grid>
-      </Grid>
+      <form noValidate autoComplete='off'>
+        <AdminPageShell
+          title='Bookings'
+          subtitle='Sessions, confirmations, cancellations, and refunds. Search by booking id.'
+          actions={
+            <CustomButton component={Link} variant='contained' href='/apps/booking' startIcon={<MenuIcon />}>
+              Settings
+            </CustomButton>
+          }
+          contentSx={{ p: 0 }}
+        >
+          <AdminPageSection>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+              <InputLabel sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>Search</InputLabel>
+              <TextField size='small' placeholder='Booking id…' onChange={e => getSearchValue(e.target.value)} />
+            </Box>
+            <div className='admin-data-grid' style={{ height: '71vh', width: '100%' }}>
+              <DataGrid
+                rows={tableData ?? []}
+                columns={columns}
+                headerClassName={styles['header-class']}
+                getRowClassName={getRowClassName}
+                initialState={{
+                  pagination: {
+                    paginationModel: { page: 0, pageSize: 25 }
+                  }
+                }}
+                pageSizeOptions={[25, 50]}
+                getRowHeight={getRowHeight}
+                columnHeaderHeight={50}
+              />
+            </div>
+          </AdminPageSection>
+        </AdminPageShell>
+      </form>
 
       <RefundPopups paymentIntentDetails={paymentIntentDetails} bookingPreview={refundRow} handleClose={handleCloseRefundPopup} open={openRefundPopup} onConform={onConformRefund} />
 

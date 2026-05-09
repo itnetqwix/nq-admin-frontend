@@ -22,24 +22,28 @@ import CanViewNavLink from 'src/layouts/components/acl/CanViewNavLink'
 // ** Util Import
 import { handleURLQueries } from 'src/@core/layouts/utils'
 
-// ** Styled Components
+// ** Styled Components — subtle active rail (minimal)
 const MenuNavLink = styled(ListItemButton)(({ theme }) => ({
   width: '100%',
-  borderRadius: 8,
-  transition: 'padding-left .25s ease-in-out',
+  borderRadius: 10,
+  transition: 'background-color 0.15s ease, color 0.15s ease',
+  '&:hover': {
+    backgroundColor: theme.palette.action.hover
+  },
   '&.active': {
     '&, &:hover': {
-      backgroundColor: theme.palette.primary.light,
+      backgroundColor:
+        theme.palette.mode === 'light' ? 'rgba(37, 99, 235, 0.1)' : 'rgba(59, 130, 246, 0.16)',
       '&.Mui-focusVisible': {
-        backgroundColor: theme.palette.primary.main
+        backgroundColor: theme.palette.mode === 'light' ? 'rgba(37, 99, 235, 0.14)' : 'rgba(59, 130, 246, 0.2)'
       }
     },
     '& .MuiTypography-root': {
-      fontWeight: 500,
-      color: `${theme.palette.common.white} !important`
+      fontWeight: 600,
+      color: `${theme.palette.primary.main} !important`
     },
     '& .MuiListItemIcon-root': {
-      color: `${theme.palette.common.white} !important`
+      color: `${theme.palette.primary.main} !important`
     }
   }
 }))
@@ -87,7 +91,7 @@ const VerticalNavLink = ({
         className='nav-link'
         disabled={item.disabled || false}
         sx={{
-          mt: 1.5,
+          mt: 0.5,
           transition: 'padding .25s ease-in-out',
           px: theme => (parent ? '0 !important' : `${theme.spacing(navCollapsed && !navHover ? 2 : 3)} !important`)
         }}
@@ -108,7 +112,7 @@ const VerticalNavLink = ({
             }
           }}
           sx={{
-            py: 2.25,
+            py: 1.5,
             ...(item.disabled ? { pointerEvents: 'none' } : { cursor: 'pointer' }),
             pr: navCollapsed && !navHover ? (collapsedNavWidth - navigationBorderWidth - 24 - 16) / 8 : 3,
             pl: navCollapsed && !navHover ? (collapsedNavWidth - navigationBorderWidth - 24 - 16) / 8 : 4

@@ -35,11 +35,10 @@ const MainContentWrapper = styled(Box)({
 const ContentWrapper = styled('main')(({ theme }) => ({
   flexGrow: 1,
   width: '100%',
-  padding: theme.spacing(6),
+  padding: theme.spacing(4, 5, 6),
   transition: 'padding .25s ease-in-out',
-  [theme.breakpoints.down('sm')]: {
-    paddingLeft: theme.spacing(4),
-    paddingRight: theme.spacing(4)
+  [theme.breakpoints.down('md')]: {
+    padding: theme.spacing(3)
   }
 }))
 

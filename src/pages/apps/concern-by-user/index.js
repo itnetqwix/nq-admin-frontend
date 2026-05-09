@@ -1,14 +1,13 @@
-import { Avatar, Badge, Box, Container, Divider, FormControl, FormHelperText, Grid, IconButton, InputLabel, MenuItem, Select, TextField, Typography, makeStyles } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { Box, InputLabel, TextField } from "@mui/material";
+import React, { useEffect } from "react";
 
 import styles from "styles/common.module.css";
 
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import SaveAsIcon from '@mui/icons-material/SaveAs';
+import { DataGrid } from '@mui/x-data-grid';
 import Link from "next/link";
 import MenuIcon from '@mui/icons-material/Menu';
 import { CustomButton } from "src/pages/components/common";
+import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell';
 import { useCommon } from "src/hooks/useCommon";
 import moment from "moment";
 import { updateTicketBaseUrl } from "src/utils/utils";
@@ -65,9 +64,6 @@ const statusColors = {
 // };
 
 export default function ConcernByUsers() {
-
-  const [currentPage, setCurrentPage] = useState(1);
-
   const common = useCommon();
 
   const {
@@ -117,7 +113,7 @@ export default function ConcernByUsers() {
         const uid = params?.row?.user_id?._id || params?.row?.user_id
         if (!uid) return <span>—</span>
         return (
-          <Link href={`/apps/users/${uid}`} style={{ color: '#14328d' }}>
+          <Link href={`/apps/users/${uid}`} style={{ color: '#2563EB', fontWeight: 500 }}>
             Open
           </Link>
         )
@@ -190,72 +186,43 @@ export default function ConcernByUsers() {
     return params.indexRelativeToCurrentPage % 2 === 0 ? `${styles['even-row']} ${styles['row-class']} ` : `${styles['odd-row']} ${styles['row-class']} `;
   };
 
-  const handlePageChange = (event, newPage) => {
-    setCurrentPage(newPage);
-  };
-
   const getRowHeight = () => 50
 
   return (
-    <Grid container spacing={3} sx={{ width: "100%" }}>
-      <Grid item xs={12} md={12} lg={12} xl={12} >
-        <form noValidate autoComplete="off" >
-          <Container maxWidth="xl">
-            <Box sx={{ background: "white", padding: 4 }}>
-              <Grid container spacing={3}>
-                <Grid item xs={6} lg={6}>
-                  <Typography sx={{ color: "black", fontSize: "18px", fontWeight: "600" }} >Support tickets</Typography>
-                </Grid>
-
-                <Grid item xs={6} lg={6} sx={{ textAlign: "right" }}>
-                  <CustomButton
-                    component={Link}
-                    variant='contained'
-                    href='/apps/booking'
-                    startIcon={<MenuIcon />} sx={{ backgroundColor: "#14328d", color: "white" }}>
-                    Setting
-                  </CustomButton>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Divider />
-                </Grid>
-
-                <Grid item xs={12}>
-
-
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', m: 2 }}>
-                    <InputLabel sx={{ color: "black", fontSize: "14px", textAlign: "right" }}>Search
-                    </InputLabel>
-                    <TextField
-                      size="small"
-                    />
-                  </Box>
-
-                </Grid>
-
-                <div style={{ height: "71vh", width: '100%' }}>
-                  <DataGrid
-                    rows={concernByUsers ?? []}
-                    columns={columns}
-                    headerClassName={styles['header-class']}
-                    getRowClassName={getRowClassName}
-                    initialState={{
-                      pagination: {
-                        paginationModel: { page: 0, pageSize: 25 },
-                      },
-                    }}
-                    pageSizeOptions={[25, 50]}
-                    getRowHeight={getRowHeight}
-                    columnHeaderHeight={50}
-                  />
-                </div>
-
-              </Grid>
-            </Box>
-          </Container>
-        </form>
-      </Grid>
-    </Grid>
+    <form noValidate autoComplete='off'>
+      <AdminPageShell
+        title='Support tickets'
+        subtitle='Raise concern workflow: status, refunds, and links to User 360.'
+        actions={
+          <CustomButton component={Link} variant='contained' href='/apps/booking' startIcon={<MenuIcon />}>
+            Settings
+          </CustomButton>
+        }
+        contentSx={{ p: 0 }}
+      >
+        <AdminPageSection>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+            <InputLabel sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>Search</InputLabel>
+            <TextField size='small' placeholder='Filter in table…' />
+          </Box>
+          <div className='admin-data-grid' style={{ height: '71vh', width: '100%' }}>
+            <DataGrid
+              rows={concernByUsers ?? []}
+              columns={columns}
+              headerClassName={styles['header-class']}
+              getRowClassName={getRowClassName}
+              initialState={{
+                pagination: {
+                  paginationModel: { page: 0, pageSize: 25 }
+                }
+              }}
+              pageSizeOptions={[25, 50]}
+              getRowHeight={getRowHeight}
+              columnHeaderHeight={50}
+            />
+          </div>
+        </AdminPageSection>
+      </AdminPageShell>
+    </form>
   )
 }
