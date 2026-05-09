@@ -20,6 +20,8 @@ import BlankLayout from 'src/@core/layouts/BlankLayout'
 
 // ** Hooks
 import { useSettings } from 'src/@core/hooks/useSettings'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
 
 // ** Demo Imports
 import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
@@ -81,6 +83,8 @@ const ForgotPassword = () => {
   // ** Hooks
   const theme = useTheme()
   const { settings } = useSettings()
+  const [email, setEmail] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   // ** Vars
   const { skin } = settings
@@ -203,13 +207,49 @@ const ForgotPassword = () => {
             <Box sx={{ mb: 6 }}>
               <TypographyStyled variant='h5'>Forgot Password? 🔒</TypographyStyled>
               <Typography variant='body2'>
-                Enter your email and we&prime;ll send you instructions to reset your password
+                Admin portal: only <strong>Admin</strong> accounts receive a reset link. Enter the email on your admin
+                profile.
               </Typography>
             </Box>
-            <form noValidate autoComplete='off' onSubmit={e => e.preventDefault()}>
-              <TextField autoFocus type='email' label='Email' sx={{ display: 'flex', mb: 4 }} />
-              <Button fullWidth size='large' type='submit' variant='contained' sx={{ mb: 5.25 }}>
-                Send reset link
+            <form
+              noValidate
+              autoComplete='off'
+              onSubmit={async e => {
+                e.preventDefault()
+                const em = email.trim()
+                if (!em) {
+                  toast.error('Email is required')
+                  return
+                }
+                setSubmitting(true)
+                try {
+                  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/forgot-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: em, portal: 'admin' })
+                  })
+                  const data = await res.json().catch(() => ({}))
+                  if (!res.ok || String(data?.status).toLowerCase() === 'fail') {
+                    throw new Error(data?.error || data?.message || 'Request failed')
+                  }
+                  toast.success(data?.msg || data?.result?.message || 'Check your email for reset instructions.')
+                } catch (err) {
+                  toast.error(err?.message || 'Unable to send reset email')
+                } finally {
+                  setSubmitting(false)
+                }
+              }}
+            >
+              <TextField
+                autoFocus
+                type='email'
+                label='Email'
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                sx={{ display: 'flex', mb: 4 }}
+              />
+              <Button fullWidth size='large' type='submit' variant='contained' disabled={submitting} sx={{ mb: 5.25 }}>
+                {submitting ? 'Sending…' : 'Send reset link'}
               </Button>
               <Typography sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <LinkStyled href='/login'>

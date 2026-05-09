@@ -9,6 +9,7 @@ import axios from 'axios'
 
 // ** Config
 import authConfig from 'src/configs/auth'
+import toast from 'react-hot-toast'
 
 // ** Defaults
 const defaultProvider = {
@@ -112,6 +113,7 @@ const AuthProvider = ({ children }) => {
           localStorage.removeItem('accessToken')
           setLoading(false)
           if (authConfig.onTokenExpiration === 'logout' && !router.pathname.includes('login')) {
+            toast.error('Session expired. Please sign in again.')
             router.replace('/login')
           }
       })

@@ -40,7 +40,8 @@ import {
   Typography,
   useTheme
 } from '@mui/material'
-import { useEffect, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
+import { AbilityContext } from 'src/layouts/components/acl/Can'
 import toast from 'react-hot-toast'
 import { deleteAdminEntity, getClipPlayUrl } from 'src/services/user360Api'
 import { getImageUrl } from 'src/utils/utils'
@@ -134,6 +135,9 @@ const timelineDotBg = (type, theme) => {
 }
 
 const DeleteActions = ({ entityType, entityId, onDeleted, hardDeletePolicy }) => {
+  const ability = useContext(AbilityContext)
+  const canSoft = ability?.can('update', 'admin-action-soft-delete') ?? true
+  const canHard = ability?.can('delete', 'admin-action-hard-delete') ?? true
   const [loadingMode, setLoadingMode] = useState('')
 
   const handleDelete = async mode => {
@@ -161,14 +165,20 @@ const DeleteActions = ({ entityType, entityId, onDeleted, hardDeletePolicy }) =>
     }
   }
 
+  if (!canSoft && !canHard) return null
+
   return (
     <Stack direction='row' spacing={0.75} flexWrap='wrap' useFlexGap>
-      <Button size='small' color='warning' variant='outlined' disabled={loadingMode !== ''} onClick={() => handleDelete('soft')}>
-        {loadingMode === 'soft' ? '…' : 'Soft delete'}
-      </Button>
-      <Button size='small' color='error' variant='outlined' disabled={loadingMode !== ''} onClick={() => handleDelete('hard')}>
-        {loadingMode === 'hard' ? '…' : 'Hard delete'}
-      </Button>
+      {canSoft ? (
+        <Button size='small' color='warning' variant='outlined' disabled={loadingMode !== ''} onClick={() => handleDelete('soft')}>
+          {loadingMode === 'soft' ? '…' : 'Soft delete'}
+        </Button>
+      ) : null}
+      {canHard ? (
+        <Button size='small' color='error' variant='outlined' disabled={loadingMode !== ''} onClick={() => handleDelete('hard')}>
+          {loadingMode === 'hard' ? '…' : 'Hard delete'}
+        </Button>
+      ) : null}
     </Stack>
   )
 }
@@ -198,6 +208,213 @@ const EmptyHint = ({ icon: Icon, title, hint }) => (
     <Typography variant='body2'>{hint}</Typography>
   </Box>
 )
+
+const formatPrimitive = val => {
+  if (val === null || val === undefined) return '—'
+  if (typeof val === 'boolean') return val ? 'Yes' : 'No'
+  if (typeof val === 'number') return String(val)
+  if (typeof val === 'string') return val.trim() === '' ? '—' : val
+  if (val instanceof Date) return val.toLocaleString()
+  try {
+    return JSON.stringify(val)
+  } catch {
+    return String(val)
+  }
+}
+
+const RATING_FIELD_LABELS = {
+  sessionRating: 'Session',
+  audioVideoRating: 'Audio & video',
+  recommendRating: 'Would recommend',
+  title: 'Title',
+  remarksInfo: 'Remarks',
+  booking_id: 'Booking',
+  session_id: 'Session'
+}
+
+/** Human-readable block for one side of a session rating (trainee / trainer). */
+const RatingSideCard = ({ label, data }) => {
+  const theme = useTheme()
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return null
+
+  const numericKeys = ['sessionRating', 'audioVideoRating', 'recommendRating']
+  const chips = []
+  numericKeys.forEach(key => {
+    const v = data[key]
+    if (v == null || v === '') return
+    const lbl = RATING_FIELD_LABELS[key] || key
+    chips.push(
+      <Chip
+        key={key}
+        size='small'
+        label={`${lbl}: ${v}/5`}
+        color='primary'
+        variant='outlined'
+        sx={{ fontWeight: 600 }}
+      />
+    )
+  })
+
+  const textBits = []
+  if (data.title) textBits.push({ k: 'Title', v: data.title })
+  if (data.remarksInfo) textBits.push({ k: 'Remarks', v: data.remarksInfo })
+  if (data.booking_id) textBits.push({ k: 'Booking ID', v: String(data.booking_id) })
+  if (data.session_id) textBits.push({ k: 'Session ID', v: String(data.session_id) })
+
+  const restKeys = Object.keys(data).filter(
+    k => !numericKeys.includes(k) && !['title', 'remarksInfo', 'booking_id', 'session_id'].includes(k)
+  )
+
+  return (
+    <Paper variant='outlined' sx={{ p: 1.25, borderRadius: 1.5, bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
+      <Typography variant='caption' sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'primary.main' }}>
+        {label}
+      </Typography>
+      {chips.length ? (
+        <Stack direction='row' flexWrap='wrap' useFlexGap spacing={0.75} sx={{ mt: 1 }}>
+          {chips}
+        </Stack>
+      ) : null}
+      {textBits.length ? (
+        <Stack spacing={0.5} sx={{ mt: chips.length ? 1 : 0.5 }}>
+          {textBits.map(({ k, v }) => (
+            <Box key={k}>
+              <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 600 }}>{k}</Typography>
+              <Typography variant='body2' sx={{ wordBreak: 'break-word' }}>{v}</Typography>
+            </Box>
+          ))}
+        </Stack>
+      ) : null}
+      {restKeys.length ? (
+        <Stack spacing={0.25} sx={{ mt: 1, pt: 1, borderTop: 1, borderColor: 'divider' }}>
+          {restKeys.map(k => (
+            <Typography key={k} variant='caption' sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>
+              {k}: {formatPrimitive(data[k])}
+            </Typography>
+          ))}
+        </Stack>
+      ) : null}
+    </Paper>
+  )
+}
+
+/** Parses `ratings` object and renders trainee / trainer (and any other object-shaped sides). */
+const ReviewRatingsCell = ({ ratings }) => {
+  if (!ratings || typeof ratings !== 'object') {
+    return <Typography variant='body2' color='text.secondary'>—</Typography>
+  }
+
+  const roleLabels = {
+    trainee: 'Trainee review',
+    trainer: 'Trainer review'
+  }
+
+  const entries = Object.entries(ratings).filter(([, v]) => v && typeof v === 'object' && !Array.isArray(v))
+
+  if (!entries.length) {
+    return <Typography variant='body2' color='text.secondary'>No structured ratings</Typography>
+  }
+
+  return (
+    <Stack spacing={1.25} sx={{ minWidth: { sm: 260 }, maxWidth: 420 }}>
+      {entries.map(([role, data]) => (
+        <RatingSideCard key={role} label={roleLabels[role] || role.charAt(0).toUpperCase() + role.slice(1)} data={data} />
+      ))}
+    </Stack>
+  )
+}
+
+const NotificationPreferencesPanel = ({ notifications }) => {
+  if (!notifications || typeof notifications !== 'object') {
+    return <Typography variant='body2' color='text.secondary'>No notification preferences stored.</Typography>
+  }
+
+  const groups = ['promotional', 'transactional'].filter(g => notifications[g] && typeof notifications[g] === 'object')
+
+  if (!groups.length) {
+    return (
+      <Typography variant='body2' color='text.secondary'>
+        Preferences are in an unexpected shape; use “Technical (raw)” below if needed.
+      </Typography>
+    )
+  }
+
+  return (
+    <Grid container spacing={2}>
+      {groups.map(group => (
+        <Grid item xs={12} md={6} key={group}>
+          <Typography variant='subtitle2' sx={{ mb: 1, fontWeight: 700, textTransform: 'capitalize' }}>
+            {group}
+          </Typography>
+          <Stack direction='row' flexWrap='wrap' useFlexGap spacing={1}>
+            {Object.entries(notifications[group]).map(([channel, on]) => (
+              <Chip
+                key={`${group}-${channel}`}
+                size='small'
+                label={`${channel}: ${on ? 'On' : 'Off'}`}
+                color={on ? 'success' : 'default'}
+                variant={on ? 'filled' : 'outlined'}
+                sx={{ fontWeight: 600 }}
+              />
+            ))}
+          </Stack>
+        </Grid>
+      ))}
+    </Grid>
+  )
+}
+
+const ExtraInfoTree = ({ data, depth = 0 }) => {
+  const theme = useTheme()
+  if (data == null) return <Typography variant='body2' color='text.secondary'>—</Typography>
+  if (typeof data !== 'object') {
+    return <Typography variant='body2' sx={{ wordBreak: 'break-word' }}>{formatPrimitive(data)}</Typography>
+  }
+  if (Array.isArray(data)) {
+    if (!data.length) return <Typography variant='body2' color='text.secondary'>Empty list</Typography>
+    return (
+      <Stack component='ul' sx={{ m: 0, pl: 2 }}>
+        {data.map((item, i) => (
+          <Box component='li' key={i} sx={{ mb: 0.5 }}>
+            {typeof item === 'object' && item !== null ? <ExtraInfoTree data={item} depth={depth + 1} /> : <Typography variant='body2'>{formatPrimitive(item)}</Typography>}
+          </Box>
+        ))}
+      </Stack>
+    )
+  }
+
+  const keys = Object.keys(data)
+  if (!keys.length) return <Typography variant='body2' color='text.secondary'>Empty</Typography>
+
+  return (
+    <Grid container spacing={1.25}>
+      {keys.map(key => {
+        const val = data[key]
+        const isNested = val && typeof val === 'object' && !Array.isArray(val) && Object.keys(val).length > 0
+        return (
+          <Grid item xs={12} key={key}>
+            <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700, display: 'block', mb: 0.25 }}>
+              {key.replace(/_/g, ' ')}
+            </Typography>
+            {isNested && depth < 4 ? (
+              <Box sx={{ pl: 1.5, borderLeft: `3px solid ${theme.palette.divider}`, py: 0.5 }}>
+                <ExtraInfoTree data={val} depth={depth + 1} />
+              </Box>
+            ) : (
+              <Box sx={{ pl: 0.5 }}>
+                {typeof val === 'object' && val !== null ? (
+                  <ExtraInfoTree data={val} depth={depth + 1} />
+                ) : (
+                  <Typography variant='body2' sx={{ wordBreak: 'break-word' }}>{formatPrimitive(val)}</Typography>
+                )}
+              </Box>
+            )}
+          </Grid>
+        )
+      })}
+    </Grid>
+  )
+}
 
 function StatTile({ label, value, emphasize }) {
   const theme = useTheme()
@@ -576,7 +793,7 @@ export default function AdminUser360Tabs({
         {tab === 0 && (
           <SectionShell
             title='Profile & account snapshot'
-            subtitle='High-signal fields for identity, wallet, and engagement counts. Expand JSON for full notification prefs and extraInfo.'
+            subtitle='High-signal fields for identity, wallet, and engagement counts. Expand sections below for notification channels and extended profile metadata.'
           >
             <Stack direction={{ xs: 'column', lg: 'row' }} spacing={3} alignItems={{ lg: 'flex-start' }}>
               <Stack alignItems='center' spacing={1.5} sx={{ minWidth: { lg: 200 } }}>
@@ -658,27 +875,66 @@ export default function AdminUser360Tabs({
                   </Grid>
                 </Grid>
 
-                <Accordion sx={{ mt: 3, borderRadius: '8px !important', '&:before': { display: 'none' }, boxShadow: 'none', border: 1, borderColor: 'divider' }} disableGutters>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography fontWeight={600}>Notification preferences &amp; extraInfo (raw JSON)</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Box
-                      component='pre'
-                      sx={{
-                        p: 2,
-                        borderRadius: 1,
-                        bgcolor: alpha(theme.palette.common.black, 0.04),
-                        overflow: 'auto',
-                        maxHeight: 360,
-                        fontSize: 12,
-                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
-                      }}
-                    >
-                      {JSON.stringify({ notifications: preferences.notifications, extraInfo: preferences.extraInfo }, null, 2)}
-                    </Box>
-                  </AccordionDetails>
-                </Accordion>
+                <Stack spacing={2} sx={{ mt: 3 }}>
+                  <Accordion
+                    defaultExpanded
+                    sx={{ borderRadius: '8px !important', '&:before': { display: 'none' }, boxShadow: 'none', border: 1, borderColor: 'divider' }}
+                    disableGutters
+                  >
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Stack direction='row' alignItems='center' spacing={1} flexWrap='wrap' sx={{ pr: 1 }}>
+                        <Typography fontWeight={600}>Notification preferences</Typography>
+                        <Typography variant='caption' color='text.secondary'>Email &amp; SMS by category</Typography>
+                      </Stack>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <NotificationPreferencesPanel notifications={preferences.notifications} />
+                    </AccordionDetails>
+                  </Accordion>
+
+                  <Accordion sx={{ borderRadius: '8px !important', '&:before': { display: 'none' }, boxShadow: 'none', border: 1, borderColor: 'divider' }} disableGutters>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Stack direction='row' alignItems='center' spacing={1} flexWrap='wrap' sx={{ pr: 1 }}>
+                        <Typography fontWeight={600}>Extra profile data (extraInfo)</Typography>
+                        <Typography variant='caption' color='text.secondary'>Availability, timezone, and other fields</Typography>
+                      </Stack>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      {preferences.extraInfo && typeof preferences.extraInfo === 'object' && Object.keys(preferences.extraInfo).length > 0 ? (
+                        <Box sx={{ maxHeight: 480, overflow: 'auto', pr: 1 }}>
+                          <ExtraInfoTree data={preferences.extraInfo} />
+                        </Box>
+                      ) : (
+                        <Typography variant='body2' color='text.secondary'>No extraInfo on this user.</Typography>
+                      )}
+                    </AccordionDetails>
+                  </Accordion>
+
+                  <Accordion sx={{ borderRadius: '8px !important', '&:before': { display: 'none' }, boxShadow: 'none', border: 1, borderColor: 'divider' }} disableGutters>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography fontWeight={600} color='text.secondary'>Technical: raw JSON</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 1 }}>
+                        For debugging or copy-paste into tickets.
+                      </Typography>
+                      <Box
+                        component='pre'
+                        sx={{
+                          p: 2,
+                          borderRadius: 1,
+                          bgcolor: alpha(theme.palette.common.black, 0.04),
+                          overflow: 'auto',
+                          maxHeight: 320,
+                          fontSize: 12,
+                          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+                        }}
+                      >
+                        {JSON.stringify({ notifications: preferences.notifications, extraInfo: preferences.extraInfo }, null, 2)}
+                      </Box>
+                    </AccordionDetails>
+                  </Accordion>
+                </Stack>
               </Box>
             </Stack>
           </SectionShell>
@@ -755,7 +1011,7 @@ export default function AdminUser360Tabs({
                       <TableCell>Status</TableCell>
                       <TableCell>Trainer</TableCell>
                       <TableCell>Trainee</TableCell>
-                      <TableCell>Ratings</TableCell>
+                      <TableCell sx={{ minWidth: 280 }}>Ratings</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -768,8 +1024,8 @@ export default function AdminUser360Tabs({
                         </TableCell>
                         <TableCell sx={{ maxWidth: 180 }}>{renderParty(review?.trainer)}</TableCell>
                         <TableCell sx={{ maxWidth: 180 }}>{renderParty(review?.trainee)}</TableCell>
-                        <TableCell sx={{ maxWidth: 280, fontSize: 12, wordBreak: 'break-word' }}>
-                          {review?.ratings ? JSON.stringify(review.ratings) : '—'}
+                        <TableCell sx={{ verticalAlign: 'top', py: 2 }}>
+                          <ReviewRatingsCell ratings={review?.ratings} />
                         </TableCell>
                       </TableRow>
                     ))}

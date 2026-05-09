@@ -3,29 +3,45 @@ import { AbilityBuilder, Ability } from '@casl/ability'
 export const AppAbility = Ability
 
 /**
- * Please define your own Ability rules according to your app requirements.
- * We have just shown Admin and Client rules for demo purpose where
- * admin can manage everything and client can just visit ACL page
+ * Admin menu + action rules. If `user.extraInfo.admin_permissions` is missing or empty,
+ * admin has full access (`manage all`). Otherwise any key set to `false` removes that ability.
  */
-const defineRulesFor = (role, subject) => {
+const defineRulesFor = (role, user) => {
   const { can, rules } = new AbilityBuilder(AppAbility)
-  // if (role === 'admin') {
-  //   can('manage', 'all')
-  // } else if (role === 'client') {
-  //   can(['read'], 'acl-page')
-  // } else {
-  //   can(['read', 'create', 'update', 'delete'], subject)
-  // }
 
-  if (role === 'Admin') {
-    can('manage', 'all')
+  if (role !== 'Admin') {
+    return rules
   }
+
+  const p = user?.extraInfo?.admin_permissions
+  const restricted = p && typeof p === 'object' && Object.keys(p).length > 0
+
+  const ok = key => !restricted || p[key] !== false
+
+  if (!restricted) {
+    can('manage', 'all')
+    return rules
+  }
+
+  if (ok('nav_home')) can('read', 'admin-nav-home')
+  if (ok('nav_trainers')) can('read', 'admin-nav-trainers')
+  if (ok('nav_trainees')) can('read', 'admin-nav-trainees')
+  if (ok('nav_bookings')) can('read', 'admin-nav-bookings')
+  if (ok('nav_user_feedback')) can('read', 'admin-nav-user-feedback')
+  if (ok('nav_support_tickets')) can('read', 'admin-nav-support-tickets')
+  if (ok('nav_audit_logs')) can('read', 'admin-nav-audit-logs')
+  if (ok('nav_call_diagnostics')) can('read', 'admin-nav-call-diagnostics')
+
+  if (ok('can_manage_commission')) can('update', 'admin-action-commission')
+  if (ok('can_process_refund')) can('update', 'admin-action-refund')
+  if (ok('can_hard_delete')) can('delete', 'admin-action-hard-delete')
+  if (ok('can_soft_delete_entities')) can('update', 'admin-action-soft-delete')
 
   return rules
 }
 
-export const buildAbilityFor = (role, subject) => {
-  return new AppAbility(defineRulesFor(role, subject), {
+export const buildAbilityFor = (role, user) => {
+  return new AppAbility(defineRulesFor(role, user), {
     // https://casl.js.org/v5/en/guide/subject-type-detection
     // @ts-ignore
     detectSubjectType: object => object.type

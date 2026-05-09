@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
@@ -37,6 +37,7 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
+import { isAdminRegisterEnabled } from 'src/configs/adminEnv'
 
 // ** Styled Components
 const RegisterIllustrationWrapper = styled(Box)(({ theme }) => ({
@@ -112,6 +113,13 @@ const Register = () => {
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
   const router = useRouter()
 
+  useEffect(() => {
+    if (!isAdminRegisterEnabled()) {
+      toast.error('Admin registration is disabled. Set NEXT_PUBLIC_ADMIN_REGISTER_ENABLED=true for local bootstrap only.')
+      router.replace('/login')
+    }
+  }, [router])
+
   // ** Vars
   const { skin } = settings
   const imageSource = skin === 'bordered' ? 'auth-v2-register-illustration-bordered' : 'auth-v2-register-illustration'
@@ -124,6 +132,10 @@ const Register = () => {
   const handleRegister = async event => {
     event.preventDefault()
     setErrorMessage('')
+    if (!isAdminRegisterEnabled()) {
+      setErrorMessage('Admin registration is disabled.')
+      return
+    }
 
     const payload = {
       fullname: formValues.fullname?.trim(),

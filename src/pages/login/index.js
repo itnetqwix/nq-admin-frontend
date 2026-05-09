@@ -24,6 +24,8 @@ import MuiFormControlLabel from '@mui/material/FormControlLabel'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
+import Alert from '@mui/material/Alert'
+import { isAdminRegisterEnabled, showAdminMfaNotice } from 'src/configs/adminEnv'
 
 // ** Third Party Imports
 import * as yup from 'yup'
@@ -269,12 +271,25 @@ const LoginPage = () => {
               <Button fullWidth size='large' type='submit' variant='contained' sx={{ mb: 7 }}>
                 Login
               </Button>
-              <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-                <Typography sx={{ mr: 2, color: 'text.secondary' }}>New on our platform?</Typography>
-                <Typography href='/register' component={Link} sx={{ color: 'primary.main', textDecoration: 'none' }}>
-                  Create an account
+              {showAdminMfaNotice() ? (
+                <Alert severity='info' sx={{ mb: 4 }}>
+                  Your organization may enable multi-factor authentication for admin accounts. Follow internal security
+                  guidance when available.
+                </Alert>
+              ) : null}
+              {isAdminRegisterEnabled() ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <Typography sx={{ mr: 2, color: 'text.secondary' }}>Need a bootstrap admin?</Typography>
+                  <Typography href='/register' component={Link} sx={{ color: 'primary.main', textDecoration: 'none' }}>
+                    Create an account
+                  </Typography>
+                </Box>
+              ) : (
+                <Typography variant='caption' sx={{ display: 'block', textAlign: 'center', color: 'text.secondary', mb: 2 }}>
+                  Admin self-registration is off. Use an existing administrator account or enable NEXT_PUBLIC_ADMIN_REGISTER_ENABLED for
+                  controlled setup only.
                 </Typography>
-              </Box>
+              )}
               <Divider
                 sx={{
                   '& .MuiDivider-wrapper': { px: 4 },

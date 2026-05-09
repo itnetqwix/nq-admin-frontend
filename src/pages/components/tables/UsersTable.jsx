@@ -1,4 +1,4 @@
-import { Box, Chip, Divider, Grid, InputLabel, TextField, Typography } from "@mui/material";
+import { Box, Button, Chip, Divider, Grid, InputLabel, TextField, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { DataGrid } from '@mui/x-data-grid';
 import styles from "styles/common.module.css";
@@ -8,7 +8,7 @@ import { useAdminRealtime } from "src/context/AdminRealtimeContext";
 
 
 export default function ActiveUsersTable() {
-    const { onlineUsers, socketConnected } = useAdminRealtime();
+    const { onlineUsers, socketConnected, refreshOnlineUsers } = useAdminRealtime();
     const [trainerList, setTrainerList] = useState([]);
     const [tableData, setTableData] = useState([]);
 
@@ -75,12 +75,17 @@ export default function ActiveUsersTable() {
                         <Typography sx={{ color: "black", fontSize: "18px", fontWeight: "600" }}>
                             Active User List (Trainers and Trainees)
                         </Typography>
-                        <Chip
-                            size='small'
-                            label={socketConnected ? 'Live · WebSocket' : 'Connecting…'}
-                            color={socketConnected ? 'success' : 'default'}
-                            variant={socketConnected ? 'filled' : 'outlined'}
-                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                            <Chip
+                                size='small'
+                                label={socketConnected ? 'Live · WebSocket' : 'Connecting…'}
+                                color={socketConnected ? 'success' : 'default'}
+                                variant={socketConnected ? 'filled' : 'outlined'}
+                            />
+                            <Button size='small' variant='outlined' onClick={() => void refreshOnlineUsers()}>
+                                Refresh from API
+                            </Button>
+                        </Box>
                     </Box>
                     <Divider sx={{ margin: "10px 0" }} />
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mb: 2 }}>

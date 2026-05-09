@@ -94,6 +94,23 @@ export default function WriteByUsers() {
       )
     },
     {
+      field: 'user360',
+      headerName: 'User 360',
+      headerClassName: styles['header-class'],
+      cellClassName: styles['cell-class'],
+      width: 110,
+      sortable: false,
+      renderCell: params => {
+        const uid = params?.row?.user_id?._id || params?.row?.user_id
+        if (!uid) return <span>—</span>
+        return (
+          <Link href={`/apps/users/${uid}`} style={{ color: '#14328d' }}>
+            Open
+          </Link>
+        )
+      }
+    },
+    {
       field: 'ticket_status',
       headerName: 'Status',
       headerClassName: styles['header-class-last'],
@@ -108,7 +125,6 @@ export default function WriteByUsers() {
 
   ];
 
-  console.log("writeByUsers====>", writeByUsers)
   const getRowClassName = (params) => {
     return params.indexRelativeToCurrentPage % 2 === 0 ? `${styles['even-row']} ${styles['row-class']} ` : `${styles['odd-row']} ${styles['row-class']} `;
   };

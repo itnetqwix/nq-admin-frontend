@@ -1,5 +1,6 @@
 import { Avatar, Badge, Box, Container, Divider, Grid, IconButton, InputLabel, TextField, Typography } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import { AbilityContext } from 'src/layouts/components/acl/Can'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 import styles from "styles/common.module.css";
@@ -25,11 +26,14 @@ const booking_status = {
 };
 
 export default function Booking() {
+  const ability = useContext(AbilityContext)
+  const canRefund = ability?.can('update', 'admin-action-refund') ?? true
 
   const [currentPage, setCurrentPage] = useState(1);
   const [openRefundPopup, setOpenRefundPopup] = useState(false);
   const [paymentIntentDetails, setPaymentIntentDetails] = useState({});
   const [bookingId, setBookingId] = useState(null);
+  const [refundRow, setRefundRow] = useState(null);
   const [openClosePopup, setOpenClosePopup] = useState(false);
   const [cancelId, setCancelId] = useState(null);
 
@@ -44,10 +48,12 @@ export default function Booking() {
     getBookingList();
   }, [])
 
-  const showRefundPopup = (id, booking_id) => {
+  const showRefundPopup = (row) => {
+    if (!row?.payment_intent_id || !canRefund) return
+    setRefundRow(row)
     setOpenRefundPopup(true);
-    setBookingId(booking_id)
-    getPaymentIntentDetails({ payment_intent_id: id })
+    setBookingId(row._id)
+    getPaymentIntentDetails({ payment_intent_id: row.payment_intent_id })
   }
 
   const columns = [
@@ -107,9 +113,15 @@ export default function Booking() {
               <div className={styles["status-booking"]} style={{ backgroundColor: "gray", marginLeft: "10px", cursor: "not-allowed" }}>
                 {params?.row?.refund_status}
               </div> :
-              <div onClick={() => showRefundPopup(params.row.payment_intent_id, params.row._id)} className={styles["status-booking"]} style={{ backgroundColor: "#2d2d3f", marginLeft: "10px", cursor: "pointer", }}>
+              canRefund ? (
+              <div onClick={() => showRefundPopup(params.row)} className={styles["status-booking"]} style={{ backgroundColor: "#2d2d3f", marginLeft: "10px", cursor: "pointer", }}>
                 Start Refund
-              </div> : null
+              </div>
+              ) : (
+              <div className={styles["status-booking"]} style={{ backgroundColor: "#555", marginLeft: "10px", cursor: "not-allowed" }} title="No refund permission">
+                Refund (restricted)
+              </div>
+              ) : null
           }
 
           {
@@ -158,9 +170,15 @@ export default function Booking() {
                       <div className={styles["status-booking"]} style={{ backgroundColor: "gray", marginLeft: "10px" }}>
                         {params?.row?.refund_status}
                       </div> :
-                      <div onClick={() => showRefundPopup(params.row.payment_intent_id, params.row._id)} className={styles["status-booking"]} style={{ backgroundColor: "#2d2d3f", marginLeft: "10px", cursor: "pointer", }}>
+                      canRefund ? (
+                      <div onClick={() => showRefundPopup(params.row)} className={styles["status-booking"]} style={{ backgroundColor: "#2d2d3f", marginLeft: "10px", cursor: "pointer", }}>
                         Start Refund
                       </div>
+                      ) : (
+                      <div className={styles["status-booking"]} style={{ backgroundColor: "#555", marginLeft: "10px", cursor: "not-allowed" }}>
+                        Refund (restricted)
+                      </div>
+                      )
                   }
                 </React.Fragment>
               : null
@@ -198,7 +216,7 @@ export default function Booking() {
 
   const handleCloseRefundPopup = () => {
     setOpenRefundPopup(false);
-    // setSelectedId(null)
+    setRefundRow(null);
   }
 
   const handleCloseCancelPopup = () => {
@@ -206,8 +224,8 @@ export default function Booking() {
     setCancelId(null)
   }
 
-  const onConformRefund = (id) => {
-    startRefund({ payment_intent_id: id })
+  const onConformRefund = (paymentIntentId, reason) => {
+    startRefund({ payment_intent_id: paymentIntentId, booking_id: bookingId, reason })
   }
 
   const onConformCancel = (id) => {
@@ -222,11 +240,12 @@ export default function Booking() {
   const getRowHeight = () => 50
 
   const getPaymentIntentDetails = (params) => {
-    // setLoading(true)
+    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
     const options = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(storedToken ? { 'Authorization': `Bearer ${storedToken}` } : {}),
       },
       body: JSON.stringify(params),
     };
@@ -285,15 +304,16 @@ export default function Booking() {
   }
 
   const startRefund = (params) => {
-    // const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-    // if (!storedToken) {
-    //   return
-    // }
+    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+    if (!storedToken) {
+      toast.error('Sign in required to process refunds')
+      return
+    }
     const options = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // 'Authorization': `Bearer ${storedToken}`
+        'Authorization': `Bearer ${storedToken}`
       },
       body: JSON.stringify(params),
     };
@@ -301,10 +321,11 @@ export default function Booking() {
       .then(data => {
         return data.json();
       }).then(response => {
-        if (response.code === 400) {
+        if (response.code === 400 || response.code === 403 || String(response?.status).toLowerCase() === 'fail') {
+          toast.error(response?.error || 'Refund was not completed')
           return;
         }
-        toast.success('Refund Completed the amount will tranfer to the source account of trainee', {
+        toast.success('Refund completed; amount returns to the trainee funding source.', {
           duration: 2000
         })
         updateRefundStatus({
@@ -312,6 +333,7 @@ export default function Booking() {
           "refund_status": "refunded"
         })
       }).catch(e => {
+        toast.error(e?.message || 'Refund request failed')
       });
 
   }
@@ -423,7 +445,7 @@ export default function Booking() {
         </Grid>
       </Grid>
 
-      <RefundPopups paymentIntentDetails={paymentIntentDetails} handleClose={handleCloseRefundPopup} open={openRefundPopup} onConform={onConformRefund} />
+      <RefundPopups paymentIntentDetails={paymentIntentDetails} bookingPreview={refundRow} handleClose={handleCloseRefundPopup} open={openRefundPopup} onConform={onConformRefund} />
 
       <CancelSessionPopups handleClose={handleCloseCancelPopup} open={openClosePopup} onConform={onConformCancel} />
     </>

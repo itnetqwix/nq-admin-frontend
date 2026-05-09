@@ -107,6 +107,23 @@ export default function ConcernByUsers() {
       )
     },
     {
+      field: 'user360',
+      headerName: 'User 360',
+      headerClassName: styles['header-class'],
+      cellClassName: styles['cell-class'],
+      width: 110,
+      sortable: false,
+      renderCell: params => {
+        const uid = params?.row?.user_id?._id || params?.row?.user_id
+        if (!uid) return <span>—</span>
+        return (
+          <Link href={`/apps/users/${uid}`} style={{ color: '#14328d' }}>
+            Open
+          </Link>
+        )
+      }
+    },
+    {
       field: '_id',
       headerName: 'Booking ID',
       headerClassName: styles['header-class'],
@@ -187,7 +204,7 @@ export default function ConcernByUsers() {
             <Box sx={{ background: "white", padding: 4 }}>
               <Grid container spacing={3}>
                 <Grid item xs={6} lg={6}>
-                  <Typography sx={{ color: "black", fontSize: "18px", fontWeight: "600" }} >Refund Request</Typography>
+                  <Typography sx={{ color: "black", fontSize: "18px", fontWeight: "600" }} >Support tickets</Typography>
                 </Grid>
 
                 <Grid item xs={6} lg={6} sx={{ textAlign: "right" }}>

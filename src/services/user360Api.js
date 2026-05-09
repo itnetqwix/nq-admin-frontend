@@ -140,3 +140,13 @@ export const getAuditLogs = async (userId, query = {}) => {
   if (isApiFailure(data, response)) throw new Error(readError(data))
   return unwrap(data) || { items: [], pagination: { page: 1, limit: 20, total: 0 } }
 }
+
+export const getCallDiagnostics = async (query = {}) => {
+  const response = await fetch(apiUrl(`/admin/call-diagnostics${toQueryString(query)}`), {
+    method: 'GET',
+    headers: getAuthHeaders()
+  })
+  const data = await response.json()
+  if (isApiFailure(data, response)) throw new Error(readError(data))
+  return data?.data || { diagnostics: [], total: 0, limit: 100, skip: 0 }
+}

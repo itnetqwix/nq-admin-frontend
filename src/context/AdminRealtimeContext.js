@@ -10,7 +10,8 @@ const defaultValue = {
   onlineUsers: [],
   metrics: null,
   socketConnected: false,
-  refreshMetrics: async () => {}
+  refreshMetrics: async () => {},
+  refreshOnlineUsers: async () => {}
 }
 
 const AdminRealtimeContext = createContext(defaultValue)
@@ -60,6 +61,30 @@ export const AdminRealtimeProvider = ({ children }) => {
     }
   }, [isAdmin])
 
+  const refreshOnlineUsers = useCallback(async () => {
+    const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
+    if (!token || !isAdmin) return
+    try {
+      const base = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '')
+      const res = await fetch(`${base}/admin/online-users`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      const json = await res.json()
+      const payload = json?.result
+      if (payload && Array.isArray(payload.users)) {
+        setOnlineUsers(payload.users)
+      }
+    } catch (e) {
+      console.error('refreshOnlineUsers', e)
+    }
+  }, [isAdmin])
+
+  useEffect(() => {
+    if (!isAdmin) return undefined
+    void refreshOnlineUsers()
+    return undefined
+  }, [isAdmin, refreshOnlineUsers])
+
   useEffect(() => {
     if (!isAdmin) {
       setOnlineUsers([])
@@ -81,6 +106,7 @@ export const AdminRealtimeProvider = ({ children }) => {
     socket.on('connect', () => {
       setSocketConnected(true)
       refreshMetrics()
+      void refreshOnlineUsers()
     })
     socket.on('disconnect', () => setSocketConnected(false))
     socket.on('ADMIN_ONLINE_USERS', payload => {
@@ -96,16 +122,17 @@ export const AdminRealtimeProvider = ({ children }) => {
       socket.disconnect()
       setSocketConnected(false)
     }
-  }, [isAdmin, refreshMetrics])
+  }, [isAdmin, refreshMetrics, refreshOnlineUsers])
 
   const value = useMemo(
     () => ({
       onlineUsers,
       metrics,
       socketConnected,
-      refreshMetrics
+      refreshMetrics,
+      refreshOnlineUsers
     }),
-    [onlineUsers, metrics, socketConnected, refreshMetrics]
+    [onlineUsers, metrics, socketConnected, refreshMetrics, refreshOnlineUsers]
   )
 
   return <AdminRealtimeContext.Provider value={value}>{children}</AdminRealtimeContext.Provider>

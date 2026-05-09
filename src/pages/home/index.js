@@ -19,9 +19,13 @@ import AnalyticsSessions from 'src/views/dashboards/analytics/AnalyticsSessions'
 import AnalyticsOverview from 'src/views/dashboards/analytics/AnalyticsOverview'
 import AnalyticsTotalRevenue from 'src/views/dashboards/analytics/AnalyticsTotalRevenue'
 
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import authConfig from 'src/configs/auth'
+import { AbilityContext } from 'src/layouts/components/acl/Can'
+import { getAdminApiEnvLabel } from 'src/configs/adminEnv'
+import Alert from '@mui/material/Alert'
+import Chip from '@mui/material/Chip'
 import Modal from '../components/modal/Modal'
 import CommissionForm from 'src/layouts/components/student/CommissionForm'
 import CustomAvatar from 'src/@core/components/mui/avatar'
@@ -30,6 +34,8 @@ import { useAdminRealtime } from 'src/context/AdminRealtimeContext'
 
 const Home = () => {
   const router = useRouter()
+  const ability = useContext(AbilityContext)
+  const canEditCommission = ability?.can('update', 'admin-action-commission') ?? true
   const { metrics, socketConnected } = useAdminRealtime()
 
   const [comission, setComission] = useState([]);
@@ -83,7 +89,20 @@ const Home = () => {
   return (
     <>
       <ApexChartWrapper>
-
+        <Grid container spacing={6} className='match-height' sx={{ mb: 2 }}>
+          <Grid item xs={12}>
+            <Alert severity='info' icon={false} sx={{ py: 0.5 }}>
+              <strong>API:</strong> {getAdminApiEnvLabel()}
+              <Chip
+                component='span'
+                size='small'
+                label={socketConnected ? 'Realtime connected' : 'Realtime connecting'}
+                color={socketConnected ? 'success' : 'default'}
+                sx={{ ml: 2, verticalAlign: 'middle' }}
+              />
+            </Alert>
+          </Grid>
+        </Grid>
 
         <Grid container spacing={6} className='match-height'>
 
@@ -101,13 +120,78 @@ const Home = () => {
                   {/* <IconButton aria-label="edit commission">
                     <EditIcon />
                   </IconButton> */}
-                  <CustomAvatar skin='light' variant='rounded' color="success" onClick={openComissionModal}>
-                    <Icon icon='tabler:edit' />
-                  </CustomAvatar>
+                  {canEditCommission ? (
+                    <CustomAvatar skin='light' variant='rounded' color='success' onClick={openComissionModal}>
+                      <Icon icon='tabler:edit' />
+                    </CustomAvatar>
+                  ) : null}
 
                 </Grid>
               </Grid>
             </Card>
+          </Grid>
+
+          <Grid item xs={12} container spacing={3}>
+            <Grid item xs={6} sm={3}>
+              <CardStatisticsVertical
+                color='warning'
+                stats={metrics != null ? fmtInt(metrics.openSupportTickets ?? 0) : '—'}
+                trendNumber='Queue'
+                trend='positive'
+                title='Open support tickets'
+                chipText='raise_concern'
+                icon={<Icon icon='mdi:lifebuoy' />}
+                onCardClick={() => router.push('/apps/concern-by-user')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <CardStatisticsVertical
+                color='secondary'
+                stats={metrics != null ? fmtInt(metrics.openUserFeedback ?? 0) : '—'}
+                trendNumber='Queue'
+                trend='positive'
+                title='Open user feedback'
+                chipText='write_us'
+                icon={<Icon icon='mdi:account-question' />}
+                onCardClick={() => router.push('/apps/write-by-user')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <CardStatisticsVertical
+                color='error'
+                stats={metrics != null ? fmtInt(metrics.bookingsPendingRefund ?? 0) : '—'}
+                trendNumber='Action'
+                trend='positive'
+                title='Bookings pending refund'
+                chipText='Canceled w/ payment'
+                icon={<Icon icon='mdi:cash-refund' />}
+                onCardClick={() => router.push('/apps/booking')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <CardStatisticsVertical
+                color='info'
+                stats={metrics != null ? fmtInt(metrics.newUsersLast7Days ?? 0) : '—'}
+                trendNumber='7d'
+                trend='positive'
+                title='New trainers + trainees'
+                chipText='Last 7 days'
+                icon={<Icon icon='mdi:account-multiple-plus' />}
+                onCardClick={() => router.push('/apps/manage-trainer')}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <CardStatisticsVertical
+                color='primary'
+                stats='Open'
+                trendNumber=' '
+                trend='positive'
+                title='Call diagnostics'
+                chipText='Quality & events'
+                icon={<Icon icon='mdi:video-outline' />}
+                onCardClick={() => router.push('/apps/call-diagnostics')}
+              />
+            </Grid>
           </Grid>
 
           <Grid item xs={12} md={8} container spacing={6}>
@@ -117,7 +201,7 @@ const Home = () => {
                 trendText={liveHint}
                 trendPositive={socketConnected}
                 chipSubtext='Paid bookings (excl. canceled)'
-                onClick={() => router.push('/apps/booking')}
+                onClick={() => router.push('/apps/booking?focus=paid')}
               />
             </Grid>
             {/* <Grid item xs={3}>
@@ -186,8 +270,8 @@ const Home = () => {
       <ActiveUsersTable />
       {/* -----------------Modal Commission Edit--------------- */}
 
-      <Modal handleClose={closeComissionModal} open={commissionModal} maxWidth="xs">
-        <CommissionForm getGlobalCommission={getGlobalCommission} />
+      <Modal handleClose={closeComissionModal} open={commissionModal} maxWidth='xs'>
+        {canEditCommission ? <CommissionForm getGlobalCommission={getGlobalCommission} /> : null}
       </Modal>
     </>
   )
