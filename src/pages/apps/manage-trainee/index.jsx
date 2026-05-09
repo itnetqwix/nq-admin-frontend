@@ -16,13 +16,11 @@ import Link from "next/link";
 import MenuIcon from '@mui/icons-material/Menu';
 import { CustomButton } from "src/pages/components/common";
 import { useCommon } from "src/hooks/useCommon";
-import Modal from "@mui/material/Modal";
-import authConfig from 'src/configs/auth'
-import StudentDetail from "src/layouts/components/student/StudentDetail";
 import { debouncedSearchMedicine, getImageUrl } from "src/utils/utils";
-import ReactStrapModal from "src/pages/components/modal/ReactStrapModal";
-import { X } from "react-feather";
 import TrainerStatus from "src/pages/components/trainer-status";
+import toast from "react-hot-toast";
+import UserQuickPreviewModal from "src/pages/components/user360/UserQuickPreviewModal";
+import { getUser360 } from "src/pages/components/user360/api";
 
 
 {/* <MenuItem value="xs">xs</MenuItem>
@@ -46,9 +44,9 @@ export default function ManageTrainee() {
   }, [])
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [isOpen, setIsOpen] = useState(false)
-  const [selectedStudentData, SetselectedStudentData] = useState({})
-  const [recentStudentClips, setRecentStudentClips] = useState([]);
+  const [isQuickPreviewOpen, setIsQuickPreviewOpen] = useState(false)
+  const [selectedStudentData, setSelectedStudentData] = useState({})
+  const [isQuickPreviewLoading, setIsQuickPreviewLoading] = useState(false);
 
 
   const [tableData, setTableData] = useState([]);
@@ -120,7 +118,6 @@ export default function ManageTrainee() {
           <IconButton
             onClick={() => {
               handleCourseClick(params.row.id)
-              SetselectedStudentData(params.row)
             }}
             aria-label='Edit'>
             <VisibilityIcon className={styles['view-icon']} />
@@ -154,33 +151,18 @@ export default function ManageTrainee() {
   ];
 
 
-  const getTraineeClips = async (params) => {
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${storedToken}`
-      },
-      body: JSON.stringify(params),
-    };
-    return fetch(process.env.NEXT_PUBLIC_API_BASE_URL + '/trainer/get-trainee-clips', options)
-      .then(data => data.json()).then(res => res.data).catch(e => e);
-
-  }
-
-  const getTraineeClipsApi = async (id) => {
+  const handleCourseClick = async (id) => {
+    setIsQuickPreviewOpen(true)
+    setIsQuickPreviewLoading(true)
     try {
-      let res = await getTraineeClips({ trainer_id: id })
-      setRecentStudentClips(res)
+      const data = await getUser360(id)
+      setSelectedStudentData(data)
     } catch (error) {
-      console.log(error)
+      toast.error(error?.message || "Unable to load user preview")
+      setSelectedStudentData({})
+    } finally {
+      setIsQuickPreviewLoading(false)
     }
-  }
-
-  const handleCourseClick = (id) => {
-    setIsOpen(true)
-    getTraineeClipsApi(id)
   };
 
   const getRowClassName = (params) => {
@@ -188,10 +170,16 @@ export default function ManageTrainee() {
   };
 
   const getRowHeight = () => 100
-  const width800 = useMediaQuery("(max-width:800px)")
 
   return (
     <>
+      <UserQuickPreviewModal
+        open={isQuickPreviewOpen}
+        handleClose={() => setIsQuickPreviewOpen(false)}
+        loading={isQuickPreviewLoading}
+        user360Data={selectedStudentData}
+        userId={selectedStudentData?.user?._id || selectedStudentData?._id}
+      />
       <Grid container spacing={3} sx={{ width: "100%" }}>
         <Grid item xs={12} md={12} lg={12} xl={12} >
           <form noValidate autoComplete="off" >
@@ -291,47 +279,6 @@ export default function ManageTrainee() {
           </form>
         </Grid>
       </Grid>
-
-      {/* ******************************************* */}
-
-      {/* <Modal handleClose={() => setIsOpen(false)} open={isOpen} maxWidth="xl">
-        <StudentDetail data={selectedStudentData} recentStudentClips={recentStudentClips} />
-      </Modal> */}
-
-      <Modal
-        handleClose={() => { setIsOpen(false) }} open={isOpen}
-
-      >
-        <div className="container media-gallery portfolio-section grid-portfolio " style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: 'center',
-          flexDirection: "column",
-          minHeight: "100dvh"
-        }}>
-          <div className="theme-title" style={{
-            width: width800 ? "100%" : "80%",
-            minHeight: width800 ? "100%" : "auto",
-            background: "white",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: 'center',
-            flexDirection: "column"
-          }}>
-            <div className="media" style={{
-              marginLeft: "90%",
-              marginRight: 0,
-              marginTop: "10px"
-            }}>
-              <div className="media-body media-body text-right">
-                <div className="icon-btn btn-sm btn-outline-light close-apps pointer" onClick={() => { setIsOpen(false) }} > <X /> </div>
-              </div>
-            </div>
-            <StudentDetail data={selectedStudentData} recentStudentClips={recentStudentClips} isOpen={isOpen} />
-          </div>
-        </div>
-      </Modal>
-
 
     </>
   )

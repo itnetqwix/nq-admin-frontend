@@ -7,14 +7,14 @@ import Modal from "./Modal";
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
-export default function DeletePopup({ handleClose, open, onConform }) {
+export default function DeletePopup({ handleClose, open, onConform, isLoading = false }) {
 
   return (
     <Modal handleClose={handleClose} open={open} maxWidth="xs">
       <Box>
         <Box padding={"2rem"} >
           <Typography variant="h6" gutterBottom sx={{ textAlign: 'center', fontWeight: "600" }}>
-            Are You sure wants to delete ?
+            Are you sure you want to delete?
           </Typography>
           <Box paddingTop={"1rem"}>
             <Grid container spacing={3}>
@@ -23,15 +23,17 @@ export default function DeletePopup({ handleClose, open, onConform }) {
               <Grid container justifyContent={"center"}>
                 <CustomButton
                   onClick={handleClose}
+                  disabled={isLoading}
                   variant='contained'
                   startIcon={<CancelPresentationIcon />} sx={{ marginRight: "10px", backgroundColor: "gray", color: "white" }}>
                   Cancel
                 </CustomButton>
                 <CustomButton
                   onClick={onConform}
+                  disabled={isLoading}
                   variant='contained'
                   startIcon={<DeleteForeverIcon />} sx={{ marginLeft: "10px", backgroundColor: "red", color: "white" }}>
-                  Delete
+                  {isLoading ? "Deleting..." : "Delete"}
                 </CustomButton>
               </Grid>
             </Grid>
