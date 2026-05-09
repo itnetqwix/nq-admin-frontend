@@ -1,10 +1,10 @@
 import { Box, Button, Chip, MenuItem, Stack, Tab, Tabs, TextField, Typography } from '@mui/material'
 import { useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
-import { deleteAdminEntity } from './api'
+import { deleteAdminEntity } from 'src/services/user360Api'
 
 const SectionCard = ({ title, children }) => (
-  <Box sx={{ border: '1px solid #e5e7eb', borderRadius: 2, p: 2, mb: 2, backgroundColor: '#fff' }}>
+  <Box sx={{ border: '1px solid #e5e7eb', borderRadius: 2, p: { xs: 1.25, md: 2 }, mb: 2, backgroundColor: '#fff' }}>
     <Typography variant='h6' sx={{ mb: 1 }}>{title}</Typography>
     {children}
   </Box>
@@ -65,11 +65,11 @@ const DeleteActions = ({ entityType, entityId, onDeleted, hardDeletePolicy }) =>
   }
 
   return (
-    <Stack direction='row' spacing={1}>
-      <Button size='small' color='warning' variant='outlined' disabled={loadingMode !== ''} onClick={() => handleDelete('soft')}>
+    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ width: { xs: '100%', sm: 'auto' } }}>
+      <Button size='small' color='warning' variant='outlined' fullWidth={true} disabled={loadingMode !== ''} onClick={() => handleDelete('soft')}>
         {loadingMode === 'soft' ? 'Deleting...' : 'Delete (soft)'}
       </Button>
-      <Button size='small' color='error' variant='outlined' disabled={loadingMode !== ''} onClick={() => handleDelete('hard')}>
+      <Button size='small' color='error' variant='outlined' fullWidth={true} disabled={loadingMode !== ''} onClick={() => handleDelete('hard')}>
         {loadingMode === 'hard' ? 'Deleting...' : 'Delete Permanently'}
       </Button>
     </Stack>
@@ -105,12 +105,13 @@ export default function AdminUser360Tabs({
   const auditItems = auditLogs?.items || []
 
   const QueryToolbar = ({ section, sectionQuery }) => (
-    <Stack direction='row' spacing={1} sx={{ mb: 2, flexWrap: 'wrap' }} useFlexGap>
+    <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} sx={{ mb: 2, flexWrap: 'wrap' }} useFlexGap>
       <TextField
         size='small'
         label='Search'
         value={sectionQuery?.search || ''}
         onChange={e => onQueryChange(section, { search: e.target.value, page: 1 })}
+        sx={{ minWidth: { xs: '100%', md: 220 } }}
       />
       <TextField
         size='small'
@@ -118,6 +119,7 @@ export default function AdminUser360Tabs({
         label='Sort By'
         value={sectionQuery?.sortBy || 'createdAt'}
         onChange={e => onQueryChange(section, { sortBy: e.target.value })}
+        sx={{ minWidth: { xs: '100%', md: 140 } }}
       >
         <MenuItem value='createdAt'>Created</MenuItem>
         <MenuItem value='booked_date'>Booked Date</MenuItem>
@@ -129,6 +131,7 @@ export default function AdminUser360Tabs({
         label='Order'
         value={sectionQuery?.sortOrder || 'desc'}
         onChange={e => onQueryChange(section, { sortOrder: e.target.value })}
+        sx={{ minWidth: { xs: '100%', md: 120 } }}
       >
         <MenuItem value='desc'>Desc</MenuItem>
         <MenuItem value='asc'>Asc</MenuItem>
@@ -139,6 +142,7 @@ export default function AdminUser360Tabs({
           label='Status'
           value={sectionQuery?.status || ''}
           onChange={e => onQueryChange(section, { status: e.target.value, page: 1 })}
+          sx={{ minWidth: { xs: '100%', md: 140 } }}
         />
       ) : null}
       <TextField
@@ -147,6 +151,7 @@ export default function AdminUser360Tabs({
         label='Limit'
         value={sectionQuery?.limit || 20}
         onChange={e => onQueryChange(section, { limit: Number(e.target.value), page: 1 })}
+        sx={{ minWidth: { xs: '100%', md: 110 } }}
       >
         <MenuItem value={10}>10</MenuItem>
         <MenuItem value={20}>20</MenuItem>
@@ -161,12 +166,12 @@ export default function AdminUser360Tabs({
     const limit = pagination?.limit || 20
     const maxPage = Math.max(1, Math.ceil(total / limit))
     return (
-      <Stack direction='row' spacing={1} alignItems='center' sx={{ mt: 2 }}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ xs: 'stretch', sm: 'center' }} sx={{ mt: 2 }}>
         <Typography variant='body2'>Page {page} of {maxPage} (Total: {total})</Typography>
-        <Button size='small' variant='outlined' disabled={page <= 1} onClick={() => onQueryChange(section, { page: page - 1 })}>
+        <Button size='small' variant='outlined' fullWidth={true} disabled={page <= 1} onClick={() => onQueryChange(section, { page: page - 1 })}>
           Prev
         </Button>
-        <Button size='small' variant='outlined' disabled={page >= maxPage} onClick={() => onQueryChange(section, { page: page + 1 })}>
+        <Button size='small' variant='outlined' fullWidth={true} disabled={page >= maxPage} onClick={() => onQueryChange(section, { page: page + 1 })}>
           Next
         </Button>
       </Stack>
@@ -174,7 +179,7 @@ export default function AdminUser360Tabs({
   }
 
   return (
-    <Box sx={{ mt: 2 }}>
+    <Box sx={{ mt: 2, width: '100%', overflowX: 'hidden' }}>
       <Tabs value={tab} onChange={(_, value) => setTab(value)} variant='scrollable' scrollButtons='auto'>
         <Tab label='Overview' />
         <Tab label='Lessons' />
@@ -204,9 +209,9 @@ export default function AdminUser360Tabs({
         {tab === 1 && (
           <SectionCard title='Lessons and Requests'>
             <QueryToolbar section='lessons' sectionQuery={query?.lessons} />
-            <Button size='small' sx={{ mb: 2 }} onClick={() => downloadCsv(lessonsItems, 'admin-lessons.csv')}>Export CSV</Button>
+            <Button size='small' sx={{ mb: 2, width: { xs: '100%', sm: 'auto' } }} onClick={() => downloadCsv(lessonsItems, 'admin-lessons.csv')}>Export CSV</Button>
             {lessonsItems.length ? lessonsItems.map(lesson => (
-              <Box key={lesson?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5 }}>
+              <Box key={lesson?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5, wordBreak: 'break-word' }}>
                 <Typography variant='body2'>Date: {lesson?.booked_date ? new Date(lesson.booked_date).toLocaleString() : '-'}</Typography>
                 <Typography variant='body2'>Time: {lesson?.session_start_time || '-'} - {lesson?.session_end_time || '-'}</Typography>
                 <Typography variant='body2'>Status: {lesson?.status || '-'}</Typography>
@@ -224,9 +229,9 @@ export default function AdminUser360Tabs({
         {tab === 2 && (
           <SectionCard title='Reviews'>
             <QueryToolbar section='reviews' sectionQuery={query?.reviews} />
-            <Button size='small' sx={{ mb: 2 }} onClick={() => downloadCsv(reviewsItems, 'admin-reviews.csv')}>Export CSV</Button>
+            <Button size='small' sx={{ mb: 2, width: { xs: '100%', sm: 'auto' } }} onClick={() => downloadCsv(reviewsItems, 'admin-reviews.csv')}>Export CSV</Button>
             {reviewsItems.length ? reviewsItems.map(review => (
-              <Box key={review?.session_id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5 }}>
+              <Box key={review?.session_id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5, wordBreak: 'break-word' }}>
                 <Typography variant='body2'>Session: {String(review?.session_id)}</Typography>
                 <Typography variant='body2'>Date: {review?.booked_date ? new Date(review.booked_date).toLocaleString() : '-'}</Typography>
                 <Typography variant='body2'>Status: {review?.status || '-'}</Typography>
@@ -242,9 +247,9 @@ export default function AdminUser360Tabs({
         {tab === 3 && (
           <SectionCard title='Clips'>
             <QueryToolbar section='assets' sectionQuery={query?.assets} />
-            <Button size='small' sx={{ mb: 2 }} onClick={() => downloadCsv(clipsItems, 'admin-clips.csv')}>Export CSV</Button>
+            <Button size='small' sx={{ mb: 2, width: { xs: '100%', sm: 'auto' } }} onClick={() => downloadCsv(clipsItems, 'admin-clips.csv')}>Export CSV</Button>
             {clipsItems.length ? clipsItems.map(item => (
-              <Box key={item?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5 }}>
+              <Box key={item?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5, wordBreak: 'break-word' }}>
                 <Typography variant='body2'>Title: {item?.title || '-'}</Typography>
                 <Typography variant='body2'>Category: {item?.category || '-'}</Typography>
                 <Typography variant='body2'>File: {item?.file_name || '-'}</Typography>
@@ -261,12 +266,12 @@ export default function AdminUser360Tabs({
         {tab === 4 && (
           <SectionCard title='PDF Plans and Session Reports'>
             <QueryToolbar section='assets' sectionQuery={query?.assets} />
-            <Stack direction='row' spacing={1} sx={{ mb: 2 }}>
-              <Button size='small' onClick={() => downloadCsv(reportItems, 'admin-pdf-reports.csv')}>Export Reports CSV</Button>
-              <Button size='small' onClick={() => downloadCsv(savedItems, 'admin-saved-sessions.csv')}>Export Sessions CSV</Button>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mb: 2 }}>
+              <Button size='small' fullWidth={true} onClick={() => downloadCsv(reportItems, 'admin-pdf-reports.csv')}>Export Reports CSV</Button>
+              <Button size='small' fullWidth={true} onClick={() => downloadCsv(savedItems, 'admin-saved-sessions.csv')}>Export Sessions CSV</Button>
             </Stack>
             {reportItems.length ? reportItems.map(item => (
-              <Box key={item?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5 }}>
+              <Box key={item?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5, wordBreak: 'break-word' }}>
                 <Typography variant='body2'>Title: {item?.title || '-'}</Typography>
                 <Typography variant='body2'>Session: {item?.sessions?._id || '-'}</Typography>
                 <Typography variant='body2'>Trainer: {item?.trainer?.fullname || '-'}</Typography>
@@ -280,7 +285,7 @@ export default function AdminUser360Tabs({
 
             <Typography variant='subtitle1' sx={{ mt: 2, mb: 1 }}>Saved Sessions</Typography>
             {savedItems.length ? savedItems.map(item => (
-              <Box key={item?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5 }}>
+              <Box key={item?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5, wordBreak: 'break-word' }}>
                 <Typography variant='body2'>File: {item?.file_name || '-'}</Typography>
                 <Typography variant='body2'>Trainer: {item?.trainer_name || '-'}</Typography>
                 <Typography variant='body2'>Trainee: {item?.trainee_name || '-'}</Typography>
@@ -296,9 +301,9 @@ export default function AdminUser360Tabs({
         {tab === 5 && (
           <SectionCard title='Admin Activity / Audit'>
             <QueryToolbar section='activity' sectionQuery={query?.activity} />
-            <Button size='small' sx={{ mb: 2 }} onClick={() => downloadCsv(auditItems, 'admin-activity.csv')}>Export CSV</Button>
+            <Button size='small' sx={{ mb: 2, width: { xs: '100%', sm: 'auto' } }} onClick={() => downloadCsv(auditItems, 'admin-activity.csv')}>Export CSV</Button>
             {auditItems.length ? auditItems.map(item => (
-              <Box key={item?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5 }}>
+              <Box key={item?._id} sx={{ borderBottom: '1px dashed #ddd', py: 1.5, wordBreak: 'break-word' }}>
                 <Typography variant='body2'>Action: {item?.action || '-'}</Typography>
                 <Typography variant='body2'>Entity: {item?.entity_type || '-'} / {item?.entity_id || '-'}</Typography>
                 <Typography variant='body2'>Admin: {item?.admin_id?.fullname || '-'}</Typography>

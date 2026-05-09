@@ -2,7 +2,7 @@ import { Box, CircularProgress, Container, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import AdminUser360Tabs from 'src/pages/components/user360/AdminUser360Tabs'
-import { getAuditLogs, getUser360, getUserAssets, getUserLessons, getUserReviews } from 'src/pages/components/user360/api'
+import { getAuditLogs, getUser360, getUserAssets, getUserLessons, getUserReviews } from 'src/services/user360Api'
 
 export default function User360Page() {
   const router = useRouter()

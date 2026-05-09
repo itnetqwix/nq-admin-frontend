@@ -26,7 +26,7 @@ import TicketStatusComponent from "src/pages/components/ticket-status";
 import TrainerStatus from "src/pages/components/trainer-status";
 import toast from "react-hot-toast";
 import UserQuickPreviewModal from "src/pages/components/user360/UserQuickPreviewModal";
-import { getUser360 } from "src/pages/components/user360/api";
+import { getUser360 } from "src/services/user360Api";
 
 function CustomPagination() {
 
