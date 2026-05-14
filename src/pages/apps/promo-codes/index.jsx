@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
@@ -11,12 +12,22 @@ import AdminTabs from 'src/components/admin/AdminTabs'
 import OpsMetricTile from 'src/components/admin/OpsMetricTile'
 import OpsSurfaceCard from 'src/components/admin/OpsSurfaceCard'
 import { useAdminConfirm } from 'src/components/admin'
+=======
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
+  FormControl, FormControlLabel, Grid, IconButton, InputLabel, MenuItem,
+  Select, Switch, TextField, Tooltip, Typography
+} from '@mui/material'
+import { DataGrid } from '@mui/x-data-grid'
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import toast from 'react-hot-toast'
+<<<<<<< HEAD
 import Link from 'next/link'
 
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
@@ -26,6 +37,14 @@ import MiniSparkline, { sparkFromUsedBy, fillDailySeries } from 'src/components/
 import {
   listPromoCodes,
   getPromoAdminStats,
+=======
+
+import styles from 'styles/common.module.css'
+import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import DeletePopup from 'src/pages/components/modal/DeletePopup'
+import {
+  listPromoCodes,
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
   createPromoCode,
   updatePromoCode,
   deletePromoCode,
@@ -60,6 +79,7 @@ function generateCode() {
   return code
 }
 
+<<<<<<< HEAD
 const SPONSOR_TABS = [
   { value: '', label: 'All promos' },
   { value: 'platform', label: 'Platform (NetQwix)' },
@@ -74,6 +94,8 @@ function sponsorChip(row) {
   return <Chip label='Platform' size='small' color='primary' variant='outlined' />
 }
 
+=======
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
 function getStatusChip(row) {
   const now = new Date()
   if (!row.is_active) return <Chip label='Inactive' size='small' color='default' />
@@ -83,6 +105,7 @@ function getStatusChip(row) {
 }
 
 export default function PromoCodesPage() {
+<<<<<<< HEAD
   const ability = useContext(AbilityContext)
   const fullAccess = ability?.can('manage', 'all') ?? false
   const canCreate = fullAccess || (ability?.can('create', 'admin-action-promo') ?? false)
@@ -95,6 +118,12 @@ export default function PromoCodesPage() {
   const [stats, setStats] = useState(null)
   const [search, setSearch] = useState('')
   const [sponsorTab, setSponsorTab] = useState('')
+=======
+  const [promos, setPromos] = useState([])
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [search, setSearch] = useState('')
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
 
@@ -103,6 +132,10 @@ export default function PromoCodesPage() {
   const [form, setForm] = useState({ ...EMPTY_FORM })
   const [saving, setSaving] = useState(false)
 
+<<<<<<< HEAD
+=======
+  const [deleteTarget, setDeleteTarget] = useState(null)
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
   const [usageOpen, setUsageOpen] = useState(false)
   const [usageData, setUsageData] = useState(null)
 
@@ -111,6 +144,7 @@ export default function PromoCodesPage() {
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
+<<<<<<< HEAD
       const query = { search, page, limit: pageSize }
       if (sponsorTab) query.sponsor_type = sponsorTab
       const [data, statsRes] = await Promise.all([
@@ -122,12 +156,22 @@ export default function PromoCodesPage() {
       setTotal(data?.result?.total || 0)
       if (statsRes?.result) setStats(statsRes.result)
       else if (statsRes && !statsRes.result) setStats(statsRes)
+=======
+      const data = await listPromoCodes({ search, page, limit: pageSize })
+      const list = data?.result?.promos || []
+      setPromos(list.map(p => ({ ...p, id: p._id })))
+      setTotal(data?.result?.total || 0)
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
     } catch (err) {
       toast.error(err.message || 'Failed to load promo codes')
     } finally {
       setLoading(false)
     }
+<<<<<<< HEAD
   }, [search, page, pageSize, sponsorTab])
+=======
+  }, [search, page, pageSize])
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
 
   useEffect(() => { fetchData() }, [fetchData])
 
@@ -141,20 +185,26 @@ export default function PromoCodesPage() {
   }
 
   const openCreate = () => {
+<<<<<<< HEAD
     if (!canCreate) {
       toast.error('You cannot create promo codes')
       return
     }
+=======
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
     setEditId(null)
     setForm({ ...EMPTY_FORM })
     setFormOpen(true)
   }
 
   const openEdit = row => {
+<<<<<<< HEAD
     if (!canUpdate) {
       toast.error('You cannot edit promo codes')
       return
     }
+=======
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
     setEditId(row._id)
     setForm({
       code: row.code || '',
@@ -224,6 +274,7 @@ export default function PromoCodesPage() {
     }
   }
 
+<<<<<<< HEAD
   const requestDelete = async row => {
     if (!canDelete) {
       toast.error('You cannot delete promo codes')
@@ -239,6 +290,14 @@ export default function PromoCodesPage() {
     try {
       await deletePromoCode(row._id)
       toast.success('Promo code deleted.')
+=======
+  const handleDelete = async () => {
+    if (!deleteTarget) return
+    try {
+      await deletePromoCode(deleteTarget._id)
+      toast.success('Promo code deleted.')
+      setDeleteTarget(null)
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
       fetchData()
     } catch (err) {
       toast.error(err.message || 'Delete failed')
@@ -279,6 +338,11 @@ export default function PromoCodesPage() {
       headerName: 'Code',
       flex: 1,
       minWidth: 120,
+<<<<<<< HEAD
+=======
+      headerClassName: styles['header-class'],
+      cellClassName: styles['cell-class'],
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
       renderCell: p => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography fontWeight={600} sx={{ fontFamily: 'monospace' }}>{p.value}</Typography>
@@ -291,22 +355,35 @@ export default function PromoCodesPage() {
       )
     },
     {
+<<<<<<< HEAD
       field: 'sponsor_type',
       headerName: 'Sponsor',
       width: 110,
       renderCell: p => sponsorChip(p.row)
     },
     {
+=======
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
       field: 'display_label',
       headerName: 'Label',
       flex: 1.2,
       minWidth: 140,
+<<<<<<< HEAD
+=======
+      headerClassName: styles['header-class'],
+      cellClassName: styles['cell-class'],
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
       renderCell: p => p.value || <Typography color='text.disabled'>--</Typography>
     },
     {
       field: 'discount',
       headerName: 'Discount',
       width: 120,
+<<<<<<< HEAD
+=======
+      headerClassName: styles['header-class'],
+      cellClassName: styles['cell-class'],
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
       renderCell: p => {
         const r = p.row
         return r.discount_type === 'percentage'
@@ -318,6 +395,7 @@ export default function PromoCodesPage() {
       field: 'usage',
       headerName: 'Usage',
       width: 110,
+<<<<<<< HEAD
       renderCell: p => `${p.row.usage_count || 0} / ${p.row.usage_limit || '∞'}`
     },
     {
@@ -331,12 +409,29 @@ export default function PromoCodesPage() {
       field: 'status',
       headerName: 'Status',
       width: 110,
+=======
+      headerClassName: styles['header-class'],
+      cellClassName: styles['cell-class'],
+      renderCell: p => `${p.row.usage_count || 0} / ${p.row.usage_limit || '∞'}`
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 110,
+      headerClassName: styles['header-class'],
+      cellClassName: styles['cell-class'],
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
       renderCell: p => getStatusChip(p.row)
     },
     {
       field: 'is_active',
       headerName: 'Active',
       width: 80,
+<<<<<<< HEAD
+=======
+      headerClassName: styles['header-class'],
+      cellClassName: styles['cell-class'],
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
       renderCell: p => (
         <Switch
           size='small'
@@ -350,6 +445,11 @@ export default function PromoCodesPage() {
       field: 'is_visible',
       headerName: 'Visible',
       width: 80,
+<<<<<<< HEAD
+=======
+      headerClassName: styles['header-class'],
+      cellClassName: styles['cell-class'],
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
       renderCell: p => (
         <Switch
           size='small'
@@ -363,6 +463,11 @@ export default function PromoCodesPage() {
       field: 'date_range',
       headerName: 'Date Range',
       width: 190,
+<<<<<<< HEAD
+=======
+      headerClassName: styles['header-class'],
+      cellClassName: styles['cell-class'],
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
       renderCell: p => {
         const s = p.row.start_date ? new Date(p.row.start_date).toLocaleDateString() : '?'
         const e = p.row.end_date ? new Date(p.row.end_date).toLocaleDateString() : '?'
@@ -374,6 +479,11 @@ export default function PromoCodesPage() {
       headerName: 'Actions',
       width: 140,
       sortable: false,
+<<<<<<< HEAD
+=======
+      headerClassName: styles['header-class-last'],
+      cellClassName: styles['cell-class-last'],
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
       renderCell: p => (
         <Box>
           <Tooltip title='View Usage'>
@@ -382,19 +492,31 @@ export default function PromoCodesPage() {
             </IconButton>
           </Tooltip>
           <Tooltip title='Edit'>
+<<<<<<< HEAD
             <IconButton size='small' disabled={!canUpdate} onClick={e => { e.stopPropagation(); openEdit(p.row) }}>
+=======
+            <IconButton size='small' onClick={e => { e.stopPropagation(); openEdit(p.row) }}>
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
               <EditIcon fontSize='small' />
             </IconButton>
           </Tooltip>
           <Tooltip title='Delete'>
+<<<<<<< HEAD
             <IconButton size='small' color='error' disabled={!canDelete} onClick={e => { e.stopPropagation(); void requestDelete(p.row) }}>
+=======
+            <IconButton size='small' color='error' onClick={e => { e.stopPropagation(); setDeleteTarget(p.row) }}>
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
               <DeleteOutlineIcon fontSize='small' />
             </IconButton>
           </Tooltip>
         </Box>
       )
     }
+<<<<<<< HEAD
   ], [canUpdate, canDelete])
+=======
+  ], [])
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
 
   const usageColumns = useMemo(() => [
     { field: 'user', headerName: 'User', flex: 1, renderCell: p => p.row.user_id?.fullname || p.row.user_id?.email || String(p.row.user_id) },
@@ -411,6 +533,7 @@ export default function PromoCodesPage() {
   return (
     <>
       <AdminPageShell
+<<<<<<< HEAD
         bare
         eyebrow='Revenue · promos'
         icon='mdi:tag-multiple-outline'
@@ -509,6 +632,38 @@ export default function PromoCodesPage() {
               />
             </AdminGridContainer>
           </OpsSurfaceCard>
+=======
+        title='Promo Codes'
+        subtitle='Create and manage promotional codes for bookings. Control discounts, validity periods, usage limits, and user visibility.'
+        actions={
+          <Button variant='contained' startIcon={<AddIcon />} onClick={openCreate} sx={{ bgcolor: '#000080', '&:hover': { bgcolor: '#0000a0' } }}>
+            Create Promo Code
+          </Button>
+        }
+        contentSx={{ p: 0 }}
+      >
+        <AdminPageSection>
+          <TextField
+            size='small'
+            placeholder='Search by code, label, or description...'
+            onChange={handleSearchChange}
+            sx={{ width: { xs: '100%', sm: 320 }, mb: 2 }}
+          />
+          <DataGrid
+            rows={promos}
+            columns={columns}
+            loading={loading}
+            rowCount={total}
+            paginationMode='server'
+            paginationModel={{ page: page - 1, pageSize }}
+            onPaginationModelChange={m => { setPage(m.page + 1); setPageSize(m.pageSize) }}
+            pageSizeOptions={[25, 50, 100]}
+            disableRowSelectionOnClick
+            autoHeight
+            getRowClassName={p => p.indexRelativeToCurrentPage % 2 === 0 ? styles['even-row'] : styles['odd-row']}
+            sx={{ border: 'none', '& .MuiDataGrid-cell': { py: 1 } }}
+          />
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
         </AdminPageSection>
       </AdminPageShell>
 
@@ -625,7 +780,16 @@ export default function PromoCodesPage() {
         </DialogActions>
       </Dialog>
 
+<<<<<<< HEAD
       {ConfirmDialog}
+=======
+      {/* Delete Confirmation */}
+      <DeletePopup
+        open={!!deleteTarget}
+        setOpen={() => setDeleteTarget(null)}
+        onClick={handleDelete}
+      />
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
 
       {/* Usage Detail Dialog */}
       <Dialog open={usageOpen} onClose={() => setUsageOpen(false)} maxWidth='md' fullWidth>
@@ -657,11 +821,21 @@ export default function PromoCodesPage() {
               </Grid>
             </Box>
           )}
+<<<<<<< HEAD
           <AdminDataGrid
             rows={usageRows}
             columns={usageColumns}
             pageSizeOptions={[10, 25]}
             initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+=======
+          <DataGrid
+            rows={usageRows}
+            columns={usageColumns}
+            autoHeight
+            pageSizeOptions={[10, 25]}
+            initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+            disableRowSelectionOnClick
+>>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
             sx={{ border: 'none' }}
           />
           {usageRows.length === 0 && (
