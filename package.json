@@ -49,6 +49,7 @@
     "clsx": "1.2.1",
     "date-fns": "2.29.3",
     "draft-js": "0.11.7",
+    "draftjs-to-html": "^0.9.1",
     "i18next": "22.4.11",
     "i18next-browser-languagedetector": "7.0.1",
     "i18next-http-backend": "2.2.0",

@@ -55,6 +55,20 @@ const navigation = () => {
       icon: 'mdi:video-outline',
       action: 'read',
       subject: 'admin-nav-call-diagnostics'
+    },
+    {
+      title: 'Promo Codes',
+      path: '/apps/promo-codes',
+      icon: 'mdi:tag-multiple-outline',
+      action: 'read',
+      subject: 'admin-nav-promo-codes'
+    },
+    {
+      title: 'Broadcasts',
+      path: '/apps/broadcasts',
+      icon: 'mdi:bullhorn-outline',
+      action: 'read',
+      subject: 'admin-nav-broadcasts'
     }
   ]
 }
