@@ -41,12 +41,13 @@ import {
   useTheme
 } from '@mui/material'
 import { useContext, useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
 import { AbilityContext } from 'src/layouts/components/acl/Can'
 import toast from 'react-hot-toast'
 import { deleteAdminEntity, getClipPlayUrl } from 'src/services/user360Api'
 import { getImageUrl } from 'src/utils/utils'
 
-const tabLabels = ['Overview', 'Lessons', 'Reviews', 'Clips', 'PDF & saved', 'Activity']
+const tabLabels = ['Overview', 'Lessons', 'Reviews', 'Clips', 'PDF & saved', 'Activity', 'Issues & Logs']
 
 const SectionShell = ({ title, subtitle, action, children }) => {
   const theme = useTheme()
@@ -512,10 +513,12 @@ export default function AdminUser360Tabs({
     savedSessions: { items: [], pagination: { page: 1, limit: 20, total: 0 } }
   },
   timeline = { items: [], pagination: { page: 1, limit: 30, total: 0 } },
+  opsEvents = { items: [], total: 0 },
   loadingLessons = false,
   loadingReviews = false,
   loadingAssets = false,
   loadingTimeline = false,
+  loadingOpsEvents = false,
   onRefresh,
   query,
   onQueryChange,
@@ -536,6 +539,7 @@ export default function AdminUser360Tabs({
   const reportItems = assets?.reports?.items || []
   const savedItems = assets?.savedSessions?.items || []
   const timelineItems = timeline?.items || []
+  const opsItems = opsEvents?.items || []
 
   const [playClipId, setPlayClipId] = useState(null)
   const [metaOpenId, setMetaOpenId] = useState(null)
@@ -1272,6 +1276,44 @@ export default function AdminUser360Tabs({
               <EmptyHint title='Nothing in this view' hint='Clear filters or widen the event type. New events appear after user actions are instrumented.' />
             ) : null}
             <PaginationBar section='activity' pagination={timeline?.pagination} />
+          </SectionShell>
+        )}
+
+        {tab === 6 && (
+          <SectionShell
+            title='Issues & logs'
+            subtitle='Ops events for this user: calls, instant lessons, wallet, support tickets, and errors.'
+            action={(
+              <Button component={Link} href={`/apps/ops-logs?userId=${userId}`} variant='outlined' size='small'>
+                View all logs
+              </Button>
+            )}
+          >
+            {loadingOpsEvents ? (
+              <Box sx={{ py: 8, display: 'flex', justifyContent: 'center' }}><CircularProgress /></Box>
+            ) : null}
+            {!loadingOpsEvents && opsItems.length ? (
+              <Stack spacing={1.5}>
+                {opsItems.slice(0, 30).map(row => (
+                  <Paper key={row._id || row.event_id} variant='outlined' sx={{ p: 2 }}>
+                    <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
+                      <Chip size='small' label={row.severity} color={row.severity === 'error' || row.severity === 'critical' ? 'error' : 'default'} />
+                      <Chip size='small' label={row.category} variant='outlined' />
+                      <Typography variant='caption' color='text.secondary'>
+                        {row.createdAt ? new Date(row.createdAt).toLocaleString() : ''}
+                      </Typography>
+                    </Stack>
+                    <Typography variant='subtitle2' sx={{ mt: 1, fontWeight: 600 }}>{row.title}</Typography>
+                    {row.summary ? (
+                      <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>{row.summary}</Typography>
+                    ) : null}
+                  </Paper>
+                ))}
+              </Stack>
+            ) : null}
+            {!loadingOpsEvents && !opsItems.length ? (
+              <EmptyHint title='No ops events' hint='Issues will appear here when logged from calls, wallet, or support.' />
+            ) : null}
           </SectionShell>
         )}
       </Box>

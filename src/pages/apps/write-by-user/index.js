@@ -54,6 +54,7 @@ const statusColors = {
 
 export default function WriteByUsers() {
   const common = useCommon();
+  const [search, setSearch] = React.useState('');
 
   const {
     writeByUsers,
@@ -63,6 +64,18 @@ export default function WriteByUsers() {
   useEffect(() => {
     getWriteByUsers();
   }, [])
+
+  const filteredRows = React.useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return writeByUsers ?? [];
+    return (writeByUsers ?? []).filter(row => {
+      const hay = [row.name, row.email, row.subject, row.description, row.user_info?.email, row.user_info?.fullName]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+      return hay.includes(q);
+    });
+  }, [writeByUsers, search]);
 
   const columns = [
     { field: 'name', headerName: 'Name', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 200 },
@@ -142,11 +155,16 @@ export default function WriteByUsers() {
         <AdminPageSection>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 1, mb: 2 }}>
             <InputLabel sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>Search</InputLabel>
-            <TextField size='small' placeholder='Filter in table…' />
+            <TextField
+              size='small'
+              placeholder='Search name, email, subject…'
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
           </Box>
           <div className='admin-data-grid' style={{ height: '71vh', width: '100%' }}>
             <DataGrid
-              rows={writeByUsers ?? []}
+              rows={filteredRows}
               columns={columns}
               headerClassName={styles['header-class']}
               getRowClassName={getRowClassName}

@@ -49,6 +49,13 @@ const navigation = () => [
     subject: 'admin-nav-audit-logs'
   },
   {
+    title: 'Operations log',
+    path: '/apps/ops-logs',
+    icon: 'mdi:alert-circle-outline',
+    action: 'read',
+    subject: 'admin-nav-ops-logs'
+  },
+  {
     title: 'Call diagnostics',
     path: '/apps/call-diagnostics',
     icon: 'mdi:video-outline',

@@ -19,6 +19,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import AdminUser360Tabs from 'src/pages/components/user360/AdminUser360Tabs'
 import { getUser360, getUserAssets, getUserLessons, getUserReviews, getUserTimeline } from 'src/services/user360Api'
+import { getOpsEventsForUser } from 'src/services/opsApi'
 
 export default function User360Page() {
   const router = useRouter()
@@ -36,6 +37,7 @@ export default function User360Page() {
   const [reviewsLoading, setReviewsLoading] = useState(false)
   const [assetsLoading, setAssetsLoading] = useState(false)
   const [timelineLoading, setTimelineLoading] = useState(false)
+  const [opsEventsLoading, setOpsEventsLoading] = useState(false)
 
   const [userData, setUserData] = useState(null)
   const [lessons, setLessons] = useState({ items: [], pagination: { page: 1, limit: 20, total: 0 } })
@@ -46,6 +48,7 @@ export default function User360Page() {
     savedSessions: { items: [], pagination: { page: 1, limit: 20, total: 0 } }
   })
   const [timeline, setTimeline] = useState({ items: [], pagination: { page: 1, limit: 30, total: 0 } })
+  const [opsEvents, setOpsEvents] = useState({ items: [], total: 0 })
 
   const [query, setQuery] = useState({
     lessons: { page: 1, limit: 20, sortBy: 'createdAt', sortOrder: 'desc', status: '', search: '' },
@@ -204,6 +207,28 @@ export default function User360Page() {
     }
   }, [userId, tab, query.activity])
 
+  useEffect(() => {
+    if (!userId || tab !== 6) return
+    let cancelled = false
+    ;(async () => {
+      setOpsEventsLoading(true)
+      try {
+        const d = await getOpsEventsForUser(userId, { page: 1, limit: 50 })
+        if (!cancelled) setOpsEvents({ items: d?.items || [], total: d?.total || 0 })
+      } catch (e) {
+        if (!cancelled) {
+          setOpsEvents({ items: [], total: 0 })
+          toast.error(e?.message || 'Failed to load issues')
+        }
+      } finally {
+        if (!cancelled) setOpsEventsLoading(false)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [userId, tab])
+
   const refreshActiveTab = useCallback(async () => {
     if (!userId) return
     try {
@@ -219,6 +244,9 @@ export default function User360Page() {
         setAssets(await getUserAssets(userId, { ...query.assets, section: 'plans' }))
       } else if (tab === 5) {
         setTimeline(await getUserTimeline(userId, query.activity))
+      } else if (tab === 6) {
+        const d = await getOpsEventsForUser(userId, { page: 1, limit: 50 })
+        setOpsEvents({ items: d?.items || [], total: d?.total || 0 })
       }
     } catch (e) {
       toast.error(e?.message || 'Refresh failed')
@@ -335,10 +363,12 @@ export default function User360Page() {
               reviews={reviews}
               assets={assets}
               timeline={timeline}
+              opsEvents={opsEvents}
               loadingLessons={lessonsLoading}
               loadingReviews={reviewsLoading}
               loadingAssets={assetsLoading}
               loadingTimeline={timelineLoading}
+              loadingOpsEvents={opsEventsLoading}
               onRefresh={refreshActiveTab}
               query={query}
               onQueryChange={updateSectionQuery}

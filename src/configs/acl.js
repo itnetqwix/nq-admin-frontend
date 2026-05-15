@@ -30,7 +30,9 @@ const defineRulesFor = (role, user) => {
   if (ok('nav_user_feedback')) can('read', 'admin-nav-user-feedback')
   if (ok('nav_support_tickets')) can('read', 'admin-nav-support-tickets')
   if (ok('nav_audit_logs')) can('read', 'admin-nav-audit-logs')
+  if (ok('nav_ops_logs') || ok('nav_audit_logs')) can('read', 'admin-nav-ops-logs')
   if (ok('nav_call_diagnostics')) can('read', 'admin-nav-call-diagnostics')
+  if (ok('nav_finance')) can('read', 'admin-nav-finance')
   if (ok('nav_promo_codes')) can('read', 'admin-nav-promo-codes')
   if (ok('nav_broadcasts')) can('read', 'admin-nav-broadcasts')
 

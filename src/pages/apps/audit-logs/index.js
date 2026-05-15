@@ -2,6 +2,7 @@ import { Box, Button, Grid, TextField } from '@mui/material'
 import Stack from '@mui/material/Stack'
 import { DataGrid } from '@mui/x-data-grid'
 import { useCallback, useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
 import styles from 'styles/common.module.css'
 import { getAuditLogs } from 'src/services/user360Api'
@@ -9,6 +10,8 @@ import moment from 'moment'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 
 export default function AuditLogsPage() {
+  const router = useRouter()
+  const filterUserId = router.isReady && router.query.userId ? String(router.query.userId) : undefined
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
@@ -19,7 +22,7 @@ export default function AuditLogsPage() {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await getAuditLogs(undefined, {
+      const data = await getAuditLogs(filterUserId, {
         page: page + 1,
         limit: pageSize,
         search: search.trim(),
@@ -43,7 +46,7 @@ export default function AuditLogsPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, pageSize, search])
+  }, [page, pageSize, search, filterUserId])
 
   useEffect(() => {
     void load()

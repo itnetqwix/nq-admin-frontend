@@ -195,6 +195,42 @@ const Home = () => {
                 onCardClick={() => router.push('/apps/call-diagnostics')}
               />
             </Grid>
+            <Grid item xs={6} sm={3}>
+              <CardStatisticsVertical
+                color='error'
+                stats={metrics != null ? fmtInt(metrics.opsCriticalOpen24h ?? 0) : '—'}
+                trendNumber='24h'
+                trend='positive'
+                title='Critical ops events'
+                chipText='Open / investigating'
+                icon={<Icon icon='mdi:alert-octagon-outline' />}
+                onCardClick={() => router.push('/apps/ops-logs?severity=critical')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <CardStatisticsVertical
+                color='warning'
+                stats={metrics != null ? fmtInt(metrics.opsInstantFailures24h ?? 0) : '—'}
+                trendNumber='24h'
+                trend='positive'
+                title='Instant lesson failures'
+                chipText='Errors'
+                icon={<Icon icon='mdi:flash-alert' />}
+                onCardClick={() => router.push('/apps/ops-logs?instant_only=true')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <CardStatisticsVertical
+                color='info'
+                stats={metrics != null ? fmtInt(metrics.opsCallPreflightFailures24h ?? 0) : '—'}
+                trendNumber='24h'
+                trend='positive'
+                title='Call preflight failures'
+                chipText='Connection'
+                icon={<Icon icon='mdi:phone-alert' />}
+                onCardClick={() => router.push('/apps/ops-logs?category=connection')}
+              />
+            </Grid>
           </Grid>
 
           <Grid item xs={12} md={8} container spacing={6}>
