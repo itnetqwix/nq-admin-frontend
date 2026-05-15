@@ -50,6 +50,13 @@ const navigation = () => {
       subject: 'admin-nav-audit-logs'
     },
     {
+      title: 'Finance',
+      path: '/apps/finance',
+      icon: 'mdi:wallet-outline',
+      action: 'read',
+      subject: 'admin-nav-finance'
+    },
+    {
       title: 'Call diagnostics',
       path: '/apps/call-diagnostics',
       icon: 'mdi:video-outline',
