@@ -24,6 +24,7 @@ const defineRulesFor = (role, user) => {
   }
 
   if (ok('nav_home')) can('read', 'admin-nav-home')
+  if (ok('nav_trainers') || ok('nav_trainer_verifications')) can('read', 'admin-nav-trainer-verifications')
   if (ok('nav_trainers')) can('read', 'admin-nav-trainers')
   if (ok('nav_trainees')) can('read', 'admin-nav-trainees')
   if (ok('nav_bookings')) can('read', 'admin-nav-bookings')

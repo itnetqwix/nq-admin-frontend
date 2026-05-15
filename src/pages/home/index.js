@@ -32,6 +32,7 @@ import CommissionForm from 'src/layouts/components/student/CommissionForm'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import ActiveUsersTable from '../components/tables/UsersTable'
 import { useAdminRealtime } from 'src/context/AdminRealtimeContext'
+import { getPendingVerificationCount } from 'src/services/verificationApi'
 
 const Home = () => {
   const router = useRouter()
@@ -41,6 +42,13 @@ const Home = () => {
 
   const [comission, setComission] = useState([]);
   const [commissionModal, setComissionModal] = useState(false);
+  const [pendingVerifications, setPendingVerifications] = useState(null);
+
+  useEffect(() => {
+    getPendingVerificationCount()
+      .then(setPendingVerifications)
+      .catch(() => setPendingVerifications(0))
+  }, [])
 
   const fmtMoney = v =>
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(
@@ -193,6 +201,18 @@ const Home = () => {
                 chipText='Quality & events'
                 icon={<Icon icon='mdi:video-outline' />}
                 onCardClick={() => router.push('/apps/call-diagnostics')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <CardStatisticsVertical
+                color='secondary'
+                stats={pendingVerifications != null ? fmtInt(pendingVerifications) : '—'}
+                trendNumber='Queue'
+                trend='positive'
+                title='Trainer verifications'
+                chipText='Pending review'
+                icon={<Icon icon='mdi:account-check-outline' />}
+                onCardClick={() => router.push('/apps/trainer-verifications')}
               />
             </Grid>
             <Grid item xs={6} sm={3}>

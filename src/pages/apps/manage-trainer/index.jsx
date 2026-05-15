@@ -309,9 +309,14 @@ export default function ManageTrainer() {
           title='Trainers'
           subtitle='Search the directory and click a row to open User 360.'
           actions={
-            <CustomButton component={Link} variant='contained' href='/apps/manage-trainer' startIcon={<MenuIcon />}>
-              Settings
-            </CustomButton>
+            <>
+              <CustomButton component={Link} variant='outlined' href='/apps/trainer-verifications'>
+                Verifications queue
+              </CustomButton>
+              <CustomButton component={Link} variant='contained' href='/apps/manage-trainer' startIcon={<MenuIcon />}>
+                Settings
+              </CustomButton>
+            </>
           }
           contentSx={{ p: 0 }}
         >

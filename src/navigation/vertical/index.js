@@ -8,6 +8,13 @@ const navigation = () => {
       subject: 'admin-nav-home'
     },
     {
+      title: 'Trainer verifications',
+      path: '/apps/trainer-verifications',
+      icon: 'mdi:account-check-outline',
+      action: 'read',
+      subject: 'admin-nav-trainer-verifications'
+    },
+    {
       title: 'Manage Trainer',
       path: '/apps/manage-trainer',
       icon: 'mdi:human-male-board',
