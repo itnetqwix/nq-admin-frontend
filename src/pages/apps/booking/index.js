@@ -39,6 +39,7 @@ export default function Booking() {
   const [cancelId, setCancelId] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailBookingId, setDetailBookingId] = useState(null);
+  const [detailListRow, setDetailListRow] = useState(null);
 
   const common = useCommon();
 
@@ -61,6 +62,7 @@ export default function Booking() {
 
   const openBookingDetail = row => {
     setDetailBookingId(row._id)
+    setDetailListRow(row)
     setDetailOpen(true)
   }
 
@@ -457,10 +459,20 @@ export default function Booking() {
       <BookingDetailDrawer
         open={detailOpen}
         bookingId={detailBookingId}
+        listRow={detailListRow}
+        canRefund={canRefund}
         onClose={() => {
           setDetailOpen(false)
           setDetailBookingId(null)
+          setDetailListRow(null)
         }}
+        onConfirm={onConfirmBooking}
+        onRequestCancel={id => {
+          setOpenClosePopup(true)
+          setCancelId(id)
+        }}
+        onRequestRefund={row => showRefundPopup(row)}
+        onActionComplete={() => getBookingList()}
       />
     </>
   )
