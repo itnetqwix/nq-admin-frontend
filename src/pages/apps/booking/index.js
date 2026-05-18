@@ -17,6 +17,7 @@ import toast from "react-hot-toast";
 import authConfig from 'src/configs/auth'
 import { BookedSession, debouncedSearchMedicine, isCurrentDateBefore } from "src/utils/utils";
 import CancelSessionPopups from "src/pages/components/modal/CancelSessionPopups";
+import BookingDetailDrawer from "src/pages/components/modal/BookingDetailDrawer";
 
 const booking_status = {
   canceled: "red",
@@ -36,6 +37,8 @@ export default function Booking() {
   const [refundRow, setRefundRow] = useState(null);
   const [openClosePopup, setOpenClosePopup] = useState(false);
   const [cancelId, setCancelId] = useState(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailBookingId, setDetailBookingId] = useState(null);
 
   const common = useCommon();
 
@@ -56,8 +59,36 @@ export default function Booking() {
     getPaymentIntentDetails({ payment_intent_id: row.payment_intent_id })
   }
 
+  const openBookingDetail = row => {
+    setDetailBookingId(row._id)
+    setDetailOpen(true)
+  }
+
   const columns = [
-    { field: '_id', headerName: 'Booking Id', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 250 },
+    {
+      field: '_id',
+      headerName: 'Booking Id',
+      headerClassName: styles['header-class'],
+      cellClassName: styles['cell-class'],
+      width: 250,
+      renderCell: params => (
+        <button
+          type='button'
+          onClick={() => openBookingDetail(params.row)}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#1976d2',
+            cursor: 'pointer',
+            textAlign: 'left',
+            padding: 0,
+            textDecoration: 'underline'
+          }}
+        >
+          {params.row._id}
+        </button>
+      )
+    },
     {
       field: 'booked_date',
       headerName: 'Booking Date',
@@ -422,6 +453,15 @@ export default function Booking() {
       <RefundPopups paymentIntentDetails={paymentIntentDetails} bookingPreview={refundRow} handleClose={handleCloseRefundPopup} open={openRefundPopup} onConform={onConformRefund} />
 
       <CancelSessionPopups handleClose={handleCloseCancelPopup} open={openClosePopup} onConform={onConformCancel} />
+
+      <BookingDetailDrawer
+        open={detailOpen}
+        bookingId={detailBookingId}
+        onClose={() => {
+          setDetailOpen(false)
+          setDetailBookingId(null)
+        }}
+      />
     </>
   )
 }
