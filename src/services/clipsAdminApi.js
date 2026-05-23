@@ -86,7 +86,10 @@ export async function presignLibraryClip(body) {
     body: JSON.stringify(body)
   })
   const data = await res.json()
-  if (!res.ok) throw new Error(data?.message || 'Presign failed')
+  if (!res.ok) throw new Error(data?.message || data?.error || 'Presign failed')
+  if (!data?.videoUploadUrl || !data?.videoKey) {
+    throw new Error('Invalid presign response from server')
+  }
   return data
 }
 
@@ -97,7 +100,7 @@ export async function confirmLibraryClip(body) {
     body: JSON.stringify(body)
   })
   const data = await res.json()
-  if (!res.ok) throw new Error(data?.message || 'Confirm failed')
+  if (!res.ok) throw new Error(data?.message || data?.error || 'Confirm failed')
   return data
 }
 
