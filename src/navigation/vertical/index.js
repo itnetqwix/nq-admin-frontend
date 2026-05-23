@@ -15,6 +15,27 @@ const navigation = () => {
       subject: 'admin-nav-trainer-verifications'
     },
     {
+      title: 'Clip taxonomy',
+      path: '/apps/clip-taxonomy',
+      icon: 'mdi:folder-outline',
+      action: 'read',
+      subject: 'admin-nav-clip-taxonomy'
+    },
+    {
+      title: 'Netqwix Library',
+      path: '/apps/netqwix-library',
+      icon: 'mdi:library-outline',
+      action: 'read',
+      subject: 'admin-nav-netqwix-library'
+    },
+    {
+      title: 'Library submissions',
+      path: '/apps/library-submissions',
+      icon: 'mdi:clipboard-check-outline',
+      action: 'read',
+      subject: 'admin-nav-library-submissions'
+    },
+    {
       title: 'Manage Trainer',
       path: '/apps/manage-trainer',
       icon: 'mdi:human-male-board',

@@ -18,7 +18,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { CustomButton } from "src/pages/components/common";
 import { useCommon } from "src/hooks/useCommon";
 import { getImageUrl } from "src/utils/utils";
-import TrainerStatus from "src/pages/components/trainer-status";
+import TraineeRejectActions from "src/pages/components/trainee-reject/TraineeRejectActions";
 import toast from "react-hot-toast";
 import UserQuickPreviewModal from "src/pages/components/user360/UserQuickPreviewModal";
 import { getUser360 } from "src/services/user360Api";
@@ -106,9 +106,11 @@ export default function ManageTrainee() {
       cellClassName: styles['cell-class'],
       width: 200,
       renderCell: params => (
-        <div className={styles["status-booking"]} >
-          <TrainerStatus params={params} />
-        </div>
+        <TraineeRejectActions
+          userId={params.row.id || params.row._id}
+          status={params.row.status}
+          onUpdated={() => getTraineesList()}
+        />
       )
     },
     { field: 'category', headerName: 'Category', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 100 },
