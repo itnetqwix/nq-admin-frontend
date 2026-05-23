@@ -24,7 +24,7 @@ import MuiFormControlLabel from '@mui/material/FormControlLabel'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
-import { isAdminRegisterEnabled, showAdminMfaNotice } from 'src/configs/adminEnv'
+import { adminRegisterEnvHint, isAdminRegisterEnabled, showAdminMfaNotice } from 'src/configs/adminEnv'
 
 // ** Third Party Imports
 import * as yup from 'yup'
@@ -285,8 +285,7 @@ const LoginPage = () => {
                 </Box>
               ) : (
                 <Typography variant='caption' sx={{ display: 'block', textAlign: 'center', color: 'text.secondary', mb: 2 }}>
-                  Admin self-registration is off. Use an existing administrator account or enable NEXT_PUBLIC_ADMIN_REGISTER_ENABLED for
-                  controlled setup only.
+                  Admin self-registration is off. Use an existing administrator account or {adminRegisterEnvHint()}
                 </Typography>
               )}
               <Divider

@@ -37,7 +37,8 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
-import { isAdminRegisterEnabled } from 'src/configs/adminEnv'
+import { adminRegisterEnvHint, isAdminRegisterEnabled } from 'src/configs/adminEnv'
+import { registerAdminAccount } from 'src/services/adminAuthApi'
 
 // ** Styled Components
 const RegisterIllustrationWrapper = styled(Box)(({ theme }) => ({
@@ -98,6 +99,7 @@ const LinkStyled = styled(Link)(({ theme }) => ({
 const Register = () => {
   // ** States
   const [showPassword, setShowPassword] = useState(false)
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [formValues, setFormValues] = useState({
@@ -137,35 +139,37 @@ const Register = () => {
       return
     }
 
-    const payload = {
-      fullname: formValues.fullname?.trim(),
-      email: formValues.email?.trim(),
-      mobile_no: formValues.mobile_no?.trim(),
-      password: formValues.password,
-      account_type: 'Admin'
+    if (!formValues.fullname?.trim() || !formValues.email?.trim() || !formValues.mobile_no?.trim() || !formValues.password) {
+      setErrorMessage('All fields are required.')
+      return
     }
 
-    if (!payload.fullname || !payload.email || !payload.mobile_no || !payload.password) {
-      setErrorMessage('All fields are required.')
+    if (!acceptedTerms) {
+      setErrorMessage('Please accept the privacy policy and terms to continue.')
+      return
+    }
+
+    const password = formValues.password
+    if (password.length < 8) {
+      setErrorMessage('Password must be at least 8 characters.')
+      return
+    }
+    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+      setErrorMessage('Password must include upper and lower case letters and a special character.')
       return
     }
 
     setIsSubmitting(true)
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
+      await registerAdminAccount({
+        fullname: formValues.fullname,
+        email: formValues.email,
+        mobile_no: formValues.mobile_no,
+        password: formValues.password,
+        accepted_terms_and_privacy: true
       })
 
-      const responseData = await response.json()
-      if (!response.ok || responseData?.status === 'fail') {
-        throw new Error(responseData?.error || responseData?.message || 'Unable to create admin account right now.')
-      }
-
-      toast.success('Admin account created successfully. Please login.')
+      toast.success('Administrator account created. Sign in with your email and password.')
       router.push('/login')
     } catch (error) {
       setErrorMessage(error?.message || 'Unable to create admin account right now.')
@@ -285,8 +289,11 @@ const Register = () => {
               </Typography>
             </Box>
             <Box sx={{ mb: 6 }}>
-              <TypographyStyled variant='h5'>Adventure starts here 🚀</TypographyStyled>
-              <Typography variant='body2'>Make your app management easy and fun!</Typography>
+              <TypographyStyled variant='h5'>Create administrator account</TypographyStyled>
+              <Typography variant='body2' sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
+                Registers a user with account type Admin in NetQwix. Use only for trusted bootstrap or internal
+                onboarding. {adminRegisterEnvHint()}
+              </Typography>
             </Box>
             <form noValidate autoComplete='off' onSubmit={handleRegister}>
               <TextField
@@ -339,6 +346,9 @@ const Register = () => {
                   }
                 />
               </FormControl>
+              <Typography variant='caption' sx={{ display: 'block', color: 'text.secondary', mt: 1 }}>
+                At least 8 characters with upper, lower, and special characters.
+              </Typography>
               {errorMessage ? (
                 <Typography color='error' variant='body2' sx={{ mt: 2 }}>
                   {errorMessage}
@@ -346,7 +356,9 @@ const Register = () => {
               ) : null}
 
               <FormControlLabel
-                control={<Checkbox />}
+                control={
+                  <Checkbox checked={acceptedTerms} onChange={e => setAcceptedTerms(e.target.checked)} />
+                }
                 sx={{ mb: 4, mt: 1.5, '& .MuiFormControlLabel-label': { fontSize: '0.875rem' } }}
                 label={
                   <>
@@ -359,8 +371,15 @@ const Register = () => {
                   </>
                 }
               />
-              <Button fullWidth size='large' type='submit' variant='contained' sx={{ mb: 7 }} disabled={isSubmitting}>
-                Sign up
+              <Button
+                fullWidth
+                size='large'
+                type='submit'
+                variant='contained'
+                sx={{ mb: 7 }}
+                disabled={isSubmitting || !acceptedTerms}
+              >
+                Create admin account
               </Button>
               <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
                 <Typography sx={{ mr: 2, color: 'text.secondary' }}>Already have an account?</Typography>
