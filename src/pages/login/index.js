@@ -267,27 +267,31 @@ const LoginPage = () => {
                   Forgot Password?
                 </Typography>
               </Box>
-              <Button fullWidth size='large' type='submit' variant='contained' sx={{ mb: 7 }}>
+              <Button fullWidth size='large' type='submit' variant='contained' sx={{ mb: 3 }}>
                 Login
               </Button>
+              <Button
+                fullWidth
+                size='large'
+                variant='outlined'
+                component={Link}
+                href='/register'
+                sx={{ mb: 4 }}
+              >
+                Create administrator account
+              </Button>
+              {!isAdminRegisterEnabled() ? (
+                <Alert severity='warning' sx={{ mb: 4 }}>
+                  Registration UI is available, but the admin app must have {adminRegisterEnvHint()} Restart the dev
+                  server after changing env.
+                </Alert>
+              ) : null}
               {showAdminMfaNotice() ? (
                 <Alert severity='info' sx={{ mb: 4 }}>
                   Your organization may enable multi-factor authentication for admin accounts. Follow internal security
                   guidance when available.
                 </Alert>
               ) : null}
-              {isAdminRegisterEnabled() ? (
-                <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-                  <Typography sx={{ mr: 2, color: 'text.secondary' }}>Need a bootstrap admin?</Typography>
-                  <Typography href='/register' component={Link} sx={{ color: 'primary.main', textDecoration: 'none' }}>
-                    Create an account
-                  </Typography>
-                </Box>
-              ) : (
-                <Typography variant='caption' sx={{ display: 'block', textAlign: 'center', color: 'text.secondary', mb: 2 }}>
-                  Admin self-registration is off. Use an existing administrator account or {adminRegisterEnvHint()}
-                </Typography>
-              )}
               <Divider
                 sx={{
                   '& .MuiDivider-wrapper': { px: 4 },

@@ -1,11 +1,12 @@
 // ** React Imports
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 // ** MUI Components
+import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 import Checkbox from '@mui/material/Checkbox'
@@ -115,12 +116,7 @@ const Register = () => {
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
   const router = useRouter()
 
-  useEffect(() => {
-    if (!isAdminRegisterEnabled()) {
-      toast.error('Admin registration is disabled. Set NEXT_PUBLIC_ADMIN_REGISTER_ENABLED=true for local bootstrap only.')
-      router.replace('/login')
-    }
-  }, [router])
+  const registerEnabled = isAdminRegisterEnabled()
 
   // ** Vars
   const { skin } = settings
@@ -134,8 +130,8 @@ const Register = () => {
   const handleRegister = async event => {
     event.preventDefault()
     setErrorMessage('')
-    if (!isAdminRegisterEnabled()) {
-      setErrorMessage('Admin registration is disabled.')
+    if (!registerEnabled) {
+      setErrorMessage(`Admin registration is disabled on this app. ${adminRegisterEnvHint()}`)
       return
     }
 
@@ -292,8 +288,13 @@ const Register = () => {
               <TypographyStyled variant='h5'>Create administrator account</TypographyStyled>
               <Typography variant='body2' sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
                 Registers a user with account type Admin in NetQwix. Use only for trusted bootstrap or internal
-                onboarding. {adminRegisterEnvHint()}
+                onboarding.
               </Typography>
+              {!registerEnabled ? (
+                <Alert severity='warning' sx={{ mt: 2 }}>
+                  {adminRegisterEnvHint()} Restart the dev server after updating env.
+                </Alert>
+              ) : null}
             </Box>
             <form noValidate autoComplete='off' onSubmit={handleRegister}>
               <TextField
