@@ -24,7 +24,7 @@ import MuiFormControlLabel from '@mui/material/FormControlLabel'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
-import { adminRegisterEnvHint, isAdminRegisterEnabled, showAdminMfaNotice } from 'src/configs/adminEnv'
+import { showAdminMfaNotice } from 'src/configs/adminEnv'
 
 // ** Third Party Imports
 import * as yup from 'yup'
@@ -280,12 +280,6 @@ const LoginPage = () => {
               >
                 Create administrator account
               </Button>
-              {!isAdminRegisterEnabled() ? (
-                <Alert severity='warning' sx={{ mb: 4 }}>
-                  Registration UI is available, but the admin app must have {adminRegisterEnvHint()} Restart the dev
-                  server after changing env.
-                </Alert>
-              ) : null}
               {showAdminMfaNotice() ? (
                 <Alert severity='info' sx={{ mb: 4 }}>
                   Your organization may enable multi-factor authentication for admin accounts. Follow internal security

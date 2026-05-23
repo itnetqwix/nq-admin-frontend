@@ -130,10 +130,6 @@ const Register = () => {
   const handleRegister = async event => {
     event.preventDefault()
     setErrorMessage('')
-    if (!registerEnabled) {
-      setErrorMessage(`Admin registration is disabled on this app. ${adminRegisterEnvHint()}`)
-      return
-    }
 
     if (!formValues.fullname?.trim() || !formValues.email?.trim() || !formValues.mobile_no?.trim() || !formValues.password) {
       setErrorMessage('All fields are required.')

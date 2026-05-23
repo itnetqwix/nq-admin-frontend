@@ -1,7 +1,10 @@
 /** Admin UI feature flags (Next.js: NEXT_PUBLIC_* only). */
 
-export const isAdminRegisterEnabled = () =>
-  String(process.env.NEXT_PUBLIC_ADMIN_REGISTER_ENABLED || '').toLowerCase() === 'true'
+/** Enabled unless explicitly set to "false" (avoids missing env after .env edits without restart). */
+export const isAdminRegisterEnabled = () => {
+  const raw = String(process.env.NEXT_PUBLIC_ADMIN_REGISTER_ENABLED ?? 'true').trim().toLowerCase()
+  return raw !== 'false'
+}
 
 /** Hint shown when bootstrap registration is enabled (API must allow it too). */
 export const adminRegisterEnvHint = () =>

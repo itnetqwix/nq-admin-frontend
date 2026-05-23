@@ -25,7 +25,7 @@ export async function registerAdminAccount({ fullname, email, mobile_no, passwor
       data?.error ||
       data?.message ||
       (res.status === 403
-        ? 'Admin registration is disabled on the API. Set ADMIN_PUBLIC_SIGNUP_ENABLED=true.'
+        ? 'Admin registration is disabled on the API (ADMIN_PUBLIC_SIGNUP_ENABLED=false). Deploy the latest API or set that env var to true on the server.'
         : 'Unable to create administrator account.')
     throw new Error(message)
   }
