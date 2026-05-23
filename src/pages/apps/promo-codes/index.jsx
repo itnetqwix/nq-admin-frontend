@@ -542,13 +542,11 @@ export default function PromoCodesPage() {
               </Grid>
             </Box>
           )}
-          <DataGrid
+          <AdminDataGrid
             rows={usageRows}
             columns={usageColumns}
-            autoHeight
             pageSizeOptions={[10, 25]}
             initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-            disableRowSelectionOnClick
             sx={{ border: 'none' }}
           />
           {usageRows.length === 0 && (

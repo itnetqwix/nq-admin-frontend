@@ -654,13 +654,11 @@ export default function BroadcastsPage() {
 
               {/* Delivery Log */}
               <Typography variant='subtitle2' sx={{ mb: 1 }}>Delivery Log</Typography>
-              <DataGrid
+              <AdminDataGrid
                 rows={logRows}
                 columns={logColumns}
-                autoHeight
                 pageSizeOptions={[10, 25, 50]}
                 initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-                disableRowSelectionOnClick
                 sx={{ border: 'none' }}
               />
               {logRows.length === 0 && (
