@@ -1,6 +1,8 @@
-import { Box, Button, Chip, InputLabel, Stack, TextField } from "@mui/material";
+import { Box, Button, Chip, Stack } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { DataGrid } from '@mui/x-data-grid';
+import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminGridContainer from 'src/components/admin/AdminGridContainer'
+import AdminFilterBar from 'src/components/admin/AdminFilterBar'
 import styles from "styles/common.module.css";
 import { getImageUrl } from "src/utils/utils";
 import { useAdminRealtime } from "src/context/AdminRealtimeContext";
@@ -89,21 +91,17 @@ export default function ActiveUsersTable() {
             contentSx={{ p: 0 }}
         >
             <AdminPageSection>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-                    <InputLabel sx={{ color: 'text.secondary', fontSize: '0.875rem', mr: 0.5 }}>Search</InputLabel>
-                    <TextField size='small' placeholder='Name…' onChange={e => handleSearch(e.target.value)} />
-                </Box>
-                <div className='admin-data-grid' style={{ height: '71vh', width: '100%' }}>
-                    <DataGrid
+                <AdminFilterBar
+                    searchPlaceholder='Name…'
+                    onSearchChange={e => handleSearch(e.target.value)}
+                />
+                <AdminGridContainer>
+                    <AdminDataGrid
+                        autoHeight={false}
                         rows={tableData ?? []}
                         columns={columns}
-                        headerClassName={styles['header-class']}
-                        pagination
-                        pageSizeOptions={[25, 50]}
-                        disableSelectionOnClick
-                        autoHeight
                     />
-                </div>
+                </AdminGridContainer>
             </AdminPageSection>
         </AdminPageShell>
         </Box>

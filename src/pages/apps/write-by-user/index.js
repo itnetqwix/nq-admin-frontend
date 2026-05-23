@@ -1,9 +1,10 @@
-import { Box, InputLabel, TextField } from "@mui/material";
 import React, { useEffect } from "react";
 
 import styles from "styles/common.module.css";
 
-import { DataGrid } from '@mui/x-data-grid';
+import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminGridContainer from 'src/components/admin/AdminGridContainer'
+import AdminFilterBar from 'src/components/admin/AdminFilterBar'
 import Link from "next/link";
 import MenuIcon from '@mui/icons-material/Menu';
 import { CustomButton } from "src/pages/components/common";
@@ -153,31 +154,21 @@ export default function WriteByUsers() {
         contentSx={{ p: 0 }}
       >
         <AdminPageSection>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-            <InputLabel sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>Search</InputLabel>
-            <TextField
-              size='small'
-              placeholder='Search name, email, subject…'
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-          </Box>
-          <div className='admin-data-grid' style={{ height: '71vh', width: '100%' }}>
-            <DataGrid
+          <AdminFilterBar
+            searchPlaceholder='Search name, email, subject…'
+            searchValue={search}
+            onSearchChange={e => setSearch(e.target.value)}
+          />
+          <AdminGridContainer>
+            <AdminDataGrid
+              autoHeight={false}
               rows={filteredRows}
               columns={columns}
-              headerClassName={styles['header-class']}
               getRowClassName={getRowClassName}
-              initialState={{
-                pagination: {
-                  paginationModel: { page: 0, pageSize: 25 }
-                }
-              }}
-              pageSizeOptions={[25, 50]}
               getRowHeight={getRowHeight}
               columnHeaderHeight={50}
             />
-          </div>
+          </AdminGridContainer>
         </AdminPageSection>
       </AdminPageShell>
     </form>

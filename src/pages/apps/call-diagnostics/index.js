@@ -1,5 +1,7 @@
-import { Box, Button, Collapse, Grid, TextField, Typography } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
+import { Box, Collapse, Grid, TextField, Typography } from '@mui/material'
+import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminGridContainer from 'src/components/admin/AdminGridContainer'
+import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
@@ -78,11 +80,7 @@ export default function CallDiagnosticsPage() {
     <AdminPageShell
       title='Call diagnostics'
       subtitle='Video and session quality events. Filter by session, user, event type, or date range.'
-      actions={
-        <Button variant='contained' onClick={() => void load()}>
-          Apply filters
-        </Button>
-      }
+      actions={<AdminRefreshButton label='Apply filters' onClick={() => void load()} loading={loading} />}
       contentSx={{ p: 0 }}
     >
       <AdminPageSection>
@@ -110,17 +108,15 @@ export default function CallDiagnosticsPage() {
             <TextField size='small' fullWidth type='date' label='To' InputLabelProps={{ shrink: true }} value={to} onChange={e => setTo(e.target.value)} />
           </Grid>
         </Grid>
-        <Box className='admin-data-grid' sx={{ height: 480, width: '100%' }}>
-          <DataGrid
+        <AdminGridContainer height={{ xs: 420, md: 520 }}>
+          <AdminDataGrid
+            autoHeight={false}
             rows={rows}
             columns={columns}
             loading={loading}
-            pageSizeOptions={[25, 50]}
-            initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
             onRowClick={p => setExpandedId(expandedId === p.id ? null : p.id)}
-            disableRowSelectionOnClick
           />
-        </Box>
+        </AdminGridContainer>
         <Collapse in={!!expandedId}>
           <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
             <Typography variant='subtitle2' sx={{ mb: 1 }}>

@@ -9,7 +9,9 @@ import styles from "styles/common.module.css";
 
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminGridContainer from 'src/components/admin/AdminGridContainer'
+import AdminFilterBar from 'src/components/admin/AdminFilterBar'
 import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
@@ -206,66 +208,24 @@ export default function ManageTrainee() {
           contentSx={{ p: 0 }}
         >
           <AdminPageSection>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-              <InputLabel sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>Search</InputLabel>
-              <TextField size='small' placeholder='Name or email…' onChange={e => scheduleTraineeSearch(e.target.value)} />
-            </Box>
-            <div className='admin-data-grid' style={{ height: '71vh', width: '100%' }}>
-                    <DataGrid
-                      disableSelectionOnClick
-                      onRowClick={(params) => {
-                        const rid = params?.row?.id || params?.row?._id
-                        if (rid) router.push(`/apps/users/${rid}`)
-                      }}
-                      sx={{ '& .MuiDataGrid-row': { cursor: 'pointer' } }}
-                      // rows={rows}
-                      // columns={columns}
-                      // headerClassName={styles['header-class']}
-                      // getRowClassName={getRowClassName}
-                      // initialState={{
-                      //   pagination: {
-                      //     paginationModel: { page: 0, pageSize: 25 },
-                      //   },
-                      // }}
-                      // pageSizeOptions={[25, 50]}
-                      // getRowHeight={getRowHeight}
-                      //   columnHeaderHeight={40}
-
-                      // className="datagrid"
-                      // loading={isLoading}
-                      // columnVisibilityModel={{
-                      //   id: false
-                      // }}
-                      // rows={rows}
-                      // columns={columns}
-                      // headerClassName={styles['header-class']}
-                      // getRowClassName={getRowClassName}
-                      // pageSize={25}
-                      // // onSelectionModelChange={onSelectionChange}
-                      // disableSelectionOnClick
-                      // components={{
-                      //   Pagination: CustomPagination,
-                      //   NoRowsOverlay: CustomNoRowsOverlay
-                      // }}
-                      // getRowHeight={getRowHeight}
-                      // columnHeaderHeight={40}
-
-                      // onRowClick={handleOpenMDP}
-
-                      rows={tableData ?? []}
-                      columns={columns}
-                      headerClassName={styles['header-class']}
-                      getRowClassName={getRowClassName}
-                      initialState={{
-                        pagination: {
-                          paginationModel: { page: 0, pageSize: 25 },
-                        },
-                      }}
-                      pageSizeOptions={[25, 50]}
-                      getRowHeight={getRowHeight}
-                      columnHeaderHeight={80}
-                    />
-            </div>
+            <AdminFilterBar
+              searchPlaceholder='Name or email…'
+              onSearchChange={e => scheduleTraineeSearch(e.target.value)}
+            />
+            <AdminGridContainer>
+              <AdminDataGrid
+                autoHeight={false}
+                onRowClick={params => {
+                  const rid = params?.row?.id || params?.row?._id
+                  if (rid) router.push(`/apps/users/${rid}`)
+                }}
+                rows={tableData ?? []}
+                columns={columns}
+                getRowClassName={getRowClassName}
+                getRowHeight={getRowHeight}
+                columnHeaderHeight={80}
+              />
+            </AdminGridContainer>
           </AdminPageSection>
         </AdminPageShell>
       </form>

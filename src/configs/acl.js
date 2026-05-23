@@ -36,11 +36,36 @@ const defineRulesFor = (role, user) => {
   if (ok('nav_finance')) can('read', 'admin-nav-finance')
   if (ok('nav_promo_codes')) can('read', 'admin-nav-promo-codes')
   if (ok('nav_broadcasts')) can('read', 'admin-nav-broadcasts')
+
+  if (ok('nav_people') || ok('nav_trainers')) {
+    can('read', 'admin-nav-people')
+    can('read', 'admin-nav-trainer-verifications')
+    can('read', 'admin-nav-trainers')
+    can('read', 'admin-nav-trainees')
+  }
   if (ok('nav_clips')) {
     can('read', 'admin-nav-clips-library')
     can('read', 'admin-nav-clip-taxonomy')
     can('read', 'admin-nav-library-submissions')
     can('read', 'admin-nav-netqwix-library')
+  }
+  if (ok('nav_operations') || ok('nav_bookings')) {
+    can('read', 'admin-nav-operations')
+    can('read', 'admin-nav-bookings')
+    can('read', 'admin-nav-user-feedback')
+    can('read', 'admin-nav-support-tickets')
+    can('read', 'admin-nav-call-diagnostics')
+  }
+  if (ok('nav_logs') || ok('nav_audit_logs')) {
+    can('read', 'admin-nav-logs')
+    can('read', 'admin-nav-audit-logs')
+    can('read', 'admin-nav-ops-logs')
+  }
+  if (ok('nav_business') || ok('nav_finance')) {
+    can('read', 'admin-nav-business')
+    can('read', 'admin-nav-finance')
+    can('read', 'admin-nav-promo-codes')
+    can('read', 'admin-nav-broadcasts')
   }
 
   if (ok('can_manage_commission')) can('update', 'admin-action-commission')

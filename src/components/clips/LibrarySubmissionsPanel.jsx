@@ -18,8 +18,8 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
 import moment from 'moment'
+import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import SubmissionStatusChip from 'src/components/clips/SubmissionStatusChip'
@@ -301,15 +301,11 @@ export default function LibrarySubmissionsPanel() {
         </Alert>
       ) : null}
 
-      <DataGrid
-        autoHeight
+      <AdminDataGrid
         rows={rows}
         columns={columns}
         loading={loading}
-        disableRowSelectionOnClick
-        pageSizeOptions={[25, 50]}
-        initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
-        sx={{ border: 'none' }}
+        emptyMessage='No library requests match this filter.'
       />
 
       <Drawer anchor='right' open={Boolean(drawer)} onClose={closeDrawer} PaperProps={{ sx: { width: { xs: '100%', sm: 480 } } }}>

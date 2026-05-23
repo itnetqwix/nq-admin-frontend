@@ -37,6 +37,7 @@ const ContentWrapper = styled('main')(({ theme }) => ({
   width: '100%',
   padding: theme.spacing(4, 5, 6),
   transition: 'padding .25s ease-in-out',
+  backgroundColor: theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.grey[50],
   [theme.breakpoints.down('md')]: {
     padding: theme.spacing(3)
   }

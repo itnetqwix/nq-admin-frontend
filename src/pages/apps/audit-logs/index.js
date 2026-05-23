@@ -1,6 +1,8 @@
 import { Box, Button, Grid, TextField } from '@mui/material'
 import Stack from '@mui/material/Stack'
-import { DataGrid } from '@mui/x-data-grid'
+import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminGridContainer from 'src/components/admin/AdminGridContainer'
+import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
@@ -99,9 +101,7 @@ export default function AuditLogsPage() {
       subtitle='Admin actions (deletes, refunds, and more). Search, refresh, or export CSV.'
       actions={
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-          <Button variant='outlined' onClick={() => void load()}>
-            Refresh
-          </Button>
+          <AdminRefreshButton onClick={() => void load()} loading={loading} />
           <Button variant='contained' onClick={exportCsv} disabled={!rows.length}>
             Export CSV
           </Button>
@@ -122,8 +122,9 @@ export default function AuditLogsPage() {
             />
           </Grid>
         </Grid>
-        <Box className='admin-data-grid' sx={{ height: 640, width: '100%' }}>
-          <DataGrid
+        <AdminGridContainer>
+          <AdminDataGrid
+            autoHeight={false}
             rows={rows}
             columns={columns}
             loading={loading}
@@ -134,10 +135,9 @@ export default function AuditLogsPage() {
               setPage(m.page)
               setPageSize(m.pageSize)
             }}
-            pageSizeOptions={[25, 50, 100]}
-            disableRowSelectionOnClick
+            emptyMessage='No audit events match your search.'
           />
-        </Box>
+        </AdminGridContainer>
       </AdminPageSection>
     </AdminPageShell>
   )

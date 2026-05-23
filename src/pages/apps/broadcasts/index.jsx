@@ -5,9 +5,9 @@ import {
   FormControl, FormControlLabel, FormGroup, Grid, IconButton, InputLabel, MenuItem,
   Radio, RadioGroup, Select, Tab, Tabs, TextField, Tooltip, Typography
 } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
+import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
 import SendIcon from '@mui/icons-material/Send'
-import RefreshIcon from '@mui/icons-material/Refresh'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import ReplayIcon from '@mui/icons-material/Replay'
@@ -517,20 +517,16 @@ export default function BroadcastsPage() {
         {/* ─── HISTORY TAB ─────────────────────────────────── */}
         {tab === 1 && (
           <AdminPageSection>
-            <Box sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center', flexWrap: 'wrap' }}>
               <TextField
                 size='small'
                 placeholder='Search broadcasts...'
                 onChange={handleSearchChange}
                 sx={{ width: { xs: '100%', sm: 320 } }}
               />
-              <Tooltip title='Refresh'>
-                <IconButton onClick={fetchHistory}>
-                  <RefreshIcon />
-                </IconButton>
-              </Tooltip>
+              <AdminRefreshButton onClick={fetchHistory} loading={loading} />
             </Box>
-            <DataGrid
+            <AdminDataGrid
               rows={broadcasts}
               columns={historyColumns}
               loading={loading}
@@ -538,11 +534,8 @@ export default function BroadcastsPage() {
               paginationMode='server'
               paginationModel={{ page: page - 1, pageSize }}
               onPaginationModelChange={m => { setPage(m.page + 1); setPageSize(m.pageSize) }}
-              pageSizeOptions={[25, 50, 100]}
-              disableRowSelectionOnClick
-              autoHeight
               getRowClassName={p => p.indexRelativeToCurrentPage % 2 === 0 ? styles['even-row'] : styles['odd-row']}
-              sx={{ border: 'none', '& .MuiDataGrid-cell': { py: 1 } }}
+              sx={{ '& .MuiDataGrid-cell': { py: 1 } }}
             />
           </AdminPageSection>
         )}

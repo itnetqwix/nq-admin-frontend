@@ -11,6 +11,8 @@ import {
   Typography
 } from '@mui/material'
 import toast from 'react-hot-toast'
+import { AdminLoadingState } from 'src/components/admin/AdminLoadingState'
+import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import {
   confirmLibraryClip,
@@ -27,14 +29,18 @@ export default function NetqwixLibraryPage() {
   const [subcategoryId, setSubcategoryId] = useState('')
   const [file, setFile] = useState(null)
   const [uploading, setUploading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   const load = useCallback(async () => {
+    setLoading(true)
     try {
       const data = await getLibraryClipsGrouped()
       setGroups(Array.isArray(data) ? data : [])
     } catch (e) {
       toast.error(e?.message || 'Failed to load library')
       setGroups([])
+    } finally {
+      setLoading(false)
     }
   }, [])
 
@@ -95,7 +101,11 @@ export default function NetqwixLibraryPage() {
   }
 
   return (
-    <AdminPageShell title='Netqwix Library' subtitle={`${clipCount} published clips`}>
+    <AdminPageShell
+      title='Netqwix Library'
+      subtitle={loading ? 'Loading published clips…' : `${clipCount} published clips`}
+      actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}
+    >
       <AdminPageSection title='Upload library clip'>
         <Stack spacing={2} sx={{ maxWidth: 480 }}>
           <TextField label='Title' value={title} onChange={e => setTitle(e.target.value)} size='small' />
@@ -134,7 +144,11 @@ export default function NetqwixLibraryPage() {
         </Stack>
       </AdminPageSection>
       <AdminPageSection title='Published clips'>
-        {groups.map(cat => (
+        {loading ? (
+          <AdminLoadingState message='Loading library…' minHeight={200} />
+        ) : null}
+        {!loading &&
+          groups.map(cat => (
           <Box key={cat.categoryId || cat.categoryName} sx={{ mb: 2 }}>
             <Typography variant='subtitle1' fontWeight={700}>
               {cat.categoryName}
@@ -152,7 +166,7 @@ export default function NetqwixLibraryPage() {
               </Box>
             ))}
           </Box>
-        ))}
+          ))}
       </AdminPageSection>
     </AdminPageShell>
   )

@@ -13,7 +13,8 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
+import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminGridContainer from 'src/components/admin/AdminGridContainer'
 import { useRouter } from 'next/router'
 import moment from 'moment'
 import toast from 'react-hot-toast'
@@ -222,8 +223,9 @@ export default function OpsLogsPage() {
           </Grid>
         </Grid>
 
-        <Box className='admin-data-grid' sx={{ height: 560, width: '100%' }}>
-          <DataGrid
+        <AdminGridContainer>
+          <AdminDataGrid
+            autoHeight={false}
             rows={rows}
             columns={columns}
             loading={loading}
@@ -234,14 +236,12 @@ export default function OpsLogsPage() {
               setPage(m.page)
               setPageSize(m.pageSize)
             }}
-            pageSizeOptions={[25, 50, 100]}
             onRowClick={p => void openDetail(p.row)}
             getRowClassName={p =>
               p.indexRelativeToCurrentPage % 2 === 0 ? `${styles['even-row']} ${styles['row-class']}` : `${styles['odd-row']} ${styles['row-class']}`
             }
-            disableRowSelectionOnClick
           />
-        </Box>
+        </AdminGridContainer>
       </AdminPageSection>
 
       <Drawer anchor='right' open={drawerOpen} onClose={() => setDrawerOpen(false)} PaperProps={{ sx: { width: { xs: '100%', sm: 480 }, p: 3 } }}>

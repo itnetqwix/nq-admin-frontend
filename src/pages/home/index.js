@@ -31,6 +31,7 @@ import Modal from '../components/modal/Modal'
 import CommissionForm from 'src/layouts/components/student/CommissionForm'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import ActiveUsersTable from '../components/tables/UsersTable'
+import AdminPageShell from 'src/layouts/components/AdminPageShell'
 import { useAdminRealtime } from 'src/context/AdminRealtimeContext'
 import { getPendingVerificationCount } from 'src/services/verificationApi'
 
@@ -97,18 +98,24 @@ const Home = () => {
 
   return (
     <>
+      <AdminPageShell
+        bare
+        title='Dashboard'
+        subtitle='Live metrics, operational shortcuts, and platform health.'
+        actions={
+          <Chip
+            size='small'
+            label={socketConnected ? 'Realtime connected' : 'Realtime connecting'}
+            color={socketConnected ? 'success' : 'default'}
+            variant={socketConnected ? 'filled' : 'outlined'}
+          />
+        }
+      >
       <ApexChartWrapper>
         <Grid container spacing={4} className='match-height' sx={{ mb: 2 }}>
           <Grid item xs={12}>
             <Alert severity='info' icon={false} sx={{ py: 0.5 }}>
               <strong>API:</strong> {getAdminApiEnvLabel()}
-              <Chip
-                component='span'
-                size='small'
-                label={socketConnected ? 'Realtime connected' : 'Realtime connecting'}
-                color={socketConnected ? 'success' : 'default'}
-                sx={{ ml: 2, verticalAlign: 'middle' }}
-              />
             </Alert>
           </Grid>
         </Grid>
@@ -324,7 +331,7 @@ const Home = () => {
           </Grid>
         </Grid>
       </ApexChartWrapper>
-
+      </AdminPageShell>
 
       <ActiveUsersTable />
       {/* -----------------Modal Commission Edit--------------- */}

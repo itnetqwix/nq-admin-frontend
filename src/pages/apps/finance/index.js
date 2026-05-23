@@ -1,14 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Tab,
-  Tabs,
-  Typography
-} from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
+import Button from '@mui/material/Button'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
+import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminGridContainer from 'src/components/admin/AdminGridContainer'
+import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
+import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import {
   getFinanceLedger,
   getEscrowHolds,
@@ -138,32 +135,31 @@ const FinancePage = () => {
   const cols =
     tab === 0 ? ledgerCols : tab === 1 ? escrowCols : tab === 2 ? payoutCols : auditCols
 
+  const tabLabels = ['Ledger', 'Escrow', 'Payouts', 'Audit log']
+
   return (
-    <Box>
-      <Typography variant='h4' sx={{ mb: 2 }}>
-        Finance
-      </Typography>
-      <Card>
-        <CardContent>
-          <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
-            <Tab label='Ledger' />
-            <Tab label='Escrow' />
-            <Tab label='Payouts' />
-            <Tab label='Audit log' />
-          </Tabs>
-          <div style={{ height: 520, width: '100%' }}>
-            <DataGrid
-              rows={rows.map((r, i) => ({ id: r._id ?? r.entry_id ?? i, ...r }))}
-              columns={cols}
-              loading={loading}
-              disableRowSelectionOnClick
-              pageSizeOptions={[25, 50, 100]}
-              initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
-            />
-          </div>
-        </CardContent>
-      </Card>
-    </Box>
+    <AdminPageShell
+      title='Finance'
+      subtitle='Ledger entries, escrow holds, payout queue, and financial audit trail.'
+      actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}
+      contentSx={{ p: 0 }}
+    >
+      <AdminPageSection>
+        <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}>
+          {tabLabels.map(label => (
+            <Tab key={label} label={label} />
+          ))}
+        </Tabs>
+        <AdminGridContainer>
+          <AdminDataGrid
+            autoHeight={false}
+            rows={rows.map((r, i) => ({ id: r._id ?? r.entry_id ?? i, ...r }))}
+            columns={cols}
+            loading={loading}
+          />
+        </AdminGridContainer>
+      </AdminPageSection>
+    </AdminPageShell>
   )
 }
 

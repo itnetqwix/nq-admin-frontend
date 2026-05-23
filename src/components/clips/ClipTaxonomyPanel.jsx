@@ -22,6 +22,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import RefreshIcon from '@mui/icons-material/Refresh'
 import toast from 'react-hot-toast'
+import { AdminLoadingState, AdminMasterDetailSkeleton } from 'src/components/admin/AdminLoadingState'
 import {
   createClipCategory,
   createClipSubcategory,
@@ -142,7 +143,14 @@ export default function ClipTaxonomyPanel({ onTaxonomyChange }) {
         </Button>
       </Stack>
 
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems='stretch'>
+      {loading && categories.length === 0 ? <AdminMasterDetailSkeleton /> : null}
+
+      <Stack
+        direction={{ xs: 'column', md: 'row' }}
+        spacing={2}
+        alignItems='stretch'
+        sx={{ display: loading && categories.length === 0 ? 'none' : 'flex' }}
+      >
         <Box
           sx={{
             width: { xs: '100%', md: 280 },
@@ -176,9 +184,9 @@ export default function ClipTaxonomyPanel({ onTaxonomyChange }) {
           </Stack>
           <Divider />
           {loading ? (
-            <Typography sx={{ p: 2 }} color='text.secondary'>
-              Loading…
-            </Typography>
+            <Box sx={{ p: 2 }}>
+              <AdminLoadingState message='Loading categories…' minHeight={120} />
+            </Box>
           ) : categories.length === 0 ? (
             <Alert severity='info' sx={{ m: 1.5 }}>
               No categories yet. Add your first category above.

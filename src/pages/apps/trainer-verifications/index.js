@@ -8,8 +8,10 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
 import moment from 'moment'
+import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminGridContainer from 'src/components/admin/AdminGridContainer'
+import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
@@ -115,16 +117,23 @@ export default function TrainerVerificationsPage() {
   ]
 
   return (
-    <AdminPageShell title='Trainer verifications' subtitle='Review face liveness and profile before granting access.'>
+    <AdminPageShell
+      title='Trainer verifications'
+      subtitle='Review face liveness and profile before granting access.'
+      actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}
+      contentSx={{ p: 0 }}
+    >
       <AdminPageSection>
-        <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
-          <Button variant='outlined' onClick={() => void load()}>
-            Refresh
-          </Button>
-        </Box>
-        <Box sx={{ height: 520 }}>
-          <DataGrid rows={rows} columns={columns} loading={loading} onRowClick={p => void openDetail(p.row)} />
-        </Box>
+        <AdminGridContainer>
+          <AdminDataGrid
+            autoHeight={false}
+            rows={rows}
+            columns={columns}
+            loading={loading}
+            onRowClick={p => void openDetail(p.row)}
+            emptyMessage='No trainers awaiting verification.'
+          />
+        </AdminGridContainer>
       </AdminPageSection>
 
       <Drawer anchor='right' open={drawerOpen} onClose={() => setDrawerOpen(false)} PaperProps={{ sx: { width: 440, p: 3 } }}>

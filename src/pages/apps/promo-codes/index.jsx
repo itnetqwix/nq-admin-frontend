@@ -4,7 +4,7 @@ import {
   FormControl, FormControlLabel, Grid, IconButton, InputLabel, MenuItem,
   Select, Switch, TextField, Tooltip, Typography
 } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
+import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
@@ -378,7 +378,7 @@ export default function PromoCodesPage() {
             onChange={handleSearchChange}
             sx={{ width: { xs: '100%', sm: 320 }, mb: 2 }}
           />
-          <DataGrid
+          <AdminDataGrid
             rows={promos}
             columns={columns}
             loading={loading}
@@ -386,11 +386,8 @@ export default function PromoCodesPage() {
             paginationMode='server'
             paginationModel={{ page: page - 1, pageSize }}
             onPaginationModelChange={m => { setPage(m.page + 1); setPageSize(m.pageSize) }}
-            pageSizeOptions={[25, 50, 100]}
-            disableRowSelectionOnClick
-            autoHeight
             getRowClassName={p => p.indexRelativeToCurrentPage % 2 === 0 ? styles['even-row'] : styles['odd-row']}
-            sx={{ border: 'none', '& .MuiDataGrid-cell': { py: 1 } }}
+            sx={{ '& .MuiDataGrid-cell': { py: 1 } }}
           />
         </AdminPageSection>
       </AdminPageShell>

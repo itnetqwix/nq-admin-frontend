@@ -4,7 +4,9 @@ import { AbilityContext } from 'src/layouts/components/acl/Can'
 
 import styles from "styles/common.module.css";
 
-import { DataGrid } from '@mui/x-data-grid';
+import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminGridContainer from 'src/components/admin/AdminGridContainer'
+import AdminFilterBar from 'src/components/admin/AdminFilterBar'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
 import Link from "next/link";
@@ -428,26 +430,20 @@ export default function Booking() {
           contentSx={{ p: 0 }}
         >
           <AdminPageSection>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-              <InputLabel sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>Search</InputLabel>
-              <TextField size='small' placeholder='Booking id…' onChange={e => getSearchValue(e.target.value)} />
-            </Box>
-            <div className='admin-data-grid' style={{ height: '71vh', width: '100%' }}>
-              <DataGrid
+            <AdminFilterBar
+              searchPlaceholder='Booking id…'
+              onSearchChange={e => getSearchValue(e.target.value)}
+            />
+            <AdminGridContainer>
+              <AdminDataGrid
+                autoHeight={false}
                 rows={tableData ?? []}
                 columns={columns}
-                headerClassName={styles['header-class']}
                 getRowClassName={getRowClassName}
-                initialState={{
-                  pagination: {
-                    paginationModel: { page: 0, pageSize: 25 }
-                  }
-                }}
-                pageSizeOptions={[25, 50]}
                 getRowHeight={getRowHeight}
                 columnHeaderHeight={50}
               />
-            </div>
+            </AdminGridContainer>
           </AdminPageSection>
         </AdminPageShell>
       </form>
