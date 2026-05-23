@@ -36,6 +36,12 @@ const defineRulesFor = (role, user) => {
   if (ok('nav_finance')) can('read', 'admin-nav-finance')
   if (ok('nav_promo_codes')) can('read', 'admin-nav-promo-codes')
   if (ok('nav_broadcasts')) can('read', 'admin-nav-broadcasts')
+  if (ok('nav_clips')) {
+    can('read', 'admin-nav-clips-library')
+    can('read', 'admin-nav-clip-taxonomy')
+    can('read', 'admin-nav-library-submissions')
+    can('read', 'admin-nav-netqwix-library')
+  }
 
   if (ok('can_manage_commission')) can('update', 'admin-action-commission')
   if (ok('can_process_refund')) can('update', 'admin-action-refund')

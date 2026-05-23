@@ -115,6 +115,14 @@ export async function getLibrarySubmissions(query = {}) {
   return parseJson(res)
 }
 
+export async function getClipPlayUrl(clipId) {
+  if (!clipId) throw new Error('Invalid clip id')
+  const res = await fetch(api(`/admin/clip-play-url/${clipId}`), { headers: headers() })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data?.error || data?.message || 'Could not load clip')
+  return data?.result ?? data?.data ?? data
+}
+
 export async function approveLibrarySubmission(id, categoryId, subcategoryId) {
   const res = await fetch(api(`/admin/library-submissions/${id}/approve`), {
     method: 'POST',

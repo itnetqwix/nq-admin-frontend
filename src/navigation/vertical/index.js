@@ -15,25 +15,30 @@ const navigation = () => {
       subject: 'admin-nav-trainer-verifications'
     },
     {
-      title: 'Clip taxonomy',
-      path: '/apps/clip-taxonomy',
-      icon: 'mdi:folder-outline',
+      title: 'Clips & Library',
+      icon: 'mdi:video-box-outline',
       action: 'read',
-      subject: 'admin-nav-clip-taxonomy'
-    },
-    {
-      title: 'Netqwix Library',
-      path: '/apps/netqwix-library',
-      icon: 'mdi:library-outline',
-      action: 'read',
-      subject: 'admin-nav-netqwix-library'
-    },
-    {
-      title: 'Library submissions',
-      path: '/apps/library-submissions',
-      icon: 'mdi:clipboard-check-outline',
-      action: 'read',
-      subject: 'admin-nav-library-submissions'
+      subject: 'admin-nav-clips-library',
+      children: [
+        {
+          title: 'Categories & subcategories',
+          path: '/apps/clip-taxonomy',
+          action: 'read',
+          subject: 'admin-nav-clip-taxonomy'
+        },
+        {
+          title: 'Library requests',
+          path: '/apps/library-submissions',
+          action: 'read',
+          subject: 'admin-nav-library-submissions'
+        },
+        {
+          title: 'Published library',
+          path: '/apps/netqwix-library',
+          action: 'read',
+          subject: 'admin-nav-netqwix-library'
+        }
+      ]
     },
     {
       title: 'Manage Trainer',
