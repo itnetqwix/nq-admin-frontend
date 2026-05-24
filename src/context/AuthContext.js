@@ -4,12 +4,15 @@ import { createContext, useEffect, useState } from 'react'
 // ** Next Import
 import { useRouter } from 'next/router'
 
-// ** Axios
-import axios from 'axios'
-
 // ** Config
 import authConfig from 'src/configs/auth'
-import toast from 'react-hot-toast'
+import {
+  clearAuthStorage,
+  handleSessionExpired,
+  isUnauthorizedResponse,
+  registerSessionExpiredCallback
+} from 'src/utils/sessionExpired'
+import { installApiAuthHandler } from 'src/utils/installApiAuthHandler'
 
 // ** Defaults
 const defaultProvider = {
@@ -29,6 +32,16 @@ const AuthProvider = ({ children }) => {
 
   // ** Hooks
   const router = useRouter()
+
+  useEffect(() => {
+    installApiAuthHandler()
+    registerSessionExpiredCallback(() => {
+      setUser(null)
+      setLoading(false)
+    })
+    return () => registerSessionExpiredCallback(null)
+  }, [])
+
   useEffect(() => {
     const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName);
     if (storedToken) getUserDetails(storedToken);
@@ -82,50 +95,52 @@ const AuthProvider = ({ children }) => {
 
   }
 
-  const getUserDetails = async (storedToken) => {
-    if (storedToken) {
-      setLoading(true)
-      await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + '/user/me', {
+  const getUserDetails = async storedToken => {
+    if (!storedToken) {
+      setLoading(false)
+      return
+    }
+
+    setLoading(true)
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/me`, {
         headers: {
-          'Authorization': `Bearer ${storedToken}`
+          Authorization: `Bearer ${storedToken}`
         }
       })
-        .then(data => {
-          return data.json();
-        })
-        .then(async response => {
 
-          window.localStorage.setItem(authConfig.storageTokenKeyName, storedToken);
-          window.localStorage.setItem('userData', JSON.stringify(response.userInfo));
+      if (isUnauthorizedResponse(res)) {
+        handleSessionExpired()
+        return
+      }
 
-          setUser({ ...response.userInfo });
+      const response = await res.json()
+      if (!response?.userInfo) {
+        handleSessionExpired()
+        return
+      }
 
-          const returnUrl = router.query.returnUrl;
-          const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/';
-          console.log("redirectURL====", redirectURL)
-          router.replace(redirectURL)
-          // router.push('/home')
-          setLoading(false)
-        })
-        .catch(() => {
-          localStorage.removeItem('userData')
-          // localStorage.removeItem('refreshToken')
-          localStorage.removeItem('accessToken')
-          setLoading(false)
-          if (authConfig.onTokenExpiration === 'logout' && !router.pathname.includes('login')) {
-            toast.error('Session expired. Please sign in again.')
-            router.replace('/login')
-          }
-      })
-    } else {
+      if (!res.ok) {
+        return
+      }
+
+      window.localStorage.setItem(authConfig.storageTokenKeyName, storedToken)
+      window.localStorage.setItem('userData', JSON.stringify(response.userInfo))
+      setUser({ ...response.userInfo })
+
+      const returnUrl = router.query.returnUrl
+      const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/home'
+      router.replace(redirectURL)
+    } catch {
+      handleSessionExpired()
+    } finally {
       setLoading(false)
     }
   }
 
   const handleLogout = () => {
     setUser(null)
-    window.localStorage.removeItem('userData')
-    window.localStorage.removeItem(authConfig.storageTokenKeyName)
+    clearAuthStorage()
     router.push('/login')
   }
 

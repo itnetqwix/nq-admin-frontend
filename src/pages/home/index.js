@@ -22,7 +22,6 @@ import AnalyticsTotalRevenue from 'src/views/dashboards/analytics/AnalyticsTotal
 
 import { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import authConfig from 'src/configs/auth'
 import { AbilityContext } from 'src/layouts/components/acl/Can'
 import { getAdminApiEnvLabel } from 'src/configs/adminEnv'
 import Alert from '@mui/material/Alert'
@@ -34,16 +33,18 @@ import ActiveUsersTable from '../components/tables/UsersTable'
 import AdminPageShell from 'src/layouts/components/AdminPageShell'
 import { useAdminRealtime } from 'src/context/AdminRealtimeContext'
 import { getPendingVerificationCount } from 'src/services/verificationApi'
+import { fetchGlobalCommission } from 'src/services/adminDashboardApi'
 
 const Home = () => {
   const router = useRouter()
   const ability = useContext(AbilityContext)
   const canEditCommission = ability?.can('update', 'admin-action-commission') ?? true
-  const { metrics, socketConnected } = useAdminRealtime()
+  const { metrics, metricsLoading, socketConnected, refreshMetrics } = useAdminRealtime()
 
-  const [comission, setComission] = useState([]);
-  const [commissionModal, setComissionModal] = useState(false);
-  const [pendingVerifications, setPendingVerifications] = useState(null);
+  const [comission, setComission] = useState(null)
+  const [commissionModal, setComissionModal] = useState(false)
+  const [pendingVerifications, setPendingVerifications] = useState(null)
+  const [commissionLoading, setCommissionLoading] = useState(true)
 
   useEffect(() => {
     getPendingVerificationCount()
@@ -56,35 +57,31 @@ const Home = () => {
       Number(v) || 0
     )
   const fmtInt = v => new Intl.NumberFormat('en-US').format(Number(v) || 0)
-  const liveHint = socketConnected ? 'Live' : '…'
+  const liveHint = socketConnected ? 'Live' : metricsLoading ? 'Loading' : 'Updated'
+  const stat = (value, fallback = '0') =>
+    metricsLoading && metrics == null ? '…' : fmtInt(value ?? fallback)
 
   useEffect(() => {
-    getGlobalCommission()
+    void loadGlobalCommission()
+    void refreshMetrics()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const getGlobalCommissionApi = async () => {
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-    if (storedToken) {
-      return await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + '/admin/get-global-commission', {
-        headers: {
-          'Authorization': `Bearer ${storedToken}`
-        }
-      }).then(data => {
-        return data.json();
-      })
-        .then(async response => {
-          return response?.result
-        })
-    }
-  }
-
-  async function getGlobalCommission() {
-    const res = await getGlobalCommissionApi()
-    if (res?.length) {
-      setComission(res[0])
-      if (commissionModal) {
-        closeComissionModal()
+  async function loadGlobalCommission() {
+    setCommissionLoading(true)
+    try {
+      const rows = await fetchGlobalCommission()
+      if (rows?.length) {
+        setComission(rows[0])
+        if (commissionModal) closeComissionModal()
+      } else {
+        setComission(null)
       }
+    } catch (e) {
+      console.error('loadGlobalCommission', e)
+      setComission(null)
+    } finally {
+      setCommissionLoading(false)
     }
   }
 
@@ -136,7 +133,7 @@ const Home = () => {
                 <Grid item xs={12} sm={2}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', sm: 'flex-end' }, gap: 1 }}>
                     <Typography variant='h6' fontWeight={600}>
-                      {comission?.commission ?? 0}%
+                      {commissionLoading ? '…' : `${comission?.commission ?? 0}%`}
                     </Typography>
                     {canEditCommission ? (
                       <CustomAvatar skin='light' variant='rounded' color='primary' onClick={openComissionModal}>
@@ -153,7 +150,7 @@ const Home = () => {
             <Grid item xs={6} sm={3}>
               <CardStatisticsVertical
                 color='warning'
-                stats={metrics != null ? fmtInt(metrics.openSupportTickets ?? 0) : '—'}
+                stats={stat(metrics?.openSupportTickets)}
                 trendNumber='Queue'
                 trend='positive'
                 title='Open support tickets'
@@ -165,7 +162,7 @@ const Home = () => {
             <Grid item xs={6} sm={3}>
               <CardStatisticsVertical
                 color='secondary'
-                stats={metrics != null ? fmtInt(metrics.openUserFeedback ?? 0) : '—'}
+                stats={stat(metrics?.openUserFeedback)}
                 trendNumber='Queue'
                 trend='positive'
                 title='Open user feedback'
@@ -177,7 +174,7 @@ const Home = () => {
             <Grid item xs={6} sm={3}>
               <CardStatisticsVertical
                 color='error'
-                stats={metrics != null ? fmtInt(metrics.bookingsPendingRefund ?? 0) : '—'}
+                stats={stat(metrics?.bookingsPendingRefund)}
                 trendNumber='Action'
                 trend='positive'
                 title='Bookings pending refund'
@@ -189,7 +186,7 @@ const Home = () => {
             <Grid item xs={6} sm={3}>
               <CardStatisticsVertical
                 color='info'
-                stats={metrics != null ? fmtInt(metrics.newUsersLast7Days ?? 0) : '—'}
+                stats={stat(metrics?.newUsersLast7Days)}
                 trendNumber='7d'
                 trend='positive'
                 title='New trainers + trainees'
@@ -225,7 +222,7 @@ const Home = () => {
             <Grid item xs={6} sm={3}>
               <CardStatisticsVertical
                 color='error'
-                stats={metrics != null ? fmtInt(metrics.opsCriticalOpen24h ?? 0) : '—'}
+                stats={stat(metrics?.opsCriticalOpen24h)}
                 trendNumber='24h'
                 trend='positive'
                 title='Critical ops events'
@@ -237,7 +234,7 @@ const Home = () => {
             <Grid item xs={6} sm={3}>
               <CardStatisticsVertical
                 color='warning'
-                stats={metrics != null ? fmtInt(metrics.opsInstantFailures24h ?? 0) : '—'}
+                stats={stat(metrics?.opsInstantFailures24h)}
                 trendNumber='24h'
                 trend='positive'
                 title='Instant lesson failures'
@@ -249,7 +246,7 @@ const Home = () => {
             <Grid item xs={6} sm={3}>
               <CardStatisticsVertical
                 color='info'
-                stats={metrics != null ? fmtInt(metrics.opsCallPreflightFailures24h ?? 0) : '—'}
+                stats={stat(metrics?.opsCallPreflightFailures24h)}
                 trendNumber='24h'
                 trend='positive'
                 title='Call preflight failures'
@@ -263,9 +260,9 @@ const Home = () => {
           <Grid item xs={12} md={8} container spacing={6}>
             <Grid item xs={6}>
               <AnalyticsTotalRevenue
-                valueText={metrics ? fmtMoney(metrics.totalRevenue) : '—'}
+                valueText={metricsLoading && !metrics ? '…' : fmtMoney(metrics?.totalRevenue ?? 0)}
                 trendText={liveHint}
-                trendPositive={socketConnected}
+                trendPositive={socketConnected || !metricsLoading}
                 chipSubtext='Paid bookings (excl. canceled)'
                 onClick={() => router.push('/apps/booking?focus=paid')}
               />
@@ -285,7 +282,7 @@ const Home = () => {
             <Grid item xs={3}>
               <CardStatisticsVertical
                 color='info'
-                stats={metrics ? fmtInt(metrics.totalImpressions) : '—'}
+                stats={stat(metrics?.totalImpressions)}
                 trendNumber={liveHint}
                 trend='positive'
                 chipText='Published clips (live)'
@@ -297,12 +294,12 @@ const Home = () => {
             <Grid item xs={3}>
               <AnalyticsOverview
                 valueText={
-                  metrics
-                    ? `${fmtInt(metrics.trainersCount)} / ${fmtInt(metrics.traineesCount)}`
-                    : '—'
+                  metricsLoading && !metrics
+                    ? '…'
+                    : `${fmtInt(metrics?.trainersCount ?? 0)} / ${fmtInt(metrics?.traineesCount ?? 0)}`
                 }
                 trendText={liveHint}
-                trendPositive={socketConnected}
+                trendPositive={socketConnected || !metricsLoading}
                 radialPercent={metrics?.overviewCompletionPercent ?? 0}
                 caption='Session completion rate'
                 onClick={() => router.push('/apps/booking')}
@@ -311,7 +308,7 @@ const Home = () => {
           </Grid>
           <Grid item xs={6} md={2}>
             <CardStatisticsVertical
-              stats={metrics ? fmtInt(metrics.totalOrders) : '—'}
+              stats={stat(metrics?.totalOrders)}
               color='primary'
               trendNumber={liveHint}
               trend='positive'
@@ -323,9 +320,9 @@ const Home = () => {
           </Grid>
           <Grid item xs={6} md={2}>
             <AnalyticsSessions
-              valueText={metrics ? fmtInt(metrics.totalSessions) : '—'}
+              valueText={metricsLoading && !metrics ? '…' : fmtInt(metrics?.totalSessions ?? 0)}
               trendText={liveHint}
-              trendPositive={socketConnected}
+              trendPositive={socketConnected || !metricsLoading}
               onClick={() => router.push('/apps/booking')}
             />
           </Grid>
@@ -337,7 +334,7 @@ const Home = () => {
       {/* -----------------Modal Commission Edit--------------- */}
 
       <Modal handleClose={closeComissionModal} open={commissionModal} maxWidth='xs'>
-        {canEditCommission ? <CommissionForm getGlobalCommission={getGlobalCommission} /> : null}
+        {canEditCommission ? <CommissionForm getGlobalCommission={loadGlobalCommission} /> : null}
       </Modal>
     </>
   )

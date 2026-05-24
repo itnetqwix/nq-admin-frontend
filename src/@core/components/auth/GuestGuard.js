@@ -15,8 +15,8 @@ const GuestGuard = props => {
     if (!router.isReady) {
       return
     }
-    if (window.localStorage.getItem('userData')) {
-      router.replace('/')
+    if (auth.user) {
+      router.replace('/home')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.route])

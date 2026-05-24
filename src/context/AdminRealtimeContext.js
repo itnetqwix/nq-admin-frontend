@@ -5,10 +5,18 @@ import { io } from 'socket.io-client'
 // ** Config
 import authConfig from 'src/configs/auth'
 import { useAuth } from 'src/hooks/useAuth'
+import {
+  fetchDashboardMetrics,
+  fetchOnlineUsers,
+  unwrapAdminResult
+} from 'src/services/adminDashboardApi'
+
+const METRICS_POLL_MS = 30000
 
 const defaultValue = {
   onlineUsers: [],
   metrics: null,
+  metricsLoading: true,
   socketConnected: false,
   refreshMetrics: async () => {},
   refreshOnlineUsers: async () => {}
@@ -32,10 +40,18 @@ const readStoredAdmin = () => {
   }
 }
 
+const normalizeMetrics = payload => {
+  if (!payload || typeof payload !== 'object') return null
+  const data = unwrapAdminResult(payload)
+  if (!data || typeof data !== 'object') return null
+  return data
+}
+
 export const AdminRealtimeProvider = ({ children }) => {
   const { user } = useAuth()
   const [onlineUsers, setOnlineUsers] = useState([])
   const [metrics, setMetrics] = useState(null)
+  const [metricsLoading, setMetricsLoading] = useState(true)
   const [socketConnected, setSocketConnected] = useState(false)
 
   const isAdmin = useMemo(() => {
@@ -45,19 +61,18 @@ export const AdminRealtimeProvider = ({ children }) => {
 
   const refreshMetrics = useCallback(async () => {
     const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
-    if (!token || !isAdmin) return
+    if (!token || !isAdmin) {
+      setMetrics(null)
+      setMetricsLoading(false)
+      return
+    }
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/dashboard-metrics`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      const json = await res.json()
-      const payload = json?.result
-      if (payload && typeof payload === 'object') {
-        const { message, status, ...rest } = payload
-        setMetrics(rest)
-      }
+      const data = await fetchDashboardMetrics()
+      if (data) setMetrics(data)
     } catch (e) {
       console.error('refreshMetrics', e)
+    } finally {
+      setMetricsLoading(false)
     }
   }, [isAdmin])
 
@@ -65,25 +80,29 @@ export const AdminRealtimeProvider = ({ children }) => {
     const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
     if (!token || !isAdmin) return
     try {
-      const base = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '')
-      const res = await fetch(`${base}/admin/online-users`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      const json = await res.json()
-      const payload = json?.result
-      if (payload && Array.isArray(payload.users)) {
-        setOnlineUsers(payload.users)
-      }
+      const users = await fetchOnlineUsers()
+      setOnlineUsers(users)
     } catch (e) {
       console.error('refreshOnlineUsers', e)
     }
   }, [isAdmin])
 
   useEffect(() => {
-    if (!isAdmin) return undefined
+    if (!isAdmin) {
+      setMetrics(null)
+      setMetricsLoading(false)
+      setOnlineUsers([])
+      return undefined
+    }
+    setMetricsLoading(true)
+    void refreshMetrics()
     void refreshOnlineUsers()
-    return undefined
-  }, [isAdmin, refreshOnlineUsers])
+    const timer = setInterval(() => {
+      void refreshMetrics()
+      void refreshOnlineUsers()
+    }, METRICS_POLL_MS)
+    return () => clearInterval(timer)
+  }, [isAdmin, refreshMetrics, refreshOnlineUsers])
 
   useEffect(() => {
     if (!isAdmin) {
@@ -105,7 +124,7 @@ export const AdminRealtimeProvider = ({ children }) => {
 
     socket.on('connect', () => {
       setSocketConnected(true)
-      refreshMetrics()
+      void refreshMetrics()
       void refreshOnlineUsers()
     })
     socket.on('disconnect', () => setSocketConnected(false))
@@ -113,8 +132,10 @@ export const AdminRealtimeProvider = ({ children }) => {
       setOnlineUsers(Array.isArray(payload?.users) ? payload.users : [])
     })
     socket.on('ADMIN_DASHBOARD_METRICS', payload => {
-      if (payload?.metrics && typeof payload.metrics === 'object') {
-        setMetrics(payload.metrics)
+      const next = normalizeMetrics(payload?.metrics)
+      if (next) {
+        setMetrics(next)
+        setMetricsLoading(false)
       }
     })
 
@@ -128,11 +149,12 @@ export const AdminRealtimeProvider = ({ children }) => {
     () => ({
       onlineUsers,
       metrics,
+      metricsLoading,
       socketConnected,
       refreshMetrics,
       refreshOnlineUsers
     }),
-    [onlineUsers, metrics, socketConnected, refreshMetrics, refreshOnlineUsers]
+    [onlineUsers, metrics, metricsLoading, socketConnected, refreshMetrics, refreshOnlineUsers]
   )
 
   return <AdminRealtimeContext.Provider value={value}>{children}</AdminRealtimeContext.Provider>

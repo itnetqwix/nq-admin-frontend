@@ -46,6 +46,9 @@ export async function rejectTrainerVerification(userId, reason) {
 
 export async function getPendingVerificationCount() {
   const res = await fetch(api('/admin/trainer-verifications/pending-count'), { headers: headers() })
-  const data = await res.json()
-  return data?.data?.total ?? 0
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok) {
+    throw new Error(data?.message || data?.error || 'Failed to load pending verifications')
+  }
+  return Number(data?.data?.total ?? data?.result?.total ?? 0) || 0
 }
