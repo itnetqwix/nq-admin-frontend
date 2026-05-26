@@ -67,6 +67,15 @@ const defineRulesFor = (role, user) => {
     can('read', 'admin-nav-promo-codes')
     can('read', 'admin-nav-broadcasts')
   }
+  if (ok('nav_content') || ok('nav_tips') || ok('nav_banners')) {
+    can('read', 'admin-nav-content')
+    can('read', 'admin-nav-tips')
+    can('read', 'admin-nav-banners')
+  }
+  if (ok('nav_lifecycle') || ok('nav_account_deletions')) {
+    can('read', 'admin-nav-lifecycle')
+    can('read', 'admin-nav-account-deletions')
+  }
 
   if (ok('can_manage_commission')) can('update', 'admin-action-commission')
   if (ok('can_process_refund')) can('update', 'admin-action-refund')

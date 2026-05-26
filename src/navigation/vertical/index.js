@@ -159,6 +159,45 @@ const navigation = () => [
         subject: 'admin-nav-broadcasts'
       }
     ]
+  },
+  { sectionTitle: 'Content', auth: false },
+  {
+    title: 'App content',
+    icon: 'mdi:cellphone-text',
+    action: 'read',
+    subject: 'admin-nav-content',
+    children: [
+      {
+        title: 'Tips',
+        path: '/apps/tips',
+        icon: 'mdi:lightbulb-on-outline',
+        action: 'read',
+        subject: 'admin-nav-tips'
+      },
+      {
+        title: 'Banners',
+        path: '/apps/banners',
+        icon: 'mdi:image-outline',
+        action: 'read',
+        subject: 'admin-nav-banners'
+      }
+    ]
+  },
+  { sectionTitle: 'Account lifecycle', auth: false },
+  {
+    title: 'Lifecycle',
+    icon: 'mdi:account-clock-outline',
+    action: 'read',
+    subject: 'admin-nav-lifecycle',
+    children: [
+      {
+        title: 'Account deletions',
+        path: '/apps/account-deletions',
+        icon: 'mdi:account-remove-outline',
+        action: 'read',
+        subject: 'admin-nav-account-deletions'
+      }
+    ]
   }
 ]
 
