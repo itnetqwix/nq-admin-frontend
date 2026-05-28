@@ -22,10 +22,16 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import NextLink from 'next/link'
 import toast from 'react-hot-toast'
 
 import styles from 'styles/common.module.css'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
+import TipPreviewCard from 'src/components/admin/content/TipPreviewCard'
+import { computeScheduleStatus, scheduleStatusChip } from 'src/components/admin/content/scheduleStatus'
+import { TIPS_AUDIENCE_HELP } from 'src/components/admin/content/contentPlacementConfig'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import DeletePopup from 'src/pages/components/modal/DeletePopup'
 import { listTips, createTip, updateTip, deleteTip, toggleTip } from 'src/services/tipsApi'
@@ -65,6 +71,8 @@ export default function TipsPage() {
   const [form, setForm] = useState({ ...EMPTY_FORM })
   const [saving, setSaving] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState(null)
+  const [deleting, setDeleting] = useState(false)
+  const [previewRow, setPreviewRow] = useState(null)
 
   const searchTimer = useRef(null)
 
@@ -165,6 +173,7 @@ export default function TipsPage() {
 
   const handleDelete = async () => {
     if (!deleteTarget) return
+    setDeleting(true)
     try {
       await deleteTip(deleteTarget._id)
       toast.success('Tip deleted.')
@@ -172,6 +181,8 @@ export default function TipsPage() {
       fetchData()
     } catch (err) {
       toast.error(err.message || 'Delete failed')
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -202,6 +213,19 @@ export default function TipsPage() {
             </Typography>
           </Box>
         )
+      },
+      {
+        field: 'schedule',
+        headerName: 'Schedule',
+        width: 110,
+        headerClassName: styles['header-class'],
+        cellClassName: styles['cell-class'],
+        renderCell: p => {
+          const status = computeScheduleStatus(p.row)
+          const meta = scheduleStatusChip(status)
+
+          return <Chip label={meta.label} size='small' color={meta.color} />
+        }
       },
       {
         field: 'audience',
@@ -257,12 +281,23 @@ export default function TipsPage() {
       {
         field: 'actions',
         headerName: 'Actions',
-        width: 110,
+        width: 140,
         sortable: false,
         headerClassName: styles['header-class-last'],
         cellClassName: styles['cell-class-last'],
         renderCell: p => (
           <Box>
+            <Tooltip title='Preview'>
+              <IconButton
+                size='small'
+                onClick={e => {
+                  e.stopPropagation()
+                  setPreviewRow(p.row)
+                }}
+              >
+                <VisibilityIcon fontSize='small' />
+              </IconButton>
+            </Tooltip>
             <Tooltip title='Edit'>
               <IconButton
                 size='small'
@@ -297,20 +332,26 @@ export default function TipsPage() {
     <>
       <AdminPageShell
         title='Tips'
-        subtitle='Admin-driven coaching tips shown to trainers and trainees in the mobile home carousel.'
+        subtitle='Coaching cards in the mobile home “Tips for you” carousel. Use audience + schedule to target trainee vs trainer homes (and guest browse for “Everyone”).'
         actions={
-          <Button
-            variant='contained'
-            startIcon={<AddIcon />}
-            onClick={openCreate}
-            sx={{ bgcolor: '#000080', '&:hover': { bgcolor: '#0000a0' } }}
-          >
-            New tip
-          </Button>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            <Button component={NextLink} href='/apps/banners' variant='outlined' size='small'>
+              Manage banners
+            </Button>
+            <Button
+              variant='contained'
+              startIcon={<AddIcon />}
+              onClick={openCreate}
+              sx={{ bgcolor: '#000080', '&:hover': { bgcolor: '#0000a0' } }}
+            >
+              New tip
+            </Button>
+          </Box>
         }
         contentSx={{ p: 0 }}
       >
         <AdminPageSection>
+          <ContentPlacementGuide kind='tips' />
           <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', mb: 2 }}>
             <TextField
               size='small'
@@ -394,7 +435,16 @@ export default function TipsPage() {
                   <MenuItem value='trainer'>Trainers only</MenuItem>
                   <MenuItem value='trainee'>Trainees only</MenuItem>
                 </Select>
+                <Typography variant='caption' color='text.secondary' sx={{ mt: 0.5, display: 'block' }}>
+                  {TIPS_AUDIENCE_HELP[form.audience] || ''}
+                </Typography>
               </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant='subtitle2' gutterBottom>
+                Mobile preview
+              </Typography>
+              <TipPreviewCard form={form} />
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -507,7 +557,34 @@ export default function TipsPage() {
         </DialogActions>
       </Dialog>
 
-      <DeletePopup open={!!deleteTarget} setOpen={() => setDeleteTarget(null)} onClick={handleDelete} />
+      <Dialog open={!!previewRow} onClose={() => setPreviewRow(null)} maxWidth='xs' fullWidth>
+        <DialogTitle>Tip preview</DialogTitle>
+        <DialogContent>
+          {previewRow ? <TipPreviewCard form={previewRow} /> : null}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPreviewRow(null)}>Close</Button>
+          {previewRow ? (
+            <Button
+              variant='contained'
+              onClick={() => {
+                openEdit(previewRow)
+                setPreviewRow(null)
+              }}
+              sx={{ bgcolor: '#000080' }}
+            >
+              Edit
+            </Button>
+          ) : null}
+        </DialogActions>
+      </Dialog>
+
+      <DeletePopup
+        open={!!deleteTarget}
+        handleClose={() => setDeleteTarget(null)}
+        onConform={handleDelete}
+        isLoading={deleting}
+      />
     </>
   )
 }

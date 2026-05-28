@@ -23,10 +23,16 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import NextLink from 'next/link'
 import toast from 'react-hot-toast'
 
 import styles from 'styles/common.module.css'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
+import BannerPreviewStrip from 'src/components/admin/content/BannerPreviewStrip'
+import { computeScheduleStatus, scheduleStatusChip } from 'src/components/admin/content/scheduleStatus'
+import { BANNERS_AUDIENCE_HELP } from 'src/components/admin/content/contentPlacementConfig'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import DeletePopup from 'src/pages/components/modal/DeletePopup'
 import {
@@ -82,6 +88,8 @@ export default function BannersPage() {
   const [form, setForm] = useState({ ...EMPTY_FORM })
   const [saving, setSaving] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState(null)
+  const [deleting, setDeleting] = useState(false)
+  const [previewRow, setPreviewRow] = useState(null)
 
   const searchTimer = useRef(null)
 
@@ -184,6 +192,7 @@ export default function BannersPage() {
 
   const handleDelete = async () => {
     if (!deleteTarget) return
+    setDeleting(true)
     try {
       await deleteBanner(deleteTarget._id)
       toast.success('Banner deleted.')
@@ -191,6 +200,8 @@ export default function BannersPage() {
       fetchData()
     } catch (err) {
       toast.error(err.message || 'Delete failed')
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -221,6 +232,19 @@ export default function BannersPage() {
             </Typography>
           </Box>
         )
+      },
+      {
+        field: 'schedule',
+        headerName: 'Schedule',
+        width: 110,
+        headerClassName: styles['header-class'],
+        cellClassName: styles['cell-class'],
+        renderCell: p => {
+          const status = computeScheduleStatus(p.row)
+          const meta = scheduleStatusChip(status)
+
+          return <Chip label={meta.label} size='small' color={meta.color} />
+        }
       },
       {
         field: 'audience',
@@ -275,12 +299,23 @@ export default function BannersPage() {
       {
         field: 'actions',
         headerName: 'Actions',
-        width: 110,
+        width: 140,
         sortable: false,
         headerClassName: styles['header-class-last'],
         cellClassName: styles['cell-class-last'],
         renderCell: p => (
           <Box>
+            <Tooltip title='Preview'>
+              <IconButton
+                size='small'
+                onClick={e => {
+                  e.stopPropagation()
+                  setPreviewRow(p.row)
+                }}
+              >
+                <VisibilityIcon fontSize='small' />
+              </IconButton>
+            </Tooltip>
             <Tooltip title='Edit'>
               <IconButton
                 size='small'
@@ -315,20 +350,26 @@ export default function BannersPage() {
     <>
       <AdminPageShell
         title='Banners'
-        subtitle='Announcement banners shown at the top of the mobile home screen. Tag with audience=guest to show on the login screen too.'
+        subtitle='Top-of-screen announcements on mobile login, guest home, and signed-in trainee/trainer dashboards. Use guest + all for sign-in promos.'
         actions={
-          <Button
-            variant='contained'
-            startIcon={<AddIcon />}
-            onClick={openCreate}
-            sx={{ bgcolor: '#000080', '&:hover': { bgcolor: '#0000a0' } }}
-          >
-            New banner
-          </Button>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            <Button component={NextLink} href='/apps/tips' variant='outlined' size='small'>
+              Manage tips
+            </Button>
+            <Button
+              variant='contained'
+              startIcon={<AddIcon />}
+              onClick={openCreate}
+              sx={{ bgcolor: '#000080', '&:hover': { bgcolor: '#0000a0' } }}
+            >
+              New banner
+            </Button>
+          </Box>
         }
         contentSx={{ p: 0 }}
       >
         <AdminPageSection>
+          <ContentPlacementGuide kind='banners' />
           <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', mb: 2 }}>
             <TextField
               size='small'
@@ -444,11 +485,20 @@ export default function BannersPage() {
                   {AUDIENCES.map(a => (
                     <MenuItem key={a} value={a}>
                       <Switch size='small' checked={form.audience.indexOf(a) > -1} />
-                      <ListItemText primary={a} />
+                      <ListItemText
+                        primary={a}
+                        secondary={BANNERS_AUDIENCE_HELP[a]}
+                      />
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant='subtitle2' gutterBottom>
+                Mobile preview
+              </Typography>
+              <BannerPreviewStrip form={form} />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -549,7 +599,34 @@ export default function BannersPage() {
         </DialogActions>
       </Dialog>
 
-      <DeletePopup open={!!deleteTarget} setOpen={() => setDeleteTarget(null)} onClick={handleDelete} />
+      <Dialog open={!!previewRow} onClose={() => setPreviewRow(null)} maxWidth='sm' fullWidth>
+        <DialogTitle>Banner preview</DialogTitle>
+        <DialogContent>
+          {previewRow ? <BannerPreviewStrip form={previewRow} /> : null}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPreviewRow(null)}>Close</Button>
+          {previewRow ? (
+            <Button
+              variant='contained'
+              onClick={() => {
+                openEdit(previewRow)
+                setPreviewRow(null)
+              }}
+              sx={{ bgcolor: '#000080' }}
+            >
+              Edit
+            </Button>
+          ) : null}
+        </DialogActions>
+      </Dialog>
+
+      <DeletePopup
+        open={!!deleteTarget}
+        handleClose={() => setDeleteTarget(null)}
+        onConform={handleDelete}
+        isLoading={deleting}
+      />
     </>
   )
 }
