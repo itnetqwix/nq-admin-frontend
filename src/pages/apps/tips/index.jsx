@@ -12,6 +12,7 @@ import {
   Grid,
   IconButton,
   InputLabel,
+  InputAdornment,
   MenuItem,
   Select,
   Switch,
@@ -20,6 +21,8 @@ import {
   Typography
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
+import SearchIcon from '@mui/icons-material/Search'
+import CloseIcon from '@mui/icons-material/Close'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import VisibilityIcon from '@mui/icons-material/Visibility'
@@ -61,6 +64,7 @@ export default function TipsPage() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const [audienceFilter, setAudienceFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [page, setPage] = useState(1)
@@ -75,6 +79,17 @@ export default function TipsPage() {
   const [previewRow, setPreviewRow] = useState(null)
 
   const searchTimer = useRef(null)
+
+  useEffect(() => {
+    setSearchInput(search)
+  }, [search])
+
+  useEffect(
+    () => () => {
+      if (searchTimer.current) clearTimeout(searchTimer.current)
+    },
+    []
+  )
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -100,13 +115,27 @@ export default function TipsPage() {
     fetchData()
   }, [fetchData])
 
-  const handleSearchChange = e => {
-    const val = e.target.value
+  const handleSearchChange = value => {
+    const val = value
+    setSearchInput(val)
     if (searchTimer.current) clearTimeout(searchTimer.current)
     searchTimer.current = setTimeout(() => {
-      setSearch(val)
+      setSearch(val.trim())
       setPage(1)
     }, 400)
+  }
+
+  const applySearchImmediately = () => {
+    if (searchTimer.current) clearTimeout(searchTimer.current)
+    setSearch(searchInput.trim())
+    setPage(1)
+  }
+
+  const clearSearch = () => {
+    if (searchTimer.current) clearTimeout(searchTimer.current)
+    setSearchInput('')
+    setSearch('')
+    setPage(1)
   }
 
   const openCreate = () => {
@@ -355,8 +384,26 @@ export default function TipsPage() {
           <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', mb: 2 }}>
             <TextField
               size='small'
-              placeholder='Search by title or body…'
-              onChange={handleSearchChange}
+              placeholder='Search title, body, CTA, audience…'
+              value={searchInput}
+              onChange={e => handleSearchChange(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') applySearchImmediately()
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <SearchIcon fontSize='small' />
+                  </InputAdornment>
+                ),
+                endAdornment: searchInput ? (
+                  <InputAdornment position='end'>
+                    <IconButton size='small' onClick={clearSearch} edge='end'>
+                      <CloseIcon fontSize='small' />
+                    </IconButton>
+                  </InputAdornment>
+                ) : null
+              }}
               sx={{ width: { xs: '100%', sm: 320 } }}
             />
             <FormControl size='small' sx={{ minWidth: 160 }}>
