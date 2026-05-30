@@ -34,6 +34,7 @@ const defineRulesFor = (role, user) => {
   if (ok('nav_ops_logs') || ok('nav_audit_logs')) can('read', 'admin-nav-ops-logs')
   if (ok('nav_call_diagnostics')) can('read', 'admin-nav-call-diagnostics')
   if (ok('nav_finance')) can('read', 'admin-nav-finance')
+  if (ok('nav_finance') || ok('can_manage_pricing')) can('read', 'admin-nav-pricing')
   if (ok('nav_promo_codes')) can('read', 'admin-nav-promo-codes')
   if (ok('nav_broadcasts')) can('read', 'admin-nav-broadcasts')
 
@@ -78,6 +79,7 @@ const defineRulesFor = (role, user) => {
   }
 
   if (ok('can_manage_commission')) can('update', 'admin-action-commission')
+  if (ok('can_manage_pricing')) can('update', 'admin-action-pricing')
   if (ok('can_process_refund')) can('update', 'admin-action-refund')
   if (ok('can_hard_delete')) can('delete', 'admin-action-hard-delete')
   if (ok('can_soft_delete_entities')) can('update', 'admin-action-soft-delete')

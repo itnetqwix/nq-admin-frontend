@@ -228,10 +228,68 @@ export default function BookingDetailDrawer({
                 <DetailRow label='Hold ID' value={detail.escrow.hold_id} />
                 <DetailRow label='Status' value={detail.escrow.status} />
                 <DetailRow
-                  label='Gross'
+                  label='Charged total'
                   value={
-                    detail.escrow.gross_minor != null
-                      ? `$${(detail.escrow.gross_minor / 100).toFixed(2)}`
+                    detail.escrow.charge_total_minor != null
+                      ? `$${(detail.escrow.charge_total_minor / 100).toFixed(2)}`
+                      : detail.escrow.gross_minor != null
+                        ? `$${(detail.escrow.gross_minor / 100).toFixed(2)}`
+                        : null
+                  }
+                />
+                <DetailRow
+                  label='Session subtotal'
+                  value={
+                    detail.escrow.session_subtotal_minor
+                      ? `$${(detail.escrow.session_subtotal_minor / 100).toFixed(2)}`
+                      : null
+                  }
+                />
+                <DetailRow
+                  label='Trainee platform fee'
+                  value={
+                    detail.escrow.trainee_platform_fee_minor
+                      ? `$${(detail.escrow.trainee_platform_fee_minor / 100).toFixed(2)}`
+                      : null
+                  }
+                />
+                <DetailRow
+                  label='Coach platform fee'
+                  value={
+                    detail.escrow.trainer_platform_fee_minor
+                      ? `$${(detail.escrow.trainer_platform_fee_minor / 100).toFixed(2)}`
+                      : null
+                  }
+                />
+                <DetailRow
+                  label='Processing'
+                  value={
+                    detail.escrow.processing_fee_minor
+                      ? `$${(detail.escrow.processing_fee_minor / 100).toFixed(2)}`
+                      : null
+                  }
+                />
+                <DetailRow
+                  label='Tax'
+                  value={
+                    detail.escrow.tax_minor
+                      ? `$${(detail.escrow.tax_minor / 100).toFixed(2)}`
+                      : null
+                  }
+                />
+                <DetailRow
+                  label='% commission'
+                  value={
+                    detail.escrow.platform_fee_minor != null
+                      ? `$${(detail.escrow.platform_fee_minor / 100).toFixed(2)}`
+                      : null
+                  }
+                />
+                <DetailRow
+                  label='Coach net'
+                  value={
+                    detail.escrow.trainer_net_minor != null
+                      ? `$${(detail.escrow.trainer_net_minor / 100).toFixed(2)}`
                       : null
                   }
                 />

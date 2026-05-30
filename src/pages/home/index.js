@@ -34,17 +34,20 @@ import AdminPageShell from 'src/layouts/components/AdminPageShell'
 import { useAdminRealtime } from 'src/context/AdminRealtimeContext'
 import { getPendingVerificationCount } from 'src/services/verificationApi'
 import { fetchGlobalCommission } from 'src/services/adminDashboardApi'
+import { fetchPricingConfig } from 'src/services/pricingApi'
 
 const Home = () => {
   const router = useRouter()
   const ability = useContext(AbilityContext)
   const canEditCommission = ability?.can('update', 'admin-action-commission') ?? true
+  const canEditPricing = ability?.can('update', 'admin-action-pricing') ?? true
   const { metrics, metricsLoading, socketConnected, refreshMetrics } = useAdminRealtime()
 
   const [comission, setComission] = useState(null)
   const [commissionModal, setComissionModal] = useState(false)
   const [pendingVerifications, setPendingVerifications] = useState(null)
   const [commissionLoading, setCommissionLoading] = useState(true)
+  const [pricingSummary, setPricingSummary] = useState(null)
 
   useEffect(() => {
     getPendingVerificationCount()
@@ -63,9 +66,19 @@ const Home = () => {
 
   useEffect(() => {
     void loadGlobalCommission()
+    void loadPricingSummary()
     void refreshMetrics()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  async function loadPricingSummary() {
+    try {
+      const data = await fetchPricingConfig()
+      setPricingSummary(data)
+    } catch {
+      setPricingSummary(null)
+    }
+  }
 
   async function loadGlobalCommission() {
     setCommissionLoading(true)
@@ -119,18 +132,18 @@ const Home = () => {
 
         <Grid container spacing={4} className='match-height'>
 
-          <Grid item xs={12}>
-            <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+          <Grid item xs={12} md={6}>
+            <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, height: '100%' }}>
               <Grid container alignItems='center' spacing={2} sx={{ px: 2, py: 1 }}>
-                <Grid item xs={12} sm={10}>
+                <Grid item xs={12} sm={9}>
                   <CardHeader title='Global commission' sx={{ px: 0, py: 1 }} titleTypographyProps={{ variant: 'h6', fontWeight: 600 }} />
                   <CardContent sx={{ pt: 0, px: 0, pb: 2 }}>
                     <Typography variant='body2' color='text.secondary'>
-                      Applies to all trainers. Use the edit control to update the rate.
+                      Default % on session subtotal. Per-trainer overrides in Manage trainers.
                     </Typography>
                   </CardContent>
                 </Grid>
-                <Grid item xs={12} sm={2}>
+                <Grid item xs={12} sm={3}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', sm: 'flex-end' }, gap: 1 }}>
                     <Typography variant='h6' fontWeight={600}>
                       {commissionLoading ? '…' : `${comission?.commission ?? 0}%`}
@@ -140,6 +153,45 @@ const Home = () => {
                         <Icon icon='tabler:edit' />
                       </CustomAvatar>
                     ) : null}
+                  </Box>
+                </Grid>
+              </Grid>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Card
+              elevation={0}
+              sx={{
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 2,
+                height: '100%',
+                cursor: 'pointer'
+              }}
+              onClick={() => router.push('/apps/pricing')}
+            >
+              <Grid container alignItems='center' spacing={2} sx={{ px: 2, py: 1 }}>
+                <Grid item xs={12} sm={9}>
+                  <CardHeader title='Pricing & fees' sx={{ px: 0, py: 1 }} titleTypographyProps={{ variant: 'h6', fontWeight: 600 }} />
+                  <CardContent sx={{ pt: 0, px: 0, pb: 2 }}>
+                    <Typography variant='body2' color='text.secondary'>
+                      US/CA platform fees ($0.50 + $0.50 default), processing, tax, storage.
+                    </Typography>
+                    {pricingSummary ? (
+                      <Typography variant='caption' color='text.secondary' display='block' sx={{ mt: 1 }}>
+                        v{pricingSummary.version} · US trainee fee $
+                        {((pricingSummary.regions?.US?.traineePlatformFeeMinor || 0) / 100).toFixed(2)} · CA C$
+                        {((pricingSummary.regions?.CA?.traineePlatformFeeMinor || 0) / 100).toFixed(2)}
+                      </Typography>
+                    ) : null}
+                  </CardContent>
+                </Grid>
+                <Grid item xs={12} sm={3}>
+                  <Box sx={{ display: 'flex', justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}>
+                    <CustomAvatar skin='light' variant='rounded' color='secondary'>
+                      <Icon icon='mdi:cash-multiple' />
+                    </CustomAvatar>
                   </Box>
                 </Grid>
               </Grid>
