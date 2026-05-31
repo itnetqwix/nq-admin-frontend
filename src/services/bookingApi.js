@@ -19,3 +19,14 @@ export async function getAdminBookingDetail(bookingId) {
   }
   return data?.data ?? data
 }
+
+export async function getAdminSessionTimeline(bookingId) {
+  const res = await fetch(apiUrl(`/admin/booking/${bookingId}/timeline`), {
+    headers: getAuthHeaders()
+  })
+  const data = await res.json()
+  if (!res.ok) {
+    throw new Error(data?.error || 'Failed to load session timeline')
+  }
+  return data?.data ?? data
+}

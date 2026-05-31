@@ -4,6 +4,7 @@ import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined'
 import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined'
+import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined'
 import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined'
 import {
   Accordion,
@@ -45,6 +46,7 @@ import Link from 'next/link'
 import { AbilityContext } from 'src/layouts/components/acl/Can'
 import toast from 'react-hot-toast'
 import { deleteAdminEntity, getClipPlayUrl } from 'src/services/user360Api'
+import LessonTimelineDialog from 'src/pages/components/booking/LessonTimelineDialog'
 import { getImageUrl } from 'src/utils/utils'
 
 const tabLabels = ['Overview', 'Lessons', 'Reviews', 'Clips', 'PDF & saved', 'Activity', 'Issues & Logs']
@@ -542,6 +544,7 @@ export default function AdminUser360Tabs({
   const opsItems = opsEvents?.items || []
 
   const [playClipId, setPlayClipId] = useState(null)
+  const [timelineBookingId, setTimelineBookingId] = useState(null)
   const [metaOpenId, setMetaOpenId] = useState(null)
 
   const lastOnlineLabel = summary.lastOnlineAt || overview.lastOnlineAt
@@ -979,7 +982,16 @@ export default function AdminUser360Tabs({
                         <TableCell sx={{ maxWidth: 200 }}>{renderParty(lesson?.trainer_id)}</TableCell>
                         <TableCell sx={{ maxWidth: 200 }}>{renderParty(lesson?.trainee_id)}</TableCell>
                         <TableCell align='right'>
-                          <DeleteActions entityType='booked_session' entityId={lesson?._id} onDeleted={onRefresh} hardDeletePolicy={hardDeletePolicy} />
+                          <Stack direction='row' spacing={0.5} justifyContent='flex-end' alignItems='center'>
+                            <IconButton
+                              size='small'
+                              aria-label='Session timeline'
+                              onClick={() => setTimelineBookingId(String(lesson?._id))}
+                            >
+                              <TimelineOutlinedIcon fontSize='small' />
+                            </IconButton>
+                            <DeleteActions entityType='booked_session' entityId={lesson?._id} onDeleted={onRefresh} hardDeletePolicy={hardDeletePolicy} />
+                          </Stack>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -1318,6 +1330,11 @@ export default function AdminUser360Tabs({
         )}
       </Box>
 
+      <LessonTimelineDialog
+        open={Boolean(timelineBookingId)}
+        bookingId={timelineBookingId}
+        onClose={() => setTimelineBookingId(null)}
+      />
       <ClipPlayDialog clipId={playClipId} open={Boolean(playClipId)} onClose={() => setPlayClipId(null)} />
     </Box>
   )

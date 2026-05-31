@@ -13,6 +13,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close'
 import moment from 'moment'
 import { getAdminBookingDetail } from 'src/services/bookingApi'
+import SessionTimelinePanel from 'src/pages/components/booking/SessionTimelinePanel'
 import { BookedSession, isCurrentDateBefore } from 'src/utils/utils'
 
 function DetailRow({ label, value }) {
@@ -61,6 +62,7 @@ export default function BookingDetailDrawer({
   const [loading, setLoading] = useState(false)
   const [detail, setDetail] = useState(null)
   const [error, setError] = useState(null)
+  const [timelineRefresh, setTimelineRefresh] = useState(0)
 
   const loadDetail = () => {
     if (!bookingId) return
@@ -95,6 +97,7 @@ export default function BookingDetailDrawer({
     onConfirm(bookingId)
     onActionComplete?.()
     loadDetail()
+    setTimelineRefresh(n => n + 1)
   }
 
   const handleCancel = () => {
@@ -340,6 +343,10 @@ export default function BookingDetailDrawer({
                   </Box>
                 ))}
               </>
+            ) : null}
+
+            {s?._id ? (
+              <SessionTimelinePanel bookingId={String(s._id)} refreshKey={timelineRefresh} />
             ) : null}
           </>
         ) : null}
