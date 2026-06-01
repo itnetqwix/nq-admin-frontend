@@ -72,6 +72,9 @@ const defineRulesFor = (role, user) => {
     can('read', 'admin-nav-content')
     can('read', 'admin-nav-tips')
     can('read', 'admin-nav-banners')
+    can('read', 'admin-nav-cms-blog')
+    can('read', 'admin-nav-cms-legal')
+    can('read', 'admin-nav-cms-faq')
   }
   if (ok('nav_lifecycle') || ok('nav_account_deletions')) {
     can('read', 'admin-nav-lifecycle')

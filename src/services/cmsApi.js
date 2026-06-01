@@ -89,7 +89,7 @@ export const publishAdminFaq = async body => {
   return handleRes(res)
 }
 
-export const seedAdminFaq = async body = {}) => {
+export const seedAdminFaq = async (body = {}) => {
   const res = await fetch(apiUrl('/admin/cms/faq/seed'), {
     method: 'POST',
     headers: getAuthHeaders(),
