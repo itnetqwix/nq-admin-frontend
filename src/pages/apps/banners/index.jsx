@@ -33,6 +33,7 @@ import toast from 'react-hot-toast'
 import styles from 'styles/common.module.css'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
+import BannerCtaEditor from 'src/components/admin/content/BannerCtaEditor'
 import BannerPreviewStrip from 'src/components/admin/content/BannerPreviewStrip'
 import { computeScheduleStatus, scheduleStatusChip } from 'src/components/admin/content/scheduleStatus'
 import { BANNERS_AUDIENCE_HELP } from 'src/components/admin/content/contentPlacementConfig'
@@ -55,6 +56,7 @@ const EMPTY_FORM = {
   image_url: '',
   audience: ['all'],
   severity: 'info',
+  ctas: [],
   cta_label: '',
   cta_url: '',
   dismissible: true,
@@ -62,6 +64,31 @@ const EMPTY_FORM = {
   sort_order: '0',
   start_date: '',
   end_date: ''
+}
+
+function normalizeCtasFromRow(row) {
+  if (Array.isArray(row?.ctas) && row.ctas.length) {
+    return row.ctas.map(c => ({
+      label: c.label || '',
+      url: c.url || '',
+      variant: c.variant || 'primary'
+    }))
+  }
+  if (row?.cta_label && row?.cta_url) {
+    return [{ label: row.cta_label, url: row.cta_url, variant: 'primary' }]
+  }
+  return []
+}
+
+function buildCtasPayload(ctas) {
+  return (ctas || [])
+    .map(c => ({
+      label: String(c.label || '').trim(),
+      url: String(c.url || '').trim(),
+      variant: ['primary', 'secondary', 'ghost'].includes(c.variant) ? c.variant : 'primary'
+    }))
+    .filter(c => c.label && c.url)
+    .slice(0, 4)
 }
 
 function severityChip(s) {
@@ -169,6 +196,7 @@ export default function BannersPage() {
       image_url: row.image_url || '',
       audience: Array.isArray(row.audience) && row.audience.length ? row.audience : ['all'],
       severity: row.severity || 'info',
+      ctas: normalizeCtasFromRow(row),
       cta_label: row.cta_label || '',
       cta_url: row.cta_url || '',
       dismissible: row.dismissible !== false,
@@ -189,14 +217,16 @@ export default function BannersPage() {
     if (!form.audience.length) return toast.error('Select at least one audience.')
     setSaving(true)
     try {
+      const ctas = buildCtasPayload(form.ctas)
       const body = {
         title: form.title.trim(),
         body: form.body.trim(),
         image_url: form.image_url || null,
         audience: form.audience,
         severity: form.severity,
-        cta_label: form.cta_label || null,
-        cta_url: form.cta_url || null,
+        ctas,
+        cta_label: ctas.length ? null : form.cta_label || null,
+        cta_url: ctas.length ? null : form.cta_url || null,
         dismissible: form.dismissible,
         is_active: form.is_active,
         sort_order: Number(form.sort_order) || 0,
@@ -557,25 +587,35 @@ export default function BannersPage() {
                 placeholder='https://…'
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label='CTA label (optional)'
-                fullWidth
-                size='small'
-                value={form.cta_label}
-                onChange={e => handleFormChange('cta_label', e.target.value)}
+            <Grid item xs={12}>
+              <BannerCtaEditor
+                ctas={form.ctas}
+                onChange={next => handleFormChange('ctas', next)}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label='CTA URL / deep link (optional)'
-                fullWidth
-                size='small'
-                value={form.cta_url}
-                onChange={e => handleFormChange('cta_url', e.target.value)}
-                placeholder='netqwix://wallet or https://…'
-              />
-            </Grid>
+            {!(form.ctas || []).length ? (
+              <>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label='CTA label (legacy, optional)'
+                    fullWidth
+                    size='small'
+                    value={form.cta_label}
+                    onChange={e => handleFormChange('cta_label', e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label='CTA URL / deep link (legacy)'
+                    fullWidth
+                    size='small'
+                    value={form.cta_url}
+                    onChange={e => handleFormChange('cta_url', e.target.value)}
+                    placeholder='netqwix://wallet or https://…'
+                  />
+                </Grid>
+              </>
+            ) : null}
             <Grid item xs={12} sm={4}>
               <TextField
                 label='Start date (optional)'

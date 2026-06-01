@@ -187,6 +187,27 @@ const navigation = () => [
         icon: 'mdi:image-outline',
         action: 'read',
         subject: 'admin-nav-banners'
+      },
+      {
+        title: 'Blog',
+        path: '/apps/cms-blog',
+        icon: 'mdi:newspaper-variant-outline',
+        action: 'read',
+        subject: 'admin-nav-cms-blog'
+      },
+      {
+        title: 'Legal',
+        path: '/apps/cms-legal',
+        icon: 'mdi:file-document-outline',
+        action: 'read',
+        subject: 'admin-nav-cms-legal'
+      },
+      {
+        title: 'FAQ',
+        path: '/apps/cms-faq',
+        icon: 'mdi:help-circle-outline',
+        action: 'read',
+        subject: 'admin-nav-cms-faq'
       }
     ]
   },

@@ -28,7 +28,11 @@ export default function BannerPreviewStrip({ form }) {
   const fg = SEVERITY_FG[severity] || SEVERITY_FG.info
   const title = form?.title?.trim() || 'Banner title'
   const body = form?.body?.trim()
-  const cta = form?.cta_label?.trim()
+  const ctas = Array.isArray(form?.ctas)
+    ? form.ctas.filter(c => c?.label?.trim())
+    : form?.cta_label?.trim()
+      ? [{ label: form.cta_label.trim() }]
+      : []
 
   return (
     <Box sx={{ px: 1, py: 1 }}>
@@ -66,10 +70,14 @@ export default function BannerPreviewStrip({ form }) {
               {body.length > 160 ? '…' : ''}
             </Typography>
           ) : null}
-          {cta ? (
-            <Typography variant='caption' sx={{ color: fg, fontWeight: 600, mt: 0.5 }}>
-              {cta} →
-            </Typography>
+          {ctas.length ? (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+              {ctas.map((c, i) => (
+                <Typography key={i} variant='caption' sx={{ color: fg, fontWeight: 600 }}>
+                  {c.label} →
+                </Typography>
+              ))}
+            </Box>
           ) : null}
         </Box>
         {form?.dismissible !== false ? (
