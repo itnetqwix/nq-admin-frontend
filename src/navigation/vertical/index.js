@@ -145,13 +145,6 @@ const navigation = () => [
         subject: 'admin-nav-finance'
       },
       {
-        title: 'Pricing & fees',
-        path: '/apps/pricing',
-        icon: 'mdi:cash-multiple',
-        action: 'read',
-        subject: 'admin-nav-pricing'
-      },
-      {
         title: 'Promo codes',
         path: '/apps/promo-codes',
         icon: 'mdi:tag-multiple-outline',
@@ -164,66 +157,6 @@ const navigation = () => [
         icon: 'mdi:bullhorn-outline',
         action: 'read',
         subject: 'admin-nav-broadcasts'
-      }
-    ]
-  },
-  { sectionTitle: 'Content', auth: false },
-  {
-    title: 'App content',
-    icon: 'mdi:cellphone-text',
-    action: 'read',
-    subject: 'admin-nav-content',
-    children: [
-      {
-        title: 'Tips',
-        path: '/apps/tips',
-        icon: 'mdi:lightbulb-on-outline',
-        action: 'read',
-        subject: 'admin-nav-tips'
-      },
-      {
-        title: 'Banners',
-        path: '/apps/banners',
-        icon: 'mdi:image-outline',
-        action: 'read',
-        subject: 'admin-nav-banners'
-      },
-      {
-        title: 'Blog',
-        path: '/apps/cms-blog',
-        icon: 'mdi:newspaper-variant-outline',
-        action: 'read',
-        subject: 'admin-nav-cms-blog'
-      },
-      {
-        title: 'Legal',
-        path: '/apps/cms-legal',
-        icon: 'mdi:file-document-outline',
-        action: 'read',
-        subject: 'admin-nav-cms-legal'
-      },
-      {
-        title: 'FAQ',
-        path: '/apps/cms-faq',
-        icon: 'mdi:help-circle-outline',
-        action: 'read',
-        subject: 'admin-nav-cms-faq'
-      }
-    ]
-  },
-  { sectionTitle: 'Account lifecycle', auth: false },
-  {
-    title: 'Lifecycle',
-    icon: 'mdi:account-clock-outline',
-    action: 'read',
-    subject: 'admin-nav-lifecycle',
-    children: [
-      {
-        title: 'Account deletions',
-        path: '/apps/account-deletions',
-        icon: 'mdi:account-remove-outline',
-        action: 'read',
-        subject: 'admin-nav-account-deletions'
       }
     ]
   }

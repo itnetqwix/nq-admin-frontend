@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
-import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
@@ -70,46 +69,10 @@ const FinancePage = () => {
     { field: 'session_id', headerName: 'Session', flex: 1 },
     { field: 'status', headerName: 'Status', width: 120 },
     {
-      field: 'charge_total_minor',
-      headerName: 'Charged',
-      width: 90,
-      valueGetter: p => ((p.row.charge_total_minor ?? p.row.gross_minor) / 100).toFixed(2)
-    },
-    {
-      field: 'session_subtotal_minor',
-      headerName: 'Session',
-      width: 90,
-      valueGetter: p => ((p.row.session_subtotal_minor ?? 0) / 100).toFixed(2)
-    },
-    {
-      field: 'trainee_platform_fee_minor',
-      headerName: 'Tr. platform',
+      field: 'gross_minor',
+      headerName: 'Gross',
       width: 100,
-      valueGetter: p => ((p.row.trainee_platform_fee_minor ?? 0) / 100).toFixed(2)
-    },
-    {
-      field: 'trainer_platform_fee_minor',
-      headerName: 'Coach platform',
-      width: 110,
-      valueGetter: p => ((p.row.trainer_platform_fee_minor ?? 0) / 100).toFixed(2)
-    },
-    {
-      field: 'processing_fee_minor',
-      headerName: 'Processing',
-      width: 100,
-      valueGetter: p => ((p.row.processing_fee_minor ?? 0) / 100).toFixed(2)
-    },
-    {
-      field: 'tax_minor',
-      headerName: 'Tax',
-      width: 80,
-      valueGetter: p => ((p.row.tax_minor ?? 0) / 100).toFixed(2)
-    },
-    {
-      field: 'trainer_net_minor',
-      headerName: 'Coach net',
-      width: 90,
-      valueGetter: p => ((p.row.trainer_net_minor ?? 0) / 100).toFixed(2)
+      valueGetter: p => (p.row.gross_minor / 100).toFixed(2)
     },
     {
       field: 'actions',
@@ -178,14 +141,7 @@ const FinancePage = () => {
     <AdminPageShell
       title='Finance'
       subtitle='Ledger entries, escrow holds, payout queue, and financial audit trail.'
-      actions={
-        <Stack direction='row' spacing={1}>
-          <Button variant='outlined' size='small' onClick={() => window.location.assign('/apps/pricing')}>
-            Pricing settings
-          </Button>
-          <AdminRefreshButton onClick={() => void load()} loading={loading} />
-        </Stack>
-      }
+      actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}
       contentSx={{ p: 0 }}
     >
       <AdminPageSection>

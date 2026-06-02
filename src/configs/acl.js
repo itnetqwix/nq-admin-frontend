@@ -34,7 +34,6 @@ const defineRulesFor = (role, user) => {
   if (ok('nav_ops_logs') || ok('nav_audit_logs')) can('read', 'admin-nav-ops-logs')
   if (ok('nav_call_diagnostics')) can('read', 'admin-nav-call-diagnostics')
   if (ok('nav_finance')) can('read', 'admin-nav-finance')
-  if (ok('nav_finance') || ok('can_manage_pricing')) can('read', 'admin-nav-pricing')
   if (ok('nav_promo_codes')) can('read', 'admin-nav-promo-codes')
   if (ok('nav_broadcasts')) can('read', 'admin-nav-broadcasts')
 
@@ -68,21 +67,8 @@ const defineRulesFor = (role, user) => {
     can('read', 'admin-nav-promo-codes')
     can('read', 'admin-nav-broadcasts')
   }
-  if (ok('nav_content') || ok('nav_tips') || ok('nav_banners')) {
-    can('read', 'admin-nav-content')
-    can('read', 'admin-nav-tips')
-    can('read', 'admin-nav-banners')
-    can('read', 'admin-nav-cms-blog')
-    can('read', 'admin-nav-cms-legal')
-    can('read', 'admin-nav-cms-faq')
-  }
-  if (ok('nav_lifecycle') || ok('nav_account_deletions')) {
-    can('read', 'admin-nav-lifecycle')
-    can('read', 'admin-nav-account-deletions')
-  }
 
   if (ok('can_manage_commission')) can('update', 'admin-action-commission')
-  if (ok('can_manage_pricing')) can('update', 'admin-action-pricing')
   if (ok('can_process_refund')) can('update', 'admin-action-refund')
   if (ok('can_hard_delete')) can('delete', 'admin-action-hard-delete')
   if (ok('can_soft_delete_entities')) can('update', 'admin-action-soft-delete')

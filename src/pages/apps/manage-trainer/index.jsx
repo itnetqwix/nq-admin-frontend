@@ -238,16 +238,12 @@ export default function ManageTrainer() {
       headerName: 'Commission',
       headerClassName: styles['header-class'],
       cellClassName: styles['cell-class'],
-      width: 190,
+      width: 150,
       renderCell: params => {
+        // console.log(params.row)
         return (
           <div style={{ display: "flex", justifyContent: "space-between", width: "-webkit-fill-available", alignItems: "center" }}>
-            <div>
-              <label>{params.row.commission}%</label>
-              <Typography variant='caption' color='text.secondary' display='block'>
-                + platform fee/session
-              </Typography>
-            </div>
+            <label>{params.row.commission}%</label>
             <IconButton
               onClick={() => handleOpenCommisionModal(params.row.id)}
               aria-label='Edit'>

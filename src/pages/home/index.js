@@ -22,6 +22,7 @@ import AnalyticsTotalRevenue from 'src/views/dashboards/analytics/AnalyticsTotal
 
 import { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import authConfig from 'src/configs/auth'
 import { AbilityContext } from 'src/layouts/components/acl/Can'
 import { getAdminApiEnvLabel } from 'src/configs/adminEnv'
 import Alert from '@mui/material/Alert'
@@ -33,21 +34,16 @@ import ActiveUsersTable from '../components/tables/UsersTable'
 import AdminPageShell from 'src/layouts/components/AdminPageShell'
 import { useAdminRealtime } from 'src/context/AdminRealtimeContext'
 import { getPendingVerificationCount } from 'src/services/verificationApi'
-import { fetchGlobalCommission } from 'src/services/adminDashboardApi'
-import { fetchPricingConfig } from 'src/services/pricingApi'
 
 const Home = () => {
   const router = useRouter()
   const ability = useContext(AbilityContext)
   const canEditCommission = ability?.can('update', 'admin-action-commission') ?? true
-  const canEditPricing = ability?.can('update', 'admin-action-pricing') ?? true
-  const { metrics, metricsLoading, socketConnected, refreshMetrics } = useAdminRealtime()
+  const { metrics, socketConnected } = useAdminRealtime()
 
-  const [comission, setComission] = useState(null)
-  const [commissionModal, setComissionModal] = useState(false)
-  const [pendingVerifications, setPendingVerifications] = useState(null)
-  const [commissionLoading, setCommissionLoading] = useState(true)
-  const [pricingSummary, setPricingSummary] = useState(null)
+  const [comission, setComission] = useState([]);
+  const [commissionModal, setComissionModal] = useState(false);
+  const [pendingVerifications, setPendingVerifications] = useState(null);
 
   useEffect(() => {
     getPendingVerificationCount()
@@ -60,41 +56,35 @@ const Home = () => {
       Number(v) || 0
     )
   const fmtInt = v => new Intl.NumberFormat('en-US').format(Number(v) || 0)
-  const liveHint = socketConnected ? 'Live' : metricsLoading ? 'Loading' : 'Updated'
-  const stat = (value, fallback = '0') =>
-    metricsLoading && metrics == null ? '…' : fmtInt(value ?? fallback)
+  const liveHint = socketConnected ? 'Live' : '…'
 
   useEffect(() => {
-    void loadGlobalCommission()
-    void loadPricingSummary()
-    void refreshMetrics()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    getGlobalCommission()
   }, [])
 
-  async function loadPricingSummary() {
-    try {
-      const data = await fetchPricingConfig()
-      setPricingSummary(data)
-    } catch {
-      setPricingSummary(null)
+  const getGlobalCommissionApi = async () => {
+    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+    if (storedToken) {
+      return await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + '/admin/get-global-commission', {
+        headers: {
+          'Authorization': `Bearer ${storedToken}`
+        }
+      }).then(data => {
+        return data.json();
+      })
+        .then(async response => {
+          return response?.result
+        })
     }
   }
 
-  async function loadGlobalCommission() {
-    setCommissionLoading(true)
-    try {
-      const rows = await fetchGlobalCommission()
-      if (rows?.length) {
-        setComission(rows[0])
-        if (commissionModal) closeComissionModal()
-      } else {
-        setComission(null)
+  async function getGlobalCommission() {
+    const res = await getGlobalCommissionApi()
+    if (res?.length) {
+      setComission(res[0])
+      if (commissionModal) {
+        closeComissionModal()
       }
-    } catch (e) {
-      console.error('loadGlobalCommission', e)
-      setComission(null)
-    } finally {
-      setCommissionLoading(false)
     }
   }
 
@@ -132,21 +122,21 @@ const Home = () => {
 
         <Grid container spacing={4} className='match-height'>
 
-          <Grid item xs={12} md={6}>
-            <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, height: '100%' }}>
+          <Grid item xs={12}>
+            <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
               <Grid container alignItems='center' spacing={2} sx={{ px: 2, py: 1 }}>
-                <Grid item xs={12} sm={9}>
+                <Grid item xs={12} sm={10}>
                   <CardHeader title='Global commission' sx={{ px: 0, py: 1 }} titleTypographyProps={{ variant: 'h6', fontWeight: 600 }} />
                   <CardContent sx={{ pt: 0, px: 0, pb: 2 }}>
                     <Typography variant='body2' color='text.secondary'>
-                      Default % on session subtotal. Per-trainer overrides in Manage trainers.
+                      Applies to all trainers. Use the edit control to update the rate.
                     </Typography>
                   </CardContent>
                 </Grid>
-                <Grid item xs={12} sm={3}>
+                <Grid item xs={12} sm={2}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', sm: 'flex-end' }, gap: 1 }}>
                     <Typography variant='h6' fontWeight={600}>
-                      {commissionLoading ? '…' : `${comission?.commission ?? 0}%`}
+                      {comission?.commission ?? 0}%
                     </Typography>
                     {canEditCommission ? (
                       <CustomAvatar skin='light' variant='rounded' color='primary' onClick={openComissionModal}>
@@ -159,50 +149,11 @@ const Home = () => {
             </Card>
           </Grid>
 
-          <Grid item xs={12} md={6}>
-            <Card
-              elevation={0}
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 2,
-                height: '100%',
-                cursor: 'pointer'
-              }}
-              onClick={() => router.push('/apps/pricing')}
-            >
-              <Grid container alignItems='center' spacing={2} sx={{ px: 2, py: 1 }}>
-                <Grid item xs={12} sm={9}>
-                  <CardHeader title='Pricing & fees' sx={{ px: 0, py: 1 }} titleTypographyProps={{ variant: 'h6', fontWeight: 600 }} />
-                  <CardContent sx={{ pt: 0, px: 0, pb: 2 }}>
-                    <Typography variant='body2' color='text.secondary'>
-                      US/CA platform fees ($0.50 + $0.50 default), processing, tax, storage.
-                    </Typography>
-                    {pricingSummary ? (
-                      <Typography variant='caption' color='text.secondary' display='block' sx={{ mt: 1 }}>
-                        v{pricingSummary.version} · US trainee fee $
-                        {((pricingSummary.regions?.US?.traineePlatformFeeMinor || 0) / 100).toFixed(2)} · CA C$
-                        {((pricingSummary.regions?.CA?.traineePlatformFeeMinor || 0) / 100).toFixed(2)}
-                      </Typography>
-                    ) : null}
-                  </CardContent>
-                </Grid>
-                <Grid item xs={12} sm={3}>
-                  <Box sx={{ display: 'flex', justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}>
-                    <CustomAvatar skin='light' variant='rounded' color='secondary'>
-                      <Icon icon='mdi:cash-multiple' />
-                    </CustomAvatar>
-                  </Box>
-                </Grid>
-              </Grid>
-            </Card>
-          </Grid>
-
           <Grid item xs={12} container spacing={3}>
             <Grid item xs={6} sm={3}>
               <CardStatisticsVertical
                 color='warning'
-                stats={stat(metrics?.openSupportTickets)}
+                stats={metrics != null ? fmtInt(metrics.openSupportTickets ?? 0) : '—'}
                 trendNumber='Queue'
                 trend='positive'
                 title='Open support tickets'
@@ -214,7 +165,7 @@ const Home = () => {
             <Grid item xs={6} sm={3}>
               <CardStatisticsVertical
                 color='secondary'
-                stats={stat(metrics?.openUserFeedback)}
+                stats={metrics != null ? fmtInt(metrics.openUserFeedback ?? 0) : '—'}
                 trendNumber='Queue'
                 trend='positive'
                 title='Open user feedback'
@@ -226,7 +177,7 @@ const Home = () => {
             <Grid item xs={6} sm={3}>
               <CardStatisticsVertical
                 color='error'
-                stats={stat(metrics?.bookingsPendingRefund)}
+                stats={metrics != null ? fmtInt(metrics.bookingsPendingRefund ?? 0) : '—'}
                 trendNumber='Action'
                 trend='positive'
                 title='Bookings pending refund'
@@ -238,7 +189,7 @@ const Home = () => {
             <Grid item xs={6} sm={3}>
               <CardStatisticsVertical
                 color='info'
-                stats={stat(metrics?.newUsersLast7Days)}
+                stats={metrics != null ? fmtInt(metrics.newUsersLast7Days ?? 0) : '—'}
                 trendNumber='7d'
                 trend='positive'
                 title='New trainers + trainees'
@@ -274,7 +225,7 @@ const Home = () => {
             <Grid item xs={6} sm={3}>
               <CardStatisticsVertical
                 color='error'
-                stats={stat(metrics?.opsCriticalOpen24h)}
+                stats={metrics != null ? fmtInt(metrics.opsCriticalOpen24h ?? 0) : '—'}
                 trendNumber='24h'
                 trend='positive'
                 title='Critical ops events'
@@ -286,7 +237,7 @@ const Home = () => {
             <Grid item xs={6} sm={3}>
               <CardStatisticsVertical
                 color='warning'
-                stats={stat(metrics?.opsInstantFailures24h)}
+                stats={metrics != null ? fmtInt(metrics.opsInstantFailures24h ?? 0) : '—'}
                 trendNumber='24h'
                 trend='positive'
                 title='Instant lesson failures'
@@ -298,7 +249,7 @@ const Home = () => {
             <Grid item xs={6} sm={3}>
               <CardStatisticsVertical
                 color='info'
-                stats={stat(metrics?.opsCallPreflightFailures24h)}
+                stats={metrics != null ? fmtInt(metrics.opsCallPreflightFailures24h ?? 0) : '—'}
                 trendNumber='24h'
                 trend='positive'
                 title='Call preflight failures'
@@ -312,9 +263,9 @@ const Home = () => {
           <Grid item xs={12} md={8} container spacing={6}>
             <Grid item xs={6}>
               <AnalyticsTotalRevenue
-                valueText={metricsLoading && !metrics ? '…' : fmtMoney(metrics?.totalRevenue ?? 0)}
+                valueText={metrics ? fmtMoney(metrics.totalRevenue) : '—'}
                 trendText={liveHint}
-                trendPositive={socketConnected || !metricsLoading}
+                trendPositive={socketConnected}
                 chipSubtext='Paid bookings (excl. canceled)'
                 onClick={() => router.push('/apps/booking?focus=paid')}
               />
@@ -334,7 +285,7 @@ const Home = () => {
             <Grid item xs={3}>
               <CardStatisticsVertical
                 color='info'
-                stats={stat(metrics?.totalImpressions)}
+                stats={metrics ? fmtInt(metrics.totalImpressions) : '—'}
                 trendNumber={liveHint}
                 trend='positive'
                 chipText='Published clips (live)'
@@ -346,12 +297,12 @@ const Home = () => {
             <Grid item xs={3}>
               <AnalyticsOverview
                 valueText={
-                  metricsLoading && !metrics
-                    ? '…'
-                    : `${fmtInt(metrics?.trainersCount ?? 0)} / ${fmtInt(metrics?.traineesCount ?? 0)}`
+                  metrics
+                    ? `${fmtInt(metrics.trainersCount)} / ${fmtInt(metrics.traineesCount)}`
+                    : '—'
                 }
                 trendText={liveHint}
-                trendPositive={socketConnected || !metricsLoading}
+                trendPositive={socketConnected}
                 radialPercent={metrics?.overviewCompletionPercent ?? 0}
                 caption='Session completion rate'
                 onClick={() => router.push('/apps/booking')}
@@ -360,7 +311,7 @@ const Home = () => {
           </Grid>
           <Grid item xs={6} md={2}>
             <CardStatisticsVertical
-              stats={stat(metrics?.totalOrders)}
+              stats={metrics ? fmtInt(metrics.totalOrders) : '—'}
               color='primary'
               trendNumber={liveHint}
               trend='positive'
@@ -372,9 +323,9 @@ const Home = () => {
           </Grid>
           <Grid item xs={6} md={2}>
             <AnalyticsSessions
-              valueText={metricsLoading && !metrics ? '…' : fmtInt(metrics?.totalSessions ?? 0)}
+              valueText={metrics ? fmtInt(metrics.totalSessions) : '—'}
               trendText={liveHint}
-              trendPositive={socketConnected || !metricsLoading}
+              trendPositive={socketConnected}
               onClick={() => router.push('/apps/booking')}
             />
           </Grid>
@@ -386,7 +337,7 @@ const Home = () => {
       {/* -----------------Modal Commission Edit--------------- */}
 
       <Modal handleClose={closeComissionModal} open={commissionModal} maxWidth='xs'>
-        {canEditCommission ? <CommissionForm getGlobalCommission={loadGlobalCommission} /> : null}
+        {canEditCommission ? <CommissionForm getGlobalCommission={getGlobalCommission} /> : null}
       </Modal>
     </>
   )
