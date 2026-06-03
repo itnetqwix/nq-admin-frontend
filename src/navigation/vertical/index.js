@@ -152,6 +152,13 @@ const navigation = () => [
         subject: 'admin-nav-promo-codes'
       },
       {
+        title: 'Referrals',
+        path: '/apps/referrals',
+        icon: 'mdi:account-arrow-right-outline',
+        action: 'read',
+        subject: 'admin-nav-referrals'
+      },
+      {
         title: 'Broadcasts',
         path: '/apps/broadcasts',
         icon: 'mdi:bullhorn-outline',
