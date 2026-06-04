@@ -35,6 +35,7 @@ import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
 import BannerCtaEditor from 'src/components/admin/content/BannerCtaEditor'
 import BannerPreviewStrip from 'src/components/admin/content/BannerPreviewStrip'
+import BannerHeroPreview from 'src/components/admin/content/BannerHeroPreview'
 import { computeScheduleStatus, scheduleStatusChip } from 'src/components/admin/content/scheduleStatus'
 import { BANNERS_AUDIENCE_HELP } from 'src/components/admin/content/contentPlacementConfig'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
@@ -49,12 +50,19 @@ import {
 
 const SEVERITIES = ['info', 'promo', 'maintenance', 'critical', 'success']
 const AUDIENCES = ['guest', 'trainee', 'trainer', 'all']
+const PLACEMENTS = [
+  { value: 'hero', label: 'Hero carousel', hint: 'Large cards under search (auto-advance)' },
+  { value: 'strip', label: 'Announcement strip', hint: 'Compact bar on login / alerts' },
+  { value: 'sticky_bottom', label: 'Sticky bottom promo', hint: 'Slim bar above tab bar' }
+]
 
 const EMPTY_FORM = {
   title: '',
   body: '',
   image_url: '',
   audience: ['all'],
+  placement: 'hero',
+  auto_advance_sec: '5',
   severity: 'info',
   ctas: [],
   cta_label: '',
@@ -110,6 +118,7 @@ export default function BannersPage() {
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
   const [audienceFilter, setAudienceFilter] = useState('')
+  const [placementFilter, setPlacementFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
@@ -141,6 +150,7 @@ export default function BannersPage() {
       const data = await listBanners({
         search,
         audience: audienceFilter,
+        placement: placementFilter,
         status: statusFilter,
         page,
         pageSize
@@ -153,7 +163,7 @@ export default function BannersPage() {
     } finally {
       setLoading(false)
     }
-  }, [search, audienceFilter, statusFilter, page, pageSize])
+  }, [search, audienceFilter, placementFilter, statusFilter, page, pageSize])
 
   useEffect(() => {
     fetchData()
@@ -196,6 +206,8 @@ export default function BannersPage() {
       image_url: row.image_url || '',
       audience: Array.isArray(row.audience) && row.audience.length ? row.audience : ['all'],
       severity: row.severity || 'info',
+      placement: row.placement || 'hero',
+      auto_advance_sec: String(row.auto_advance_sec ?? 5),
       ctas: normalizeCtasFromRow(row),
       cta_label: row.cta_label || '',
       cta_url: row.cta_url || '',
@@ -224,6 +236,8 @@ export default function BannersPage() {
         image_url: form.image_url || null,
         audience: form.audience,
         severity: form.severity,
+        placement: form.placement || 'hero',
+        auto_advance_sec: Number(form.auto_advance_sec) || 5,
         ctas,
         cta_label: ctas.length ? null : form.cta_label || null,
         cta_url: ctas.length ? null : form.cta_url || null,
@@ -304,6 +318,14 @@ export default function BannersPage() {
 
           return <Chip label={meta.label} size='small' color={meta.color} />
         }
+      },
+      {
+        field: 'placement',
+        headerName: 'Placement',
+        width: 130,
+        headerClassName: styles['header-class'],
+        cellClassName: styles['cell-class'],
+        renderCell: p => <Chip label={p.value || 'hero'} size='small' color='primary' variant='outlined' />
       },
       {
         field: 'audience',
@@ -472,6 +494,24 @@ export default function BannersPage() {
                 ))}
               </Select>
             </FormControl>
+            <FormControl size='small' sx={{ minWidth: 180 }}>
+              <InputLabel>Placement</InputLabel>
+              <Select
+                label='Placement'
+                value={placementFilter}
+                onChange={e => {
+                  setPlacementFilter(e.target.value)
+                  setPage(1)
+                }}
+              >
+                <MenuItem value=''>All</MenuItem>
+                {PLACEMENTS.map(p => (
+                  <MenuItem key={p.value} value={p.value}>
+                    {p.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <FormControl size='small' sx={{ minWidth: 160 }}>
               <InputLabel>Status</InputLabel>
               <Select
@@ -519,6 +559,22 @@ export default function BannersPage() {
                 onChange={e => handleFormChange('title', e.target.value)}
                 inputProps={{ maxLength: 120 }}
               />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth size='small'>
+                <InputLabel>Placement</InputLabel>
+                <Select
+                  label='Placement'
+                  value={form.placement}
+                  onChange={e => handleFormChange('placement', e.target.value)}
+                >
+                  {PLACEMENTS.map(p => (
+                    <MenuItem key={p.value} value={p.value}>
+                      <ListItemText primary={p.label} secondary={p.hint} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12} sm={4}>
               <FormControl fullWidth size='small'>
@@ -575,8 +631,23 @@ export default function BannersPage() {
               <Typography variant='subtitle2' gutterBottom>
                 Mobile preview
               </Typography>
+              <BannerHeroPreview form={form} />
               <BannerPreviewStrip form={form} />
             </Grid>
+            {form.placement === 'hero' ? (
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  label='Auto-advance (seconds)'
+                  fullWidth
+                  size='small'
+                  type='number'
+                  inputProps={{ min: 3, max: 60 }}
+                  value={form.auto_advance_sec}
+                  onChange={e => handleFormChange('auto_advance_sec', e.target.value)}
+                  helperText='Hero carousel slide interval (3–60)'
+                />
+              </Grid>
+            ) : null}
             <Grid item xs={12} sm={6}>
               <TextField
                 label='Image URL (optional)'
@@ -689,7 +760,12 @@ export default function BannersPage() {
       <Dialog open={!!previewRow} onClose={() => setPreviewRow(null)} maxWidth='sm' fullWidth>
         <DialogTitle>Banner preview</DialogTitle>
         <DialogContent>
-          {previewRow ? <BannerPreviewStrip form={previewRow} /> : null}
+          {previewRow ? (
+            <>
+              <BannerHeroPreview form={previewRow} />
+              <BannerPreviewStrip form={previewRow} />
+            </>
+          ) : null}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setPreviewRow(null)}>Close</Button>

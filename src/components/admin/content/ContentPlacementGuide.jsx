@@ -62,6 +62,7 @@ export default function ContentPlacementGuide({ kind }) {
           <TableHead>
             <TableRow>
               <TableCell>Surface</TableCell>
+              {kind === 'banners' ? <TableCell>Placement key</TableCell> : null}
               <TableCell>Path</TableCell>
               <TableCell>Audience tags</TableCell>
               <TableCell>Notes</TableCell>
@@ -75,6 +76,13 @@ export default function ContentPlacementGuide({ kind }) {
                     {row.surface}
                   </Typography>
                 </TableCell>
+                {kind === 'banners' && row.placement ? (
+                  <TableCell>
+                    <Chip label={row.placement} size='small' variant='outlined' />
+                  </TableCell>
+                ) : kind === 'banners' ? (
+                  <TableCell>—</TableCell>
+                ) : null}
                 <TableCell>
                   <Typography variant='body2' color='text.secondary'>
                     {row.path}
