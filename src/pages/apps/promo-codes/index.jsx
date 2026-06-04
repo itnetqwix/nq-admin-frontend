@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
   FormControl, FormControlLabel, Grid, IconButton, InputLabel, MenuItem,
-  Select, Switch, TextField, Tooltip, Typography
+  Select, Switch, Tab, Tabs, TextField, Tooltip, Typography
 } from '@mui/material'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AddIcon from '@mui/icons-material/Add'
@@ -17,6 +17,7 @@ import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPa
 import DeletePopup from 'src/pages/components/modal/DeletePopup'
 import {
   listPromoCodes,
+  getPromoAdminStats,
   createPromoCode,
   updatePromoCode,
   deletePromoCode,
@@ -51,6 +52,20 @@ function generateCode() {
   return code
 }
 
+const SPONSOR_TABS = [
+  { value: '', label: 'All promos' },
+  { value: 'platform', label: 'Platform (NetQwix)' },
+  { value: 'trainer', label: 'Coach-owned' }
+]
+
+function sponsorChip(row) {
+  const t = row.sponsor_type || 'platform'
+  if (t === 'trainer') {
+    return <Chip label='Coach' size='small' color='secondary' variant='outlined' />
+  }
+  return <Chip label='Platform' size='small' color='primary' variant='outlined' />
+}
+
 function getStatusChip(row) {
   const now = new Date()
   if (!row.is_active) return <Chip label='Inactive' size='small' color='default' />
@@ -63,7 +78,9 @@ export default function PromoCodesPage() {
   const [promos, setPromos] = useState([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [stats, setStats] = useState(null)
   const [search, setSearch] = useState('')
+  const [sponsorTab, setSponsorTab] = useState('')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
 
@@ -81,16 +98,23 @@ export default function PromoCodesPage() {
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await listPromoCodes({ search, page, limit: pageSize })
+      const query = { search, page, limit: pageSize }
+      if (sponsorTab) query.sponsor_type = sponsorTab
+      const [data, statsRes] = await Promise.all([
+        listPromoCodes(query),
+        getPromoAdminStats().catch(() => null)
+      ])
       const list = data?.result?.promos || []
       setPromos(list.map(p => ({ ...p, id: p._id })))
       setTotal(data?.result?.total || 0)
+      if (statsRes?.result) setStats(statsRes.result)
+      else if (statsRes && !statsRes.result) setStats(statsRes)
     } catch (err) {
       toast.error(err.message || 'Failed to load promo codes')
     } finally {
       setLoading(false)
     }
-  }, [search, page, pageSize])
+  }, [search, page, pageSize, sponsorTab])
 
   useEffect(() => { fetchData() }, [fetchData])
 
@@ -239,6 +263,14 @@ export default function PromoCodesPage() {
       )
     },
     {
+      field: 'sponsor_type',
+      headerName: 'Sponsor',
+      width: 110,
+      headerClassName: styles['header-class'],
+      cellClassName: styles['cell-class'],
+      renderCell: p => sponsorChip(p.row)
+    },
+    {
       field: 'display_label',
       headerName: 'Label',
       flex: 1.2,
@@ -362,8 +394,8 @@ export default function PromoCodesPage() {
   return (
     <>
       <AdminPageShell
-        title='Promo Codes'
-        subtitle='Create and manage promotional codes for bookings. Control discounts, validity periods, usage limits, and user visibility.'
+        title='Promo codes'
+        subtitle='Platform promos (NetQwix-funded) and coach-owned promos. Coach codes only apply to that coach’s bookings.'
         actions={
           <Button variant='contained' startIcon={<AddIcon />} onClick={openCreate} sx={{ bgcolor: '#000080', '&:hover': { bgcolor: '#0000a0' } }}>
             Create Promo Code
@@ -372,6 +404,35 @@ export default function PromoCodesPage() {
         contentSx={{ p: 0 }}
       >
         <AdminPageSection>
+          {stats ? (
+            <Grid container spacing={3} sx={{ mb: 3 }}>
+              <Grid item xs={6} md={3}>
+                <Typography variant='caption' color='text.secondary'>Platform active</Typography>
+                <Typography fontWeight={700}>{stats.platformActive ?? 0} / {stats.platformTotal ?? 0}</Typography>
+              </Grid>
+              <Grid item xs={6} md={3}>
+                <Typography variant='caption' color='text.secondary'>Coach promos active</Typography>
+                <Typography fontWeight={700}>{stats.trainerActive ?? 0} / {stats.trainerTotal ?? 0}</Typography>
+              </Grid>
+              <Grid item xs={6} md={3}>
+                <Typography variant='caption' color='text.secondary'>Total redemptions</Typography>
+                <Typography fontWeight={700}>{stats.totalRedemptions ?? 0}</Typography>
+              </Grid>
+              <Grid item xs={6} md={3}>
+                <Typography variant='caption' color='text.secondary'>Expiring (7 days)</Typography>
+                <Typography fontWeight={700}>{stats.expiringSoon ?? 0}</Typography>
+              </Grid>
+            </Grid>
+          ) : null}
+          <Tabs
+            value={sponsorTab}
+            onChange={(_, v) => { setSponsorTab(v); setPage(1) }}
+            sx={{ mb: 2 }}
+          >
+            {SPONSOR_TABS.map(t => (
+              <Tab key={t.value || 'all'} label={t.label} value={t.value} />
+            ))}
+          </Tabs>
           <TextField
             size='small'
             placeholder='Search by code, label, or description...'

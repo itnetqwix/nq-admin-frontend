@@ -21,8 +21,7 @@ const fmtMoney = minor =>
     (Number(minor) || 0) / 100
   )
 
-const fmtUsd = v =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(v) || 0)
+const fmtPts = n => `${Number(n) || 0} pts`
 
 const ReferralsAdminPage = () => {
   const [tab, setTab] = useState(0)
@@ -49,16 +48,17 @@ const ReferralsAdminPage = () => {
 
   const summary = data?.summary ?? {}
   const cfg = data?.firstLessonDiscount ?? {}
+  const matrix = data?.rewardMatrixPoints ?? {}
 
   const rewardCols = useMemo(
     () => [
       { field: 'beneficiary_role', headerName: 'Role', width: 100 },
       { field: 'trigger', headerName: 'Trigger', width: 120 },
       {
-        field: 'amount_minor',
-        headerName: 'Amount',
-        width: 100,
-        valueGetter: p => fmtMoney(p.row.amount_minor)
+        field: 'points_awarded',
+        headerName: 'Points',
+        width: 90,
+        valueGetter: p => fmtPts(p.row.points_awarded)
       },
       { field: 'status', headerName: 'Status', width: 110 },
       {
@@ -98,15 +98,6 @@ const ReferralsAdminPage = () => {
       { field: 'referrer_account_type', headerName: 'Ref type', width: 100 },
       { field: 'referee_account_type', headerName: 'New type', width: 100 },
       {
-        field: 'first_lesson_discount_used',
-        headerName: '1st lesson $',
-        width: 110,
-        valueGetter: p =>
-          p.row.first_lesson_discount_used
-            ? fmtUsd(p.row.first_lesson_discount_amount)
-            : '—'
-      },
-      {
         field: 'createdAt',
         headerName: 'Linked',
         width: 170,
@@ -122,10 +113,17 @@ const ReferralsAdminPage = () => {
     ...p
   }))
 
+  const matrixChips = [
+    { label: 'Trainer → Trainee', preview: matrix.trainerInviteTrainee },
+    { label: 'Trainer → Trainer', preview: matrix.trainerInviteTrainer },
+    { label: 'Trainee → Trainee', preview: matrix.traineeInviteTrainee },
+    { label: 'Trainee → Trainer', preview: matrix.traineeInviteTrainer }
+  ]
+
   return (
     <AdminPageShell
-      title='Referrals'
-      subtitle='Invites, attributions, wallet rewards, and first-lesson checkout discounts.'
+      title='Referrals & points'
+      subtitle='Invites, attributions, referral points (1–5 per event), and wallet redemptions (100 pts = $5).'
       actions={<AdminRefreshButton onClick={load} loading={loading} />}
     >
       {error ? (
@@ -159,18 +157,18 @@ const ReferralsAdminPage = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <CardStatisticsVertical
-            stats={fmtMoney(summary.rewardsCreditedMinor)}
-            title='Wallet credited'
-            subtitle={`${summary.rewardsCreditedCount ?? 0} payouts`}
-            icon='mdi:wallet-outline'
+            stats={fmtPts(summary.referralPointsIssued)}
+            title='Referral points issued'
+            subtitle={`${summary.rewardsCreditedCount ?? 0} credited rewards`}
+            icon='mdi:star-circle-outline'
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <CardStatisticsVertical
-            stats={fmtUsd(summary.checkoutDiscountDollars)}
-            title='Checkout discounts'
-            subtitle={`${summary.checkoutDiscountsUsed ?? 0} first lessons`}
-            icon='mdi:tag-outline'
+            stats={fmtMoney(summary.pointsRedeemedWalletMinor)}
+            title='Points redeemed'
+            subtitle={`${summary.pointsRedemptionsCount ?? 0} redemptions · ${fmtPts(summary.pointsRedeemedTotal)} burned`}
+            icon='mdi:wallet-outline'
           />
         </Grid>
       </Grid>
@@ -178,25 +176,53 @@ const ReferralsAdminPage = () => {
       <Card sx={{ mb: 4 }}>
         <CardContent>
           <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>
-            First lesson checkout discount (stacks with promo)
+            Referral earn matrix (points)
           </Typography>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            <Chip
-              size='small'
-              label={cfg.enabled ? 'Enabled' : 'Disabled'}
-              color={cfg.enabled ? 'success' : 'default'}
-            />
-            <Chip size='small' label={`Type: ${cfg.discountType || 'fixed_amount'}`} />
-            <Chip
-              size='small'
-              label={
-                cfg.discountType === 'percentage'
-                  ? `Value: ${cfg.discountValue}%`
-                  : `Value: ${fmtUsd(cfg.discountValue)}`
-              }
-            />
-            <Chip size='small' label={`Max: ${fmtUsd(cfg.maxDiscountDollars)}`} />
+          <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+            Redeem in the app: 100 points = $5 wallet credit. Per-action cap: 5 points.
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            {matrixChips.map(row => {
+              const p = row.preview ?? {}
+              const bits = [
+                p.referrerSignupPoints > 0 && `referrer signup ${p.referrerSignupPoints} pts`,
+                p.refereeSignupPoints > 0 && `referee signup ${p.refereeSignupPoints} pts`,
+                p.referrerFirstBookingPoints > 0 &&
+                  `referrer first booking ${p.referrerFirstBookingPoints} pts`
+              ].filter(Boolean)
+              return (
+                <Box
+                  key={row.label}
+                  sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}
+                >
+                  <Chip size='small' label={row.label} variant='outlined' />
+                  {bits.length ? (
+                    bits.map(b => <Chip key={b} size='small' label={b} />)
+                  ) : (
+                    <Typography variant='caption' color='text.secondary'>
+                      No points for this pair
+                    </Typography>
+                  )}
+                </Box>
+              )
+            })}
           </Box>
+        </CardContent>
+      </Card>
+
+      <Card sx={{ mb: 4 }}>
+        <CardContent>
+          <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>
+            First lesson checkout discount
+          </Typography>
+          <Alert severity='info' sx={{ mb: 1 }}>
+            Dollar checkout discounts for referred trainees are disabled; rewards are points-only.
+          </Alert>
+          <Chip
+            size='small'
+            label={cfg.enabled ? 'Enabled (legacy config)' : 'Disabled'}
+            color={cfg.enabled ? 'warning' : 'default'}
+          />
         </CardContent>
       </Card>
 

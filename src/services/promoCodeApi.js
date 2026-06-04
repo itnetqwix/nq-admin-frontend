@@ -20,6 +20,14 @@ const handleRes = async response => {
   return data
 }
 
+export const getPromoAdminStats = async () => {
+  const res = await fetch(apiUrl('/admin/promo-codes/stats'), {
+    method: 'GET',
+    headers: getAuthHeaders()
+  })
+  return handleRes(res)
+}
+
 export const listPromoCodes = async (query = {}) => {
   const params = new URLSearchParams()
   Object.entries(query).forEach(([k, v]) => {
