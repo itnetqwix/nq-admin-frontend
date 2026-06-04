@@ -1,5 +1,6 @@
 import React from 'react'
 import { Box, Typography } from '@mui/material'
+import { resolveCmsImageUrl } from 'src/utils/cmsImageUrl'
 
 /**
  * Mobile hero carousel card preview (Blinkit / marketplace style).
@@ -7,7 +8,7 @@ import { Box, Typography } from '@mui/material'
 export default function BannerHeroPreview({ form }) {
   const title = form?.title?.trim() || 'Banner title'
   const body = form?.body?.trim()
-  const imageUrl = form?.image_url?.trim()
+  const imageUrl = resolveCmsImageUrl(form?.image_url)
   const ctas = Array.isArray(form?.ctas)
     ? form.ctas.filter(c => c?.label?.trim())
     : form?.cta_label?.trim()

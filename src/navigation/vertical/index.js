@@ -40,6 +40,57 @@ const navigation = () => [
       }
     ]
   },
+  { sectionTitle: 'Content & ads', auth: false },
+  {
+    title: 'CMS',
+    icon: 'mdi:view-dashboard-edit-outline',
+    action: 'read',
+    subject: 'admin-nav-content',
+    children: [
+      {
+        title: 'Overview',
+        path: '/apps/cms',
+        icon: 'mdi:view-grid-outline',
+        action: 'read',
+        subject: 'admin-nav-cms-overview'
+      },
+      {
+        title: 'Banners',
+        path: '/apps/banners',
+        icon: 'mdi:image-multiple-outline',
+        action: 'read',
+        subject: 'admin-nav-banners'
+      },
+      {
+        title: 'Tips (offers)',
+        path: '/apps/tips',
+        icon: 'mdi:lightbulb-on-outline',
+        action: 'read',
+        subject: 'admin-nav-tips'
+      },
+      {
+        title: 'Blog & pages',
+        path: '/apps/cms-blog',
+        icon: 'mdi:post-outline',
+        action: 'read',
+        subject: 'admin-nav-cms-blog'
+      },
+      {
+        title: 'Legal',
+        path: '/apps/cms-legal',
+        icon: 'mdi:file-document-outline',
+        action: 'read',
+        subject: 'admin-nav-cms-legal'
+      },
+      {
+        title: 'FAQ',
+        path: '/apps/cms-faq',
+        icon: 'mdi:help-circle-outline',
+        action: 'read',
+        subject: 'admin-nav-cms-faq'
+      }
+    ]
+  },
   { sectionTitle: 'Clips & video', auth: false },
   {
     title: 'Netqwix Library',

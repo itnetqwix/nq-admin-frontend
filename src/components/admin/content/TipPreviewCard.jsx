@@ -1,6 +1,7 @@
 import React from 'react'
 import { Box, Typography } from '@mui/material'
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined'
+import { resolveCmsImageUrl } from 'src/utils/cmsImageUrl'
 
 /**
  * Mirrors mobile TipsCarousel card (approximate).
@@ -9,6 +10,7 @@ export default function TipPreviewCard({ form }) {
   const title = form?.title?.trim() || 'Tip title'
   const body = form?.body?.trim() || 'Tip body appears here…'
   const cta = form?.cta_label?.trim()
+  const imageUrl = resolveCmsImageUrl(form?.image_url)
 
   return (
     <Box
@@ -20,7 +22,11 @@ export default function TipPreviewCard({ form }) {
         border: '1px solid',
         borderColor: 'divider',
         bgcolor: 'background.paper',
-        boxShadow: 1
+        boxShadow: 1,
+        overflow: 'hidden',
+        backgroundImage: imageUrl ? `url(${imageUrl})` : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
       }}
     >
       <Box
@@ -28,7 +34,7 @@ export default function TipPreviewCard({ form }) {
           width: 36,
           height: 36,
           borderRadius: '50%',
-          bgcolor: '#e8eaf6',
+          bgcolor: imageUrl ? 'rgba(255,255,255,0.92)' : '#e8eaf6',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

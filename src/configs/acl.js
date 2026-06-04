@@ -37,6 +37,22 @@ const defineRulesFor = (role, user) => {
   if (ok('nav_promo_codes')) can('read', 'admin-nav-promo-codes')
   if (ok('nav_referrals')) can('read', 'admin-nav-referrals')
   if (ok('nav_broadcasts')) can('read', 'admin-nav-broadcasts')
+  if (ok('nav_cms') || ok('nav_banners')) can('read', 'admin-nav-banners')
+  if (ok('nav_cms') || ok('nav_tips')) can('read', 'admin-nav-tips')
+  if (ok('nav_cms') || ok('nav_cms_blog')) can('read', 'admin-nav-cms-blog')
+  if (ok('nav_cms') || ok('nav_cms_legal')) can('read', 'admin-nav-cms-legal')
+  if (ok('nav_cms') || ok('nav_cms_faq')) can('read', 'admin-nav-cms-faq')
+  if (ok('nav_cms')) can('read', 'admin-nav-cms-overview')
+
+  if (ok('nav_cms') || ok('nav_banners') || ok('nav_tips')) {
+    can('read', 'admin-nav-content')
+    can('read', 'admin-nav-banners')
+    can('read', 'admin-nav-tips')
+    can('read', 'admin-nav-cms-blog')
+    can('read', 'admin-nav-cms-legal')
+    can('read', 'admin-nav-cms-faq')
+    can('read', 'admin-nav-cms-overview')
+  }
 
   if (ok('nav_people') || ok('nav_trainers')) {
     can('read', 'admin-nav-people')

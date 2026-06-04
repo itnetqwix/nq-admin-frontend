@@ -34,8 +34,8 @@ import styles from 'styles/common.module.css'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
 import BannerCtaEditor from 'src/components/admin/content/BannerCtaEditor'
-import BannerPreviewStrip from 'src/components/admin/content/BannerPreviewStrip'
-import BannerHeroPreview from 'src/components/admin/content/BannerHeroPreview'
+import BannerPlacementPreview from 'src/components/admin/content/BannerPlacementPreview'
+import CmsImageUploader from 'src/components/admin/content/CmsImageUploader'
 import { computeScheduleStatus, scheduleStatusChip } from 'src/components/admin/content/scheduleStatus'
 import { BANNERS_AUDIENCE_HELP } from 'src/components/admin/content/contentPlacementConfig'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
@@ -431,7 +431,7 @@ export default function BannersPage() {
     <>
       <AdminPageShell
         title='Banners'
-        subtitle='Top-of-screen announcements on mobile login, guest home, and signed-in trainee/trainer dashboards. Use guest + all for sign-in promos.'
+        subtitle='Hero carousel, announcement strip, and sticky promo on mobile + web dashboard home. Upload images or paste URL/S3 key. Use guest + all for sign-in promos.'
         actions={
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
             <Button component={NextLink} href='/apps/tips' variant='outlined' size='small'>
@@ -628,11 +628,7 @@ export default function BannersPage() {
               </FormControl>
             </Grid>
             <Grid item xs={12}>
-              <Typography variant='subtitle2' gutterBottom>
-                Mobile preview
-              </Typography>
-              <BannerHeroPreview form={form} />
-              <BannerPreviewStrip form={form} />
+              <BannerPlacementPreview form={form} />
             </Grid>
             {form.placement === 'hero' ? (
               <Grid item xs={12} sm={4}>
@@ -648,14 +644,11 @@ export default function BannersPage() {
                 />
               </Grid>
             ) : null}
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label='Image URL (optional)'
-                fullWidth
-                size='small'
+            <Grid item xs={12}>
+              <CmsImageUploader
+                kind='banners'
                 value={form.image_url}
-                onChange={e => handleFormChange('image_url', e.target.value)}
-                placeholder='https://…'
+                onChange={v => handleFormChange('image_url', v)}
               />
             </Grid>
             <Grid item xs={12}>
@@ -758,14 +751,13 @@ export default function BannersPage() {
       </Dialog>
 
       <Dialog open={!!previewRow} onClose={() => setPreviewRow(null)} maxWidth='sm' fullWidth>
-        <DialogTitle>Banner preview</DialogTitle>
+        <DialogTitle>
+          {previewRow
+            ? `Preview · ${PLACEMENTS.find(p => p.value === (previewRow.placement || 'hero'))?.label || previewRow.placement}`
+            : 'Banner preview'}
+        </DialogTitle>
         <DialogContent>
-          {previewRow ? (
-            <>
-              <BannerHeroPreview form={previewRow} />
-              <BannerPreviewStrip form={previewRow} />
-            </>
-          ) : null}
+          {previewRow ? <BannerPlacementPreview form={previewRow} showLabel={false} /> : null}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setPreviewRow(null)}>Close</Button>

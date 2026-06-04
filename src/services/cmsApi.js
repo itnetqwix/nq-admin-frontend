@@ -34,8 +34,9 @@ export const upsertLegalDocument = async (slug, body) => {
   return handleRes(res)
 }
 
-export const listCmsPages = async (type = 'blog') => {
-  const res = await fetch(apiUrl(`/admin/cms/pages?type=${encodeURIComponent(type)}`), {
+export const listCmsPages = async (type) => {
+  const qs = type ? `?type=${encodeURIComponent(type)}` : ''
+  const res = await fetch(apiUrl(`/admin/cms/pages${qs}`), {
     headers: getAuthHeaders()
   })
   return handleRes(res)

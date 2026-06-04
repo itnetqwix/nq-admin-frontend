@@ -33,6 +33,7 @@ import styles from 'styles/common.module.css'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
 import TipPreviewCard from 'src/components/admin/content/TipPreviewCard'
+import CmsImageUploader from 'src/components/admin/content/CmsImageUploader'
 import { computeScheduleStatus, scheduleStatusChip } from 'src/components/admin/content/scheduleStatus'
 import { TIPS_AUDIENCE_HELP } from 'src/components/admin/content/contentPlacementConfig'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
@@ -506,14 +507,11 @@ export default function TipsPage() {
                 helperText={`${form.body.length}/600`}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label='Image URL (optional)'
-                fullWidth
-                size='small'
+            <Grid item xs={12}>
+              <CmsImageUploader
+                kind='tips'
                 value={form.image_url}
-                onChange={e => handleFormChange('image_url', e.target.value)}
-                placeholder='https://…'
+                onChange={v => handleFormChange('image_url', v)}
               />
             </Grid>
             <Grid item xs={12} sm={6}>

@@ -152,6 +152,46 @@ const Home = () => {
           <Grid item xs={12} container spacing={3}>
             <Grid item xs={6} sm={3}>
               <CardStatisticsVertical
+                color='primary'
+                stats={metrics != null ? fmtInt(metrics.activeBanners ?? 0) : '—'}
+                trendNumber='Live'
+                trend='positive'
+                title='Active banners'
+                chipText='CMS'
+                icon={<Icon icon='mdi:image-multiple-outline' />}
+                onCardClick={() => router.push('/apps/banners')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <CardStatisticsVertical
+                color='info'
+                stats={metrics != null ? fmtInt(metrics.activeTips ?? 0) : '—'}
+                trendNumber='Offers'
+                trend='positive'
+                title='Active tips'
+                chipText='CMS'
+                icon={<Icon icon='mdi:lightbulb-on-outline' />}
+                onCardClick={() => router.push('/apps/tips')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <CardStatisticsVertical
+                color='secondary'
+                stats={
+                  metrics != null
+                    ? `${fmtInt(metrics.activeBannersHero ?? 0)} / ${fmtInt(metrics.activeBannersStrip ?? 0)} / ${fmtInt(metrics.activeBannersSticky ?? 0)}`
+                    : '—'
+                }
+                trendNumber='H / S / B'
+                trend='positive'
+                title='Banner placements'
+                chipText='hero · strip · sticky'
+                icon={<Icon icon='mdi:view-dashboard-edit-outline' />}
+                onCardClick={() => router.push('/apps/cms')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <CardStatisticsVertical
                 color='warning'
                 stats={metrics != null ? fmtInt(metrics.openSupportTickets ?? 0) : '—'}
                 trendNumber='Queue'
