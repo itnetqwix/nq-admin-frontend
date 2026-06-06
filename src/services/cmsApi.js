@@ -98,3 +98,54 @@ export const seedAdminFaq = async (body = {}) => {
   })
   return handleRes(res)
 }
+
+export const getCmsSummary = async () => {
+  const res = await fetch(apiUrl('/admin/cms/summary'), { headers: getAuthHeaders() })
+  return handleRes(res)
+}
+
+/**
+ * Request a presigned PUT URL for a CMS asset (banner/tip/page cover).
+ * `kind` must be one of: banners | tips | pages.
+ */
+export const presignCmsAsset = async ({ kind, contentType, fileSizeBytes, fileName }) => {
+  const res = await fetch(apiUrl('/admin/cms/asset-presign'), {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ kind, contentType, fileSizeBytes, fileName })
+  })
+  return handleRes(res)
+}
+
+/**
+ * Two-step upload: presign with the backend, then PUT the file directly to S3.
+ * Returns the permanent mediaUrl ready to persist on the CMS entity.
+ */
+export const uploadCmsAsset = async (file, kind) => {
+  if (!file) throw new Error('No file selected.')
+  const allowed = new Set(['image/jpeg', 'image/png', 'image/webp'])
+  if (!allowed.has(file.type)) {
+    throw new Error('Unsupported image type. Use JPEG, PNG, or WebP.')
+  }
+  const MAX = 5 * 1024 * 1024
+  if (file.size > MAX) {
+    throw new Error(`Image is too large (max ${Math.round(MAX / 1024 / 1024)} MB).`)
+  }
+  const presign = await presignCmsAsset({
+    kind,
+    contentType: file.type,
+    fileSizeBytes: file.size,
+    fileName: file.name
+  })
+  const { uploadUrl, mediaUrl } = presign.data || {}
+  if (!uploadUrl || !mediaUrl) throw new Error('Presign response missing upload URL.')
+  const put = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': file.type },
+    body: file
+  })
+  if (!put.ok) {
+    throw new Error(`S3 upload failed (${put.status}).`)
+  }
+  return { mediaUrl, key: presign.data?.key }
+}

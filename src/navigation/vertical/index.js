@@ -181,6 +181,57 @@ const navigation = () => [
       }
     ]
   },
+  { sectionTitle: 'Content (CMS)', auth: false },
+  {
+    title: 'Mobile content',
+    icon: 'mdi:cellphone-cog',
+    action: 'read',
+    subject: 'admin-nav-cms',
+    children: [
+      {
+        title: 'Overview',
+        path: '/apps/cms',
+        icon: 'mdi:view-dashboard-outline',
+        action: 'read',
+        subject: 'admin-nav-cms'
+      },
+      {
+        title: 'Banners',
+        path: '/apps/banners',
+        icon: 'mdi:image-multiple-outline',
+        action: 'read',
+        subject: 'admin-nav-cms-banners'
+      },
+      {
+        title: 'Tips',
+        path: '/apps/tips',
+        icon: 'mdi:lightbulb-on-outline',
+        action: 'read',
+        subject: 'admin-nav-cms-tips'
+      },
+      {
+        title: 'Blog & pages',
+        path: '/apps/cms-blog',
+        icon: 'mdi:post-outline',
+        action: 'read',
+        subject: 'admin-nav-cms-blog'
+      },
+      {
+        title: 'FAQ',
+        path: '/apps/cms-faq',
+        icon: 'mdi:frequently-asked-questions',
+        action: 'read',
+        subject: 'admin-nav-cms-faq'
+      },
+      {
+        title: 'Legal (terms & privacy)',
+        path: '/apps/cms-legal',
+        icon: 'mdi:gavel',
+        action: 'read',
+        subject: 'admin-nav-cms-legal'
+      }
+    ]
+  },
   { sectionTitle: 'Business', auth: false },
   {
     title: 'Revenue & growth',

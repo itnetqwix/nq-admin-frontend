@@ -85,6 +85,35 @@ const defineRulesFor = (role, user) => {
     can('read', 'admin-nav-referrals')
     can('read', 'admin-nav-broadcasts')
   }
+  if (ok('nav_cms')) {
+    can('read', 'admin-nav-cms')
+    can('read', 'admin-nav-cms-banners')
+    can('read', 'admin-nav-cms-tips')
+    can('read', 'admin-nav-cms-blog')
+    can('read', 'admin-nav-cms-faq')
+    can('read', 'admin-nav-cms-legal')
+  } else {
+    if (ok('nav_cms_banners')) {
+      can('read', 'admin-nav-cms')
+      can('read', 'admin-nav-cms-banners')
+    }
+    if (ok('nav_cms_tips')) {
+      can('read', 'admin-nav-cms')
+      can('read', 'admin-nav-cms-tips')
+    }
+    if (ok('nav_cms_blog')) {
+      can('read', 'admin-nav-cms')
+      can('read', 'admin-nav-cms-blog')
+    }
+    if (ok('nav_cms_faq')) {
+      can('read', 'admin-nav-cms')
+      can('read', 'admin-nav-cms-faq')
+    }
+    if (ok('nav_cms_legal')) {
+      can('read', 'admin-nav-cms')
+      can('read', 'admin-nav-cms-legal')
+    }
+  }
 
   if (ok('can_manage_commission')) can('update', 'admin-action-commission')
   if (ok('can_process_refund')) can('update', 'admin-action-refund')

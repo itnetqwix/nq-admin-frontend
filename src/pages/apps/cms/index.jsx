@@ -1,76 +1,120 @@
-import React from 'react'
-import { Box, Button, Card, CardContent, Grid, Typography } from '@mui/material'
+import React, { useCallback, useEffect, useState } from 'react'
 import NextLink from 'next/link'
+import { Box, Button, Card, CardContent, Chip, Grid, Stack, Typography } from '@mui/material'
+import RefreshIcon from '@mui/icons-material/Refresh'
+import toast from 'react-hot-toast'
 
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
+import { getCmsSummary } from 'src/services/cmsApi'
 
-const LINKS = [
+/**
+ * CMS overview — landing page that links to each CMS surface and exposes the
+ * live/scheduled counts the backend already aggregates at /admin/cms/summary.
+ */
+const SECTIONS = [
   {
     title: 'Banners',
-    description: 'Hero carousel, announcement strip, sticky bottom promo',
     href: '/apps/banners',
-    color: '#000080'
+    description: 'Home hero carousel, announcement strip, and sticky bottom promos.',
+    metric: s => s?.live?.banners
   },
   {
-    title: 'Tips (offers)',
-    description: '“Offers for you” carousel on mobile home',
+    title: 'Tips',
     href: '/apps/tips',
-    color: '#1565c0'
+    description: 'Coaching tips shown on the trainee home feed.',
+    metric: s => s?.live?.tips
   },
   {
     title: 'Blog & pages',
-    description: 'In-app articles and static pages',
     href: '/apps/cms-blog',
-    color: '#2e7d32'
-  },
-  {
-    title: 'Legal',
-    description: 'Terms of service and privacy policy',
-    href: '/apps/cms-legal',
-    color: '#6a1b9a'
+    description: 'Editorial posts and standalone screens like About / Methodology.',
+    metric: () => null
   },
   {
     title: 'FAQ',
-    description: 'Mobile help center sections',
     href: '/apps/cms-faq',
-    color: '#ef6c00'
+    description: 'Settings → FAQ content, instantly publishable to mobile.',
+    metric: () => null
+  },
+  {
+    title: 'Legal',
+    href: '/apps/cms-legal',
+    description: 'Terms of service and Privacy policy — versioned for OTA refresh.',
+    metric: () => null
   }
 ]
 
-export default function CmsHubPage() {
+export default function CmsOverviewPage() {
+  const [summary, setSummary] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      const res = await getCmsSummary()
+      setSummary(res.data || null)
+    } catch (e) {
+      toast.error(e.message || 'Failed to load CMS summary')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
   return (
     <AdminPageShell
       title='Content & ads'
       subtitle='Manage marketplace home placements on the mobile app. Changes publish via CMS_UPDATED socket.'
+      action={
+        <Button variant='outlined' startIcon={<RefreshIcon />} onClick={load} disabled={loading}>
+          Refresh
+        </Button>
+      }
     >
       <AdminPageSection>
-        <Grid container spacing={2} sx={{ mb: 3 }}>
-          {LINKS.map(link => (
-            <Grid item xs={12} sm={6} md={4} key={link.href}>
-              <Card variant='outlined' sx={{ height: '100%' }}>
-                <CardContent>
-                  <Typography variant='h6' fontWeight={700} gutterBottom>
-                    {link.title}
-                  </Typography>
-                  <Typography variant='body2' color='text.secondary' sx={{ mb: 2, minHeight: 40 }}>
-                    {link.description}
-                  </Typography>
-                  <Button
-                    component={NextLink}
-                    href={link.href}
-                    variant='contained'
-                    size='small'
-                    sx={{ bgcolor: link.color, '&:hover': { bgcolor: link.color, opacity: 0.9 } }}
-                  >
-                    Open
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
+        <Stack direction='row' spacing={2} flexWrap='wrap' sx={{ mb: 3 }}>
+          <Chip label={`Live banners: ${summary?.live?.banners ?? '—'}`} color='primary' />
+          <Chip label={`Live tips: ${summary?.live?.tips ?? '—'}`} color='primary' />
+          <Chip label={`Scheduled (off-window): ${summary?.scheduled_off_window ?? '—'}`} />
+          <Chip label={`Inactive banners: ${summary?.inactive?.banners ?? '—'}`} color='default' />
+          <Chip label={`Inactive tips: ${summary?.inactive?.tips ?? '—'}`} color='default' />
+        </Stack>
+
+        <Grid container spacing={2}>
+          {SECTIONS.map(section => {
+            const metric = section.metric(summary)
+            return (
+              <Grid key={section.href} item xs={12} sm={6} md={4}>
+                <Card variant='outlined' sx={{ height: '100%' }}>
+                  <CardContent>
+                    <Stack direction='row' justifyContent='space-between' alignItems='flex-start'>
+                      <Typography variant='h6'>{section.title}</Typography>
+                      {typeof metric === 'number' ? (
+                        <Chip size='small' color='success' label={`${metric} live`} />
+                      ) : null}
+                    </Stack>
+                    <Typography variant='body2' color='text.secondary' sx={{ mt: 1, mb: 2 }}>
+                      {section.description}
+                    </Typography>
+                    <Button component={NextLink} href={section.href} variant='contained' size='small'>
+                      Open
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
+            )
+          })}
         </Grid>
-        <Box>
+
+        <Box sx={{ mt: 4 }}>
+          <Typography variant='caption' color='text.secondary' display='block' sx={{ mb: 2 }}>
+            Content version: {summary?.content_version ?? '—'} · Updated:{' '}
+            {summary?.updated_at ? new Date(summary.updated_at).toLocaleString() : '—'}
+          </Typography>
           <Typography variant='subtitle1' fontWeight={700} gutterBottom>
             Placement guide
           </Typography>
