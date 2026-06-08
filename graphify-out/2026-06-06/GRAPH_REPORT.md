@@ -1,18 +1,12 @@
-# Graph Report - nq-admin-frontend  (2026-06-06)
+# Graph Report - /Users/kumarsatyam/Desktop/nq-admin  (2026-06-05)
 
 ## Corpus Check
-- 283 files · ~503,712 words
-- Verdict: corpus is large enough that graph structure adds value.
+- Large corpus: 313 files · ~503,102 words. Semantic extraction will be expensive (many Claude tokens). Consider running on a subfolder.
 
 ## Summary
-- 1236 nodes · 1492 edges · 192 communities (143 shown, 49 thin omitted)
+- 1114 nodes · 1346 edges · 188 communities (139 shown, 49 thin omitted)
 - Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 99 edges (avg confidence: 0.82)
 - Token cost: 0 input · 0 output
-
-## Graph Freshness
-- Built from commit: `ccf55184`
-- Run `git rev-parse HEAD` and compare to check if the graph is stale.
-- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - [[_COMMUNITY_Package Dependencies|Package Dependencies]]
@@ -119,19 +113,15 @@
 - [[_COMMUNITY_Images Pages 401|Images Pages 401]]
 - [[_COMMUNITY_Images Pages 404|Images Pages 404]]
 - [[_COMMUNITY_Images Pages 500|Images Pages 500]]
-- [[_COMMUNITY_Community 188|Community 188]]
-- [[_COMMUNITY_Community 189|Community 189]]
-- [[_COMMUNITY_Community 190|Community 190]]
-- [[_COMMUNITY_Community 191|Community 191]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `api()` - 20 edges
 2. `headers()` - 19 edges
 3. `requireApiBaseUrl()` - 18 edges
 4. `parseJson()` - 16 edges
-5. `apiUrl()` - 14 edges
-6. `getAuthHeaders()` - 13 edges
-7. `handleRes()` - 13 edges
+5. `apiUrl()` - 12 edges
+6. `getAuthHeaders()` - 11 edges
+7. `handleRes()` - 11 edges
 8. `apiUrl()` - 11 edges
 9. `resolutions` - 10 edges
 10. `useSettings()` - 10 edges
@@ -141,17 +131,17 @@
   src/@core/components/customizer/index.js → src/@core/hooks/useSettings.js
 - `GlobalStyles()` --calls--> `useSettings()`  [INFERRED]
   src/@core/theme/globalStyles.js → src/@core/hooks/useSettings.js
+- `AddEditCommision()` --calls--> `useCommon()`  [INFERRED]
+  src/pages/components/add-edit-commision/index.js → src/hooks/useCommon.js
 - `AuthGuard()` --calls--> `useAuth()`  [INFERRED]
   src/@core/components/auth/AuthGuard.js → src/hooks/useAuth.js
 - `GuestGuard()` --calls--> `useAuth()`  [INFERRED]
   src/@core/components/auth/GuestGuard.js → src/hooks/useAuth.js
-- `Badge()` --calls--> `UseBgColor()`  [INFERRED]
-  src/@core/components/mui/badge/index.js → src/@core/hooks/useBgColor.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (192 total, 49 thin omitted)
+## Communities (188 total, 49 thin omitted)
 
 ### Community 0 - "Package Dependencies"
 Cohesion: 0.03
@@ -159,23 +149,23 @@ Nodes (73): dependencies, apexcharts-clevision, axios, axios-mock-adapter, @babe
 
 ### Community 1 - "Booking & Clips Panel"
 Cohesion: 0.05
-Nodes (22): fmt(), SessionTimelinePanel(), LibrarySubmissionsPanel(), proposedLabel(), STATUS_TABS, BookingDetailDrawer(), refundTransferLabel(), authConfig (+14 more)
+Nodes (23): fmt(), SessionTimelinePanel(), LibrarySubmissionsPanel(), proposedLabel(), STATUS_TABS, BookingDetailDrawer(), refundTransferLabel(), StudentDetail() (+15 more)
 
 ### Community 2 - "Dev Dependencies & Config"
 Cohesion: 0.05
 Nodes (37): devDependencies, eslint, eslint-config-next, eslint-config-prettier, eslint-import-resolver-alias, eslint-import-resolver-typescript, eslint-plugin-import, @iconify/iconify (+29 more)
 
 ### Community 3 - "Auth Guards & Middleware"
-Cohesion: 0.07
-Nodes (28): AclGuard(), AuthGuard(), GuestGuard(), buildAbilityFor(), defaultACLObj, defineRulesFor(), getAdminApiEnvLabel(), AdminRealtimeContext (+20 more)
+Cohesion: 0.06
+Nodes (22): AclGuard(), AuthGuard(), GuestGuard(), Booking(), booking_status, ConcernByUsers(), statusColors, buildAbilityFor() (+14 more)
 
 ### Community 4 - "Layouts & Navigation UI"
 Cohesion: 0.06
 Nodes (12): UserLayout(), hasActiveChild(), HorizontalNavGroup(), ListItem, NavigationMenu, HorizontalNavItems(), ListItem, MenuItemTextWrapper (+4 more)
 
 ### Community 5 - "Commission Management"
-Cohesion: 0.07
-Nodes (14): AddEditCommision(), defaultValues, schema, Booking(), booking_status, CustomButton, ConcernByUsers(), statusColors (+6 more)
+Cohesion: 0.09
+Nodes (19): AddEditCommision(), defaultValues, schema, CustomButton, AdminRealtimeContext, defaultValue, isAdminRole(), normalizeMetrics() (+11 more)
 
 ### Community 6 - "Pricing Analytics UI"
 Cohesion: 0.07
@@ -190,7 +180,7 @@ Cohesion: 0.08
 Nodes (13): breakpoints(), UserThemeOptions(), SwipeableDrawer, StyledBoxForShadow, HeaderTitle, LinkStyled, MenuHeaderWrapper, Shadows() (+5 more)
 
 ### Community 9 - "VSCode & Editor Config"
-Cohesion: 0.12
+Cohesion: 0.07
 Nodes (27): cSpell.words, [css], editor.defaultFormatter, editor.codeActionsOnSave, source.fixAll.eslint, source.organizeImports, editor.defaultFormatter, editor.formatOnSave (+19 more)
 
 ### Community 10 - "Broadcasts & Messaging UI"
@@ -198,8 +188,8 @@ Cohesion: 0.15
 Nodes (17): Editor, editorFromHtml(), emptyEditor(), STEPS, BroadcastDetailDrawer(), AUDIENCE_OPTIONS, CHANNELS, HISTORY_STATUS_FILTERS (+9 more)
 
 ### Community 11 - "Booking API Services"
-Cohesion: 0.56
-Nodes (8): apiUrl(), approvePayout(), getAuthHeaders(), getEscrowHolds(), getFinanceLedger(), getFinancialAuditLog(), getPayoutQueue(), releaseEscrowHold()
+Cohesion: 0.15
+Nodes (22): apiUrl(), getAdminBookingDetail(), getAdminSessionTimeline(), getAuthHeaders(), apiUrl(), getAuthHeaders(), presignCmsAsset(), apiUrl() (+14 more)
 
 ### Community 12 - "Clips Admin API"
 Cohesion: 0.31
@@ -210,8 +200,8 @@ Cohesion: 0.12
 Nodes (11): BannerHeroPreview(), BannerPlacementPreview(), formWithResolvedImage(), PLACEMENT_LABELS, SEVERITY_BG, SEVERITY_FG, CmsImageUploader(), StickyBottomPreview() (+3 more)
 
 ### Community 14 - "Student Clips Management"
-Cohesion: 0.03
-Nodes (73): dependencies, apexcharts-clevision, axios, axios-mock-adapter, @babel/core, babel-eslint, @babel/eslint-parser, bootstrap-icons (+65 more)
+Cohesion: 0.15
+Nodes (7): authConfig, axios, deleteReports(), deleteSavedSession(), getAllSavedSessions(), reports(), allTabs
 
 ### Community 15 - "Admin Admindatagrid"
 Cohesion: 0.16
@@ -222,8 +212,8 @@ Cohesion: 0.54
 Nodes (15): apiUrl(), deleteAdminEntity(), getAuditLogs(), getAuthHeaders(), getCallDiagnostics(), getClipPlayUrl(), getUser360(), getUserAssets() (+7 more)
 
 ### Community 17 - "Services Cmsapi"
-Cohesion: 0.18
-Nodes (25): apiUrl(), getAdminBookingDetail(), getAdminSessionTimeline(), getAuthHeaders(), apiUrl(), createCmsPage(), deleteCmsPage(), getAdminFaq() (+17 more)
+Cohesion: 0.47
+Nodes (13): apiUrl(), createCmsPage(), deleteCmsPage(), getAdminFaq(), getAuthHeaders(), handleRes(), listCmsPages(), listLegalDocuments() (+5 more)
 
 ### Community 18 - "Services Promocodeapi"
 Cohesion: 0.53
@@ -298,8 +288,8 @@ Cohesion: 0.36
 Nodes (5): clearNumber(), formatCreditCardNumber(), formatCVC(), formatDateToMonthShort(), isToday()
 
 ### Community 37 - "Configs Adminenv"
-Cohesion: 0.40
-Nodes (5): adminRegisterEnvHint(), isAdminRegisterEnabled(), showAdminMfaNotice(), LoginPage(), Register()
+Cohesion: 0.33
+Nodes (6): adminRegisterEnvHint(), getAdminApiEnvLabel(), isAdminRegisterEnabled(), showAdminMfaNotice(), LoginPage(), Register()
 
 ### Community 38 - "Context Settingscontext"
 Cohesion: 0.29
@@ -373,41 +363,25 @@ Nodes (3): Borderless, EditorWrapper, ToolbarBottom
 Cohesion: 0.83
 Nodes (3): fmtMoney(), fmtPts(), ReferralsAdminPage()
 
-### Community 188 - "Community 188"
-Cohesion: 0.05
-Nodes (37): devDependencies, eslint, eslint-config-next, eslint-config-prettier, eslint-import-resolver-alias, eslint-import-resolver-typescript, eslint-plugin-import, @iconify/iconify (+29 more)
-
-### Community 189 - "Community 189"
-Cohesion: 0.12
-Nodes (8): AdminUser360Tabs(), ExtraInfoTree(), formatPrimitive(), RATING_FIELD_LABELS, safeImg(), tabLabels, timelineDotBg(), timelineDotColor()
-
-### Community 190 - "Community 190"
-Cohesion: 0.73
-Nodes (5): apiUrl(), getAuthHeaders(), getReferralDashboard(), getReferralRewards(), unwrap()
-
-### Community 191 - "Community 191"
-Cohesion: 0.50
-Nodes (3): compilerOptions, baseUrl, include
-
 ## Knowledge Gaps
-- **411 isolated node(s):** `editor.defaultFormatter`, `editor.defaultFormatter`, `source.fixAll.eslint`, `source.organizeImports`, `editor.defaultFormatter` (+406 more)
+- **319 isolated node(s):** `recommendations`, `javascript.updateImportsOnFileMove.enabled`, `editor.defaultFormatter`, `editor.defaultFormatter`, `git.rebaseWhenSync` (+314 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **49 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `useSettings()` connect `Blank Layout With` to `Theme & Responsive Layout`, `Layouts & Navigation UI`, `Configs Adminenv`, `Customizer Index`?**
-  _High betweenness centrality (0.055) - this node is a cross-community bridge._
-- **Why does `requireApiBaseUrl()` connect `Services Cmsapi` to `Services Pricingapi`, `Auth Guards & Middleware`, `Services Verificationapi`, `Services Accountdeletionsapi`, `Booking API Services`, `Clips Admin API`, `Services User360api`, `Services Promocodeapi`, `Services Broadcastapi`, `Services Opsapi`, `Services Bannersapi`, `Services Tipsapi`, `Community 190`?**
-  _High betweenness centrality (0.055) - this node is a cross-community bridge._
 - **Why does `LoginPage()` connect `Configs Adminenv` to `Blank Layout With`, `Login Index`, `Auth Guards & Middleware`, `Badge Index`?**
-  _High betweenness centrality (0.054) - this node is a cross-community bridge._
+  _High betweenness centrality (0.067) - this node is a cross-community bridge._
+- **Why does `useAuth()` connect `Auth Guards & Middleware` to `Configs Adminenv`?**
+  _High betweenness centrality (0.067) - this node is a cross-community bridge._
+- **Why does `useSettings()` connect `Blank Layout With` to `Theme & Responsive Layout`, `Layouts & Navigation UI`, `Configs Adminenv`, `Customizer Index`?**
+  _High betweenness centrality (0.066) - this node is a cross-community bridge._
 - **Are the 16 inferred relationships involving `requireApiBaseUrl()` (e.g. with `apiUrl()` and `apiUrl()`) actually correct?**
   _`requireApiBaseUrl()` has 16 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `editor.defaultFormatter`, `editor.defaultFormatter`, `source.fixAll.eslint` to the rest of the system?**
-  _411 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **What connects `recommendations`, `javascript.updateImportsOnFileMove.enabled`, `editor.defaultFormatter` to the rest of the system?**
+  _319 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Package Dependencies` be split into smaller, more focused modules?**
   _Cohesion score 0.0273972602739726 - nodes in this community are weakly interconnected._
 - **Should `Booking & Clips Panel` be split into smaller, more focused modules?**
-  _Cohesion score 0.05496828752642706 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.04927536231884058 - nodes in this community are weakly interconnected._
