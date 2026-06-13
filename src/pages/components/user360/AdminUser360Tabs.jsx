@@ -5,7 +5,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined'
 import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined'
-import { User360AccountReviewActions } from './User360AccountReviewActions'
+import User360AccountReviewActions from './User360AccountReviewActions'
 import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined'
 import {
   Accordion,

@@ -10,7 +10,7 @@ import {
   rejectTrainerVerification
 } from 'src/services/verificationApi'
 
-export function User360AccountReviewActions({ userId, accountType, status, onUpdated }) {
+export default function User360AccountReviewActions({ userId, accountType, status, onUpdated }) {
   const [reason, setReason] = useState('')
   const [busy, setBusy] = useState(false)
   const normalized = String(status || '').toLowerCase()
