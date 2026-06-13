@@ -114,7 +114,7 @@ const UserDropdown = props => {
               <Avatar alt='Md Alam' src='/images/avatars/1.png' sx={{ width: '2.5rem', height: '2.5rem' }} />
             </Badge>
             <Box sx={{ display: 'flex', ml: 3, alignItems: 'flex-start', flexDirection: 'column' }}>
-              <Typography sx={{ fontWeight: 600 }}>Netqwix</Typography>
+              <Typography sx={{ fontWeight: 600 }}>NetQwix</Typography>
               <Typography variant='body2' sx={{ fontSize: '0.8rem', color: 'text.disabled' }}>
                 Admin
               </Typography>

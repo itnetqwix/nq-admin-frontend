@@ -10900,7 +10900,7 @@
       "id": "workflows_deploy_staging_branch_staging"
     },
     {
-      "label": "Netqwix Full Logo (text + hand icon + stars)",
+      "label": "NetQwix Full Logo (text + hand icon + stars)",
       "file_type": "image",
       "source_file": "public/images/netquix_logo.png",
       "source_location": null,
@@ -10913,7 +10913,7 @@
       "id": "images_netquix_logo_logo"
     },
     {
-      "label": "Netqwix Logo v1 (smaller/alternate variant with hand icon + stars)",
+      "label": "NetQwix Logo v1 (smaller/alternate variant with hand icon + stars)",
       "file_type": "image",
       "source_file": "public/images/netquix_logo_v1.png",
       "source_location": null,
@@ -10926,7 +10926,7 @@
       "id": "images_netquix_logo_v1_logo_v1"
     },
     {
-      "label": "Netqwix Favicon (hand icon + Q + stars, square crop)",
+      "label": "NetQwix Favicon (hand icon + Q + stars, square crop)",
       "file_type": "image",
       "source_file": "public/images/favicon.png",
       "source_location": null,
@@ -10939,7 +10939,7 @@
       "id": "images_favicon_favicon"
     },
     {
-      "label": "Netqwix Apple Touch Icon (hand icon + Q + stars, identical to favicon)",
+      "label": "NetQwix Apple Touch Icon (hand icon + Q + stars, identical to favicon)",
       "file_type": "image",
       "source_file": "public/images/apple-touch-icon.png",
       "source_location": null,
@@ -11160,7 +11160,7 @@
       "id": "pages_auth_v2_register_mask_light_image"
     },
     {
-      "label": "Favicon - Netqwix Brand Icon",
+      "label": "Favicon - NetQwix Brand Icon",
       "file_type": "image",
       "source_file": "public/images/pages/favicon.png",
       "source_location": null,

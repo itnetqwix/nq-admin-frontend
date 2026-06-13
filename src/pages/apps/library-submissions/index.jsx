@@ -6,8 +6,8 @@ import LibrarySubmissionsPanel from 'src/components/clips/LibrarySubmissionsPane
 export default function LibrarySubmissionsPage() {
   return (
     <AdminPageShell
-      title='Netqwix Library requests'
-      subtitle='Review videos submitted by trainers or trainees who want their clip added to the public Netqwix Library. Watch the clip, confirm category placement, then approve or reject with a reason.'
+      title='NetQwix Library requests'
+      subtitle='Review videos submitted by trainers or trainees who want their clip added to the public NetQwix Library. Watch the clip, confirm category placement, then approve or reject with a reason.'
       actions={
         <Button component={Link} href='/apps/clip-taxonomy' variant='outlined' size='small'>
           Manage categories

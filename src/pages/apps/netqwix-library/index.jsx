@@ -206,7 +206,7 @@ export default function NetqwixLibraryPage() {
 
   return (
     <AdminPageShell
-      title='Netqwix Library'
+      title='NetQwix Library'
       subtitle={loading ? 'Loading published clips…' : `${clipCount} published clips`}
       actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}
     >
@@ -215,8 +215,8 @@ export default function NetqwixLibraryPage() {
           <CardContent>
             <Stack spacing={2.5}>
               <Typography variant='body2' color='text.secondary'>
-                Upload a coaching clip to the public Netqwix library. Max size 50 MB. Clips appear in
-                the mobile app under Locker → Netqwix Library.
+                Upload a coaching clip to the public NetQwix library. Max size 50 MB. Clips appear in
+                the mobile app under Locker → NetQwix Library.
               </Typography>
 
               <TextField

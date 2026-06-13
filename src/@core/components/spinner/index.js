@@ -23,7 +23,7 @@ const FallbackSpinner = ({ sx }) => {
         width={500}
         height={150}
         src={'/images/netquix_logo.png'}
-        alt='Netqwix Logo'
+        alt='NetQwix Logo'
         // loading="lazy"
         priority
       />

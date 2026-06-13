@@ -100,7 +100,7 @@ const navigation = () => [
   },
   { sectionTitle: 'Clips & video', auth: false },
   {
-    title: 'Netqwix Library',
+    title: 'NetQwix Library',
     icon: 'mdi:video-box-outline',
     action: 'read',
     subject: 'admin-nav-clips-library',

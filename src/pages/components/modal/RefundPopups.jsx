@@ -50,7 +50,7 @@ export default function RefundPopups({ paymentIntentDetails, bookingPreview, han
               ) : null}
               <Grid item xs={12} sm={12}>
                 <Typography>Total session cost: {amountUsd}$</Typography>
-                <Typography>Netqwix fee: {feeUsd}$</Typography>
+                <Typography>NetQwix fee: {feeUsd}$</Typography>
                 <Typography>
                   Payment method:{' '}
                   {paymentIntentDetails?.payment_method_types ? paymentIntentDetails.payment_method_types[0] : ''}

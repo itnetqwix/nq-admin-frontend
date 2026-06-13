@@ -161,7 +161,7 @@ export default function LibrarySubmissionsPanel() {
     setActing(true)
     try {
       await approveLibrarySubmission(drawer._id, categoryId, subcategoryId)
-      toast.success('Published to Netqwix Library')
+      toast.success('Published to NetQwix Library')
       closeDrawer()
       void load()
     } catch (e) {
@@ -419,7 +419,7 @@ export default function LibrarySubmissionsPanel() {
                 </Select>
               </FormControl>
               <Button variant='contained' color='success' disabled={acting} onClick={() => void handleApprove()}>
-                Approve & publish to Netqwix Library
+                Approve & publish to NetQwix Library
               </Button>
 
               <TextField
