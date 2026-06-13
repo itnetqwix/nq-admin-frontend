@@ -5,6 +5,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined'
 import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined'
+import { User360AccountReviewActions } from './User360AccountReviewActions'
 import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined'
 import {
   Accordion,
@@ -827,6 +828,13 @@ export default function AdminUser360Tabs({
                 <Typography variant='body1' color='primary' sx={{ mb: 2 }}>
                   {identity.email || profile?.email || '—'}
                 </Typography>
+
+                <User360AccountReviewActions
+                  userId={identity._id || profile?._id}
+                  accountType={identity.account_type || profile?.account_type}
+                  status={identity.status || profile?.status}
+                  onUpdated={onRefresh}
+                />
 
                 <Paper elevation={0} sx={{ p: 2, mb: 3, borderRadius: 2, bgcolor: alpha(theme.palette.info.main, 0.06), border: `1px solid ${alpha(theme.palette.info.main, 0.2)}` }}>
                   <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700 }}>Last activity</Typography>

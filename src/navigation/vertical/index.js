@@ -25,6 +25,13 @@ const navigation = () => [
         subject: 'admin-nav-trainer-verifications'
       },
       {
+        title: 'Trainee reviews',
+        path: '/apps/trainee-account-reviews',
+        icon: 'mdi:account-clock-outline',
+        action: 'read',
+        subject: 'admin-nav-trainee-reviews'
+      },
+      {
         title: 'Trainers',
         path: '/apps/manage-trainer',
         icon: 'mdi:human-male-board',

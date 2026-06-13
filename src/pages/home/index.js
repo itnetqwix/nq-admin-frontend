@@ -34,6 +34,7 @@ import ActiveUsersTable from '../components/tables/UsersTable'
 import AdminPageShell from 'src/layouts/components/AdminPageShell'
 import { useAdminRealtime } from 'src/context/AdminRealtimeContext'
 import { getPendingVerificationCount } from 'src/services/verificationApi'
+import { getPendingTraineeCount } from 'src/services/clipsAdminApi'
 
 const Home = () => {
   const router = useRouter()
@@ -44,11 +45,15 @@ const Home = () => {
   const [comission, setComission] = useState([]);
   const [commissionModal, setComissionModal] = useState(false);
   const [pendingVerifications, setPendingVerifications] = useState(null);
+  const [pendingTraineeReviews, setPendingTraineeReviews] = useState(null);
 
   useEffect(() => {
     getPendingVerificationCount()
       .then(setPendingVerifications)
       .catch(() => setPendingVerifications(0))
+    getPendingTraineeCount()
+      .then(setPendingTraineeReviews)
+      .catch(() => setPendingTraineeReviews(0))
   }, [])
 
   const fmtMoney = v =>
@@ -260,6 +265,18 @@ const Home = () => {
                 chipText='Pending review'
                 icon={<Icon icon='mdi:account-check-outline' />}
                 onCardClick={() => router.push('/apps/trainer-verifications')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <CardStatisticsVertical
+                color='warning'
+                stats={pendingTraineeReviews != null ? fmtInt(pendingTraineeReviews) : '—'}
+                trendNumber='Queue'
+                trend='positive'
+                title='Trainee reviews'
+                chipText='Pending review'
+                icon={<Icon icon='mdi:account-clock-outline' />}
+                onCardClick={() => router.push('/apps/trainee-account-reviews')}
               />
             </Grid>
             <Grid item xs={6} sm={3}>

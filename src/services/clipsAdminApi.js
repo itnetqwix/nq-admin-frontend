@@ -168,3 +168,18 @@ export async function approveTraineeAccount(userId) {
   })
   return parseJson(res)
 }
+
+export async function getPendingTraineeAccounts(query = {}) {
+  const params = new URLSearchParams(query).toString()
+  const res = await fetch(api(`/admin/trainee-accounts/pending?${params}`), { headers: headers() })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data?.message || data?.error || 'Failed to load pending trainees')
+  return data?.data ?? data
+}
+
+export async function getPendingTraineeCount() {
+  const res = await fetch(api('/admin/trainee-accounts/pending-count'), { headers: headers() })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data?.message || data?.error || 'Failed to load pending trainee count')
+  return data?.data?.total ?? data?.total ?? 0
+}
