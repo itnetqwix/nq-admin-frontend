@@ -180,6 +180,97 @@ export default function BookingDetailDrawer({
             <DetailRow label='Accepted at' value={fmt(s.accepted_at)} />
             <DetailRow label='Join deadline' value={fmt(s.join_deadline_at)} />
             <DetailRow label='Both joined' value={fmt(s.both_joined_at)} />
+            <DetailRow label='Actual end' value={fmt(s.actual_end_at)} />
+            <DetailRow label='Early end (trainer ack)' value={fmt(s.early_end_trainer_ack_at)} />
+            <DetailRow label='Early end (trainee ack)' value={fmt(s.early_end_trainee_ack_at)} />
+
+            {detail?.live_state || detail?.departure ? (
+              <>
+                <Divider sx={{ my: 2 }} />
+                <Typography variant='subtitle2' sx={{ mb: 1 }}>
+                  Live session state
+                </Typography>
+                <Stack direction='row' spacing={1} sx={{ mb: 1, flexWrap: 'wrap' }}>
+                  <Button
+                    size='small'
+                    variant='outlined'
+                    href={`/apps/ops-logs?sessionId=${s._id}`}
+                    component='a'
+                  >
+                    Ops logs
+                  </Button>
+                  <Button
+                    size='small'
+                    variant='outlined'
+                    href={`/apps/call-diagnostics?sessionId=${s._id}`}
+                    component='a'
+                  >
+                    Call diagnostics
+                  </Button>
+                </Stack>
+                <DetailRow
+                  label='Departure role'
+                  value={detail?.departure?.initiated_by_role || s.departure_initiated_by_role}
+                />
+                <DetailRow
+                  label='Departure at'
+                  value={fmt(detail?.departure?.initiated_at || s.departure_initiated_at)}
+                />
+                <DetailRow
+                  label='Partner stayed'
+                  value={fmt(detail?.departure?.stayed_active_at || s.departure_stayed_active_at)}
+                />
+                <DetailRow
+                  label='Rejoin deadline'
+                  value={fmt(detail?.departure?.rejoin_deadline_at || s.departure_rejoin_deadline_at)}
+                />
+                <DetailRow
+                  label='Concern raised'
+                  value={fmt(detail?.departure?.concern_raised_at || s.departure_concern_raised_at)}
+                />
+                <DetailRow
+                  label='Timer status'
+                  value={detail?.live_state?.lesson_timer?.status}
+                />
+                <DetailRow
+                  label='Timer remaining'
+                  value={
+                    detail?.live_state?.lesson_timer?.remainingSeconds != null
+                      ? `${detail.live_state.lesson_timer.remainingSeconds}s`
+                      : null
+                  }
+                />
+                <DetailRow
+                  label='Pause reason'
+                  value={detail?.live_state?.lesson_timer?.pauseReason}
+                />
+                <DetailRow
+                  label='Trainer call slot'
+                  value={
+                    detail?.live_state?.call_slots?.trainer?.canJoin === false
+                      ? 'Active elsewhere'
+                      : 'Available'
+                  }
+                />
+                <DetailRow
+                  label='Trainee call slot'
+                  value={
+                    detail?.live_state?.call_slots?.trainee?.canJoin === false
+                      ? 'Active elsewhere'
+                      : 'Available'
+                  }
+                />
+                {Array.isArray(detail?.live_state?.lesson_client_kinds) &&
+                detail.live_state.lesson_client_kinds.length > 0 ? (
+                  <DetailRow
+                    label='Client kinds'
+                    value={detail.live_state.lesson_client_kinds
+                      .map(c => `${c.role}: ${c.client}`)
+                      .join(' · ')}
+                  />
+                ) : null}
+              </>
+            ) : null}
 
             {Array.isArray(s.extensions) && s.extensions.length > 0 ? (
               <>

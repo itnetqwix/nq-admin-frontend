@@ -67,6 +67,7 @@ const statusColors = {
 export default function ConcernByUsers() {
   const common = useCommon();
   const [search, setSearch] = React.useState('');
+  const [reasonFilter, setReasonFilter] = React.useState('');
 
   const {
     concernByUsers,
@@ -78,9 +79,13 @@ export default function ConcernByUsers() {
   }, [])
 
   const filteredRows = React.useMemo(() => {
+    let rows = concernByUsers ?? [];
+    if (reasonFilter) {
+      rows = rows.filter(row => String(row.reason ?? '') === reasonFilter);
+    }
     const q = search.trim().toLowerCase();
-    if (!q) return concernByUsers ?? [];
-    return (concernByUsers ?? []).filter(row => {
+    if (!q) return rows;
+    return rows.filter(row => {
       const hay = [
         row.name,
         row.email,
@@ -95,7 +100,7 @@ export default function ConcernByUsers() {
         .toLowerCase();
       return hay.includes(q);
     });
-  }, [concernByUsers, search]);
+  }, [concernByUsers, search, reasonFilter]);
 
   const columns = [
     { field: 'name', headerName: 'Name', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 200 },
@@ -228,6 +233,24 @@ export default function ConcernByUsers() {
             searchValue={search}
             onSearchChange={e => setSearch(e.target.value)}
           />
+          <Stack direction='row' spacing={1} sx={{ px: 2, pb: 1, flexWrap: 'wrap' }}>
+            <Chip
+              size='small'
+              label='All reasons'
+              color={reasonFilter === '' ? 'primary' : 'default'}
+              onClick={() => setReasonFilter('')}
+            />
+            <Chip
+              size='small'
+              label='Coach left session'
+              color={reasonFilter === 'coach_left_session' ? 'primary' : 'default'}
+              onClick={() =>
+                setReasonFilter(prev =>
+                  prev === 'coach_left_session' ? '' : 'coach_left_session'
+                )
+              }
+            />
+          </Stack>
           <AdminGridContainer>
             <AdminDataGrid
               autoHeight={false}

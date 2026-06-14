@@ -78,9 +78,44 @@ export default function SessionTimelinePanel({ bookingId, refreshKey = 0 }) {
           <TimelineRow label='Join deadline' value={fmt(timeline.joinDeadlineAt)} />
           <TimelineRow label='Both joined' value={fmt(timeline.bothJoinedAt)} />
           {timeline.timer ? (
+            <>
+              <TimelineRow
+                label='Timer (live)'
+                value={`${timeline.timer.remainingSeconds}s left · ${timeline.timer.duration ?? '?'}s duration`}
+              />
+              {timeline.timer.pauseReason ? (
+                <TimelineRow label='Pause reason' value={timeline.timer.pauseReason} />
+              ) : null}
+            </>
+          ) : null}
+          <TimelineRow label='Actual end' value={fmt(timeline.actualEndAt)} />
+
+          {Array.isArray(timeline.departureEvents) && timeline.departureEvents.length > 0 ? (
+            <>
+              <Typography variant='caption' sx={{ display: 'block', mt: 1.5, mb: 0.5, fontWeight: 700 }}>
+                Departure events
+              </Typography>
+              {timeline.departureEvents.map((ev, idx) => (
+                <Box
+                  key={`dep-${idx}`}
+                  sx={{ mb: 1, pl: 1, borderLeft: 2, borderColor: 'error.main' }}
+                >
+                  <Typography variant='caption' fontWeight={600}>
+                    {ev.label}
+                    {ev.detail ? ` · ${ev.detail}` : ''}
+                  </Typography>
+                  <Typography variant='caption' color='text.secondary' display='block'>
+                    {fmt(ev.at)}
+                  </Typography>
+                </Box>
+              ))}
+            </>
+          ) : null}
+
+          {Array.isArray(timeline.lessonClientKinds) && timeline.lessonClientKinds.length > 0 ? (
             <TimelineRow
-              label='Timer (live)'
-              value={`${timeline.timer.remainingSeconds}s left · ${timeline.timer.duration ?? '?'}s duration`}
+              label='Client kinds'
+              value={timeline.lessonClientKinds.map(c => `${c.role}: ${c.client}`).join(' · ')}
             />
           ) : null}
 
