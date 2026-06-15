@@ -35,7 +35,8 @@ const DEFAULT_INPUT = {
   promoDollars: '0'
 }
 
-export default function PricingSimulatorTab({ config, isDirty }) {
+export default function PricingSimulatorTab({ config, isDirty, variant = 'full' }) {
+  const simple = variant === 'simple'
   const [input, setInput] = useState(DEFAULT_INPUT)
   const [quote, setQuote] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -91,15 +92,15 @@ export default function PricingSimulatorTab({ config, isDirty }) {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} md={5}>
-        <AdminPageSection title='Quote simulator'>
-          <Stack spacing={2}>
+      <Grid item xs={12} md={simple ? 12 : 5}>
+        <AdminPageSection title={simple ? undefined : 'Quote simulator'}>
+          <Stack spacing={2} direction={simple ? { xs: 'column', md: 'row' } : 'column'} flexWrap='wrap'>
             {isDirty ? (
               <Chip size='small' color='warning' label='Preview uses unsaved draft' sx={{ alignSelf: 'flex-start' }} />
             ) : (
               <Chip size='small' color='success' variant='outlined' label='Preview uses saved config' sx={{ alignSelf: 'flex-start' }} />
             )}
-            <FormControl fullWidth size='small'>
+            <FormControl fullWidth size='small' sx={{ minWidth: simple ? 160 : undefined, flex: simple ? 1 : undefined }}>
               <InputLabel>Region</InputLabel>
               <Select
                 label='Region'
@@ -110,7 +111,7 @@ export default function PricingSimulatorTab({ config, isDirty }) {
                 <MenuItem value='CA'>Canada (CAD)</MenuItem>
               </Select>
             </FormControl>
-            <FormControl fullWidth size='small'>
+            <FormControl fullWidth size='small' sx={{ minWidth: simple ? 180 : undefined, flex: simple ? 1 : undefined }}>
               <InputLabel>Product</InputLabel>
               <Select
                 label='Product'
@@ -129,9 +130,12 @@ export default function PricingSimulatorTab({ config, isDirty }) {
               fullWidth
               label='Session price'
               type='number'
+              sx={{ minWidth: simple ? 140 : undefined, flex: simple ? 1 : undefined }}
               value={input.sessionDollars}
               onChange={e => setInput(p => ({ ...p, sessionDollars: e.target.value }))}
             />
+            {!simple ? (
+              <>
             <TextField
               size='small'
               fullWidth
@@ -168,6 +172,8 @@ export default function PricingSimulatorTab({ config, isDirty }) {
                 ))}
               </Select>
             </FormControl>
+              </>
+            ) : null}
             <Button variant='outlined' onClick={() => void runQuote()} disabled={loading}>
               Refresh now
             </Button>
@@ -175,7 +181,68 @@ export default function PricingSimulatorTab({ config, isDirty }) {
         </AdminPageSection>
       </Grid>
 
+      {simple && quote ? (
+        <Grid item xs={12}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={4}>
+              <Card variant='outlined' sx={{ height: '100%', bgcolor: 'primary.50' }}>
+                <CardContent>
+                  <Typography variant='overline' color='text.secondary'>
+                    Trainee pays
+                  </Typography>
+                  <Typography variant='h4' fontWeight={800}>
+                    {fmtMoney(
+                      (quote.breakdown || []).find(r => r.key === 'total')?.amountMinor ?? 0,
+                      currency
+                    )}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Card variant='outlined' sx={{ height: '100%' }}>
+                <CardContent>
+                  <Typography variant='overline' color='text.secondary'>
+                    Coach receives
+                  </Typography>
+                  <Typography variant='h4' fontWeight={800}>
+                    {fmtMoney(quote.trainerNetCents, currency)}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Card
+                variant='outlined'
+                sx={{
+                  height: '100%',
+                  borderColor: quote.platformNetMarginCents >= 0 ? 'success.light' : 'error.light'
+                }}
+              >
+                <CardContent>
+                  <Typography variant='overline' color='text.secondary'>
+                    You keep (before infra)
+                  </Typography>
+                  <Typography
+                    variant='h4'
+                    fontWeight={800}
+                    color={quote.platformNetMarginCents >= 0 ? 'success.main' : 'error.main'}
+                  >
+                    {fmtMoney(quote.platformNetMarginCents, currency)}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+          <Typography variant='caption' color='text.secondary' display='block' sx={{ mt: 1 }}>
+            Uses default card processing for {input.region === 'CA' ? 'Ontario' : 'Texas'}.
+          </Typography>
+        </Grid>
+      ) : null}
+
+      {!simple ? (
       <Grid item xs={12} md={7}>
+        {!simple ? (
         <Card variant='outlined' sx={{ height: '100%' }}>
           <CardContent>
             <Stack direction='row' alignItems='center' spacing={1} sx={{ mb: 2 }}>
@@ -244,7 +311,9 @@ export default function PricingSimulatorTab({ config, isDirty }) {
             ) : null}
           </CardContent>
         </Card>
+        ) : null}
       </Grid>
+      ) : null}
     </Grid>
   )
 }

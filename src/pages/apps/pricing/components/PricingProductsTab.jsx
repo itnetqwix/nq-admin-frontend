@@ -3,7 +3,7 @@ import AdminGridContainer from 'src/components/admin/AdminGridContainer'
 import { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import { PRODUCT_LABELS, centsToInput, inputToCents } from 'src/constants/pricingAdmin'
 
-export default function PricingProductsTab({ productFees, onPatchProductFee, canEdit = true }) {
+export default function PricingProductsTab({ productFees, onPatchProductFee, canEdit = true, hideTitle = false }) {
   const rows = Object.entries(productFees || {}).map(([key, fees]) => ({
     id: key,
     product: PRODUCT_LABELS[key] || key.replace(/_/g, ' '),
@@ -30,7 +30,7 @@ export default function PricingProductsTab({ productFees, onPatchProductFee, can
   ]
 
   return (
-    <AdminPageSection title='Per-product platform fees'>
+    <AdminPageSection title={hideTitle ? undefined : 'Per-product platform fees'}>
       <AdminGridContainer>
         <AdminDataGrid
           autoHeight

@@ -7,19 +7,16 @@ import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
-import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import AdminPageShell from 'src/layouts/components/AdminPageShell'
 import { AbilityContext } from 'src/layouts/components/acl/Can'
 import { usePricingConfig } from 'src/hooks/usePricingConfig'
-import PricingOverviewTab from './components/PricingOverviewTab'
-import PricingRegionTab from './components/PricingRegionTab'
-import PricingProductsTab from './components/PricingProductsTab'
-import PricingSimulatorTab from './components/PricingSimulatorTab'
-import PricingUnitEconomicsTab from './components/PricingUnitEconomicsTab'
+import PricingDashboardTab from './components/PricingDashboardTab'
+import PricingRatesTab from './components/PricingRatesTab'
+import PricingProfitCheckTab from './components/PricingProfitCheckTab'
 import PricingHistoryTab from './components/PricingHistoryTab'
 
-const TAB_LABELS = ['Overview', 'United States', 'Canada', 'Session products', 'Quote simulator', 'Unit economics', 'History']
+const TAB_LABELS = ['Overview', 'Rates & fees', 'Profit check', 'History']
 
 const PricingPage = () => {
   const ability = useContext(AbilityContext)
@@ -53,7 +50,7 @@ const PricingPage = () => {
     <>
       <AdminPageShell
         title='Pricing & fees'
-        subtitle='Manage platform fees, commissions, Stripe processing rates, storage prices, and preview checkout totals for US & Canada.'
+        subtitle='Set commission and platform fees, preview checkout totals, and confirm each lesson is profitable.'
         actions={
           <Stack direction='row' spacing={1} flexWrap='wrap'>
             {canEdit ? (
@@ -80,24 +77,9 @@ const PricingPage = () => {
           </Alert>
         ) : null}
 
-        <Box sx={{ mb: 2 }}>
-          <TextField
-            size='small'
-            type='number'
-            label='Quote tolerance (¢)'
-            value={config.quoteToleranceMinor ?? 5}
-            onChange={e => patchGlobal({ quoteToleranceMinor: Number(e.target.value) || 0 })}
-            disabled={!canEdit}
-            sx={{ width: 200 }}
-            helperText='Max drift between quote and checkout'
-          />
-        </Box>
-
         <Tabs
           value={tab}
           onChange={(_, v) => setTab(v)}
-          variant='scrollable'
-          scrollButtons='auto'
           sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}
         >
           {TAB_LABELS.map(label => (
@@ -105,41 +87,20 @@ const PricingPage = () => {
           ))}
         </Tabs>
 
-        {tab === 0 ? <PricingOverviewTab config={config} onGoTab={setTab} /> : null}
+        {tab === 0 ? <PricingDashboardTab config={config} onGoTab={setTab} /> : null}
         {tab === 1 ? (
-          <PricingRegionTab
-            regionKey='US'
-            title='United States'
-            currency='USD'
-            region={config.regions?.US}
+          <PricingRatesTab
+            config={config}
             canEdit={canEdit}
             onPatchRegion={patchRegion}
             onPatchPaymentMethod={patchPaymentMethod}
             onPatchStoragePlan={patchStoragePlan}
-          />
-        ) : null}
-        {tab === 2 ? (
-          <PricingRegionTab
-            regionKey='CA'
-            title='Canada'
-            currency='CAD'
-            region={config.regions?.CA}
-            canEdit={canEdit}
-            onPatchRegion={patchRegion}
-            onPatchPaymentMethod={patchPaymentMethod}
-            onPatchStoragePlan={patchStoragePlan}
-          />
-        ) : null}
-        {tab === 3 ? (
-          <PricingProductsTab
-            productFees={config.productFees}
-            canEdit={canEdit}
             onPatchProductFee={patchProductFee}
+            onPatchGlobal={patchGlobal}
           />
         ) : null}
-        {tab === 4 ? <PricingSimulatorTab config={config} isDirty={isDirty} /> : null}
-        {tab === 5 ? <PricingUnitEconomicsTab config={config} isDirty={isDirty} /> : null}
-        {tab === 6 ? <PricingHistoryTab /> : null}
+        {tab === 2 ? <PricingProfitCheckTab config={config} isDirty={isDirty} /> : null}
+        {tab === 3 ? <PricingHistoryTab /> : null}
       </AdminPageShell>
 
       {isDirty && canEdit ? (

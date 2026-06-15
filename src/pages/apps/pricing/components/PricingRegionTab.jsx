@@ -26,9 +26,16 @@ export default function PricingRegionTab({
   canEdit = true,
   onPatchRegion,
   onPatchPaymentMethod,
-  onPatchStoragePlan
+  onPatchStoragePlan,
+  /** core = commission & fees only; payments | storage | checkout = single section */
+  section = 'all'
 }) {
   if (!region) return null
+
+  const showCore = section === 'all' || section === 'core'
+  const showCheckout = section === 'all' || section === 'checkout'
+  const showPayments = section === 'all' || section === 'payments'
+  const showStorage = section === 'all' || section === 'storage'
 
   const paymentMethods = regionKey === 'CA' ? CA_PAYMENT_METHODS : US_PAYMENT_METHODS
   const currencySymbol = currency === 'CAD' ? 'C$' : '$'
@@ -95,7 +102,8 @@ export default function PricingRegionTab({
 
   return (
     <Stack spacing={0}>
-      <AdminPageSection title={`${title} — platform & commission`}>
+      {showCore ? (
+      <AdminPageSection title={section === 'core' ? undefined : `${title} — platform & commission`}>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
             <TextField
@@ -154,8 +162,10 @@ export default function PricingRegionTab({
           </Grid>
         </Grid>
       </AdminPageSection>
+      ) : null}
 
-      <AdminPageSection title='Checkout policy'>
+      {showCheckout ? (
+      <AdminPageSection title={section === 'checkout' ? undefined : 'Checkout policy'}>
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
             <FormControlLabel
@@ -188,8 +198,10 @@ export default function PricingRegionTab({
           </Grid>
         </Grid>
       </AdminPageSection>
+      ) : null}
 
-      <AdminPageSection title='Payment processing fees'>
+      {showPayments ? (
+      <AdminPageSection title={section === 'payments' ? undefined : 'Payment processing fees'}>
         <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
           Edit rate (basis points) and fixed fee in cents. 290 bps = 2.9%.
         </Typography>
@@ -216,8 +228,10 @@ export default function PricingRegionTab({
           />
         </AdminGridContainer>
       </AdminPageSection>
+      ) : null}
 
-      <AdminPageSection title='Storage plan prices'>
+      {showStorage ? (
+      <AdminPageSection title={section === 'storage' ? undefined : 'Storage plan prices'}>
         <AdminGridContainer>
           <AdminDataGrid
             autoHeight
@@ -236,6 +250,7 @@ export default function PricingRegionTab({
           />
         </AdminGridContainer>
       </AdminPageSection>
+      ) : null}
     </Stack>
   )
 }
