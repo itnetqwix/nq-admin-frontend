@@ -16,9 +16,10 @@ import PricingOverviewTab from './components/PricingOverviewTab'
 import PricingRegionTab from './components/PricingRegionTab'
 import PricingProductsTab from './components/PricingProductsTab'
 import PricingSimulatorTab from './components/PricingSimulatorTab'
+import PricingUnitEconomicsTab from './components/PricingUnitEconomicsTab'
 import PricingHistoryTab from './components/PricingHistoryTab'
 
-const TAB_LABELS = ['Overview', 'United States', 'Canada', 'Session products', 'Quote simulator', 'History']
+const TAB_LABELS = ['Overview', 'United States', 'Canada', 'Session products', 'Quote simulator', 'Unit economics', 'History']
 
 const PricingPage = () => {
   const ability = useContext(AbilityContext)
@@ -137,7 +138,8 @@ const PricingPage = () => {
           />
         ) : null}
         {tab === 4 ? <PricingSimulatorTab config={config} isDirty={isDirty} /> : null}
-        {tab === 5 ? <PricingHistoryTab /> : null}
+        {tab === 5 ? <PricingUnitEconomicsTab config={config} isDirty={isDirty} /> : null}
+        {tab === 6 ? <PricingHistoryTab /> : null}
       </AdminPageShell>
 
       {isDirty && canEdit ? (

@@ -100,10 +100,13 @@ export default function PricingOverviewTab({ config, onGoTab }) {
           <Button variant='outlined' onClick={() => onGoTab(4)}>
             Open quote simulator
           </Button>
+          <Button variant='contained' onClick={() => onGoTab(5)}>
+            Unit economics
+          </Button>
           <Button variant='outlined' onClick={() => onGoTab(3)}>
             Edit session product fees
           </Button>
-          <Button variant='outlined' onClick={() => onGoTab(5)}>
+          <Button variant='outlined' onClick={() => onGoTab(6)}>
             View config history
           </Button>
           <Button variant='outlined' onClick={() => router.push('/apps/finance')}>

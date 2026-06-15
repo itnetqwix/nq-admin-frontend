@@ -254,6 +254,13 @@ const navigation = () => [
         subject: 'admin-nav-finance'
       },
       {
+        title: 'Pricing & fees',
+        path: '/apps/pricing',
+        icon: 'mdi:currency-usd',
+        action: 'read',
+        subject: 'admin-nav-pricing'
+      },
+      {
         title: 'Promo codes',
         path: '/apps/promo-codes',
         icon: 'mdi:tag-multiple-outline',
