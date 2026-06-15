@@ -1,4 +1,24 @@
-import { DEFAULT_UNIT_ECONOMICS_INFRA, INFRA_CATEGORY_LABELS } from '../../../config/unitEconomicsInfra'
+/** Admin UI constants for unit economics — mirrors backend unitEconomicsInfra.ts */
+
+export const INFRA_CATEGORY_LABELS = {
+  compute: 'Compute & API',
+  data: 'Databases & cache',
+  storage: 'Storage & CDN',
+  video: 'Live video (WebRTC)',
+  messaging: 'Email, SMS & push',
+  payments: 'Payments risk',
+  ai: 'AI / ML',
+  observability: 'Monitoring',
+  onboarding: 'Trainer verification'
+}
+
+export const DEFAULT_UNIT_ECONOMICS_INFRA = {
+  version: 1,
+  monthlyLessonVolume: 500,
+  monthlyTrainerOnboardings: 8,
+  analysisPeriodDays: 30,
+  services: {}
+}
 
 /** Mirrors backend INFRA_CATEGORY_LABELS for admin UI. */
 export const INFRA_CATEGORIES = Object.entries(INFRA_CATEGORY_LABELS).map(([id, label]) => ({
