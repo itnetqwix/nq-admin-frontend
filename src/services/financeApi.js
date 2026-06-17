@@ -11,12 +11,70 @@ const getAuthHeaders = () => {
 
 const apiUrl = path => `${requireApiBaseUrl()}${path.startsWith('/') ? path : `/${path}`}`
 
+async function parseJsonResponse(res) {
+  const data = await res.json()
+  const failed =
+    !res.ok ||
+    data?.code === 400 ||
+    data?.code === 403 ||
+    String(data?.status || '').toLowerCase() === 'fail'
+  if (failed) {
+    throw new Error(data?.error || data?.msg || 'Request failed')
+  }
+  return data?.data ?? data
+}
+
+async function postFinance(path, body) {
+  const res = await fetch(apiUrl(path), {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(body)
+  })
+  return parseJsonResponse(res)
+}
+
 export async function getFinanceLedger(query = {}) {
-  const params = new URLSearchParams(query).toString()
+  const params = new URLSearchParams(
+    Object.fromEntries(Object.entries(query).filter(([, v]) => v != null && v !== ''))
+  ).toString()
   const res = await fetch(apiUrl(`/admin/finance/ledger?${params}`), {
     headers: getAuthHeaders()
   })
   const data = await res.json()
+  if (!res.ok) throw new Error(data?.error || 'Failed to load ledger')
+  return data?.data ?? data
+}
+
+export async function searchFinanceTransactions(query = {}) {
+  const params = new URLSearchParams(
+    Object.fromEntries(Object.entries(query).filter(([, v]) => v != null && v !== ''))
+  ).toString()
+  const res = await fetch(apiUrl(`/admin/finance/transactions/search?${params}`), {
+    headers: getAuthHeaders()
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data?.error || 'Search failed')
+  return data?.data ?? data
+}
+
+export async function getRefundQueue(query = {}) {
+  const params = new URLSearchParams(
+    Object.fromEntries(Object.entries(query).filter(([, v]) => v != null && v !== ''))
+  ).toString()
+  const res = await fetch(apiUrl(`/admin/finance/refunds?${params}`), {
+    headers: getAuthHeaders()
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data?.error || 'Failed to load refunds')
+  return data?.data ?? data
+}
+
+export async function getEscrowSummary() {
+  const res = await fetch(apiUrl('/admin/finance/escrow/summary'), {
+    headers: getAuthHeaders()
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data?.error || 'Failed to load escrow summary')
   return data?.data ?? data
 }
 
@@ -48,39 +106,19 @@ export async function getFinancialAuditLog(query = {}) {
 }
 
 export async function releaseEscrowHold(holdId, reason) {
-  const res = await fetch(apiUrl(`/admin/finance/escrow/${holdId}/release`), {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ reason })
-  })
-  return res.json()
+  return postFinance(`/admin/finance/escrow/${holdId}/release`, { reason })
 }
 
 export async function refundEscrowHold(holdId, reason) {
-  const res = await fetch(apiUrl(`/admin/finance/escrow/${holdId}/refund`), {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ reason })
-  })
-  return res.json()
+  return postFinance(`/admin/finance/escrow/${holdId}/refund`, { reason })
 }
 
 export async function adjustWallet(payload) {
-  const res = await fetch(apiUrl('/admin/finance/wallet/adjust'), {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(payload)
-  })
-  return res.json()
+  return postFinance('/admin/finance/wallet/adjust', payload)
 }
 
 export async function refundWalletSession(payload) {
-  const res = await fetch(apiUrl('/admin/finance/wallet/refund-session'), {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(payload)
-  })
-  return res.json()
+  return postFinance('/admin/finance/wallet/refund-session', payload)
 }
 
 export async function getStuckTopUps(query = {}) {
@@ -93,37 +131,19 @@ export async function getStuckTopUps(query = {}) {
 }
 
 export async function reconcileStuckTopUps(maxAgeMinutes = 30) {
-  const res = await fetch(apiUrl('/admin/finance/topups/reconcile'), {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ maxAgeMinutes })
-  })
-  return res.json()
+  return postFinance('/admin/finance/topups/reconcile', { maxAgeMinutes })
 }
 
 export async function reconcileFailedRefunds() {
-  const res = await fetch(apiUrl('/admin/finance/reconcile/refunds'), {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({})
-  })
-  return res.json()
+  return postFinance('/admin/finance/reconcile/refunds', {})
 }
 
 export async function reconcileStuckReleasingHolds(maxAgeMinutes = 60) {
-  const res = await fetch(apiUrl('/admin/finance/reconcile/releasing-holds'), {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ maxAgeMinutes })
-  })
-  return res.json()
+  return postFinance('/admin/finance/reconcile/releasing-holds', { maxAgeMinutes })
 }
 
 export async function approvePayout(payoutId, secondAdminId) {
-  const res = await fetch(apiUrl(`/admin/finance/payouts/${payoutId}/approve`), {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ second_admin_id: secondAdminId })
+  return postFinance(`/admin/finance/payouts/${payoutId}/approve`, {
+    second_admin_id: secondAdminId
   })
-  return res.json()
 }

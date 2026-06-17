@@ -17,6 +17,7 @@ import moment from "moment";
 import RefundPopups from "src/pages/components/modal/RefundPopups";
 import toast from "react-hot-toast";
 import authConfig from 'src/configs/auth'
+import { refundWalletSession } from 'src/services/financeApi'
 import { BookedSession, debouncedSearchMedicine, isCurrentDateBefore } from "src/utils/utils";
 import CancelSessionPopups from "src/pages/components/modal/CancelSessionPopups";
 import BookingDetailDrawer from "src/pages/components/modal/BookingDetailDrawer";
@@ -55,11 +56,39 @@ export default function Booking() {
   }, [])
 
   const showRefundPopup = (row) => {
-    if (!row?.payment_intent_id || !canRefund) return
+    if (!canRefund) return
+    if (!row?.payment_intent_id) {
+      void handleWalletRefund(row)
+      return
+    }
     setRefundRow(row)
     setOpenRefundPopup(true);
     setBookingId(row._id)
     getPaymentIntentDetails({ payment_intent_id: row.payment_intent_id })
+  }
+
+  const handleWalletRefund = async row => {
+    const traineeId =
+      row?.trainee_id || row?.trainee_info?._id || row?.trainee_info?.id
+    if (!row?._id || !traineeId) {
+      toast.error('Missing session or trainee id for wallet refund')
+      return
+    }
+    if (!window.confirm('Refund this wallet-paid session to the trainee wallet/escrow path?')) {
+      return
+    }
+    try {
+      await refundWalletSession({
+        sessionId: String(row._id),
+        traineeId: String(traineeId),
+        kind: 'booking',
+        reason: 'admin_booking_wallet_refund'
+      })
+      toast.success('Wallet refund submitted')
+      getBookingList()
+    } catch (e) {
+      toast.error(e?.message || 'Wallet refund failed')
+    }
   }
 
   const openBookingDetail = row => {
@@ -363,10 +392,10 @@ export default function Booking() {
         toast.success('Refund completed; amount returns to the trainee funding source.', {
           duration: 2000
         })
-        updateRefundStatus({
-          "booking_id": bookingId,
-          "refund_status": "refunded"
-        })
+        getBookingList();
+        setBookingId(null)
+        setPaymentIntentDetails({})
+        setOpenRefundPopup(false)
       }).catch(e => {
         toast.error(e?.message || 'Refund request failed')
       });

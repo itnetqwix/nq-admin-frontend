@@ -6,6 +6,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined'
 import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined'
 import User360AccountReviewActions from './User360AccountReviewActions'
+import User360WalletTab from './User360WalletTab'
 import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined'
 import {
   Accordion,
@@ -50,7 +51,7 @@ import { deleteAdminEntity, getClipPlayUrl } from 'src/services/user360Api'
 import LessonTimelineDialog from 'src/pages/components/booking/LessonTimelineDialog'
 import { getImageUrl } from 'src/utils/utils'
 
-const tabLabels = ['Overview', 'Lessons', 'Reviews', 'Clips', 'PDF & saved', 'Activity', 'Issues & Logs']
+const tabLabels = ['Overview', 'Lessons', 'Reviews', 'Clips', 'PDF & saved', 'Activity', 'Wallet', 'Issues & Logs']
 
 const SectionShell = ({ title, subtitle, action, children }) => {
   const theme = useTheme()
@@ -1300,6 +1301,19 @@ export default function AdminUser360Tabs({
         )}
 
         {tab === 6 && (
+          <SectionShell
+            title='Wallet ledger'
+            subtitle='Per-user wallet ledger entries (credits, debits, escrow holds, refunds).'
+          >
+            <User360WalletTab
+              userId={userId}
+              walletAmount={money.wallet_amount}
+              currency={money.currency || 'USD'}
+            />
+          </SectionShell>
+        )}
+
+        {tab === 7 && (
           <SectionShell
             title='Issues & logs'
             subtitle='Ops events for this user: calls, instant lessons, wallet, support tickets, and errors.'

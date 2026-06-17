@@ -1,5 +1,8 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/router'
 import Button from '@mui/material/Button'
+import Link from 'next/link'
+import Chip from '@mui/material/Chip'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
@@ -9,6 +12,9 @@ import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
+import toast from 'react-hot-toast'
+import { AbilityContext } from 'src/layouts/components/acl/Can'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminGridContainer from 'src/components/admin/AdminGridContainer'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
@@ -16,8 +22,11 @@ import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPa
 import {
   getFinanceLedger,
   getEscrowHolds,
+  getEscrowSummary,
   getPayoutQueue,
   getFinancialAuditLog,
+  getRefundQueue,
+  searchFinanceTransactions,
   releaseEscrowHold,
   refundEscrowHold,
   adjustWallet,
@@ -29,14 +38,68 @@ import {
   approvePayout
 } from 'src/services/financeApi'
 
+const TAB = {
+  LEDGER: 0,
+  TRANSACTIONS: 1,
+  ESCROW: 2,
+  REFUNDS: 3,
+  PAYOUTS: 4,
+  STUCK_TOPUPS: 5,
+  AUDIT: 6
+}
+
+const tabLabels = [
+  'Ledger',
+  'Transactions',
+  'Escrow',
+  'Refunds',
+  'Payouts',
+  'Stuck top-ups',
+  'Audit log'
+]
+
+function formatMinor(minor) {
+  if (minor == null) return '—'
+  return (Number(minor) / 100).toFixed(2)
+}
+
+async function runReconcile(label, fn, onDone) {
+  try {
+    const result = await fn()
+    const retried = result?.data?.retried ?? result?.retried
+    const ok = result?.data?.ok ?? result?.ok
+    if (retried != null) {
+      toast.success(`${label}: retried ${retried}`)
+    } else if (ok) {
+      toast.success(`${label} completed`)
+    } else {
+      toast.success(label)
+    }
+    onDone?.()
+  } catch (e) {
+    toast.error(e?.message || `${label} failed`)
+  }
+}
+
 const FinancePage = () => {
-  const [tab, setTab] = useState(0)
+  const router = useRouter()
+  const ability = useContext(AbilityContext)
+  const canRefund = ability?.can('update', 'admin-action-refund') ?? true
+  const [tab, setTab] = useState(TAB.LEDGER)
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
+  const pageSize = 50
   const [ledger, setLedger] = useState([])
+  const [transactions, setTransactions] = useState([])
   const [escrow, setEscrow] = useState([])
+  const [escrowSummary, setEscrowSummary] = useState(null)
+  const [refunds, setRefunds] = useState([])
   const [payouts, setPayouts] = useState([])
   const [audit, setAudit] = useState([])
   const [stuckTopUps, setStuckTopUps] = useState([])
   const [loading, setLoading] = useState(false)
+  const [searchQ, setSearchQ] = useState('')
+  const [refundStatus, setRefundStatus] = useState('')
   const [adjustOpen, setAdjustOpen] = useState(false)
   const [walletRefundOpen, setWalletRefundOpen] = useState(false)
   const [adjustForm, setAdjustForm] = useState({
@@ -52,31 +115,70 @@ const FinancePage = () => {
     reason: 'admin_wallet_refund'
   })
 
+  useEffect(() => {
+    const q = router.query?.userId
+    if (typeof q === 'string' && q.trim()) {
+      setSearchQ(q.trim())
+      setTab(TAB.TRANSACTIONS)
+    }
+  }, [router.query?.userId])
+
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      if (tab === 0) {
-        const r = await getFinanceLedger({ page: 1, limit: 100 })
+      if (tab === TAB.LEDGER) {
+        const r = await getFinanceLedger({ page, limit: pageSize, userId: searchQ || undefined })
         setLedger(r?.items ?? [])
-      } else if (tab === 1) {
-        const r = await getEscrowHolds({ page: 1, limit: 100 })
+        setTotal(r?.total ?? 0)
+      } else if (tab === TAB.TRANSACTIONS) {
+        const query = searchQ.trim()
+        const isPi = query.startsWith('pi_')
+        const r = await searchFinanceTransactions({
+          page,
+          limit: pageSize,
+          q: query || undefined,
+          paymentIntentId: isPi ? query : undefined,
+          userId: !isPi && query && query.length === 24 ? query : undefined,
+          sessionId: !isPi && query && query.length === 24 ? query : undefined
+        })
+        setTransactions(r?.items ?? [])
+        setTotal(r?.total ?? 0)
+      } else if (tab === TAB.ESCROW) {
+        const [r, summary] = await Promise.all([
+          getEscrowHolds({ page, limit: pageSize }),
+          getEscrowSummary()
+        ])
         setEscrow(r?.items ?? [])
-      } else if (tab === 2) {
-        const r = await getPayoutQueue({ page: 1, limit: 100 })
+        setTotal(r?.total ?? 0)
+        setEscrowSummary(summary)
+      } else if (tab === TAB.REFUNDS) {
+        const r = await getRefundQueue({ page, limit: pageSize, status: refundStatus || undefined })
+        setRefunds(r?.items ?? [])
+        setTotal(r?.total ?? 0)
+      } else if (tab === TAB.PAYOUTS) {
+        const r = await getPayoutQueue({ page, limit: pageSize })
         setPayouts(r?.items ?? [])
-      } else if (tab === 3) {
+        setTotal(r?.total ?? 0)
+      } else if (tab === TAB.STUCK_TOPUPS) {
         const r = await getStuckTopUps({ maxAgeMinutes: 30 })
         setStuckTopUps(r?.items ?? [])
+        setTotal(r?.items?.length ?? 0)
       } else {
-        const r = await getFinancialAuditLog({ page: 1, limit: 100 })
+        const r = await getFinancialAuditLog({ page, limit: pageSize })
         setAudit(r?.items ?? [])
+        setTotal(r?.total ?? 0)
       }
     } catch (e) {
       console.error(e)
+      toast.error(e?.message || 'Failed to load finance data')
     } finally {
       setLoading(false)
     }
-  }, [tab])
+  }, [tab, page, searchQ, refundStatus])
+
+  useEffect(() => {
+    setPage(1)
+  }, [tab, searchQ, refundStatus])
 
   useEffect(() => {
     load()
@@ -84,27 +186,61 @@ const FinancePage = () => {
 
   const escrowCols = [
     { field: '_id', headerName: 'Hold ID', flex: 1, minWidth: 120 },
-    { field: 'session_id', headerName: 'Session', flex: 1 },
+    {
+      field: 'session_id',
+      headerName: 'Session',
+      flex: 1,
+      renderCell: params =>
+        params.row.session_id ? (
+          <Button
+            size='small'
+            component={Link}
+            href={`/apps/booking?bookingId=${params.row.session_id}`}
+          >
+            Open
+          </Button>
+        ) : (
+          '—'
+        )
+    },
     { field: 'status', headerName: 'Status', width: 120 },
     { field: 'kind', headerName: 'Kind', width: 100 },
     {
       field: 'gross_minor',
       headerName: 'Gross',
       width: 100,
-      valueGetter: p => (p.row.gross_minor / 100).toFixed(2)
+      valueGetter: p => formatMinor(p.row.gross_minor)
+    },
+    {
+      field: 'createdAt',
+      headerName: 'Age',
+      width: 120,
+      valueGetter: p => {
+        if (!p.row.createdAt) return '—'
+        const hours = (Date.now() - new Date(p.row.createdAt).getTime()) / 3_600_000
+        if (hours < 24) return '<24h'
+        if (hours < 168) return '1–7d'
+        if (hours < 720) return '7–30d'
+        return '30d+'
+      }
     },
     {
       field: 'actions',
       headerName: '',
       width: 220,
       renderCell: params =>
-        params.row.status === 'held' ? (
+        params.row.status === 'held' && canRefund ? (
           <Stack direction='row' spacing={1}>
             <Button
               size='small'
               onClick={async () => {
-                await releaseEscrowHold(params.row._id, 'admin_release')
-                load()
+                try {
+                  await releaseEscrowHold(params.row._id, 'admin_release')
+                  toast.success('Escrow released')
+                  load()
+                } catch (e) {
+                  toast.error(e?.message || 'Release failed')
+                }
               }}
             >
               Release
@@ -113,8 +249,13 @@ const FinancePage = () => {
               size='small'
               color='warning'
               onClick={async () => {
-                await refundEscrowHold(params.row._id, 'admin_refund')
-                load()
+                try {
+                  await refundEscrowHold(params.row._id, 'admin_refund')
+                  toast.success('Escrow refund started')
+                  load()
+                } catch (e) {
+                  toast.error(e?.message || 'Refund failed')
+                }
               }}
             >
               Refund
@@ -133,8 +274,40 @@ const FinancePage = () => {
       field: 'amount_minor',
       headerName: 'Amount',
       width: 100,
-      valueGetter: p => (p.row.amount_minor / 100).toFixed(2)
+      valueGetter: p => formatMinor(p.row.amount_minor)
     },
+    { field: 'createdAt', headerName: 'When', width: 180 }
+  ]
+
+  const transactionCols = [
+    { field: 'source', headerName: 'Source', width: 110 },
+    { field: 'label', headerName: 'Label', flex: 1, minWidth: 140 },
+    { field: 'id', headerName: 'ID', flex: 1, minWidth: 120 },
+    { field: 'session_id', headerName: 'Session', flex: 1, minWidth: 120 },
+    { field: 'payment_intent_id', headerName: 'PI', flex: 1, minWidth: 120 },
+    { field: 'status', headerName: 'Status', width: 110 },
+    {
+      field: 'amount_minor',
+      headerName: 'Amount',
+      width: 100,
+      valueGetter: p => formatMinor(p.row.amount_minor)
+    },
+    { field: 'createdAt', headerName: 'When', width: 180 }
+  ]
+
+  const refundCols = [
+    { field: 'source', headerName: 'Source', width: 100 },
+    { field: 'status', headerName: 'Status', width: 120 },
+    { field: 'path', headerName: 'Path', width: 100 },
+    { field: 'session_id', headerName: 'Session', flex: 1 },
+    { field: 'payment_intent_id', headerName: 'PI', flex: 1 },
+    {
+      field: 'amount_minor',
+      headerName: 'Amount',
+      width: 100,
+      valueGetter: p => formatMinor(p.row.amount_minor)
+    },
+    { field: 'reason', headerName: 'Reason', flex: 1 },
     { field: 'createdAt', headerName: 'When', width: 180 }
   ]
 
@@ -146,7 +319,7 @@ const FinancePage = () => {
       field: 'amount_minor',
       headerName: 'Amount',
       width: 100,
-      valueGetter: p => (p.row.amount_minor / 100).toFixed(2)
+      valueGetter: p => formatMinor(p.row.amount_minor)
     },
     {
       field: 'actions',
@@ -157,8 +330,13 @@ const FinancePage = () => {
           <Button
             size='small'
             onClick={async () => {
-              await approvePayout(params.row._id)
-              load()
+              try {
+                await approvePayout(params.row._id)
+                toast.success('Payout approved')
+                load()
+              } catch (e) {
+                toast.error(e?.message || 'Approve failed')
+              }
             }}
           >
             Approve
@@ -175,7 +353,7 @@ const FinancePage = () => {
       field: 'amount_minor',
       headerName: 'Amount',
       width: 100,
-      valueGetter: p => (p.row.amount_minor / 100).toFixed(2)
+      valueGetter: p => formatMinor(p.row.amount_minor)
     },
     { field: 'stripe_payment_intent_id', headerName: 'PI', flex: 1 },
     { field: 'createdAt', headerName: 'Created', width: 180 }
@@ -189,59 +367,63 @@ const FinancePage = () => {
     { field: 'createdAt', headerName: 'When', width: 180 }
   ]
 
-  const rows =
-    tab === 0 ? ledger : tab === 1 ? escrow : tab === 2 ? payouts : tab === 3 ? stuckTopUps : audit
-  const cols =
-    tab === 0
-      ? ledgerCols
-      : tab === 1
-        ? escrowCols
-        : tab === 2
-          ? payoutCols
-          : tab === 3
-            ? topUpCols
-            : auditCols
+  const rows = useMemo(() => {
+    if (tab === TAB.LEDGER) return ledger
+    if (tab === TAB.TRANSACTIONS) return transactions
+    if (tab === TAB.ESCROW) return escrow
+    if (tab === TAB.REFUNDS) return refunds
+    if (tab === TAB.PAYOUTS) return payouts
+    if (tab === TAB.STUCK_TOPUPS) return stuckTopUps
+    return audit
+  }, [tab, ledger, transactions, escrow, refunds, payouts, stuckTopUps, audit])
 
-  const tabLabels = ['Ledger', 'Escrow', 'Payouts', 'Stuck top-ups', 'Audit log']
+  const cols = useMemo(() => {
+    if (tab === TAB.LEDGER) return ledgerCols
+    if (tab === TAB.TRANSACTIONS) return transactionCols
+    if (tab === TAB.ESCROW) return escrowCols
+    if (tab === TAB.REFUNDS) return refundCols
+    if (tab === TAB.PAYOUTS) return payoutCols
+    if (tab === TAB.STUCK_TOPUPS) return topUpCols
+    return auditCols
+  }, [tab])
+
+  const heldSummary = escrowSummary?.byStatus?.held
+  const aging = escrowSummary?.aging
 
   return (
     <AdminPageShell
       title='Finance'
       subtitle='Ledger, escrow, payouts, wallet ops, and audit trail.'
       actions={
-        <Stack direction='row' spacing={1}>
+        <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
           <Button size='small' variant='outlined' onClick={() => setAdjustOpen(true)}>
             Adjust wallet
           </Button>
-          <Button size='small' variant='outlined' onClick={() => setWalletRefundOpen(true)}>
-            Wallet refund
-          </Button>
+          {canRefund ? (
+            <Button size='small' variant='outlined' onClick={() => setWalletRefundOpen(true)}>
+              Wallet refund
+            </Button>
+          ) : null}
           <Button
             size='small'
             variant='outlined'
-            onClick={async () => {
-              await reconcileStuckTopUps(30)
-              load()
-            }}
+            onClick={() => runReconcile('Reconcile top-ups', () => reconcileStuckTopUps(30), load)}
           >
             Reconcile top-ups
           </Button>
           <Button
             size='small'
             variant='outlined'
-            onClick={async () => {
-              await reconcileFailedRefunds()
-            }}
+            onClick={() => runReconcile('Reconcile refunds', () => reconcileFailedRefunds(), load)}
           >
             Reconcile refunds
           </Button>
           <Button
             size='small'
             variant='outlined'
-            onClick={async () => {
-              await reconcileStuckReleasingHolds(60)
-              load()
-            }}
+            onClick={() =>
+              runReconcile('Reconcile releasing', () => reconcileStuckReleasingHolds(60), load)
+            }
           >
             Reconcile releasing
           </Button>
@@ -251,15 +433,89 @@ const FinancePage = () => {
       contentSx={{ p: 0 }}
     >
       <AdminPageSection>
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} sx={{ mb: 2 }}>
+          <TextField
+            size='small'
+            label='Search PI, user ID, or session ID'
+            value={searchQ}
+            onChange={e => setSearchQ(e.target.value)}
+            sx={{ minWidth: 280, flex: 1 }}
+          />
+          <Button
+            size='small'
+            variant='contained'
+            onClick={() => {
+              setTab(TAB.TRANSACTIONS)
+              setPage(1)
+            }}
+          >
+            Search
+          </Button>
+          {tab === TAB.REFUNDS ? (
+            <TextField
+              select
+              size='small'
+              label='Refund status'
+              value={refundStatus}
+              onChange={e => setRefundStatus(e.target.value)}
+              sx={{ minWidth: 180 }}
+            >
+              <MenuItem value=''>All</MenuItem>
+              <MenuItem value='pending'>Pending</MenuItem>
+              <MenuItem value='processing'>Processing</MenuItem>
+              <MenuItem value='completed'>Completed</MenuItem>
+              <MenuItem value='failed'>Failed</MenuItem>
+            </TextField>
+          ) : null}
+        </Stack>
+
+        {tab === TAB.ESCROW && escrowSummary ? (
+          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
+            <Chip
+              label={`Held: ${heldSummary?.count ?? 0} · $${formatMinor(heldSummary?.totalMinor)}`}
+              color='warning'
+              variant='outlined'
+            />
+            <Chip label={`<24h: ${aging?.under24h ?? 0}`} size='small' />
+            <Chip label={`1–7d: ${aging?.d1to7 ?? 0}`} size='small' />
+            <Chip label={`7–30d: ${aging?.d7to30 ?? 0}`} size='small' />
+            <Chip label={`30d+: ${aging?.over30 ?? 0}`} size='small' color='error' variant='outlined' />
+            {Object.entries(escrowSummary.byStatus || {}).map(([status, row]) => (
+              <Chip
+                key={status}
+                size='small'
+                variant='outlined'
+                label={`${status}: ${row.count} ($${formatMinor(row.totalMinor)})`}
+              />
+            ))}
+          </Stack>
+        ) : null}
+
         <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}>
           {tabLabels.map(label => (
             <Tab key={label} label={label} />
           ))}
         </Tabs>
+        <Stack direction='row' spacing={1} sx={{ mb: 2, alignItems: 'center' }}>
+          <Button size='small' disabled={page <= 1 || loading} onClick={() => setPage(p => Math.max(1, p - 1))}>
+            Previous
+          </Button>
+          <Button
+            size='small'
+            disabled={page * pageSize >= total || loading}
+            onClick={() => setPage(p => p + 1)}
+          >
+            Next
+          </Button>
+          <Typography variant='body2' color='text.secondary'>
+            Page {page}
+            {total ? ` · ${total} total` : ''}
+          </Typography>
+        </Stack>
         <AdminGridContainer>
           <AdminDataGrid
             autoHeight={false}
-            rows={rows.map((r, i) => ({ id: r._id ?? r.entry_id ?? i, ...r }))}
+            rows={rows.map((r, i) => ({ id: r._id ?? r.entry_id ?? r.id ?? i, ...r }))}
             columns={cols}
             loading={loading}
           />
@@ -306,14 +562,19 @@ const FinancePage = () => {
           <Button
             variant='contained'
             onClick={async () => {
-              await adjustWallet({
-                walletAccountId: adjustForm.walletAccountId,
-                amount_minor: Number(adjustForm.amount_minor),
-                direction: adjustForm.direction,
-                reason: adjustForm.reason
-              })
-              setAdjustOpen(false)
-              load()
+              try {
+                await adjustWallet({
+                  walletAccountId: adjustForm.walletAccountId,
+                  amount_minor: Number(adjustForm.amount_minor),
+                  direction: adjustForm.direction,
+                  reason: adjustForm.reason
+                })
+                toast.success('Wallet adjusted')
+                setAdjustOpen(false)
+                load()
+              } catch (e) {
+                toast.error(e?.message || 'Adjustment failed')
+              }
             }}
           >
             Apply
@@ -361,8 +622,14 @@ const FinancePage = () => {
             variant='contained'
             color='warning'
             onClick={async () => {
-              await refundWalletSession(walletRefundForm)
-              setWalletRefundOpen(false)
+              try {
+                await refundWalletSession(walletRefundForm)
+                toast.success('Wallet refund submitted')
+                setWalletRefundOpen(false)
+                load()
+              } catch (e) {
+                toast.error(e?.message || 'Refund failed')
+              }
             }}
           >
             Refund
