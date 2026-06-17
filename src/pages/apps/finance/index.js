@@ -35,7 +35,8 @@ import {
   reconcileStuckTopUps,
   reconcileFailedRefunds,
   reconcileStuckReleasingHolds,
-  approvePayout
+  approvePayout,
+  migrateLegacyBalances
 } from 'src/services/financeApi'
 
 const TAB = {
@@ -100,6 +101,12 @@ const FinancePage = () => {
   const [loading, setLoading] = useState(false)
   const [searchQ, setSearchQ] = useState('')
   const [refundStatus, setRefundStatus] = useState('')
+  const [escrowStatus, setEscrowStatus] = useState('')
+  const [ledgerReferenceType, setLedgerReferenceType] = useState('')
+  const [migrateOpen, setMigrateOpen] = useState(false)
+  const [migrateDryRun, setMigrateDryRun] = useState(true)
+  const [migrateResult, setMigrateResult] = useState(null)
+  const [migrateBusy, setMigrateBusy] = useState(false)
   const [adjustOpen, setAdjustOpen] = useState(false)
   const [walletRefundOpen, setWalletRefundOpen] = useState(false)
   const [adjustForm, setAdjustForm] = useState({
@@ -121,13 +128,31 @@ const FinancePage = () => {
       setSearchQ(q.trim())
       setTab(TAB.TRANSACTIONS)
     }
-  }, [router.query?.userId])
+    const sessionId = router.query?.sessionId
+    if (typeof sessionId === 'string' && sessionId.trim()) {
+      setSearchQ(sessionId.trim())
+      const tabKey = String(router.query?.tab || '').toLowerCase()
+      if (tabKey === 'escrow') {
+        setTab(TAB.ESCROW)
+      } else if (tabKey === 'ledger') {
+        setTab(TAB.LEDGER)
+      } else {
+        setTab(TAB.TRANSACTIONS)
+      }
+    }
+  }, [router.query?.userId, router.query?.sessionId, router.query?.tab])
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
       if (tab === TAB.LEDGER) {
-        const r = await getFinanceLedger({ page, limit: pageSize, userId: searchQ || undefined })
+        const r = await getFinanceLedger({
+          page,
+          limit: pageSize,
+          userId: searchQ || undefined,
+          referenceType: ledgerReferenceType || undefined,
+          sessionId: searchQ && searchQ.length === 24 ? searchQ : undefined
+        })
         setLedger(r?.items ?? [])
         setTotal(r?.total ?? 0)
       } else if (tab === TAB.TRANSACTIONS) {
@@ -145,7 +170,12 @@ const FinancePage = () => {
         setTotal(r?.total ?? 0)
       } else if (tab === TAB.ESCROW) {
         const [r, summary] = await Promise.all([
-          getEscrowHolds({ page, limit: pageSize }),
+          getEscrowHolds({
+            page,
+            limit: pageSize,
+            status: escrowStatus || undefined,
+            sessionId: searchQ && searchQ.length === 24 ? searchQ : undefined
+          }),
           getEscrowSummary()
         ])
         setEscrow(r?.items ?? [])
@@ -174,11 +204,11 @@ const FinancePage = () => {
     } finally {
       setLoading(false)
     }
-  }, [tab, page, searchQ, refundStatus])
+  }, [tab, page, searchQ, refundStatus, escrowStatus, ledgerReferenceType])
 
   useEffect(() => {
     setPage(1)
-  }, [tab, searchQ, refundStatus])
+  }, [tab, searchQ, refundStatus, escrowStatus, ledgerReferenceType])
 
   useEffect(() => {
     load()
@@ -407,6 +437,16 @@ const FinancePage = () => {
           <Button
             size='small'
             variant='outlined'
+            onClick={() => {
+              setMigrateOpen(true)
+              setMigrateResult(null)
+            }}
+          >
+            Migrate legacy balances
+          </Button>
+          <Button
+            size='small'
+            variant='outlined'
             onClick={() => runReconcile('Reconcile top-ups', () => reconcileStuckTopUps(30), load)}
           >
             Reconcile top-ups
@@ -465,6 +505,40 @@ const FinancePage = () => {
               <MenuItem value='processing'>Processing</MenuItem>
               <MenuItem value='completed'>Completed</MenuItem>
               <MenuItem value='failed'>Failed</MenuItem>
+            </TextField>
+          ) : null}
+          {tab === TAB.ESCROW ? (
+            <TextField
+              select
+              size='small'
+              label='Escrow status'
+              value={escrowStatus}
+              onChange={e => setEscrowStatus(e.target.value)}
+              sx={{ minWidth: 160 }}
+            >
+              <MenuItem value=''>All</MenuItem>
+              <MenuItem value='held'>Held</MenuItem>
+              <MenuItem value='released'>Released</MenuItem>
+              <MenuItem value='refunded'>Refunded</MenuItem>
+              <MenuItem value='releasing'>Releasing</MenuItem>
+            </TextField>
+          ) : null}
+          {tab === TAB.LEDGER ? (
+            <TextField
+              select
+              size='small'
+              label='Reference type'
+              value={ledgerReferenceType}
+              onChange={e => setLedgerReferenceType(e.target.value)}
+              sx={{ minWidth: 180 }}
+            >
+              <MenuItem value=''>All</MenuItem>
+              <MenuItem value='topup'>topup</MenuItem>
+              <MenuItem value='booking_escrow'>booking_escrow</MenuItem>
+              <MenuItem value='escrow_release'>escrow_release</MenuItem>
+              <MenuItem value='escrow_refund'>escrow_refund</MenuItem>
+              <MenuItem value='payout'>payout</MenuItem>
+              <MenuItem value='migration_opening'>migration_opening</MenuItem>
             </TextField>
           ) : null}
         </Stack>
@@ -633,6 +707,53 @@ const FinancePage = () => {
             }}
           >
             Refund
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={migrateOpen} onClose={() => setMigrateOpen(false)} maxWidth='sm' fullWidth>
+        <DialogTitle>Migrate legacy trainer balances</DialogTitle>
+        <DialogContent>
+          <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+            Maps legacy <code>user.wallet_amount</code> to ledger opening balances. Run dry-run first.
+          </Typography>
+          <TextField
+            select
+            fullWidth
+            size='small'
+            label='Mode'
+            value={migrateDryRun ? 'dry' : 'live'}
+            onChange={e => setMigrateDryRun(e.target.value === 'dry')}
+          >
+            <MenuItem value='dry'>Dry run (preview only)</MenuItem>
+            <MenuItem value='live'>Apply migration</MenuItem>
+          </TextField>
+          {migrateResult ? (
+            <Typography variant='body2' sx={{ mt: 2, whiteSpace: 'pre-wrap' }}>
+              {JSON.stringify(migrateResult, null, 2)}
+            </Typography>
+          ) : null}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setMigrateOpen(false)}>Close</Button>
+          <Button
+            variant='contained'
+            disabled={migrateBusy}
+            onClick={async () => {
+              setMigrateBusy(true)
+              try {
+                const result = await migrateLegacyBalances(migrateDryRun)
+                setMigrateResult(result)
+                toast.success(migrateDryRun ? 'Dry run complete' : 'Migration applied')
+                if (!migrateDryRun) load()
+              } catch (e) {
+                toast.error(e?.message || 'Migration failed')
+              } finally {
+                setMigrateBusy(false)
+              }
+            }}
+          >
+            {migrateDryRun ? 'Run dry-run' : 'Apply migration'}
           </Button>
         </DialogActions>
       </Dialog>

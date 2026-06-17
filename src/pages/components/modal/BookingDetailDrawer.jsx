@@ -12,7 +12,9 @@ import {
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import moment from 'moment'
+import toast from 'react-hot-toast'
 import { getAdminBookingDetail } from 'src/services/bookingApi'
+import { releaseEscrowHold, refundEscrowHold } from 'src/services/financeApi'
 import SessionTimelinePanel from 'src/pages/components/booking/SessionTimelinePanel'
 import { BookedSession, isCurrentDateBefore } from 'src/utils/utils'
 
@@ -63,6 +65,7 @@ export default function BookingDetailDrawer({
   const [detail, setDetail] = useState(null)
   const [error, setError] = useState(null)
   const [timelineRefresh, setTimelineRefresh] = useState(0)
+  const [escrowBusy, setEscrowBusy] = useState(false)
 
   const loadDetail = () => {
     if (!bookingId) return
@@ -90,7 +93,39 @@ export default function BookingDetailDrawer({
     canRefund &&
     s?.status === 'canceled' &&
     s?.refund_status !== 'refunded' &&
-    (listRow?.payment_intent_id || detail?.payment?.payment_intent_id)
+    (listRow?.payment_intent_id ||
+      detail?.payment?.payment_intent_id ||
+      detail?.escrow?.hold_id ||
+      listRow?.trainee_id ||
+      detail?.trainee?._id)
+
+  const escrowHoldId = detail?.escrow?.hold_id
+  const canEscrowAction =
+    canRefund && detail?.escrow?.status === 'held' && escrowHoldId
+
+  const traineeFinanceId =
+    detail?.trainee?._id || listRow?.trainee_id || listRow?.trainee_info?._id
+
+  const runEscrowAction = async (action, reason) => {
+    if (!escrowHoldId) return
+    setEscrowBusy(true)
+    try {
+      if (action === 'release') {
+        await releaseEscrowHold(escrowHoldId, reason)
+        toast.success('Escrow released')
+      } else {
+        await refundEscrowHold(escrowHoldId, reason)
+        toast.success('Escrow refund started')
+      }
+      loadDetail()
+      setTimelineRefresh(n => n + 1)
+      onActionComplete?.()
+    } catch (e) {
+      toast.error(e?.message || 'Escrow action failed')
+    } finally {
+      setEscrowBusy(false)
+    }
+  }
 
   const handleConfirm = () => {
     if (!bookingId || !onConfirm) return
@@ -319,6 +354,37 @@ export default function BookingDetailDrawer({
                 <Typography variant='subtitle2' sx={{ mb: 1 }}>
                   Escrow
                 </Typography>
+                <Stack direction='row' spacing={1} sx={{ mb: 1, flexWrap: 'wrap' }}>
+                  <Button
+                    size='small'
+                    variant='outlined'
+                    href={`/apps/finance?sessionId=${s._id}&tab=escrow`}
+                    component='a'
+                  >
+                    Finance (escrow)
+                  </Button>
+                  {canEscrowAction ? (
+                    <>
+                      <Button
+                        size='small'
+                        variant='contained'
+                        disabled={escrowBusy}
+                        onClick={() => runEscrowAction('release', 'admin_booking_release')}
+                      >
+                        Release hold
+                      </Button>
+                      <Button
+                        size='small'
+                        variant='outlined'
+                        color='warning'
+                        disabled={escrowBusy}
+                        onClick={() => runEscrowAction('refund', 'admin_booking_refund')}
+                      >
+                        Refund hold
+                      </Button>
+                    </>
+                  ) : null}
+                </Stack>
                 <DetailRow label='Hold ID' value={detail.escrow.hold_id} />
                 <DetailRow label='Status' value={detail.escrow.status} />
                 <DetailRow
@@ -393,14 +459,38 @@ export default function BookingDetailDrawer({
               </>
             ) : null}
 
-            {detail?.payment?.payment_intent_id ? (
+            {detail?.payment?.payment_intent_id || s?._id ? (
               <>
                 <Divider sx={{ my: 2 }} />
                 <Typography variant='subtitle2' sx={{ mb: 1 }}>
-                  Payment
+                  Payment & finance
                 </Typography>
-                <DetailRow label='Method' value={detail.payment.method} />
-                <DetailRow label='Payment intent' value={detail.payment.payment_intent_id} />
+                <Stack direction='row' spacing={1} sx={{ mb: 1, flexWrap: 'wrap' }}>
+                  <Button
+                    size='small'
+                    variant='outlined'
+                    href={`/apps/finance?sessionId=${s._id}`}
+                    component='a'
+                  >
+                    Transactions
+                  </Button>
+                  {traineeFinanceId ? (
+                    <Button
+                      size='small'
+                      variant='outlined'
+                      href={`/apps/finance?userId=${traineeFinanceId}`}
+                      component='a'
+                    >
+                      Trainee wallet
+                    </Button>
+                  ) : null}
+                </Stack>
+                {detail?.payment?.payment_intent_id ? (
+                  <>
+                    <DetailRow label='Method' value={detail.payment.method} />
+                    <DetailRow label='Payment intent' value={detail.payment.payment_intent_id} />
+                  </>
+                ) : null}
               </>
             ) : null}
 

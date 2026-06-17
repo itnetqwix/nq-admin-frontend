@@ -147,3 +147,7 @@ export async function approvePayout(payoutId, secondAdminId) {
     second_admin_id: secondAdminId
   })
 }
+
+export async function migrateLegacyBalances(dryRun = true) {
+  return postFinance('/admin/finance/migrate-legacy-balances', { dry_run: dryRun })
+}
