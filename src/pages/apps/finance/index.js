@@ -38,6 +38,7 @@ import {
   approvePayout,
   migrateLegacyBalances,
   disputeEscrowHold,
+  resolveDisputeEscrow,
   getTopUpHistory,
   getFinanceOpsDashboard
 } from 'src/services/financeApi'
@@ -276,8 +277,84 @@ const FinancePage = () => {
       field: 'actions',
       headerName: '',
       width: 300,
-      renderCell: params =>
-        params.row.status === 'held' && canRefund ? (
+      renderCell: params => {
+        if (!canRefund) return null
+        if (params.row.status === 'disputed') {
+          return (
+            <Stack direction='row' spacing={1} flexWrap='wrap'>
+              <Button
+                size='small'
+                onClick={async () => {
+                  const ok = await confirm({
+                    title: 'Release to trainer?',
+                    message: 'Resolve dispute in favor of the trainer and release escrow.',
+                    detail: `Hold ID: ${params.row._id}`,
+                    confirmLabel: 'Release trainer',
+                    variant: 'warning'
+                  })
+                  if (!ok) return
+                  try {
+                    await resolveDisputeEscrow(params.row._id, 'release_trainer', 'admin_dispute_release')
+                    toast.success('Dispute resolved — released to trainer')
+                    load()
+                  } catch (e) {
+                    toast.error(e?.message || 'Resolve failed')
+                  }
+                }}
+              >
+                Release trainer
+              </Button>
+              <Button
+                size='small'
+                color='warning'
+                onClick={async () => {
+                  const ok = await confirm({
+                    title: 'Refund trainee?',
+                    message: 'Resolve dispute in favor of the trainee and refund escrow.',
+                    detail: `Hold ID: ${params.row._id}`,
+                    confirmLabel: 'Refund trainee',
+                    variant: 'danger'
+                  })
+                  if (!ok) return
+                  try {
+                    await resolveDisputeEscrow(params.row._id, 'refund_trainee', 'admin_dispute_refund')
+                    toast.success('Dispute resolved — refunded trainee')
+                    load()
+                  } catch (e) {
+                    toast.error(e?.message || 'Resolve failed')
+                  }
+                }}
+              >
+                Refund trainee
+              </Button>
+              <Button
+                size='small'
+                variant='outlined'
+                onClick={async () => {
+                  const ok = await confirm({
+                    title: 'Reinstate hold?',
+                    message: 'Return this hold to normal held status (dispute cleared).',
+                    detail: `Hold ID: ${params.row._id}`,
+                    confirmLabel: 'Reinstate',
+                    variant: 'default'
+                  })
+                  if (!ok) return
+                  try {
+                    await resolveDisputeEscrow(params.row._id, 'reinstate_held', 'admin_dispute_reinstate')
+                    toast.success('Hold reinstated')
+                    load()
+                  } catch (e) {
+                    toast.error(e?.message || 'Reinstate failed')
+                  }
+                }}
+              >
+                Reinstate
+              </Button>
+            </Stack>
+          )
+        }
+        if (params.row.status !== 'held') return null
+        return (
           <Stack direction='row' spacing={1} flexWrap='wrap'>
             <Button
               size='small'
@@ -348,7 +425,8 @@ const FinancePage = () => {
               Dispute
             </Button>
           </Stack>
-        ) : null
+        )
+      }
     }
   ]
 

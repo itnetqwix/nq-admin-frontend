@@ -117,6 +117,10 @@ export async function disputeEscrowHold(holdId, reason) {
   return postFinance(`/admin/finance/escrow/${holdId}/dispute`, { reason })
 }
 
+export async function resolveDisputeEscrow(holdId, resolution, reason) {
+  return postFinance(`/admin/finance/escrow/${holdId}/resolve-dispute`, { resolution, reason })
+}
+
 export async function adjustWallet(payload) {
   return postFinance('/admin/finance/wallet/adjust', payload)
 }
