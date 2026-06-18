@@ -113,6 +113,10 @@ export async function refundEscrowHold(holdId, reason) {
   return postFinance(`/admin/finance/escrow/${holdId}/refund`, { reason })
 }
 
+export async function disputeEscrowHold(holdId, reason) {
+  return postFinance(`/admin/finance/escrow/${holdId}/dispute`, { reason })
+}
+
 export async function adjustWallet(payload) {
   return postFinance('/admin/finance/wallet/adjust', payload)
 }
@@ -150,4 +154,37 @@ export async function approvePayout(payoutId, secondAdminId) {
 
 export async function migrateLegacyBalances(dryRun = true) {
   return postFinance('/admin/finance/migrate-legacy-balances', { dry_run: dryRun })
+}
+
+export async function getConnectAccounts(query = {}) {
+  const params = new URLSearchParams(
+    Object.fromEntries(Object.entries(query).filter(([, v]) => v != null && v !== ''))
+  ).toString()
+  const res = await fetch(apiUrl(`/admin/finance/connect-accounts?${params}`), {
+    headers: getAuthHeaders()
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data?.error || 'Failed to load Connect accounts')
+  return data?.data ?? data
+}
+
+export async function getTopUpHistory(query = {}) {
+  const params = new URLSearchParams(
+    Object.fromEntries(Object.entries(query).filter(([, v]) => v != null && v !== ''))
+  ).toString()
+  const res = await fetch(apiUrl(`/admin/finance/topups?${params}`), {
+    headers: getAuthHeaders()
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data?.error || 'Failed to load top-ups')
+  return data?.data ?? data
+}
+
+export async function getFinanceOpsDashboard() {
+  const res = await fetch(apiUrl('/admin/finance/ops-dashboard'), {
+    headers: getAuthHeaders()
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data?.error || 'Failed to load ops dashboard')
+  return data?.data ?? data
 }

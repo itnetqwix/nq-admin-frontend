@@ -15,7 +15,7 @@ import moment from 'moment'
 import toast from 'react-hot-toast'
 import { useAdminConfirm } from 'src/components/admin'
 import { getAdminBookingDetail } from 'src/services/bookingApi'
-import { releaseEscrowHold, refundEscrowHold } from 'src/services/financeApi'
+import { releaseEscrowHold, refundEscrowHold, refundWalletSession } from 'src/services/financeApi'
 import SessionTimelinePanel from 'src/pages/components/booking/SessionTimelinePanel'
 import { BookedSession, isCurrentDateBefore } from 'src/utils/utils'
 
@@ -67,6 +67,7 @@ export default function BookingDetailDrawer({
   const [error, setError] = useState(null)
   const [timelineRefresh, setTimelineRefresh] = useState(0)
   const [escrowBusy, setEscrowBusy] = useState(false)
+  const [extensionRefundBusy, setExtensionRefundBusy] = useState(false)
   const { confirm, ConfirmDialog } = useAdminConfirm()
 
   const loadDetail = () => {
@@ -107,6 +108,34 @@ export default function BookingDetailDrawer({
 
   const traineeFinanceId =
     detail?.trainee?._id || listRow?.trainee_id || listRow?.trainee_info?._id
+
+  const runExtensionWalletRefund = async ext => {
+    if (!s?._id || !traineeFinanceId) return
+    const ok = await confirm({
+      title: 'Refund extension to trainee wallet?',
+      message: `Refund +${ext.minutes} min ($${Number(ext.amount).toFixed(2)}) via wallet refund path.`,
+      detail: `Session: ${s._id}`,
+      confirmLabel: 'Refund extension',
+      variant: 'danger'
+    })
+    if (!ok) return
+    setExtensionRefundBusy(true)
+    try {
+      await refundWalletSession({
+        sessionId: String(s._id),
+        traineeId: String(traineeFinanceId),
+        kind: 'extension',
+        reason: 'admin_booking_extension_refund'
+      })
+      toast.success('Extension wallet refund submitted')
+      loadDetail()
+      onActionComplete?.()
+    } catch (e) {
+      toast.error(e?.message || 'Extension refund failed')
+    } finally {
+      setExtensionRefundBusy(false)
+    }
+  }
 
   const runEscrowAction = async (action, reason) => {
     if (!escrowHoldId) return
@@ -336,6 +365,19 @@ export default function BookingDetailDrawer({
                       {ext.requested_by_name ? ` · ${ext.requested_by_name}` : ''} ·{' '}
                       {fmt(ext.applied_at || ext.requested_at)}
                     </Typography>
+                    {canRefund &&
+                    traineeFinanceId &&
+                    (ext.status === 'paid' || ext.status === 'applied') ? (
+                      <Button
+                        size='small'
+                        color='warning'
+                        sx={{ mt: 0.5 }}
+                        disabled={extensionRefundBusy}
+                        onClick={() => runExtensionWalletRefund(ext)}
+                      >
+                        Refund extension
+                      </Button>
+                    ) : null}
                   </Box>
                 ))}
                 {s.total_extended_minutes ? (

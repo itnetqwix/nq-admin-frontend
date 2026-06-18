@@ -36,7 +36,10 @@ import {
   reconcileFailedRefunds,
   reconcileStuckReleasingHolds,
   approvePayout,
-  migrateLegacyBalances
+  migrateLegacyBalances,
+  disputeEscrowHold,
+  getTopUpHistory,
+  getFinanceOpsDashboard
 } from 'src/services/financeApi'
 
 const TAB = {
@@ -46,6 +49,7 @@ const TAB = {
   REFUNDS: 3,
   PAYOUTS: 4,
   STUCK_TOPUPS: 5,
+  TOPUPS: 7,
   AUDIT: 6
 }
 
@@ -56,6 +60,7 @@ const tabLabels = [
   'Refunds',
   'Payouts',
   'Stuck top-ups',
+  'Top-up history',
   'Audit log'
 ]
 
@@ -99,6 +104,8 @@ const FinancePage = () => {
   const [payouts, setPayouts] = useState([])
   const [audit, setAudit] = useState([])
   const [stuckTopUps, setStuckTopUps] = useState([])
+  const [topUpHistory, setTopUpHistory] = useState([])
+  const [opsDashboard, setOpsDashboard] = useState(null)
   const [loading, setLoading] = useState(false)
   const [searchQ, setSearchQ] = useState('')
   const [refundStatus, setRefundStatus] = useState('')
@@ -194,6 +201,10 @@ const FinancePage = () => {
         const r = await getStuckTopUps({ maxAgeMinutes: 30 })
         setStuckTopUps(r?.items ?? [])
         setTotal(r?.items?.length ?? 0)
+      } else if (tab === TAB.TOPUPS) {
+        const r = await getTopUpHistory({ page, limit: pageSize, userId: searchQ || undefined })
+        setTopUpHistory(r?.items ?? [])
+        setTotal(r?.total ?? 0)
       } else {
         const r = await getFinancialAuditLog({ page, limit: pageSize })
         setAudit(r?.items ?? [])
@@ -206,6 +217,12 @@ const FinancePage = () => {
       setLoading(false)
     }
   }, [tab, page, searchQ, refundStatus, escrowStatus, ledgerReferenceType])
+
+  useEffect(() => {
+    void getFinanceOpsDashboard()
+      .then(setOpsDashboard)
+      .catch(() => setOpsDashboard(null))
+  }, [tab, page])
 
   useEffect(() => {
     setPage(1)
@@ -258,10 +275,10 @@ const FinancePage = () => {
     {
       field: 'actions',
       headerName: '',
-      width: 220,
+      width: 300,
       renderCell: params =>
         params.row.status === 'held' && canRefund ? (
-          <Stack direction='row' spacing={1}>
+          <Stack direction='row' spacing={1} flexWrap='wrap'>
             <Button
               size='small'
               onClick={async () => {
@@ -306,6 +323,29 @@ const FinancePage = () => {
               }}
             >
               Refund
+            </Button>
+            <Button
+              size='small'
+              color='error'
+              onClick={async () => {
+                const ok = await confirm({
+                  title: 'Mark escrow as disputed?',
+                  message: 'Freezes the hold for manual review. No automatic release until resolved.',
+                  detail: `Hold ID: ${params.row._id}`,
+                  confirmLabel: 'Mark disputed',
+                  variant: 'danger'
+                })
+                if (!ok) return
+                try {
+                  await disputeEscrowHold(params.row._id, 'admin_dispute')
+                  toast.success('Hold marked disputed')
+                  load()
+                } catch (e) {
+                  toast.error(e?.message || 'Dispute failed')
+                }
+              }}
+            >
+              Dispute
             </Button>
           </Stack>
         ) : null
@@ -385,8 +425,15 @@ const FinancePage = () => {
                 variant: 'warning'
               })
               if (!ok) return
+              const secondAdminId = window.prompt(
+                'Second admin user ID (required for dual approval on large payouts):'
+              )
+              if (!secondAdminId?.trim()) {
+                toast.error('Second admin ID is required')
+                return
+              }
               try {
-                await approvePayout(params.row._id)
+                await approvePayout(params.row._id, secondAdminId.trim())
                 toast.success('Payout approved')
                 load()
               } catch (e) {
@@ -429,8 +476,9 @@ const FinancePage = () => {
     if (tab === TAB.REFUNDS) return refunds
     if (tab === TAB.PAYOUTS) return payouts
     if (tab === TAB.STUCK_TOPUPS) return stuckTopUps
+    if (tab === TAB.TOPUPS) return topUpHistory
     return audit
-  }, [tab, ledger, transactions, escrow, refunds, payouts, stuckTopUps, audit])
+  }, [tab, ledger, transactions, escrow, refunds, payouts, stuckTopUps, topUpHistory, audit])
 
   const cols = useMemo(() => {
     if (tab === TAB.LEDGER) return ledgerCols
@@ -439,6 +487,7 @@ const FinancePage = () => {
     if (tab === TAB.REFUNDS) return refundCols
     if (tab === TAB.PAYOUTS) return payoutCols
     if (tab === TAB.STUCK_TOPUPS) return topUpCols
+    if (tab === TAB.TOPUPS) return topUpCols
     return auditCols
   }, [tab])
 
@@ -451,6 +500,9 @@ const FinancePage = () => {
       subtitle='Ledger, escrow, payouts, wallet ops, and audit trail.'
       actions={
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+          <Button size='small' variant='outlined' component={Link} href='/apps/finance/connect'>
+            Stripe Connect
+          </Button>
           <Button size='small' variant='outlined' onClick={() => setAdjustOpen(true)}>
             Adjust wallet
           </Button>
@@ -546,6 +598,7 @@ const FinancePage = () => {
               <MenuItem value='released'>Released</MenuItem>
               <MenuItem value='refunded'>Refunded</MenuItem>
               <MenuItem value='releasing'>Releasing</MenuItem>
+              <MenuItem value='disputed'>Disputed</MenuItem>
             </TextField>
           ) : null}
           {tab === TAB.LEDGER ? (
@@ -567,6 +620,38 @@ const FinancePage = () => {
             </TextField>
           ) : null}
         </Stack>
+
+        {opsDashboard ? (
+          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
+            <Chip
+              label={`Releasing: ${opsDashboard.releasingCount ?? 0}`}
+              color={opsDashboard.releasingCount > 0 ? 'warning' : 'default'}
+              size='small'
+              variant='outlined'
+            />
+            <Chip
+              label={`Disputed: ${opsDashboard.disputedCount ?? 0}`}
+              color={opsDashboard.disputedCount > 0 ? 'error' : 'default'}
+              size='small'
+              variant='outlined'
+            />
+            <Chip
+              label={`Transfer failures (7d): ${opsDashboard.transferFailuresLast7d ?? 0}`}
+              size='small'
+              variant='outlined'
+            />
+            <Chip
+              label={`Stuck top-ups: ${opsDashboard.stuckTopUpsPending30m ?? 0}`}
+              size='small'
+              variant='outlined'
+            />
+            <Chip
+              label={`Paid-unapplied extensions: ${opsDashboard.paidUnappliedExtensions ?? 0}`}
+              size='small'
+              variant='outlined'
+            />
+          </Stack>
+        ) : null}
 
         {tab === TAB.ESCROW && escrowSummary ? (
           <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>

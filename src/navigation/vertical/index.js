@@ -210,6 +210,13 @@ const navigation = () => [
         subject: 'admin-nav-finance'
       },
       {
+        title: 'Stripe Connect',
+        path: '/apps/finance/connect',
+        icon: 'mdi:bank-transfer',
+        action: 'read',
+        subject: 'admin-nav-finance'
+      },
+      {
         title: 'Pricing & fees',
         path: '/apps/pricing',
         icon: 'mdi:currency-usd',
