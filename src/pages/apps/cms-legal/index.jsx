@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Box, Button, Tab, Tabs, TextField, Typography } from '@mui/material'
+import { Box, Button, TextField, Typography } from '@mui/material'
 import toast from 'react-hot-toast'
 
+import AdminTabs from 'src/components/admin/AdminTabs'
+import { useAdminConfirm } from 'src/components/admin'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import { listLegalDocuments, upsertLegalDocument } from 'src/services/cmsApi'
 
@@ -11,6 +13,7 @@ const SLUGS = [
 ]
 
 export default function CmsLegalPage() {
+  const { confirm, ConfirmDialog } = useAdminConfirm()
   const [tab, setTab] = useState(0)
   const [docs, setDocs] = useState({})
   const [title, setTitle] = useState('')
@@ -43,6 +46,14 @@ export default function CmsLegalPage() {
   }, [docs, slug, tab])
 
   const handlePublish = async () => {
+    const ok = await confirm({
+      title: `Publish ${SLUGS[tab].label}?`,
+      message: 'This replaces the live document in all mobile apps.',
+      detail: `Slug: ${slug} · version ${docs[slug]?.version ?? 'new'}`,
+      confirmLabel: 'Publish',
+      variant: 'warning'
+    })
+    if (!ok) return
     setSaving(true)
     try {
       await upsertLegalDocument(slug, {
@@ -67,11 +78,11 @@ export default function CmsLegalPage() {
         <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
           HTML is rendered in-app. Version {version ?? '—'} is shown to users after publish.
         </Typography>
-        <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
-          {SLUGS.map((s, i) => (
-            <Tab key={s.slug} label={s.label} value={i} />
-          ))}
-        </Tabs>
+        <AdminTabs
+          value={tab}
+          onChange={setTab}
+          tabs={SLUGS.map((s, i) => ({ value: i, label: s.label }))}
+        />
         <TextField
           fullWidth
           label='Title'
@@ -89,11 +100,12 @@ export default function CmsLegalPage() {
           sx={{ mb: 2, fontFamily: 'monospace' }}
         />
         <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button variant='contained' onClick={handlePublish} disabled={saving}>
+          <Button variant='contained' onClick={() => void handlePublish()} disabled={saving}>
             {saving ? 'Publishing…' : 'Publish to app'}
           </Button>
         </Box>
       </AdminPageSection>
+      {ConfirmDialog}
     </AdminPageShell>
   )
 }

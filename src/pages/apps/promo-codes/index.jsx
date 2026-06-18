@@ -2,9 +2,12 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
   FormControl, FormControlLabel, Grid, IconButton, InputLabel, MenuItem,
-  Select, Switch, Tab, Tabs, TextField, Tooltip, Typography
+  Select, Switch, TextField, Tooltip, Typography
 } from '@mui/material'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminFilterBar from 'src/components/admin/AdminFilterBar'
+import AdminTabs from 'src/components/admin/AdminTabs'
+import { useAdminConfirm } from 'src/components/admin'
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
@@ -12,9 +15,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import toast from 'react-hot-toast'
 
-import styles from 'styles/common.module.css'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
-import DeletePopup from 'src/pages/components/modal/DeletePopup'
 import {
   listPromoCodes,
   getPromoAdminStats,
@@ -75,6 +76,7 @@ function getStatusChip(row) {
 }
 
 export default function PromoCodesPage() {
+  const { confirm, ConfirmDialog } = useAdminConfirm()
   const [promos, setPromos] = useState([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
@@ -89,7 +91,6 @@ export default function PromoCodesPage() {
   const [form, setForm] = useState({ ...EMPTY_FORM })
   const [saving, setSaving] = useState(false)
 
-  const [deleteTarget, setDeleteTarget] = useState(null)
   const [usageOpen, setUsageOpen] = useState(false)
   const [usageData, setUsageData] = useState(null)
 
@@ -203,12 +204,17 @@ export default function PromoCodesPage() {
     }
   }
 
-  const handleDelete = async () => {
-    if (!deleteTarget) return
+  const requestDelete = async row => {
+    const ok = await confirm({
+      title: 'Delete promo code?',
+      message: `"${row.code}" will be deactivated and removed from the list.`,
+      confirmLabel: 'Delete',
+      variant: 'danger'
+    })
+    if (!ok) return
     try {
-      await deletePromoCode(deleteTarget._id)
+      await deletePromoCode(row._id)
       toast.success('Promo code deleted.')
-      setDeleteTarget(null)
       fetchData()
     } catch (err) {
       toast.error(err.message || 'Delete failed')
@@ -249,8 +255,6 @@ export default function PromoCodesPage() {
       headerName: 'Code',
       flex: 1,
       minWidth: 120,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
       renderCell: p => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography fontWeight={600} sx={{ fontFamily: 'monospace' }}>{p.value}</Typography>
@@ -266,8 +270,6 @@ export default function PromoCodesPage() {
       field: 'sponsor_type',
       headerName: 'Sponsor',
       width: 110,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
       renderCell: p => sponsorChip(p.row)
     },
     {
@@ -275,16 +277,12 @@ export default function PromoCodesPage() {
       headerName: 'Label',
       flex: 1.2,
       minWidth: 140,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
       renderCell: p => p.value || <Typography color='text.disabled'>--</Typography>
     },
     {
       field: 'discount',
       headerName: 'Discount',
       width: 120,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
       renderCell: p => {
         const r = p.row
         return r.discount_type === 'percentage'
@@ -296,24 +294,18 @@ export default function PromoCodesPage() {
       field: 'usage',
       headerName: 'Usage',
       width: 110,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
       renderCell: p => `${p.row.usage_count || 0} / ${p.row.usage_limit || '∞'}`
     },
     {
       field: 'status',
       headerName: 'Status',
       width: 110,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
       renderCell: p => getStatusChip(p.row)
     },
     {
       field: 'is_active',
       headerName: 'Active',
       width: 80,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
       renderCell: p => (
         <Switch
           size='small'
@@ -327,8 +319,6 @@ export default function PromoCodesPage() {
       field: 'is_visible',
       headerName: 'Visible',
       width: 80,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
       renderCell: p => (
         <Switch
           size='small'
@@ -342,8 +332,6 @@ export default function PromoCodesPage() {
       field: 'date_range',
       headerName: 'Date Range',
       width: 190,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
       renderCell: p => {
         const s = p.row.start_date ? new Date(p.row.start_date).toLocaleDateString() : '?'
         const e = p.row.end_date ? new Date(p.row.end_date).toLocaleDateString() : '?'
@@ -355,8 +343,6 @@ export default function PromoCodesPage() {
       headerName: 'Actions',
       width: 140,
       sortable: false,
-      headerClassName: styles['header-class-last'],
-      cellClassName: styles['cell-class-last'],
       renderCell: p => (
         <Box>
           <Tooltip title='View Usage'>
@@ -370,7 +356,7 @@ export default function PromoCodesPage() {
             </IconButton>
           </Tooltip>
           <Tooltip title='Delete'>
-            <IconButton size='small' color='error' onClick={e => { e.stopPropagation(); setDeleteTarget(p.row) }}>
+            <IconButton size='small' color='error' onClick={e => { e.stopPropagation(); void requestDelete(p.row) }}>
               <DeleteOutlineIcon fontSize='small' />
             </IconButton>
           </Tooltip>
@@ -424,20 +410,17 @@ export default function PromoCodesPage() {
               </Grid>
             </Grid>
           ) : null}
-          <Tabs
+          <AdminTabs
             value={sponsorTab}
-            onChange={(_, v) => { setSponsorTab(v); setPage(1) }}
-            sx={{ mb: 2 }}
-          >
-            {SPONSOR_TABS.map(t => (
-              <Tab key={t.value || 'all'} label={t.label} value={t.value} />
-            ))}
-          </Tabs>
-          <TextField
-            size='small'
-            placeholder='Search by code, label, or description...'
-            onChange={handleSearchChange}
-            sx={{ width: { xs: '100%', sm: 320 }, mb: 2 }}
+            onChange={v => { setSponsorTab(v); setPage(1) }}
+            tabs={SPONSOR_TABS.map(t => ({ value: t.value, label: t.label }))}
+          />
+          <AdminFilterBar
+            searchPlaceholder='Search by code, label, or description…'
+            onSearchChange={handleSearchChange}
+            resultCount={total}
+            onRefresh={() => void fetchData()}
+            refreshLoading={loading}
           />
           <AdminDataGrid
             rows={promos}
@@ -447,7 +430,6 @@ export default function PromoCodesPage() {
             paginationMode='server'
             paginationModel={{ page: page - 1, pageSize }}
             onPaginationModelChange={m => { setPage(m.page + 1); setPageSize(m.pageSize) }}
-            getRowClassName={p => p.indexRelativeToCurrentPage % 2 === 0 ? styles['even-row'] : styles['odd-row']}
             sx={{ '& .MuiDataGrid-cell': { py: 1 } }}
           />
         </AdminPageSection>
@@ -566,12 +548,7 @@ export default function PromoCodesPage() {
         </DialogActions>
       </Dialog>
 
-      {/* Delete Confirmation */}
-      <DeletePopup
-        open={!!deleteTarget}
-        setOpen={() => setDeleteTarget(null)}
-        onClick={handleDelete}
-      />
+      {ConfirmDialog}
 
       {/* Usage Detail Dialog */}
       <Dialog open={usageOpen} onClose={() => setUsageOpen(false)} maxWidth='md' fullWidth>

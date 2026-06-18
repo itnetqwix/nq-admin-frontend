@@ -13,6 +13,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close'
 import moment from 'moment'
 import toast from 'react-hot-toast'
+import { useAdminConfirm } from 'src/components/admin'
 import { getAdminBookingDetail } from 'src/services/bookingApi'
 import { releaseEscrowHold, refundEscrowHold } from 'src/services/financeApi'
 import SessionTimelinePanel from 'src/pages/components/booking/SessionTimelinePanel'
@@ -66,6 +67,7 @@ export default function BookingDetailDrawer({
   const [error, setError] = useState(null)
   const [timelineRefresh, setTimelineRefresh] = useState(0)
   const [escrowBusy, setEscrowBusy] = useState(false)
+  const { confirm, ConfirmDialog } = useAdminConfirm()
 
   const loadDetail = () => {
     if (!bookingId) return
@@ -108,6 +110,17 @@ export default function BookingDetailDrawer({
 
   const runEscrowAction = async (action, reason) => {
     if (!escrowHoldId) return
+    const ok = await confirm({
+      title: action === 'release' ? 'Release escrow to trainer?' : 'Refund escrow to trainee?',
+      message:
+        action === 'release'
+          ? 'Held funds will be released from escrow for this session.'
+          : 'This starts a refund from held escrow back to the trainee wallet or card.',
+      detail: `Hold ID: ${escrowHoldId}`,
+      confirmLabel: action === 'release' ? 'Release' : 'Refund',
+      variant: action === 'release' ? 'warning' : 'danger'
+    })
+    if (!ok) return
     setEscrowBusy(true)
     try {
       if (action === 'release') {
@@ -532,6 +545,7 @@ export default function BookingDetailDrawer({
           </>
         ) : null}
       </Box>
+      {ConfirmDialog}
     </Drawer>
   )
 }

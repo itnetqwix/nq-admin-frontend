@@ -3,9 +3,12 @@ import {
   Alert,
   Box, Button, Checkbox, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
   FormControl, FormControlLabel, FormGroup, Grid, IconButton, InputLabel, MenuItem,
-  Radio, RadioGroup, Select, Tab, Tabs, TextField, Tooltip, Typography
+  Radio, RadioGroup, Select, TextField, Tooltip, Typography
 } from '@mui/material'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminFilterBar from 'src/components/admin/AdminFilterBar'
+import AdminTabs from 'src/components/admin/AdminTabs'
+import { useAdminConfirm } from 'src/components/admin'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
 import SendIcon from '@mui/icons-material/Send'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
@@ -17,7 +20,6 @@ import { EditorState, convertToRaw } from 'draft-js'
 import draftToHtml from 'draftjs-to-html'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 
-import styles from 'styles/common.module.css'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import { EditorWrapper } from 'src/@core/styles/libs/react-draft-wysiwyg'
 import {
@@ -53,6 +55,7 @@ function stripHtml(html) {
 }
 
 export default function BroadcastsPage() {
+  const { confirm, ConfirmDialog } = useAdminConfirm()
   const [tab, setTab] = useState(0)
 
   // ─── Compose state ──────────────────────────────────────────
@@ -81,10 +84,6 @@ export default function BroadcastsPage() {
   const [detailOpen, setDetailOpen] = useState(false)
   const [detailData, setDetailData] = useState(null)
   const [detailLoading, setDetailLoading] = useState(false)
-
-  // ─── Delete state ──────────────────────────────────────────
-  const [deleteTarget, setDeleteTarget] = useState(null)
-  const [deleteLoading, setDeleteLoading] = useState(false)
 
   // ─── Recipient Preview ────────────────────────────────────
   useEffect(() => {
@@ -226,8 +225,14 @@ export default function BroadcastsPage() {
     }
   }
 
-  // ─── Resend ───────────────────────────────────────────────
-  const handleResend = async id => {
+  const requestResend = async id => {
+    const ok = await confirm({
+      title: 'Resend broadcast?',
+      message: 'Delivery will be retried for failed recipients.',
+      confirmLabel: 'Resend',
+      variant: 'warning'
+    })
+    if (!ok) return
     try {
       await resendBroadcast(id)
       toast.success('Broadcast resend initiated.')
@@ -238,19 +243,20 @@ export default function BroadcastsPage() {
     }
   }
 
-  // ─── Delete ───────────────────────────────────────────────
-  const handleDelete = async () => {
-    if (!deleteTarget) return
-    setDeleteLoading(true)
+  const requestDelete = async row => {
+    const ok = await confirm({
+      title: 'Delete broadcast?',
+      message: `"${row.title}" will be removed permanently.`,
+      confirmLabel: 'Delete',
+      variant: 'danger'
+    })
+    if (!ok) return
     try {
-      await deleteBroadcast(deleteTarget._id)
+      await deleteBroadcast(row._id)
       toast.success('Broadcast deleted.')
-      setDeleteTarget(null)
       fetchHistory()
     } catch (err) {
       toast.error(err.message || 'Delete failed')
-    } finally {
-      setDeleteLoading(false)
     }
   }
 
@@ -261,22 +267,16 @@ export default function BroadcastsPage() {
       headerName: 'Title',
       flex: 1.5,
       minWidth: 200,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
     },
     {
       field: 'audience',
       headerName: 'Audience',
       width: 110,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
     },
     {
       field: 'channels',
       headerName: 'Channels',
       width: 220,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
       renderCell: p => (
         <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
           {(p.value || []).map(ch => (
@@ -289,8 +289,6 @@ export default function BroadcastsPage() {
       field: 'status',
       headerName: 'Status',
       width: 110,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
       renderCell: p => (
         <Chip label={p.value} size='small' color={STATUS_COLORS[p.value] || 'default'} />
       ),
@@ -299,16 +297,12 @@ export default function BroadcastsPage() {
       field: 'stats',
       headerName: 'Recipients',
       width: 110,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
       renderCell: p => p.value?.total_recipients ?? '--',
     },
     {
       field: 'sent_at',
       headerName: 'Sent At',
       width: 170,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
       renderCell: p => p.value ? new Date(p.value).toLocaleString() : '--',
     },
     {
@@ -316,8 +310,6 @@ export default function BroadcastsPage() {
       headerName: 'Actions',
       width: 140,
       sortable: false,
-      headerClassName: styles['header-class-last'],
-      cellClassName: styles['cell-class-last'],
       renderCell: p => (
         <Box>
           <Tooltip title='View Details'>
@@ -327,13 +319,13 @@ export default function BroadcastsPage() {
           </Tooltip>
           {p.row.status === 'failed' && (
             <Tooltip title='Resend'>
-              <IconButton size='small' color='warning' onClick={e => { e.stopPropagation(); handleResend(p.row._id) }}>
+              <IconButton size='small' color='warning' onClick={e => { e.stopPropagation(); void requestResend(p.row._id) }}>
                 <ReplayIcon fontSize='small' />
               </IconButton>
             </Tooltip>
           )}
           <Tooltip title='Delete'>
-            <IconButton size='small' color='error' onClick={e => { e.stopPropagation(); setDeleteTarget(p.row) }}>
+            <IconButton size='small' color='error' onClick={e => { e.stopPropagation(); void requestDelete(p.row) }}>
               <DeleteOutlineIcon fontSize='small' />
             </IconButton>
           </Tooltip>
@@ -381,12 +373,14 @@ export default function BroadcastsPage() {
         subtitle='Send messages to your users via Email, SMS, WhatsApp, In-App notifications, and Push notifications.'
         contentSx={{ p: 0 }}
       >
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={tab} onChange={(_, v) => setTab(v)}>
-            <Tab label='Compose' />
-            <Tab label='History' />
-          </Tabs>
-        </Box>
+        <AdminTabs
+          value={tab}
+          onChange={setTab}
+          tabs={[
+            { value: 0, label: 'Compose' },
+            { value: 1, label: 'History' }
+          ]}
+        />
 
         {/* ─── COMPOSE TAB ─────────────────────────────────── */}
         {tab === 0 && (
@@ -517,15 +511,13 @@ export default function BroadcastsPage() {
         {/* ─── HISTORY TAB ─────────────────────────────────── */}
         {tab === 1 && (
           <AdminPageSection>
-            <Box sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-              <TextField
-                size='small'
-                placeholder='Search broadcasts...'
-                onChange={handleSearchChange}
-                sx={{ width: { xs: '100%', sm: 320 } }}
-              />
-              <AdminRefreshButton onClick={fetchHistory} loading={loading} />
-            </Box>
+            <AdminFilterBar
+              searchPlaceholder='Search broadcasts…'
+              onSearchChange={handleSearchChange}
+              resultCount={total}
+              onRefresh={() => void fetchHistory()}
+              refreshLoading={loading}
+            />
             <AdminDataGrid
               rows={broadcasts}
               columns={historyColumns}
@@ -534,7 +526,6 @@ export default function BroadcastsPage() {
               paginationMode='server'
               paginationModel={{ page: page - 1, pageSize }}
               onPaginationModelChange={m => { setPage(m.page + 1); setPageSize(m.pageSize) }}
-              getRowClassName={p => p.indexRelativeToCurrentPage % 2 === 0 ? styles['even-row'] : styles['odd-row']}
               sx={{ '& .MuiDataGrid-cell': { py: 1 } }}
             />
           </AdminPageSection>
@@ -674,7 +665,7 @@ export default function BroadcastsPage() {
             <Button
               color='warning'
               startIcon={<ReplayIcon />}
-              onClick={() => handleResend(detailData._id)}
+              onClick={() => void requestResend(detailData._id)}
             >
               Resend
             </Button>
@@ -684,27 +675,7 @@ export default function BroadcastsPage() {
       </Dialog>
 
       {/* ─── DELETE CONFIRMATION ───────────────────────────── */}
-      <Dialog open={!!deleteTarget} onClose={() => !deleteLoading && setDeleteTarget(null)} maxWidth='xs' fullWidth>
-        <DialogTitle>Delete Broadcast</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to delete the broadcast &quot;{deleteTarget?.title}&quot;?
-            This action cannot be undone.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteTarget(null)} disabled={deleteLoading}>Cancel</Button>
-          <Button
-            variant='contained'
-            color='error'
-            onClick={handleDelete}
-            disabled={deleteLoading}
-            startIcon={<DeleteOutlineIcon />}
-          >
-            {deleteLoading ? 'Deleting...' : 'Delete'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {ConfirmDialog}
     </>
   )
 }

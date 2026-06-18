@@ -1,111 +1,133 @@
-import { Autocomplete, Avatar, Badge, Box, Button, CircularProgress, FormControl, FormControlLabel, FormHelperText, Grid, IconButton, InputLabel, MenuItem, Radio, RadioGroup, TextField, Typography, useMediaQuery } from "@mui/material";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/router";
-import AddIcon from '@mui/icons-material/Add';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Avatar, Badge, Box, IconButton } from '@mui/material'
+import React, { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/router'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import Link from 'next/link'
+import MenuIcon from '@mui/icons-material/Menu'
 
-import styles from "styles/common.module.css";
-
-import Pagination from '@mui/material/Pagination';
-import Stack from '@mui/material/Stack';
-import AdminDataGrid from 'src/components/admin/AdminDataGrid'
-import AdminGridContainer from 'src/components/admin/AdminGridContainer'
-import AdminFilterBar from 'src/components/admin/AdminFilterBar'
-import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
-import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
-import SaveAsIcon from '@mui/icons-material/SaveAs';
-import Link from "next/link";
-import MenuIcon from '@mui/icons-material/Menu';
-import { CustomButton } from "src/pages/components/common";
-import { useCommon } from "src/hooks/useCommon";
-import { getImageUrl } from "src/utils/utils";
-import TraineeRejectActions from "src/pages/components/trainee-reject/TraineeRejectActions";
-import toast from "react-hot-toast";
-import UserQuickPreviewModal from "src/pages/components/user360/UserQuickPreviewModal";
-import { getUser360 } from "src/services/user360Api";
-import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell';
-
-
-{/* <MenuItem value="xs">xs</MenuItem>
-<MenuItem value="sm">sm</MenuItem>
-<MenuItem value="md">md</MenuItem>
-<MenuItem value="lg">lg</MenuItem>
-<MenuItem value="xl">xl</MenuItem> */}
-
+import {
+  AdminDataGrid,
+  AdminFilterBar,
+  AdminGridContainer,
+  useAdminConfirm
+} from 'src/components/admin'
+import { CustomButton } from 'src/pages/components/common'
+import { useCommon } from 'src/hooks/useCommon'
+import { getImageUrl } from 'src/utils/utils'
+import TraineeRejectActions from 'src/pages/components/trainee-reject/TraineeRejectActions'
+import toast from 'react-hot-toast'
+import UserQuickPreviewModal from 'src/pages/components/user360/UserQuickPreviewModal'
+import { getUser360 } from 'src/services/user360Api'
+import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import authConfig from 'src/configs/auth'
 
 export default function ManageTrainee() {
-  const router = useRouter();
-  const searchTimerRef = useRef(null);
+  const router = useRouter()
+  const searchTimerRef = useRef(null)
+  const { confirm, ConfirmDialog } = useAdminConfirm()
 
-  const common = useCommon();
-
-  const {
-    traineeList,
-    getTraineesList
-  } = common;
+  const common = useCommon()
+  const { traineeList, getTraineesList } = common
 
   useEffect(() => {
-    getTraineesList();
+    getTraineesList()
   }, [])
 
-  const [currentPage, setCurrentPage] = useState(1);
   const [isQuickPreviewOpen, setIsQuickPreviewOpen] = useState(false)
   const [selectedStudentData, setSelectedStudentData] = useState({})
-  const [isQuickPreviewLoading, setIsQuickPreviewLoading] = useState(false);
-  const [previewUserId, setPreviewUserId] = useState(null);
-
-
-  const [tableData, setTableData] = useState([]);
+  const [isQuickPreviewLoading, setIsQuickPreviewLoading] = useState(false)
+  const [previewUserId, setPreviewUserId] = useState(null)
+  const [tableData, setTableData] = useState([])
+  const [searchText, setSearchText] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
-    if (traineeList) {
-      setTableData(traineeList)
-    }
+    if (traineeList) setTableData(traineeList)
   }, [traineeList])
 
-  function scheduleTraineeSearch(searchText) {
+  function scheduleTraineeSearch(searchValue) {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
     searchTimerRef.current = setTimeout(() => {
-      getTraineesList(searchText || "")
+      getTraineesList(searchValue || '')
     }, 400)
   }
 
+  const requestDelete = async id => {
+    const ok = await confirm({
+      title: 'Delete trainee account?',
+      message: 'This permanently removes the user and cannot be undone.',
+      detail: `User ID: ${id}`,
+      confirmLabel: 'Delete',
+      variant: 'danger'
+    })
+    if (!ok) return
 
+    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+    if (!storedToken) {
+      toast.error('Session expired. Please login again.')
+      return
+    }
+
+    setIsDeleting(true)
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/delete-user/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${storedToken}` }
+      })
+      const responseData = await response.json()
+      if (!response.ok || responseData?.status === 'fail') {
+        throw new Error(responseData?.error || 'Unable to delete user.')
+      }
+      setTableData(prev => prev.filter(item => item?.id !== id))
+      toast.success('User deleted successfully.')
+    } catch (error) {
+      toast.error(error?.message || 'Unable to delete user.')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  const handleCourseClick = async id => {
+    if (id == null || id === 'undefined') return
+    setPreviewUserId(String(id))
+    setIsQuickPreviewOpen(true)
+    setIsQuickPreviewLoading(true)
+    try {
+      const data = await getUser360(id)
+      setSelectedStudentData(data || {})
+    } catch (error) {
+      toast.error(error?.message || 'Unable to load user preview')
+      setSelectedStudentData({})
+    } finally {
+      setIsQuickPreviewLoading(false)
+    }
+  }
 
   const columns = [
     {
       field: 'image',
       headerName: 'Image',
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
       width: 120,
       renderCell: params => (
-        <Badge
-          overlap='circular'
-          sx={{ ml: 2, cursor: 'pointer' }}
-        // anchorOrigin={{
-        //   vertical: 'bottom',
-        //   horizontal: 'right'
-        // }}
-        >
+        <Badge overlap='circular' sx={{ ml: 2 }}>
           <Avatar
-            alt='Alam'
-            sx={{ width: 80, height: 80 }}
-            src={getImageUrl(params?.row?.profile_picture) ?? 'https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png'}
-          // src='https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png'
+            alt={params?.row?.fullname || 'Trainee'}
+            sx={{ width: 64, height: 64 }}
+            src={
+              getImageUrl(params?.row?.profile_picture) ??
+              'https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png'
+            }
           />
         </Badge>
       )
     },
-    { field: 'fullname', headerName: 'Trainer Name', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 180 },
-    { field: 'email', headerName: 'Trainer Email', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 200 },
-    { field: 'mobile_no', headerName: 'Mobile Number', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
+    { field: 'fullname', headerName: 'Trainee Name', width: 180 },
+    { field: 'email', headerName: 'Email', width: 200 },
+    { field: 'mobile_no', headerName: 'Mobile Number', width: 150 },
     {
       field: 'status',
       headerName: 'Status',
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
       width: 200,
       renderCell: params => (
         <TraineeRejectActions
@@ -115,74 +137,41 @@ export default function ManageTrainee() {
         />
       )
     },
-    { field: 'category', headerName: 'Category', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 100 },
-    { field: 'wallet_amount', headerName: 'Wallet Amount', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
-    { field: 'login_type', headerName: 'Login Type', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
+    { field: 'category', headerName: 'Category', width: 100 },
+    { field: 'wallet_amount', headerName: 'Wallet Amount', width: 150 },
+    { field: 'login_type', headerName: 'Login Type', width: 150 },
     {
       field: 'view',
-      headerName: 'Trainee Clips',
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
-      width: 150,
+      headerName: 'Clips',
+      width: 100,
+      sortable: false,
       renderCell: params => (
-        <div >
-          <IconButton
-            onClick={() => {
-              handleCourseClick(params.row.id)
-            }}
-            aria-label='Edit'>
-            <VisibilityIcon className={styles['view-icon']} />
-          </IconButton>
-        </div>
+        <IconButton onClick={() => handleCourseClick(params.row.id)} aria-label='Preview clips' size='small'>
+          <VisibilityIcon fontSize='small' />
+        </IconButton>
       )
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      headerClassName: styles['header-class-last'],
-      cellClassName: styles['cell-class-last'],
-      width: 100,
+      width: 80,
+      sortable: false,
       renderCell: params => (
-        <div>
-          <IconButton
-            // onClick={() => handleEdit(params.row.id)}
-            aria-label='Edit'>
-            <SaveAsIcon className={styles['edit-icon']} />
-          </IconButton>
-
-          <IconButton
-            // onClick={() => handleOpen(params.row.id)}
-            aria-label='Delete'>
-            <DeleteOutlineIcon className={styles['delete-icon']} />
-          </IconButton>
-        </div>
+        <IconButton
+          onClick={e => {
+            e.stopPropagation()
+            void requestDelete(params.row.id)
+          }}
+          aria-label='Delete'
+          color='error'
+          size='small'
+          disabled={isDeleting}
+        >
+          <DeleteOutlineIcon fontSize='small' />
+        </IconButton>
       )
     }
-
-  ];
-
-
-  const handleCourseClick = async (id) => {
-    if (id == null || id === "undefined") return
-    setPreviewUserId(String(id))
-    setIsQuickPreviewOpen(true)
-    setIsQuickPreviewLoading(true)
-    try {
-      const data = await getUser360(id)
-      setSelectedStudentData(data || {})
-    } catch (error) {
-      toast.error(error?.message || "Unable to load user preview")
-      setSelectedStudentData({})
-    } finally {
-      setIsQuickPreviewLoading(false)
-    }
-  };
-
-  const getRowClassName = (params) => {
-    return params.indexRelativeToCurrentPage % 2 === 0 ? `${styles['even-row']} ${styles['row-class']} ` : `${styles['odd-row']} ${styles['row-class']} `;
-  };
-
-  const getRowHeight = () => 100
+  ]
 
   return (
     <>
@@ -202,7 +191,7 @@ export default function ManageTrainee() {
           subtitle='Search and open any trainee in User 360 from a row click.'
           actions={
             <CustomButton component={Link} variant='contained' href='/apps/manage-trainer' startIcon={<MenuIcon />}>
-              Settings
+              Trainers
             </CustomButton>
           }
           contentSx={{ p: 0 }}
@@ -210,7 +199,13 @@ export default function ManageTrainee() {
           <AdminPageSection>
             <AdminFilterBar
               searchPlaceholder='Name or email…'
-              onSearchChange={e => scheduleTraineeSearch(e.target.value)}
+              searchValue={searchText}
+              onSearchChange={e => {
+                setSearchText(e.target.value)
+                scheduleTraineeSearch(e.target.value)
+              }}
+              resultCount={tableData?.length}
+              helperText='Click a row to open the full user profile.'
             />
             <AdminGridContainer>
               <AdminDataGrid
@@ -221,17 +216,15 @@ export default function ManageTrainee() {
                 }}
                 rows={tableData ?? []}
                 columns={columns}
-                getRowClassName={getRowClassName}
-                getRowHeight={getRowHeight}
-                columnHeaderHeight={80}
+                getRowHeight={() => 88}
+                columnHeaderHeight={56}
+                clickableRows
               />
             </AdminGridContainer>
           </AdminPageSection>
         </AdminPageShell>
       </form>
-
+      {ConfirmDialog}
     </>
   )
 }
-
-

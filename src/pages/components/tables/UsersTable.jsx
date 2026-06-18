@@ -1,109 +1,103 @@
-import { Box, Button, Chip, Stack } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import AdminDataGrid from 'src/components/admin/AdminDataGrid'
-import AdminGridContainer from 'src/components/admin/AdminGridContainer'
-import AdminFilterBar from 'src/components/admin/AdminFilterBar'
-import styles from "styles/common.module.css";
-import { getImageUrl } from "src/utils/utils";
-import { useAdminRealtime } from "src/context/AdminRealtimeContext";
-import AdminPageShell, { AdminPageSection } from "src/layouts/components/AdminPageShell";
-
-
+import { Avatar, Box, Button, Chip, Stack } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import { AdminDataGrid, AdminFilterBar, AdminGridContainer } from 'src/components/admin'
+import { getImageUrl } from 'src/utils/utils'
+import { useAdminRealtime } from 'src/context/AdminRealtimeContext'
+import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 
 export default function ActiveUsersTable() {
-    const { onlineUsers, socketConnected, refreshOnlineUsers } = useAdminRealtime();
-    const [trainerList, setTrainerList] = useState([]);
-    const [tableData, setTableData] = useState([]);
+  const { onlineUsers, socketConnected, refreshOnlineUsers } = useAdminRealtime()
+  const [trainerList, setTrainerList] = useState([])
+  const [tableData, setTableData] = useState([])
+  const [search, setSearch] = useState('')
 
-    useEffect(() => {
-        const rows = (onlineUsers || []).map(u => ({
-            ...u,
-            id: u._id || u.id,
-            presence: 'Online'
-        }));
-        setTrainerList(rows);
-    }, [onlineUsers]);
+  useEffect(() => {
+    const rows = (onlineUsers || []).map(u => ({
+      ...u,
+      id: u._id || u.id,
+      presence: 'Online'
+    }))
+    setTrainerList(rows)
+  }, [onlineUsers])
 
-    useEffect(() => {
-        setTableData(trainerList);
-    }, [trainerList]);
+  useEffect(() => {
+    setTableData(trainerList)
+  }, [trainerList])
 
-    const columns = [
-        {
-            field: 'image',
-            headerName: 'Image',
-            headerClassName: styles['header-class'],
-            cellClassName: styles['cell-class'],
-            width: 120,
-            renderCell: params => (
-                <img
-                    alt='Profile'
-                    src={getImageUrl(params?.row?.profile_picture) ?? 'https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png'}
-                    style={{ width: 'auto', height: '45px', borderRadius: '50%' }}
-                />
-            )
-        },
-        { field: 'fullname', headerName: 'Full Name', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 180 },
-        { field: 'email', headerName: 'Email', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 200 },
-        { field: 'mobile_no', headerName: 'Mobile Number', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
-        { field: 'category', headerName: 'Category', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 100 },
-        { field: 'wallet_amount', headerName: 'Wallet Amount', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
-        { field: 'commission', headerName: 'Commission (%)', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
-        { field: 'login_type', headerName: 'Login Type', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
-        { field: 'account_type', headerName: 'Account Type', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
-        {
-            field: 'presence',
-            headerName: 'Presence',
-            headerClassName: styles['header-class'],
-            cellClassName: styles['cell-class'],
-            width: 110,
-            renderCell: () => (
-                <Chip size='small' label='Online' color='success' variant='outlined' />
-            )
-        },
-    ];
+  const handleSearch = searchText => {
+    const filteredData = trainerList.filter(trainer =>
+      trainer.fullname.toLowerCase().includes(searchText.toLowerCase())
+    )
+    setTableData(filteredData)
+  }
 
-    const handleSearch = (searchText) => {
-        const filteredData = trainerList.filter(trainer =>
-            trainer.fullname.toLowerCase().includes(searchText.toLowerCase())
-        );
-        setTableData(filteredData);
-    };
+  const columns = [
+    {
+      field: 'image',
+      headerName: 'Image',
+      width: 100,
+      renderCell: params => (
+        <Avatar
+          alt={params?.row?.fullname || 'User'}
+          src={
+            getImageUrl(params?.row?.profile_picture) ??
+            'https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png'
+          }
+          sx={{ width: 44, height: 44 }}
+        />
+      )
+    },
+    { field: 'fullname', headerName: 'Full Name', width: 180 },
+    { field: 'email', headerName: 'Email', width: 200 },
+    { field: 'mobile_no', headerName: 'Mobile Number', width: 150 },
+    { field: 'category', headerName: 'Category', width: 100 },
+    { field: 'wallet_amount', headerName: 'Wallet Amount', width: 150 },
+    { field: 'commission', headerName: 'Commission (%)', width: 150 },
+    { field: 'login_type', headerName: 'Login Type', width: 150 },
+    { field: 'account_type', headerName: 'Account Type', width: 150 },
+    {
+      field: 'presence',
+      headerName: 'Presence',
+      width: 110,
+      renderCell: () => <Chip size='small' label='Online' color='success' variant='outlined' />
+    }
+  ]
 
-    return (
-        <Box sx={{ mt: 4, width: '100%' }}>
-        <AdminPageShell
-            title='Who is online now'
-            subtitle='Trainers and trainees currently connected. Data refreshes over the admin realtime channel.'
-            actions={
-                <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
-                    <Chip
-                        size='small'
-                        label={socketConnected ? 'Live · WebSocket' : 'Connecting…'}
-                        color={socketConnected ? 'success' : 'default'}
-                        variant={socketConnected ? 'filled' : 'outlined'}
-                    />
-                    <Button size='small' variant='outlined' onClick={() => void refreshOnlineUsers()}>
-                        Refresh from API
-                    </Button>
-                </Stack>
-            }
-            contentSx={{ p: 0 }}
-        >
-            <AdminPageSection>
-                <AdminFilterBar
-                    searchPlaceholder='Name…'
-                    onSearchChange={e => handleSearch(e.target.value)}
-                />
-                <AdminGridContainer>
-                    <AdminDataGrid
-                        autoHeight={false}
-                        rows={tableData ?? []}
-                        columns={columns}
-                    />
-                </AdminGridContainer>
-            </AdminPageSection>
-        </AdminPageShell>
-        </Box>
-    );
+  return (
+    <Box sx={{ mt: 4, width: '100%' }}>
+      <AdminPageShell
+        title='Who is online now'
+        subtitle='Trainers and trainees currently connected. Data refreshes over the admin realtime channel.'
+        actions={
+          <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
+            <Chip
+              size='small'
+              label={socketConnected ? 'Live · WebSocket' : 'Connecting…'}
+              color={socketConnected ? 'success' : 'default'}
+              variant={socketConnected ? 'filled' : 'outlined'}
+            />
+            <Button size='small' variant='outlined' onClick={() => void refreshOnlineUsers()}>
+              Refresh from API
+            </Button>
+          </Stack>
+        }
+        contentSx={{ p: 0 }}
+      >
+        <AdminPageSection>
+          <AdminFilterBar
+            searchPlaceholder='Name…'
+            searchValue={search}
+            onSearchChange={e => {
+              setSearch(e.target.value)
+              handleSearch(e.target.value)
+            }}
+            resultCount={tableData.length}
+          />
+          <AdminGridContainer>
+            <AdminDataGrid autoHeight={false} rows={tableData ?? []} columns={columns} />
+          </AdminGridContainer>
+        </AdminPageSection>
+      </AdminPageShell>
+    </Box>
+  )
 }

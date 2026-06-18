@@ -30,8 +30,9 @@ import VisibilityIcon from '@mui/icons-material/Visibility'
 import NextLink from 'next/link'
 import toast from 'react-hot-toast'
 
-import styles from 'styles/common.module.css'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminFilterBar from 'src/components/admin/AdminFilterBar'
+import { useAdminConfirm } from 'src/components/admin'
 import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
 import BannerCtaEditor from 'src/components/admin/content/BannerCtaEditor'
 import BannerPlacementPreview from 'src/components/admin/content/BannerPlacementPreview'
@@ -39,7 +40,6 @@ import CmsImageUploader from 'src/components/admin/content/CmsImageUploader'
 import { computeScheduleStatus, scheduleStatusChip } from 'src/components/admin/content/scheduleStatus'
 import { BANNERS_AUDIENCE_HELP } from 'src/components/admin/content/contentPlacementConfig'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
-import DeletePopup from 'src/pages/components/modal/DeletePopup'
 import {
   listBanners,
   createBanner,
@@ -112,6 +112,7 @@ function severityChip(s) {
 }
 
 export default function BannersPage() {
+  const { confirm, ConfirmDialog } = useAdminConfirm()
   const [banners, setBanners] = useState([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
@@ -127,8 +128,6 @@ export default function BannersPage() {
   const [editId, setEditId] = useState(null)
   const [form, setForm] = useState({ ...EMPTY_FORM })
   const [saving, setSaving] = useState(false)
-  const [deleteTarget, setDeleteTarget] = useState(null)
-  const [deleting, setDeleting] = useState(false)
   const [previewRow, setPreviewRow] = useState(null)
 
   const searchTimer = useRef(null)
@@ -263,18 +262,20 @@ export default function BannersPage() {
     }
   }
 
-  const handleDelete = async () => {
-    if (!deleteTarget) return
-    setDeleting(true)
+  const requestDelete = async row => {
+    const ok = await confirm({
+      title: 'Delete banner?',
+      message: `"${row.title}" will be removed from all mobile placements.`,
+      confirmLabel: 'Delete',
+      variant: 'danger'
+    })
+    if (!ok) return
     try {
-      await deleteBanner(deleteTarget._id)
+      await deleteBanner(row._id)
       toast.success('Banner deleted.')
-      setDeleteTarget(null)
       fetchData()
     } catch (err) {
       toast.error(err.message || 'Delete failed')
-    } finally {
-      setDeleting(false)
     }
   }
 
@@ -294,8 +295,6 @@ export default function BannersPage() {
         headerName: 'Title',
         flex: 1.6,
         minWidth: 240,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class'],
         renderCell: p => (
           <Box>
             <Typography fontWeight={600}>{p.value}</Typography>
@@ -310,8 +309,6 @@ export default function BannersPage() {
         field: 'schedule',
         headerName: 'Schedule',
         width: 110,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class'],
         renderCell: p => {
           const status = computeScheduleStatus(p.row)
           const meta = scheduleStatusChip(status)
@@ -323,16 +320,12 @@ export default function BannersPage() {
         field: 'placement',
         headerName: 'Placement',
         width: 130,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class'],
         renderCell: p => <Chip label={p.value || 'hero'} size='small' color='primary' variant='outlined' />
       },
       {
         field: 'audience',
         headerName: 'Audience',
         width: 200,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class'],
         renderCell: p => (
           <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
             {(p.value || []).map(a => (
@@ -345,16 +338,12 @@ export default function BannersPage() {
         field: 'severity',
         headerName: 'Severity',
         width: 120,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class'],
         renderCell: p => severityChip(p.value)
       },
       {
         field: 'is_active',
         headerName: 'Active',
         width: 100,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class'],
         renderCell: p => (
           <Switch
             size='small'
@@ -368,8 +357,6 @@ export default function BannersPage() {
         field: 'date_range',
         headerName: 'Window',
         width: 190,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class'],
         renderCell: p => {
           const s = p.row.start_date ? new Date(p.row.start_date).toLocaleDateString() : 'Always'
           const e = p.row.end_date ? new Date(p.row.end_date).toLocaleDateString() : 'Always'
@@ -382,8 +369,6 @@ export default function BannersPage() {
         headerName: 'Actions',
         width: 140,
         sortable: false,
-        headerClassName: styles['header-class-last'],
-        cellClassName: styles['cell-class-last'],
         renderCell: p => (
           <Box>
             <Tooltip title='Preview'>
@@ -414,7 +399,7 @@ export default function BannersPage() {
                 color='error'
                 onClick={e => {
                   e.stopPropagation()
-                  setDeleteTarget(p.row)
+                  void requestDelete(p.row)
                 }}
               >
                 <DeleteOutlineIcon fontSize='small' />
@@ -451,31 +436,15 @@ export default function BannersPage() {
       >
         <AdminPageSection>
           <ContentPlacementGuide kind='banners' />
-          <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', mb: 2 }}>
-            <TextField
-              size='small'
-              placeholder='Search title, body, CTA, audience…'
-              value={searchInput}
-              onChange={e => handleSearchChange(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter') applySearchImmediately()
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position='start'>
-                    <SearchIcon fontSize='small' />
-                  </InputAdornment>
-                ),
-                endAdornment: searchInput ? (
-                  <InputAdornment position='end'>
-                    <IconButton size='small' onClick={clearSearch} edge='end'>
-                      <CloseIcon fontSize='small' />
-                    </IconButton>
-                  </InputAdornment>
-                ) : null
-              }}
-              sx={{ width: { xs: '100%', sm: 320 } }}
-            />
+          <AdminFilterBar
+            searchPlaceholder='Search title, body, CTA, audience…'
+            searchValue={searchInput}
+            onSearchChange={e => handleSearchChange(e.target.value)}
+            onSearchSubmit={applySearchImmediately}
+            resultCount={total}
+            onRefresh={() => void fetchData()}
+            refreshLoading={loading}
+          >
             <FormControl size='small' sx={{ minWidth: 160 }}>
               <InputLabel>Audience</InputLabel>
               <Select
@@ -527,7 +496,7 @@ export default function BannersPage() {
                 <MenuItem value='inactive'>Inactive</MenuItem>
               </Select>
             </FormControl>
-          </Box>
+          </AdminFilterBar>
           <AdminDataGrid
             rows={banners}
             columns={columns}
@@ -539,7 +508,6 @@ export default function BannersPage() {
               setPage(m.page + 1)
               setPageSize(m.pageSize)
             }}
-            getRowClassName={p => (p.indexRelativeToCurrentPage % 2 === 0 ? styles['even-row'] : styles['odd-row'])}
             sx={{ '& .MuiDataGrid-cell': { py: 1 } }}
             getRowHeight={() => 72}
           />
@@ -776,12 +744,7 @@ export default function BannersPage() {
         </DialogActions>
       </Dialog>
 
-      <DeletePopup
-        open={!!deleteTarget}
-        handleClose={() => setDeleteTarget(null)}
-        onConform={handleDelete}
-        isLoading={deleting}
-      />
+      {ConfirmDialog}
     </>
   )
 }

@@ -9,8 +9,6 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
-import Tab from '@mui/material/Tab'
-import Tabs from '@mui/material/Tabs'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import toast from 'react-hot-toast'
@@ -18,6 +16,8 @@ import { AbilityContext } from 'src/layouts/components/acl/Can'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminGridContainer from 'src/components/admin/AdminGridContainer'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
+import AdminTabs from 'src/components/admin/AdminTabs'
+import { useAdminConfirm } from 'src/components/admin/useAdminConfirm'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import {
   getFinanceLedger,
@@ -85,6 +85,7 @@ async function runReconcile(label, fn, onDone) {
 const FinancePage = () => {
   const router = useRouter()
   const ability = useContext(AbilityContext)
+  const { confirm, ConfirmDialog } = useAdminConfirm()
   const canRefund = ability?.can('update', 'admin-action-refund') ?? true
   const [tab, setTab] = useState(TAB.LEDGER)
   const [page, setPage] = useState(1)
@@ -264,6 +265,14 @@ const FinancePage = () => {
             <Button
               size='small'
               onClick={async () => {
+                const ok = await confirm({
+                  title: 'Release escrow to trainer?',
+                  message: 'Held funds will be released from escrow for this session.',
+                  detail: `Hold ID: ${params.row._id}`,
+                  confirmLabel: 'Release',
+                  variant: 'warning'
+                })
+                if (!ok) return
                 try {
                   await releaseEscrowHold(params.row._id, 'admin_release')
                   toast.success('Escrow released')
@@ -279,6 +288,14 @@ const FinancePage = () => {
               size='small'
               color='warning'
               onClick={async () => {
+                const ok = await confirm({
+                  title: 'Refund escrow to trainee?',
+                  message: 'This starts a refund from held escrow back to the trainee wallet or card.',
+                  detail: `Hold ID: ${params.row._id}`,
+                  confirmLabel: 'Refund',
+                  variant: 'danger'
+                })
+                if (!ok) return
                 try {
                   await refundEscrowHold(params.row._id, 'admin_refund')
                   toast.success('Escrow refund started')
@@ -360,6 +377,14 @@ const FinancePage = () => {
           <Button
             size='small'
             onClick={async () => {
+              const ok = await confirm({
+                title: 'Approve trainer payout?',
+                message: 'Funds will be sent to the trainer per the payout preference on file.',
+                detail: `Payout ID: ${params.row._id}`,
+                confirmLabel: 'Approve',
+                variant: 'warning'
+              })
+              if (!ok) return
               try {
                 await approvePayout(params.row._id)
                 toast.success('Payout approved')
@@ -565,11 +590,11 @@ const FinancePage = () => {
           </Stack>
         ) : null}
 
-        <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}>
-          {tabLabels.map(label => (
-            <Tab key={label} label={label} />
-          ))}
-        </Tabs>
+        <AdminTabs
+          value={tab}
+          onChange={setTab}
+          tabs={tabLabels.map((label, index) => ({ value: index, label }))}
+        />
         <Stack direction='row' spacing={1} sx={{ mb: 2, alignItems: 'center' }}>
           <Button size='small' disabled={page <= 1 || loading} onClick={() => setPage(p => Math.max(1, p - 1))}>
             Previous
@@ -757,6 +782,7 @@ const FinancePage = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      {ConfirmDialog}
     </AdminPageShell>
   )
 }

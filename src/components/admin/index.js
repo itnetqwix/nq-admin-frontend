@@ -1,5 +1,13 @@
+/**
+ * Standard admin UI kit — use across all `/apps/*` pages instead of
+ * `common.module.css`, raw MUI Tabs, `window.confirm`, and legacy modals.
+ */
 export { default as AdminDataGrid } from './AdminDataGrid'
 export { default as AdminGridContainer, ADMIN_LIST_GRID_HEIGHT } from './AdminGridContainer'
 export { AdminLoadingState, AdminMasterDetailSkeleton } from './AdminLoadingState'
 export { default as AdminRefreshButton } from './AdminRefreshButton'
 export { default as AdminFilterBar } from './AdminFilterBar'
+export { default as AdminConfirmDialog } from './AdminConfirmDialog'
+export { default as AdminEmptyState } from './AdminEmptyState'
+export { default as AdminTabs } from './AdminTabs'
+export { useAdminConfirm } from './useAdminConfirm'

@@ -11,6 +11,7 @@ import AddIcon from '@mui/icons-material/Add'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import toast from 'react-hot-toast'
 
+import { useAdminConfirm } from 'src/components/admin'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import { getAdminFaq, publishAdminFaq, seedAdminFaq } from 'src/services/cmsApi'
 
@@ -49,6 +50,7 @@ function fromApi(data) {
 }
 
 export default function CmsFaqPage() {
+  const { confirm, ConfirmDialog } = useAdminConfirm()
   const [sections, setSections] = useState([emptySection()])
   const [version, setVersion] = useState(0)
   const [saving, setSaving] = useState(false)
@@ -87,17 +89,39 @@ export default function CmsFaqPage() {
   }
 
   const addSection = () => setSections(prev => [...prev, emptySection()])
-  const removeSection = si => setSections(prev => prev.filter((_, i) => i !== si))
+
+  const removeSection = async si => {
+    const title = sections[si]?.title || `Section ${si + 1}`
+    const ok = await confirm({
+      title: 'Remove FAQ section?',
+      message: `"${title}" and all its questions will be removed from the draft.`,
+      confirmLabel: 'Remove',
+      variant: 'danger'
+    })
+    if (!ok) return
+    setSections(prev => prev.filter((_, i) => i !== si))
+  }
+
   const addItem = si =>
     setSections(prev =>
       prev.map((s, i) => (i === si ? { ...s, items: [...s.items, emptyItem()] } : s))
     )
-  const removeItem = (si, ii) =>
+
+  const removeItem = async (si, ii) => {
+    const question = sections[si]?.items?.[ii]?.q || 'this question'
+    const ok = await confirm({
+      title: 'Remove question?',
+      message: `"${question.slice(0, 80)}${question.length > 80 ? '…' : ''}" will be removed from the draft.`,
+      confirmLabel: 'Remove',
+      variant: 'warning'
+    })
+    if (!ok) return
     setSections(prev =>
       prev.map((s, i) =>
         i === si ? { ...s, items: s.items.filter((_, j) => j !== ii) } : s
       )
     )
+  }
 
   const handlePublish = async () => {
     const payload = toApiSections(sections)
@@ -105,6 +129,14 @@ export default function CmsFaqPage() {
       toast.error('Add at least one section with a question and answer.')
       return
     }
+    const ok = await confirm({
+      title: 'Publish FAQ to all apps?',
+      message: 'Live FAQ content will be replaced. Signed-in users refresh instantly.',
+      detail: `${payload.length} section(s) · version ${version || 'new'}`,
+      confirmLabel: 'Publish',
+      variant: 'warning'
+    })
+    if (!ok) return
     setSaving(true)
     try {
       await publishAdminFaq({ sections: payload, is_active: true })
@@ -118,9 +150,13 @@ export default function CmsFaqPage() {
   }
 
   const handleSeed = async () => {
-    if (!window.confirm('Import default FAQ from the mobile app bundle? Existing content will be overwritten.')) {
-      return
-    }
+    const ok = await confirm({
+      title: 'Import default FAQ?',
+      message: 'This loads the bundled mobile app defaults and overwrites your current draft.',
+      confirmLabel: 'Import',
+      variant: 'danger'
+    })
+    if (!ok) return
     setSeeding(true)
     try {
       await seedAdminFaq({ force: true })
@@ -144,13 +180,13 @@ export default function CmsFaqPage() {
           next manifest poll (~60s).
         </Typography>
         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 3 }}>
-          <Button variant='outlined' onClick={handleSeed} disabled={seeding}>
+          <Button variant='outlined' onClick={() => void handleSeed()} disabled={seeding}>
             {seeding ? 'Importing…' : 'Import app defaults'}
           </Button>
           <Button variant='outlined' startIcon={<AddIcon />} onClick={addSection}>
             Add section
           </Button>
-          <Button variant='contained' onClick={handlePublish} disabled={saving}>
+          <Button variant='contained' onClick={() => void handlePublish()} disabled={saving}>
             {saving ? 'Publishing…' : 'Publish to app'}
           </Button>
         </Box>
@@ -166,7 +202,7 @@ export default function CmsFaqPage() {
                 onChange={e => updateSection(si, 'title', e.target.value)}
               />
               {sections.length > 1 ? (
-                <IconButton color='error' onClick={() => removeSection(si)} aria-label='Remove section'>
+                <IconButton color='error' onClick={() => void removeSection(si)} aria-label='Remove section'>
                   <DeleteOutlineIcon />
                 </IconButton>
               ) : null}
@@ -195,7 +231,7 @@ export default function CmsFaqPage() {
                     Add question
                   </Button>
                   {(sec.items || []).length > 1 ? (
-                    <Button size='small' color='error' onClick={() => removeItem(si, ii)}>
+                    <Button size='small' color='error' onClick={() => void removeItem(si, ii)}>
                       Remove
                     </Button>
                   ) : null}
@@ -206,6 +242,7 @@ export default function CmsFaqPage() {
           </Box>
         ))}
       </AdminPageSection>
+      {ConfirmDialog}
     </AdminPageShell>
   )
 }

@@ -12,6 +12,7 @@ export default function AdminPageShell({
   title,
   subtitle,
   actions,
+  action,
   children,
   contentSx = {},
   loading = false,
@@ -19,6 +20,7 @@ export default function AdminPageShell({
   /** Dashboard-style pages: no outer card wrapper */
   bare = false
 }) {
+  const headerActions = actions ?? action
   const header = (
     <Stack
       direction={{ xs: 'column', sm: 'row' }}
@@ -40,7 +42,7 @@ export default function AdminPageShell({
           </Typography>
         ) : null}
       </Box>
-      {actions ? <Box sx={{ flexShrink: 0 }}>{actions}</Box> : null}
+      {headerActions ? <Box sx={{ flexShrink: 0 }}>{headerActions}</Box> : null}
     </Stack>
   )
 
@@ -74,16 +76,23 @@ export default function AdminPageShell({
   )
 }
 
-export function AdminPageSection({ title, children, withDivider = false, action }) {
+export function AdminPageSection({ title, description, children, withDivider = false, action }) {
   return (
     <>
       {withDivider ? <Divider /> : null}
       <Box sx={{ p: { xs: 2, sm: 3 } }}>
         {title ? (
-          <Stack direction='row' alignItems='center' justifyContent='space-between' sx={{ mb: 2 }}>
-            <Typography variant='subtitle1' fontWeight={700}>
-              {title}
-            </Typography>
+          <Stack direction='row' alignItems='flex-start' justifyContent='space-between' sx={{ mb: description ? 1 : 2 }}>
+            <Box>
+              <Typography variant='subtitle1' fontWeight={700}>
+                {title}
+              </Typography>
+              {description ? (
+                <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5, maxWidth: 720, lineHeight: 1.6 }}>
+                  {description}
+                </Typography>
+              ) : null}
+            </Box>
             {action}
           </Stack>
         ) : null}

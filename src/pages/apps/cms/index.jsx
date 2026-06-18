@@ -67,9 +67,9 @@ export default function CmsOverviewPage() {
 
   return (
     <AdminPageShell
-      title='Content & ads'
+      title='Mobile content'
       subtitle='Manage marketplace home placements on the mobile app. Changes publish via CMS_UPDATED socket.'
-      action={
+      actions={
         <Button variant='outlined' startIcon={<RefreshIcon />} onClick={load} disabled={loading}>
           Refresh
         </Button>

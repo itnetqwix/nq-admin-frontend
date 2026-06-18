@@ -44,20 +44,27 @@ const navigation = () => [
         icon: 'mdi:account-school-outline',
         action: 'read',
         subject: 'admin-nav-trainees'
+      },
+      {
+        title: 'Account deletions',
+        path: '/apps/account-deletions',
+        icon: 'mdi:account-remove-outline',
+        action: 'read',
+        subject: 'admin-nav-account-deletions'
       }
     ]
   },
-  { sectionTitle: 'Content & ads', auth: false },
+  { sectionTitle: 'Mobile content', auth: false },
   {
-    title: 'CMS',
-    icon: 'mdi:view-dashboard-edit-outline',
+    title: 'CMS & placements',
+    icon: 'mdi:cellphone-cog',
     action: 'read',
     subject: 'admin-nav-content',
     children: [
       {
         title: 'Overview',
         path: '/apps/cms',
-        icon: 'mdi:view-grid-outline',
+        icon: 'mdi:view-dashboard-outline',
         action: 'read',
         subject: 'admin-nav-cms-overview'
       },
@@ -83,18 +90,18 @@ const navigation = () => [
         subject: 'admin-nav-cms-blog'
       },
       {
-        title: 'Legal',
-        path: '/apps/cms-legal',
-        icon: 'mdi:file-document-outline',
-        action: 'read',
-        subject: 'admin-nav-cms-legal'
-      },
-      {
         title: 'FAQ',
         path: '/apps/cms-faq',
         icon: 'mdi:help-circle-outline',
         action: 'read',
         subject: 'admin-nav-cms-faq'
+      },
+      {
+        title: 'Legal',
+        path: '/apps/cms-legal',
+        icon: 'mdi:file-document-outline',
+        action: 'read',
+        subject: 'admin-nav-cms-legal'
       }
     ]
   },
@@ -185,57 +192,6 @@ const navigation = () => [
         icon: 'mdi:alert-circle-outline',
         action: 'read',
         subject: 'admin-nav-ops-logs'
-      }
-    ]
-  },
-  { sectionTitle: 'Content (CMS)', auth: false },
-  {
-    title: 'Mobile content',
-    icon: 'mdi:cellphone-cog',
-    action: 'read',
-    subject: 'admin-nav-cms',
-    children: [
-      {
-        title: 'Overview',
-        path: '/apps/cms',
-        icon: 'mdi:view-dashboard-outline',
-        action: 'read',
-        subject: 'admin-nav-cms'
-      },
-      {
-        title: 'Banners',
-        path: '/apps/banners',
-        icon: 'mdi:image-multiple-outline',
-        action: 'read',
-        subject: 'admin-nav-cms-banners'
-      },
-      {
-        title: 'Tips',
-        path: '/apps/tips',
-        icon: 'mdi:lightbulb-on-outline',
-        action: 'read',
-        subject: 'admin-nav-cms-tips'
-      },
-      {
-        title: 'Blog & pages',
-        path: '/apps/cms-blog',
-        icon: 'mdi:post-outline',
-        action: 'read',
-        subject: 'admin-nav-cms-blog'
-      },
-      {
-        title: 'FAQ',
-        path: '/apps/cms-faq',
-        icon: 'mdi:frequently-asked-questions',
-        action: 'read',
-        subject: 'admin-nav-cms-faq'
-      },
-      {
-        title: 'Legal (terms & privacy)',
-        path: '/apps/cms-legal',
-        icon: 'mdi:gavel',
-        action: 'read',
-        subject: 'admin-nav-cms-legal'
       }
     ]
   },

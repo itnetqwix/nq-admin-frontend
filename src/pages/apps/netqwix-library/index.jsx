@@ -17,6 +17,7 @@ import {
 import toast from 'react-hot-toast'
 import { AdminLoadingState } from 'src/components/admin/AdminLoadingState'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
+import { useAdminConfirm } from 'src/components/admin'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import {
   confirmLibraryClip,
@@ -82,6 +83,7 @@ function captureVideoThumbnail(file) {
 }
 
 export default function NetqwixLibraryPage() {
+  const { confirm, ConfirmDialog } = useAdminConfirm()
   const [groups, setGroups] = useState([])
   const [taxonomy, setTaxonomy] = useState([])
   const [title, setTitle] = useState('')
@@ -140,6 +142,17 @@ export default function NetqwixLibraryPage() {
       toast.error('Video must be 50 MB or smaller')
       return
     }
+
+    const catName = activeCategories.find(c => (c.id || c._id) === categoryId)?.name
+    const subName = subs.find(s => (s.id || s._id) === subcategoryId)?.name
+    const ok = await confirm({
+      title: 'Publish clip to library?',
+      message: 'This uploads and publishes the video to the public NetQwix library.',
+      detail: `"${title.trim()}" → ${catName} › ${subName}`,
+      confirmLabel: 'Publish',
+      variant: 'warning'
+    })
+    if (!ok) return
 
     setUploading(true)
     try {
@@ -359,6 +372,7 @@ export default function NetqwixLibraryPage() {
           ))
         )}
       </AdminPageSection>
+      {ConfirmDialog}
     </AdminPageShell>
   )
 }

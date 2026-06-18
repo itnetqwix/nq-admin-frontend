@@ -18,7 +18,6 @@ import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminFilterBar from 'src/components/admin/AdminFilterBar'
 import { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import { listBroadcasts } from 'src/services/broadcastApi'
-import styles from 'styles/common.module.css'
 import { HISTORY_STATUS_FILTERS, STATUS_COLORS } from './constants'
 import { deliverySuccessRate, formatDateTime } from './utils'
 
@@ -97,22 +96,16 @@ export default function BroadcastHistory({
         headerName: 'Title',
         flex: 1.2,
         minWidth: 180,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class']
       },
       {
         field: 'audience',
         headerName: 'Audience',
         width: 100,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class']
       },
       {
         field: 'channels',
         headerName: 'Channels',
         width: 200,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class'],
         renderCell: p => (
           <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', py: 0.5 }}>
             {(p.value || []).map(ch => (
@@ -125,8 +118,6 @@ export default function BroadcastHistory({
         field: 'status',
         headerName: 'Status',
         width: 120,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class'],
         renderCell: p => (
           <Stack spacing={0.5}>
             <Chip label={p.value} size='small' color={STATUS_COLORS[p.value] || 'default'} />
@@ -138,8 +129,6 @@ export default function BroadcastHistory({
         field: 'stats',
         headerName: 'Delivery',
         width: 130,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class'],
         renderCell: p => {
           const rate = deliverySuccessRate(p.value, p.row.channels)
           const totalRecipients = p.value?.total_recipients ?? 0
@@ -163,16 +152,12 @@ export default function BroadcastHistory({
         field: 'created_by',
         headerName: 'Sent by',
         width: 140,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class'],
         renderCell: p => p.row.created_by?.fullname || p.row.created_by?.email || '—'
       },
       {
         field: 'sent_at',
         headerName: 'Sent',
         width: 165,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class'],
         renderCell: p => formatDateTime(p.value)
       },
       {
@@ -180,8 +165,6 @@ export default function BroadcastHistory({
         headerName: 'Actions',
         width: 160,
         sortable: false,
-        headerClassName: styles['header-class-last'],
-        cellClassName: styles['cell-class-last'],
         renderCell: p => (
           <Box>
             <Tooltip title='View details'>
@@ -266,7 +249,6 @@ export default function BroadcastHistory({
           setPageSize(m.pageSize)
         }}
         onRowClick={p => onView(p.row)}
-        getRowClassName={p => (p.indexRelativeToCurrentPage % 2 === 0 ? styles['even-row'] : styles['odd-row'])}
         sx={{ '& .MuiDataGrid-row': { cursor: 'pointer' } }}
       />
 

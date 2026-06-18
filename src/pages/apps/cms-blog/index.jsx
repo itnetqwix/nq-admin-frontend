@@ -22,6 +22,8 @@ import NextLink from 'next/link'
 import toast from 'react-hot-toast'
 
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminFilterBar from 'src/components/admin/AdminFilterBar'
+import { useAdminConfirm } from 'src/components/admin'
 import CmsImageUploader from 'src/components/admin/content/CmsImageUploader'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import {
@@ -66,6 +68,7 @@ function audienceChip(audience) {
 }
 
 export default function CmsBlogPage() {
+  const { confirm, ConfirmDialog } = useAdminConfirm()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
   const [typeFilter, setTypeFilter] = useState('')
@@ -193,7 +196,14 @@ export default function CmsBlogPage() {
             size='small'
             color='error'
             onClick={async () => {
-              if (!window.confirm('Delete this page?')) return
+              const ok = await confirm({
+                title: 'Delete this page?',
+                message: 'The blog or static page will be removed from the mobile app.',
+                detail: row.title,
+                confirmLabel: 'Delete',
+                variant: 'danger'
+              })
+              if (!ok) return
               await deleteCmsPage(row._id)
               await load()
             }}
@@ -224,8 +234,8 @@ export default function CmsBlogPage() {
       }
     >
       <AdminPageSection>
-        <Box sx={{ mb: 2, maxWidth: 220 }}>
-          <FormControl fullWidth size='small'>
+        <AdminFilterBar onRefresh={() => void load()} refreshLoading={loading} resultCount={rows.length}>
+          <FormControl fullWidth size='small' sx={{ minWidth: 200 }}>
             <InputLabel>Filter type</InputLabel>
             <Select label='Filter type' value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
               <MenuItem value=''>All</MenuItem>
@@ -233,7 +243,7 @@ export default function CmsBlogPage() {
               <MenuItem value='page'>Page</MenuItem>
             </Select>
           </FormControl>
-        </Box>
+        </AdminFilterBar>
         <AdminDataGrid rows={rows} columns={columns} loading={loading} getRowId={r => r._id} autoHeight />
       </AdminPageSection>
 
@@ -390,6 +400,7 @@ export default function CmsBlogPage() {
           </Button>
         </DialogActions>
       </Dialog>
+      {ConfirmDialog}
     </AdminPageShell>
   )
 }

@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box'
 import LinearProgress from '@mui/material/LinearProgress'
-import Typography from '@mui/material/Typography'
 import { DataGrid } from '@mui/x-data-grid'
+import AdminEmptyState from './AdminEmptyState'
 
 function GridLoadingBar() {
   return (
@@ -16,29 +16,38 @@ const defaultSx = {
   '& .MuiDataGrid-columnHeaders': {
     bgcolor: 'action.hover',
     borderRadius: 0,
-    fontSize: '0.8125rem',
-    fontWeight: 600
+    fontSize: '0.75rem',
+    fontWeight: 700,
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase'
   },
   '& .MuiDataGrid-cell': {
     borderColor: 'divider',
-    fontSize: '0.875rem'
+    fontSize: '0.875rem',
+    lineHeight: 1.45
+  },
+  '& .MuiDataGrid-row:nth-of-type(even)': {
+    bgcolor: 'action.hover'
   },
   '& .MuiDataGrid-row:hover': {
-    bgcolor: 'action.hover'
+    bgcolor: theme => `${theme.palette.primary.main}08`
   },
   '& .MuiDataGrid-footerContainer': {
     borderTop: '1px solid',
-    borderColor: 'divider'
+    borderColor: 'divider',
+    minHeight: 52
   }
 }
 
-function NoRowsOverlay({ message }) {
+function NoRowsOverlay({ message, description, onAction, actionLabel }) {
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', p: 3 }}>
-      <Typography variant='body2' color='text.secondary'>
-        {message}
-      </Typography>
-    </Box>
+    <AdminEmptyState
+      compact
+      title={message}
+      description={description}
+      actionLabel={actionLabel}
+      onAction={onAction}
+    />
   )
 }
 
@@ -47,9 +56,13 @@ function NoRowsOverlay({ message }) {
  */
 export default function AdminDataGrid({
   loading,
-  emptyMessage = 'No records found.',
+  emptyMessage = 'No records found',
+  emptyDescription = 'Try adjusting filters or refresh the list.',
+  emptyActionLabel,
+  onEmptyAction,
   autoHeight = true,
   clickableRows = false,
+  density = 'comfortable',
   slots,
   slotProps,
   sx,
@@ -59,13 +72,21 @@ export default function AdminDataGrid({
   return (
     <DataGrid
       autoHeight={autoHeight}
+      density={density}
       disableRowSelectionOnClick
       pageSizeOptions={[25, 50, 100]}
       initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
       loading={loading}
       slots={{
         loadingOverlay: GridLoadingBar,
-        noRowsOverlay: () => <NoRowsOverlay message={emptyMessage} />,
+        noRowsOverlay: () => (
+          <NoRowsOverlay
+            message={emptyMessage}
+            description={emptyDescription}
+            actionLabel={emptyActionLabel}
+            onAction={onEmptyAction}
+          />
+        ),
         ...slots
       }}
       slotProps={{ ...slotProps }}

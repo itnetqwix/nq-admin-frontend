@@ -1,12 +1,11 @@
-import { Box, Button, Grid, TextField } from '@mui/material'
-import Stack from '@mui/material/Stack'
+import { Button, Stack } from '@mui/material'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminFilterBar from 'src/components/admin/AdminFilterBar'
 import AdminGridContainer from 'src/components/admin/AdminGridContainer'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
-import styles from 'styles/common.module.css'
 import { getAuditLogs } from 'src/services/user360Api'
 import moment from 'moment'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
@@ -83,22 +82,20 @@ export default function AuditLogsPage() {
       field: 'at',
       headerName: 'When',
       width: 180,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
       valueFormatter: p => (p.value ? moment(p.value).format('YYYY-MM-DD HH:mm') : '')
     },
-    { field: 'action', headerName: 'Action', width: 120, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
-    { field: 'entity_type', headerName: 'Entity', width: 130, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
-    { field: 'entity_id', headerName: 'Entity ID', width: 220, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
-    { field: 'adminLabel', headerName: 'Admin', width: 160, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
-    { field: 'targetLabel', headerName: 'Target user', width: 160, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
-    { field: 'reason', headerName: 'Reason', flex: 1, minWidth: 160, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] }
+    { field: 'action', headerName: 'Action', width: 120 },
+    { field: 'entity_type', headerName: 'Entity', width: 130 },
+    { field: 'entity_id', headerName: 'Entity ID', width: 220 },
+    { field: 'adminLabel', headerName: 'Admin', width: 160 },
+    { field: 'targetLabel', headerName: 'Target user', width: 160 },
+    { field: 'reason', headerName: 'Reason', flex: 1, minWidth: 160 }
   ]
 
   return (
     <AdminPageShell
       title='Audit log'
-      subtitle='Admin actions (deletes, refunds, and more). Search, refresh, or export CSV.'
+      subtitle='Admin actions (deletes, refunds, wallet adjustments, and more). Search, refresh, or export CSV.'
       actions={
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
           <AdminRefreshButton onClick={() => void load()} loading={loading} />
@@ -110,18 +107,19 @@ export default function AuditLogsPage() {
       contentSx={{ p: 0 }}
     >
       <AdminPageSection>
-        <Grid container spacing={2} sx={{ mb: 2 }}>
-          <Grid item xs={12} md={8}>
-            <TextField
-              size='small'
-              fullWidth
-              label='Search (reason, action, entity type, id)'
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && void load()}
-            />
-          </Grid>
-        </Grid>
+        <AdminFilterBar
+          searchPlaceholder='Search reason, action, entity type, or ID'
+          searchValue={search}
+          onSearchChange={e => setSearch(e.target.value)}
+          onSearchSubmit={() => {
+            setPage(0)
+            void load()
+          }}
+          onRefresh={() => void load()}
+          refreshLoading={loading}
+          resultCount={total}
+          helperText='Press Enter to search. Filter by user via User 360 deep links.'
+        />
         <AdminGridContainer>
           <AdminDataGrid
             autoHeight={false}
@@ -135,7 +133,14 @@ export default function AuditLogsPage() {
               setPage(m.page)
               setPageSize(m.pageSize)
             }}
-            emptyMessage='No audit events match your search.'
+            emptyMessage='No audit events match your search'
+            emptyDescription='Try a broader keyword or clear filters.'
+            onEmptyAction={() => {
+              setSearch('')
+              setPage(0)
+              void load()
+            }}
+            emptyActionLabel='Clear search'
           />
         </AdminGridContainer>
       </AdminPageSection>

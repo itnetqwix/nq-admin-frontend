@@ -27,6 +27,7 @@ const defineRulesFor = (role, user) => {
   if (ok('nav_trainers') || ok('nav_trainer_verifications')) can('read', 'admin-nav-trainer-verifications')
   if (ok('nav_trainers')) can('read', 'admin-nav-trainers')
   if (ok('nav_trainees')) can('read', 'admin-nav-trainees')
+  if (ok('nav_trainees')) can('read', 'admin-nav-account-deletions')
   if (ok('nav_bookings')) can('read', 'admin-nav-bookings')
   if (ok('nav_user_feedback')) can('read', 'admin-nav-user-feedback')
   if (ok('nav_support_tickets')) can('read', 'admin-nav-support-tickets')
@@ -59,6 +60,7 @@ const defineRulesFor = (role, user) => {
     can('read', 'admin-nav-trainer-verifications')
     can('read', 'admin-nav-trainers')
     can('read', 'admin-nav-trainees')
+    can('read', 'admin-nav-account-deletions')
   }
   if (ok('nav_clips')) {
     can('read', 'admin-nav-clips-library')

@@ -1,0 +1,42 @@
+---
+description: Admin panel UI standards — shared components, confirmations, tables
+globs: src/pages/apps/**/*.{js,jsx},src/components/admin/**/*.{js,jsx},src/views/**/*
+alwaysApply: false
+---
+
+# Admin UI kit (`src/components/admin/`)
+
+When adding or editing admin pages under `src/pages/apps/`:
+
+## Use these (required)
+
+- **Layout**: `AdminPageShell` + `AdminPageSection` from `src/layouts/components/AdminPageShell`
+- **Tables**: `AdminDataGrid` + `AdminGridContainer` — zebra/empty states are built in
+- **Filters**: `AdminFilterBar` (search, result count, refresh, filter `children`)
+- **Tabs**: `AdminTabs` — not raw MUI `Tabs` on list/settings pages
+- **Confirmations**: `useAdminConfirm()` — not `window.confirm`, not bespoke delete dialogs
+- **Destructive actions**: `variant: 'danger'`; publish/sensitive: `'warning'`
+
+```jsx
+import {
+  AdminDataGrid,
+  AdminFilterBar,
+  AdminGridContainer,
+  AdminTabs,
+  useAdminConfirm
+} from 'src/components/admin'
+
+const { confirm, ConfirmDialog } = useAdminConfirm()
+// await confirm({ title, message, detail, confirmLabel, variant })
+// render: {ConfirmDialog}
+```
+
+## Avoid
+
+- `styles/common.module.css` grid classes (`header-class`, `even-row`, `status-booking`)
+- Legacy `DeletePopup` / `Modal.jsx` for new flows (use MUI `Dialog` or `useAdminConfirm`)
+- Manual zebra `getRowClassName` on `AdminDataGrid`
+
+## Reference pages
+
+- Finance, audit-logs, bookings, banners, pricing — migrated patterns

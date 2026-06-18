@@ -5,10 +5,10 @@ import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
-import Tab from '@mui/material/Tab'
-import Tabs from '@mui/material/Tabs'
 import Typography from '@mui/material/Typography'
 import AdminPageShell from 'src/layouts/components/AdminPageShell'
+import AdminTabs from 'src/components/admin/AdminTabs'
+import { useAdminConfirm } from 'src/components/admin'
 import { AbilityContext } from 'src/layouts/components/acl/Can'
 import { usePricingConfig } from 'src/hooks/usePricingConfig'
 import PricingDashboardTab from './components/PricingDashboardTab'
@@ -21,6 +21,7 @@ const TAB_LABELS = ['Overview', 'Rates & fees', 'Profit check', 'History']
 const PricingPage = () => {
   const ability = useContext(AbilityContext)
   const canEdit = ability?.can('update', 'admin-action-pricing') ?? true
+  const { confirm, ConfirmDialog } = useAdminConfirm()
   const [tab, setTab] = useState(0)
 
   const {
@@ -37,6 +38,39 @@ const PricingPage = () => {
     patchStoragePlan,
     patchGlobal
   } = usePricingConfig()
+
+  const confirmReset = async () => {
+    const ok = await confirm({
+      title: 'Load default pricing?',
+      message: 'All unsaved edits will be replaced with platform defaults.',
+      confirmLabel: 'Load defaults',
+      variant: 'danger'
+    })
+    if (!ok) return
+    void resetToDefaults()
+  }
+
+  const confirmDiscard = async () => {
+    const ok = await confirm({
+      title: 'Discard unsaved changes?',
+      message: 'Your edits on this page will be reverted to the last saved version.',
+      confirmLabel: 'Discard',
+      variant: 'warning'
+    })
+    if (!ok) return
+    discard()
+  }
+
+  const confirmSave = async () => {
+    const ok = await confirm({
+      title: 'Save pricing changes?',
+      message: 'New rates apply to future checkouts and sessions.',
+      confirmLabel: 'Save',
+      variant: 'warning'
+    })
+    if (!ok) return
+    void save()
+  }
 
   if (loading || !config) {
     return (
@@ -55,13 +89,13 @@ const PricingPage = () => {
           <Stack direction='row' spacing={1} flexWrap='wrap'>
             {canEdit ? (
               <>
-                <Button variant='outlined' color='inherit' onClick={() => void resetToDefaults()} disabled={saving}>
+                <Button variant='outlined' color='inherit' onClick={() => void confirmReset()} disabled={saving}>
                   Load defaults
                 </Button>
-                <Button variant='outlined' onClick={discard} disabled={!isDirty || saving}>
+                <Button variant='outlined' onClick={() => void confirmDiscard()} disabled={!isDirty || saving}>
                   Discard
                 </Button>
-                <Button variant='contained' onClick={() => void save()} disabled={!isDirty || saving}>
+                <Button variant='contained' onClick={() => void confirmSave()} disabled={!isDirty || saving}>
                   {saving ? 'Saving…' : 'Save changes'}
                 </Button>
               </>
@@ -77,15 +111,12 @@ const PricingPage = () => {
           </Alert>
         ) : null}
 
-        <Tabs
+        <AdminTabs
           value={tab}
-          onChange={(_, v) => setTab(v)}
-          sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}
-        >
-          {TAB_LABELS.map(label => (
-            <Tab key={label} label={label} />
-          ))}
-        </Tabs>
+          onChange={setTab}
+          tabs={TAB_LABELS.map((label, i) => ({ value: i, label }))}
+          sx={{ mb: 3 }}
+        />
 
         {tab === 0 ? <PricingDashboardTab config={config} onGoTab={setTab} /> : null}
         {tab === 1 ? (
@@ -123,16 +154,18 @@ const PricingPage = () => {
               Unsaved pricing changes
             </Typography>
             <Stack direction='row' spacing={1}>
-              <Button size='small' onClick={discard} disabled={saving}>
+              <Button size='small' onClick={() => void confirmDiscard()} disabled={saving}>
                 Discard
               </Button>
-              <Button size='small' variant='contained' onClick={() => void save()} disabled={saving}>
+              <Button size='small' variant='contained' onClick={() => void confirmSave()} disabled={saving}>
                 {saving ? 'Saving…' : 'Save now'}
               </Button>
             </Stack>
           </Stack>
         </Paper>
       ) : null}
+
+      {ConfirmDialog}
     </>
   )
 }

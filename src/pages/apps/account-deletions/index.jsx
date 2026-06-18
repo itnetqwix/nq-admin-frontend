@@ -19,8 +19,9 @@ import RestoreIcon from '@mui/icons-material/Restore'
 import NoteAddOutlinedIcon from '@mui/icons-material/NoteAddOutlined'
 import toast from 'react-hot-toast'
 
-import styles from 'styles/common.module.css'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminFilterBar from 'src/components/admin/AdminFilterBar'
+import { useAdminConfirm } from 'src/components/admin'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import {
   listAccountDeletions,
@@ -45,9 +46,11 @@ function daysLeft(deadline) {
 }
 
 export default function AccountDeletionsPage() {
+  const { confirm, ConfirmDialog } = useAdminConfirm()
   const [rows, setRows] = useState([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('confirmed')
   const [page, setPage] = useState(1)
@@ -83,6 +86,7 @@ export default function AccountDeletionsPage() {
 
   const handleSearchChange = e => {
     const val = e.target.value
+    setSearchInput(val)
     if (searchTimer.current) clearTimeout(searchTimer.current)
     searchTimer.current = setTimeout(() => {
       setSearch(val)
@@ -97,6 +101,14 @@ export default function AccountDeletionsPage() {
 
   const handleRestore = async () => {
     if (!restoreTarget) return
+    const ok = await confirm({
+      title: 'Restore account?',
+      message: 'The user can sign in again and will leave the deletion queue.',
+      detail: restoreTarget?.user_email_at_request || restoreTarget?.user_fullname_at_request,
+      confirmLabel: 'Restore',
+      variant: 'warning'
+    })
+    if (!ok) return
     setRestoring(true)
     try {
       await restoreAccountDeletion(restoreTarget._id, restoreNote)
@@ -137,8 +149,6 @@ export default function AccountDeletionsPage() {
         headerName: 'User',
         flex: 1.4,
         minWidth: 220,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class'],
         renderCell: p => (
           <Box>
             <Typography fontWeight={600}>{p.value || 'Unknown'}</Typography>
@@ -152,8 +162,6 @@ export default function AccountDeletionsPage() {
         field: 'status',
         headerName: 'Status',
         width: 130,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class'],
         renderCell: p => <Chip label={p.value} color={STATUS_COLOR[p.value] || 'default'} size='small' />
       },
       {
@@ -161,8 +169,6 @@ export default function AccountDeletionsPage() {
         headerName: 'Reason',
         flex: 1.2,
         minWidth: 200,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class'],
         renderCell: p => (
           <Tooltip title={p.value || ''}>
             <Typography variant='body2' noWrap>
@@ -175,16 +181,12 @@ export default function AccountDeletionsPage() {
         field: 'confirmed_at',
         headerName: 'Confirmed',
         width: 160,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class'],
         renderCell: p => (p.value ? new Date(p.value).toLocaleString() : '--')
       },
       {
         field: 'restore_deadline',
         headerName: 'Restore window',
         width: 150,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class'],
         renderCell: p => {
           if (!p.value) return '--'
           const left = daysLeft(p.value)
@@ -204,8 +206,6 @@ export default function AccountDeletionsPage() {
         headerName: 'Notes',
         flex: 1,
         minWidth: 180,
-        headerClassName: styles['header-class'],
-        cellClassName: styles['cell-class'],
         renderCell: p => (
           <Tooltip title={p.value || ''}>
             <Typography variant='body2' noWrap>
@@ -219,8 +219,6 @@ export default function AccountDeletionsPage() {
         headerName: 'Actions',
         width: 130,
         sortable: false,
-        headerClassName: styles['header-class-last'],
-        cellClassName: styles['cell-class-last'],
         renderCell: p => (
           <Box>
             {(p.row.status === 'confirmed' || p.row.status === 'pending') && (
@@ -267,13 +265,14 @@ export default function AccountDeletionsPage() {
         contentSx={{ p: 0 }}
       >
         <AdminPageSection>
-          <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', mb: 2 }}>
-            <TextField
-              size='small'
-              placeholder='Search by name, email, reason…'
-              onChange={handleSearchChange}
-              sx={{ width: { xs: '100%', sm: 320 } }}
-            />
+          <AdminFilterBar
+            searchPlaceholder='Search by name, email, reason…'
+            searchValue={searchInput}
+            onSearchChange={handleSearchChange}
+            resultCount={total}
+            onRefresh={() => void fetchData()}
+            refreshLoading={loading}
+          >
             <FormControl size='small' sx={{ minWidth: 200 }}>
               <InputLabel>Status</InputLabel>
               <Select
@@ -292,7 +291,7 @@ export default function AccountDeletionsPage() {
                 <MenuItem value='cancelled'>Cancelled</MenuItem>
               </Select>
             </FormControl>
-          </Box>
+          </AdminFilterBar>
           <AdminDataGrid
             rows={rows}
             columns={columns}
@@ -304,7 +303,6 @@ export default function AccountDeletionsPage() {
               setPage(m.page + 1)
               setPageSize(m.pageSize)
             }}
-            getRowClassName={p => (p.indexRelativeToCurrentPage % 2 === 0 ? styles['even-row'] : styles['odd-row'])}
             sx={{ '& .MuiDataGrid-cell': { py: 1 } }}
             getRowHeight={() => 72}
           />
@@ -370,6 +368,7 @@ export default function AccountDeletionsPage() {
           </Button>
         </DialogActions>
       </Dialog>
+      {ConfirmDialog}
     </>
   )
 }

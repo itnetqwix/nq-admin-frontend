@@ -15,13 +15,14 @@ import {
 } from '@mui/material'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminGridContainer from 'src/components/admin/AdminGridContainer'
+import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
+import { useAdminConfirm } from 'src/components/admin/useAdminConfirm'
 import { useRouter } from 'next/router'
 import moment from 'moment'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import { getOpsEventDetail, getOpsEvents, resolveOpsEvent } from 'src/services/opsApi'
-import styles from 'styles/common.module.css'
 
 const CATEGORIES = [
   'instant_lesson',
@@ -43,6 +44,7 @@ const severityColor = s => {
 
 export default function OpsLogsPage() {
   const router = useRouter()
+  const { confirm, ConfirmDialog } = useAdminConfirm()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
   const [total, setTotal] = useState(0)
@@ -115,6 +117,14 @@ export default function OpsLogsPage() {
 
   const handleResolve = async status => {
     if (!detail?.event) return
+    const ok = await confirm({
+      title: status === 'resolved' ? 'Mark event resolved?' : 'Update resolution status?',
+      message: 'This updates the ops event status for the support and engineering trail.',
+      detail: detail.event.title || detail.event.event_type,
+      confirmLabel: status === 'resolved' ? 'Resolve' : 'Update',
+      variant: status === 'wont_fix' ? 'danger' : 'warning'
+    })
+    if (!ok) return
     try {
       await resolveOpsEvent(detail.event.event_id || detail.event._id, {
         resolution_status: status,
@@ -150,11 +160,7 @@ export default function OpsLogsPage() {
     <AdminPageShell
       title='Operations log'
       subtitle='Unified issues: instant lessons, calls, wallet, support, and admin actions.'
-      actions={
-        <Button variant='outlined' onClick={() => void load()}>
-          Refresh
-        </Button>
-      }
+      actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}
       contentSx={{ p: 0 }}
     >
       <AdminPageSection>
@@ -237,9 +243,7 @@ export default function OpsLogsPage() {
               setPageSize(m.pageSize)
             }}
             onRowClick={p => void openDetail(p.row)}
-            getRowClassName={p =>
-              p.indexRelativeToCurrentPage % 2 === 0 ? `${styles['even-row']} ${styles['row-class']}` : `${styles['odd-row']} ${styles['row-class']}`
-            }
+            clickableRows
           />
         </AdminGridContainer>
       </AdminPageSection>
@@ -317,6 +321,7 @@ export default function OpsLogsPage() {
           </Stack>
         ) : null}
       </Drawer>
+      {ConfirmDialog}
     </AdminPageShell>
   )
 }

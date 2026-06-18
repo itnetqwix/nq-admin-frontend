@@ -13,13 +13,13 @@ import {
   MenuItem,
   Select,
   Stack,
-  Tab,
-  Tabs,
   TextField,
   Typography
 } from '@mui/material'
 import moment from 'moment'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminTabs from 'src/components/admin/AdminTabs'
+import { useAdminConfirm } from 'src/components/admin'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import SubmissionStatusChip from 'src/components/clips/SubmissionStatusChip'
@@ -57,6 +57,7 @@ function proposedLabel(sub) {
 }
 
 export default function LibrarySubmissionsPanel() {
+  const { confirm, ConfirmDialog } = useAdminConfirm()
   const [statusFilter, setStatusFilter] = useState('')
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
@@ -158,6 +159,16 @@ export default function LibrarySubmissionsPanel() {
       toast.error('Select category and subcategory for the library')
       return
     }
+    const catName = taxonomy.find(c => (c.id || c._id) === categoryId)?.name
+    const subName = subs.find(s => (s.id || s._id) === subcategoryId)?.name
+    const ok = await confirm({
+      title: 'Publish to NetQwix Library?',
+      message: 'This clip becomes publicly visible in the mobile app library.',
+      detail: `${drawer?.source_clip_id?.title || 'Clip'} → ${catName} › ${subName}`,
+      confirmLabel: 'Approve & publish',
+      variant: 'warning'
+    })
+    if (!ok) return
     setActing(true)
     try {
       await approveLibrarySubmission(drawer._id, categoryId, subcategoryId)
@@ -176,6 +187,14 @@ export default function LibrarySubmissionsPanel() {
       toast.error('Rejection reason is required')
       return
     }
+    const ok = await confirm({
+      title: 'Reject library request?',
+      message: 'The requester will see your reason in the mobile app.',
+      detail: rejectReason.trim().slice(0, 120) + (rejectReason.trim().length > 120 ? '…' : ''),
+      confirmLabel: 'Reject',
+      variant: 'danger'
+    })
+    if (!ok) return
     setActing(true)
     try {
       await rejectLibrarySubmission(drawer._id, rejectReason.trim())
@@ -283,17 +302,11 @@ export default function LibrarySubmissionsPanel() {
         </Button>
       </Stack>
 
-      <Tabs
+      <AdminTabs
         value={statusFilter}
-        onChange={(_, v) => setStatusFilter(v)}
-        variant='scrollable'
-        scrollButtons='auto'
-        sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
-      >
-        {STATUS_TABS.map(tab => (
-          <Tab key={tab.value || 'pending'} label={tab.label} value={tab.value} />
-        ))}
-      </Tabs>
+        onChange={setStatusFilter}
+        tabs={STATUS_TABS.map(tab => ({ value: tab.value, label: tab.label }))}
+      />
 
       {statusFilter === '' && rows.length === 0 && !loading ? (
         <Alert severity='success' sx={{ mb: 2 }}>
@@ -439,6 +452,7 @@ export default function LibrarySubmissionsPanel() {
           )}
         </Box>
       </Drawer>
+      {ConfirmDialog}
     </Box>
   )
 }

@@ -3,11 +3,6 @@ import {
   Alert,
   Box,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Divider,
   IconButton,
   List,
@@ -23,6 +18,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import RefreshIcon from '@mui/icons-material/Refresh'
 import toast from 'react-hot-toast'
 import { AdminLoadingState, AdminMasterDetailSkeleton } from 'src/components/admin/AdminLoadingState'
+import { useAdminConfirm } from 'src/components/admin'
 import {
   createClipCategory,
   createClipSubcategory,
@@ -44,7 +40,7 @@ export default function ClipTaxonomyPanel({ onTaxonomyChange }) {
   const [newSubName, setNewSubName] = useState('')
   const [editCatName, setEditCatName] = useState('')
   const [editingCat, setEditingCat] = useState(false)
-  const [deleteTarget, setDeleteTarget] = useState(null)
+  const { confirm, ConfirmDialog } = useAdminConfirm()
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -114,17 +110,26 @@ export default function ClipTaxonomyPanel({ onTaxonomyChange }) {
     }
   }
 
-  const confirmDelete = async () => {
-    if (!deleteTarget) return
+  const requestDelete = async target => {
+    const ok = await confirm({
+      title: `Delete ${target.type === 'category' ? 'category' : 'subcategory'}?`,
+      message:
+        target.type === 'category'
+          ? 'All subcategories must be removed first. This cannot be undone.'
+          : 'This subcategory will be removed from the taxonomy.',
+      detail: target.label,
+      confirmLabel: 'Delete',
+      variant: 'danger'
+    })
+    if (!ok) return
     try {
-      if (deleteTarget.type === 'category') {
-        await deleteClipCategory(deleteTarget.id)
+      if (target.type === 'category') {
+        await deleteClipCategory(target.id)
         toast.success('Category deleted')
       } else {
-        await deleteClipSubcategory(deleteTarget.id)
+        await deleteClipSubcategory(target.id)
         toast.success('Subcategory deleted')
       }
-      setDeleteTarget(null)
       void load()
     } catch (e) {
       toast.error(e?.message)
@@ -255,7 +260,7 @@ export default function ClipTaxonomyPanel({ onTaxonomyChange }) {
                     size='small'
                     color='error'
                     onClick={() =>
-                      setDeleteTarget({
+                      void requestDelete({
                         type: 'category',
                         id: selectedId,
                         label: selected.name
@@ -307,7 +312,7 @@ export default function ClipTaxonomyPanel({ onTaxonomyChange }) {
                           size='small'
                           color='error'
                           onClick={() =>
-                            setDeleteTarget({
+                            void requestDelete({
                               type: 'subcategory',
                               id: subId,
                               label: sub.name
@@ -326,23 +331,7 @@ export default function ClipTaxonomyPanel({ onTaxonomyChange }) {
         </Box>
       </Stack>
 
-      <Dialog open={Boolean(deleteTarget)} onClose={() => setDeleteTarget(null)}>
-        <DialogTitle>Delete {deleteTarget?.type === 'category' ? 'category' : 'subcategory'}?</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Remove <strong>{deleteTarget?.label}</strong>?{' '}
-            {deleteTarget?.type === 'category'
-              ? 'All subcategories must be removed first.'
-              : 'This cannot be undone.'}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteTarget(null)}>Cancel</Button>
-          <Button color='error' variant='contained' onClick={() => void confirmDelete()}>
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {ConfirmDialog}
     </Box>
   )
 }
