@@ -1,12 +1,13 @@
 import React from 'react'
 import { Box, Typography } from '@mui/material'
 import { resolveCmsImageUrl } from 'src/utils/cmsImageUrl'
-import { IMAGE_SPECS, MOBILE_FRAME } from './contentPlacementConfig'
+import { useMobilePreviewFrame } from './MobilePreviewFrameContext'
 
 /**
  * Mobile hero carousel card — width × 0.45 aspect (HomeHeroCarousel).
  */
 export default function BannerHeroPreview({ form, embedded = false }) {
+  const frame = useMobilePreviewFrame()
   const title = form?.title?.trim() || 'Banner title'
   const body = form?.body?.trim()
   const imageUrl = resolveCmsImageUrl(form?.image_url)
@@ -15,14 +16,14 @@ export default function BannerHeroPreview({ form, embedded = false }) {
     : form?.cta_label?.trim()
       ? [{ label: form.cta_label.trim() }]
       : []
-  const cardH = IMAGE_SPECS['banner.hero'].previewHeight
-  const cardW = embedded ? MOBILE_FRAME.contentWidth : '100%'
+  const cardH = Math.round(frame.contentWidth * 0.45)
+  const cardW = embedded ? frame.contentWidth : '100%'
 
   return (
-    <Box sx={{ px: embedded ? `${MOBILE_FRAME.contentPadding}px` : 1, py: embedded ? 1 : 1 }}>
+    <Box sx={{ px: embedded ? `${frame.contentPadding}px` : 1, py: embedded ? 1 : 1 }}>
       {!embedded ? (
         <Typography variant='caption' color='text.secondary' sx={{ mb: 0.5, display: 'block' }}>
-          Hero carousel · {MOBILE_FRAME.contentWidth}×{cardH}pt
+          Hero carousel · {frame.contentWidth}×{cardH}pt
         </Typography>
       ) : null}
       <Box

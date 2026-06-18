@@ -19,6 +19,7 @@ import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
 import AdminTabs from 'src/components/admin/AdminTabs'
 import { useAdminConfirm } from 'src/components/admin/useAdminConfirm'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import FinanceOverviewPanel from 'src/components/admin/finance/FinanceOverviewPanel'
 import {
   getFinanceLedger,
   getEscrowHolds,
@@ -44,17 +45,19 @@ import {
 } from 'src/services/financeApi'
 
 const TAB = {
-  LEDGER: 0,
-  TRANSACTIONS: 1,
-  ESCROW: 2,
-  REFUNDS: 3,
-  PAYOUTS: 4,
-  STUCK_TOPUPS: 5,
+  OVERVIEW: 0,
+  LEDGER: 1,
+  TRANSACTIONS: 2,
+  ESCROW: 3,
+  REFUNDS: 4,
+  PAYOUTS: 5,
+  STUCK_TOPUPS: 6,
   TOPUPS: 7,
-  AUDIT: 6
+  AUDIT: 8
 }
 
 const tabLabels = [
+  'Overview',
   'Ledger',
   'Transactions',
   'Escrow',
@@ -93,7 +96,7 @@ const FinancePage = () => {
   const ability = useContext(AbilityContext)
   const { confirm, ConfirmDialog } = useAdminConfirm()
   const canRefund = ability?.can('update', 'admin-action-refund') ?? true
-  const [tab, setTab] = useState(TAB.LEDGER)
+  const [tab, setTab] = useState(TAB.OVERVIEW)
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
   const pageSize = 50
@@ -149,12 +152,30 @@ const FinancePage = () => {
         setTab(TAB.TRANSACTIONS)
       }
     }
-  }, [router.query?.userId, router.query?.sessionId, router.query?.tab])
+    const tabKey = String(router.query?.tab || '').toLowerCase()
+    if (tabKey === 'overview') setTab(TAB.OVERVIEW)
+    else if (tabKey === 'ledger') setTab(TAB.LEDGER)
+    else if (tabKey === 'transactions') setTab(TAB.TRANSACTIONS)
+    else if (tabKey === 'escrow') setTab(TAB.ESCROW)
+    else if (tabKey === 'refunds') setTab(TAB.REFUNDS)
+    else if (tabKey === 'payouts') setTab(TAB.PAYOUTS)
+    else if (tabKey === 'stuck_topups') setTab(TAB.STUCK_TOPUPS)
+    else if (tabKey === 'topups') setTab(TAB.TOPUPS)
+    else if (tabKey === 'audit') setTab(TAB.AUDIT)
+    const status = router.query?.status
+    if (typeof status === 'string' && status.trim()) {
+      setEscrowStatus(status.trim())
+    }
+  }, [router.query?.userId, router.query?.sessionId, router.query?.tab, router.query?.status])
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      if (tab === TAB.LEDGER) {
+      if (tab === TAB.OVERVIEW) {
+        const summary = await getEscrowSummary()
+        setEscrowSummary(summary)
+        setTotal(0)
+      } else if (tab === TAB.LEDGER) {
         const r = await getFinanceLedger({
           page,
           limit: pageSize,
@@ -206,7 +227,7 @@ const FinancePage = () => {
         const r = await getTopUpHistory({ page, limit: pageSize, userId: searchQ || undefined })
         setTopUpHistory(r?.items ?? [])
         setTotal(r?.total ?? 0)
-      } else {
+      } else if (tab === TAB.AUDIT) {
         const r = await getFinancialAuditLog({ page, limit: pageSize })
         setAudit(r?.items ?? [])
         setTotal(r?.total ?? 0)
@@ -252,13 +273,33 @@ const FinancePage = () => {
           '—'
         )
     },
-    { field: 'status', headerName: 'Status', width: 120 },
-    { field: 'kind', headerName: 'Kind', width: 100 },
+    { field: 'status', headerName: 'Status', width: 110 },
+    { field: 'kind', headerName: 'Kind', width: 90 },
+    { field: 'funding_source', headerName: 'Funding', width: 90 },
     {
       field: 'gross_minor',
       headerName: 'Gross',
-      width: 100,
+      width: 90,
       valueGetter: p => formatMinor(p.row.gross_minor)
+    },
+    {
+      field: 'platform_fee_minor',
+      headerName: 'Platform fee',
+      width: 100,
+      valueGetter: p => formatMinor(p.row.platform_fee_minor)
+    },
+    {
+      field: 'trainer_net_minor',
+      headerName: 'Trainer net',
+      width: 100,
+      valueGetter: p => formatMinor(p.row.trainer_net_minor)
+    },
+    {
+      field: 'release_eligible_at',
+      headerName: 'Release eligible',
+      width: 150,
+      valueGetter: p =>
+        p.row.release_eligible_at ? new Date(p.row.release_eligible_at).toLocaleString() : '—'
     },
     {
       field: 'createdAt',
@@ -433,6 +474,25 @@ const FinancePage = () => {
   const ledgerCols = [
     { field: 'entry_id', headerName: 'Entry', flex: 1, minWidth: 120 },
     { field: 'reference_type', headerName: 'Type', width: 140 },
+    {
+      field: 'reference_id',
+      headerName: 'Reference',
+      flex: 1,
+      minWidth: 120,
+      renderCell: params => {
+        const ref = params.row.reference_id
+        if (!ref) return '—'
+        const isSession = String(params.row.reference_type || '').includes('escrow') || ref.length === 24
+        if (isSession && ref.length === 24) {
+          return (
+            <Button size='small' component={Link} href={`/apps/booking?bookingId=${ref}`}>
+              {String(ref).slice(-6)}
+            </Button>
+          )
+        }
+        return String(ref).slice(0, 16)
+      }
+    },
     { field: 'entry_type', headerName: 'Dr/Cr', width: 90 },
     { field: 'bucket', headerName: 'Bucket', width: 120 },
     {
@@ -448,7 +508,20 @@ const FinancePage = () => {
     { field: 'source', headerName: 'Source', width: 110 },
     { field: 'label', headerName: 'Label', flex: 1, minWidth: 140 },
     { field: 'id', headerName: 'ID', flex: 1, minWidth: 120 },
-    { field: 'session_id', headerName: 'Session', flex: 1, minWidth: 120 },
+    {
+      field: 'session_id',
+      headerName: 'Session',
+      flex: 1,
+      minWidth: 120,
+      renderCell: params =>
+        params.row.session_id ? (
+          <Button size='small' component={Link} href={`/apps/booking?bookingId=${params.row.session_id}`}>
+            Open
+          </Button>
+        ) : (
+          '—'
+        )
+    },
     { field: 'payment_intent_id', headerName: 'PI', flex: 1, minWidth: 120 },
     { field: 'status', headerName: 'Status', width: 110 },
     {
@@ -477,9 +550,27 @@ const FinancePage = () => {
   ]
 
   const payoutCols = [
-    { field: '_id', headerName: 'ID', flex: 1 },
-    { field: 'trainer_id', headerName: 'Trainer', flex: 1 },
+    { field: '_id', headerName: 'ID', flex: 1, minWidth: 100 },
+    {
+      field: 'trainer_id',
+      headerName: 'Trainer',
+      flex: 1,
+      minWidth: 120,
+      valueGetter: p => {
+        const t = p.row.trainer_id
+        if (!t) return '—'
+        if (typeof t === 'object') return t.fullname || t.email || t._id
+        return String(t).slice(-8)
+      }
+    },
     { field: 'status', headerName: 'Status', width: 140 },
+    {
+      field: 'stripe_transfer_id',
+      headerName: 'Stripe transfer',
+      flex: 1,
+      minWidth: 120,
+      valueGetter: p => p.row.stripe_transfer_id || '—'
+    },
     {
       field: 'amount_minor',
       headerName: 'Amount',
@@ -548,6 +639,7 @@ const FinancePage = () => {
   ]
 
   const rows = useMemo(() => {
+    if (tab === TAB.OVERVIEW) return []
     if (tab === TAB.LEDGER) return ledger
     if (tab === TAB.TRANSACTIONS) return transactions
     if (tab === TAB.ESCROW) return escrow
@@ -569,6 +661,31 @@ const FinancePage = () => {
     return auditCols
   }, [tab])
 
+  const handleGoTab = (key, opts = {}) => {
+    const map = {
+      escrow: TAB.ESCROW,
+      stuck_topups: TAB.STUCK_TOPUPS,
+      ledger: TAB.LEDGER,
+      transactions: TAB.TRANSACTIONS,
+      refunds: TAB.REFUNDS,
+      payouts: TAB.PAYOUTS,
+      topups: TAB.TOPUPS,
+      audit: TAB.AUDIT
+    }
+    if (map[key] != null) setTab(map[key])
+    if (opts.status) setEscrowStatus(opts.status)
+  }
+
+  const handleOverviewReconcile = kind => {
+    if (kind === 'topups') {
+      void runReconcile('Reconcile top-ups', () => reconcileStuckTopUps(30), load)
+    } else if (kind === 'refunds') {
+      void runReconcile('Reconcile refunds', () => reconcileFailedRefunds(), load)
+    } else if (kind === 'releasing') {
+      void runReconcile('Reconcile releasing', () => reconcileStuckReleasingHolds(60), load)
+    }
+  }
+
   const heldSummary = escrowSummary?.byStatus?.held
   const aging = escrowSummary?.aging
 
@@ -578,6 +695,9 @@ const FinancePage = () => {
       subtitle='Ledger, escrow, payouts, wallet ops, and audit trail.'
       actions={
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+          <Button size='small' variant='outlined' component={Link} href='/apps/platform-health'>
+            Platform health
+          </Button>
           <Button size='small' variant='outlined' component={Link} href='/apps/finance/connect'>
             Stripe Connect
           </Button>
@@ -629,6 +749,8 @@ const FinancePage = () => {
     >
       <AdminPageSection>
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} sx={{ mb: 2 }}>
+          {tab !== TAB.OVERVIEW ? (
+            <>
           <TextField
             size='small'
             label='Search PI, user ID, or session ID'
@@ -697,10 +819,18 @@ const FinancePage = () => {
               <MenuItem value='migration_opening'>migration_opening</MenuItem>
             </TextField>
           ) : null}
+            </>
+          ) : null}
         </Stack>
 
         {opsDashboard ? (
           <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
+            <Chip
+              label={`Held: ${opsDashboard.heldCount ?? 0}`}
+              color={(opsDashboard.heldCount ?? 0) > 0 ? 'warning' : 'default'}
+              size='small'
+              variant='outlined'
+            />
             <Chip
               label={`Releasing: ${opsDashboard.releasingCount ?? 0}`}
               color={opsDashboard.releasingCount > 0 ? 'warning' : 'default'}
@@ -758,6 +888,7 @@ const FinancePage = () => {
           onChange={setTab}
           tabs={tabLabels.map((label, index) => ({ value: index, label }))}
         />
+        {tab !== TAB.OVERVIEW ? (
         <Stack direction='row' spacing={1} sx={{ mb: 2, alignItems: 'center' }}>
           <Button size='small' disabled={page <= 1 || loading} onClick={() => setPage(p => Math.max(1, p - 1))}>
             Previous
@@ -774,6 +905,15 @@ const FinancePage = () => {
             {total ? ` · ${total} total` : ''}
           </Typography>
         </Stack>
+        ) : null}
+        {tab === TAB.OVERVIEW ? (
+          <FinanceOverviewPanel
+            opsDashboard={opsDashboard}
+            escrowSummary={escrowSummary}
+            onGoTab={handleGoTab}
+            onReconcile={handleOverviewReconcile}
+          />
+        ) : (
         <AdminGridContainer>
           <AdminDataGrid
             autoHeight={false}
@@ -782,6 +922,7 @@ const FinancePage = () => {
             loading={loading}
           />
         </AdminGridContainer>
+        )}
       </AdminPageSection>
 
       <Dialog open={adjustOpen} onClose={() => setAdjustOpen(false)} maxWidth='sm' fullWidth>

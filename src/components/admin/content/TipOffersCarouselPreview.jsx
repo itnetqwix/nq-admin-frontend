@@ -2,20 +2,21 @@ import React from 'react'
 import { Box, Typography } from '@mui/material'
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined'
 import { resolveCmsImageUrl } from 'src/utils/cmsImageUrl'
-import { MOBILE_FRAME } from './contentPlacementConfig'
+import { useMobilePreviewFrame } from './MobilePreviewFrameContext'
 
 /**
  * Matches mobile HomeOffersCarousel card (72% content width, 48×48 thumb).
  */
 export default function TipOffersCarouselPreview({ form }) {
+  const frame = useMobilePreviewFrame()
   const title = form?.title?.trim() || 'Tip title'
   const body = form?.body?.trim()
   const cta = form?.cta_label?.trim()
   const imageUrl = resolveCmsImageUrl(form?.image_url)
-  const cardW = Math.round(MOBILE_FRAME.contentWidth * 0.72)
+  const cardW = Math.round(frame.contentWidth * 0.72)
 
   return (
-    <Box sx={{ px: `${MOBILE_FRAME.contentPadding}px`, py: 1.5, bgcolor: '#eef1f6' }}>
+    <Box sx={{ px: `${frame.contentPadding}px`, py: 1.5, bgcolor: '#eef1f6' }}>
       <Typography
         align='center'
         fontWeight={800}

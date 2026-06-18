@@ -1,10 +1,11 @@
-import React from 'react'
-import { Box, Chip, Typography } from '@mui/material'
+import React, { useMemo, useState } from 'react'
+import { Box, Chip, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 
-import { MOBILE_FRAME } from './contentPlacementConfig'
+import { DEVICE_PRESETS, getDeviceFrame } from './contentPlacementConfig'
+import { MobilePreviewFrameProvider } from './MobilePreviewFrameContext'
 
 /**
- * iPhone-style frame for CMS “testing phase” previews (390pt logical width).
+ * iPhone-style frame for CMS “testing phase” previews with device width toggle.
  */
 export default function MobileFramePreview({
   children,
@@ -12,10 +13,14 @@ export default function MobileFramePreview({
   subtitle,
   scale = 0.92,
   dark = false,
-  footer
+  footer,
+  defaultDevice = 'standard',
+  showDeviceToggle = true
 }) {
-  const w = MOBILE_FRAME.width
-  const h = MOBILE_FRAME.height
+  const [deviceId, setDeviceId] = useState(defaultDevice)
+  const frame = useMemo(() => getDeviceFrame(deviceId), [deviceId])
+  const w = frame.width
+  const h = frame.height
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
@@ -24,8 +29,25 @@ export default function MobileFramePreview({
           {label}
         </Typography>
         <Chip size='small' label={`${w}×${h}pt`} variant='outlined' />
+        {showDeviceToggle ? (
+          <ToggleButtonGroup
+            size='small'
+            exclusive
+            value={deviceId}
+            onChange={(_e, next) => {
+              if (next) setDeviceId(next)
+            }}
+            sx={{ ml: 'auto' }}
+          >
+            {Object.values(DEVICE_PRESETS).map(p => (
+              <ToggleButton key={p.id} value={p.id} sx={{ px: 1.25, py: 0.25, fontSize: 11 }}>
+                {p.shortLabel}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+        ) : null}
         {subtitle ? (
-          <Typography variant='caption' color='text.secondary' sx={{ flex: 1 }}>
+          <Typography variant='caption' color='text.secondary' sx={{ flex: 1, minWidth: 160 }}>
             {subtitle}
           </Typography>
         ) : null}
@@ -65,7 +87,7 @@ export default function MobileFramePreview({
             color: dark ? '#f5f5f5' : 'inherit'
           }}
         >
-          {children}
+          <MobilePreviewFrameProvider frame={frame}>{children}</MobilePreviewFrameProvider>
         </Box>
         {footer !== false ? (
           <Box

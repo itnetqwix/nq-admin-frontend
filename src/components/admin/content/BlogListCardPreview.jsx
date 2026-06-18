@@ -2,17 +2,18 @@ import React from 'react'
 import { Box, Typography } from '@mui/material'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import { resolveCmsImageUrl } from 'src/utils/cmsImageUrl'
-import { MOBILE_FRAME } from './contentPlacementConfig'
+import { useMobilePreviewFrame } from './MobilePreviewFrameContext'
 
 /** Matches mobile BlogsScreen list row (88×88 thumb). */
 export default function BlogListCardPreview({ form }) {
+  const frame = useMobilePreviewFrame()
   const title = form?.title?.trim() || 'Post title'
   const excerpt = form?.excerpt?.trim() || 'Excerpt appears here…'
   const imageUrl = resolveCmsImageUrl(form?.cover_image_url)
   const thumb = 88
 
   return (
-    <Box sx={{ px: `${MOBILE_FRAME.contentPadding}px`, py: 1 }}>
+    <Box sx={{ px: `${frame.contentPadding}px`, py: 1 }}>
       <Typography variant='caption' color='text.secondary' fontWeight={700} sx={{ mb: 0.75, display: 'block' }}>
         Blog list card
       </Typography>

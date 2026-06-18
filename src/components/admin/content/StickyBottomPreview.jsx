@@ -2,18 +2,19 @@ import React from 'react'
 import { Box, IconButton, Typography } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined'
-import { MOBILE_FRAME } from './contentPlacementConfig'
+import { useMobilePreviewFrame } from './MobilePreviewFrameContext'
 
 /**
  * Mirrors mobile StickyBottomPromoBar — pricetag icon, no CMS image.
  */
 export default function StickyBottomPreview({ form, embedded = false }) {
+  const frame = useMobilePreviewFrame()
   const title = form?.title?.trim() || 'Promo title'
   const body = form?.body?.trim()
   const line = body ? `${title} · ${body}` : title
 
   return (
-    <Box sx={{ px: embedded ? `${MOBILE_FRAME.contentPadding}px` : 1, py: 1 }}>
+    <Box sx={{ px: embedded ? `${frame.contentPadding}px` : 1, py: 1 }}>
       {!embedded ? (
         <Typography variant='caption' color='text.secondary' sx={{ mb: 0.5, display: 'block' }}>
           Sticky bottom promo (above tab bar)

@@ -2,14 +2,37 @@
  * Where CMS content renders in NetQwix apps + pixel specs for admin previews.
  */
 
-export const MOBILE_FRAME = {
-  width: 390,
-  height: 720,
-  contentPadding: 16,
-  get contentWidth() {
-    return this.width - this.contentPadding * 2
+/** Logical iPhone widths for CMS “testing phase” previews. */
+export const DEVICE_PRESETS = {
+  se: { id: 'se', label: 'iPhone SE', shortLabel: '375', width: 375, height: 667, contentPadding: 16 },
+  standard: {
+    id: 'standard',
+    label: 'iPhone 15',
+    shortLabel: '390',
+    width: 390,
+    height: 720,
+    contentPadding: 16
+  },
+  pro_max: {
+    id: 'pro_max',
+    label: 'Pro Max',
+    shortLabel: '430',
+    width: 430,
+    height: 932,
+    contentPadding: 16
   }
 }
+
+export function getDeviceFrame(deviceId = 'standard') {
+  const p = DEVICE_PRESETS[deviceId] || DEVICE_PRESETS.standard
+  return {
+    ...p,
+    contentWidth: p.width - p.contentPadding * 2
+  }
+}
+
+/** Default frame (standard iPhone 15). */
+export const MOBILE_FRAME = getDeviceFrame('standard')
 
 /** Recommended upload sizes & preview geometry (matches nq-mobile components). */
 export const IMAGE_SPECS = {

@@ -1,14 +1,15 @@
 import React, { useMemo } from 'react'
 import { Box, Typography } from '@mui/material'
 import { resolveCmsImageUrl } from 'src/utils/cmsImageUrl'
-import { MOBILE_FRAME, IMAGE_SPECS } from './contentPlacementConfig'
+import { useMobilePreviewFrame } from './MobilePreviewFrameContext'
 
 /** Matches mobile BlogPostScreen — hero + WebView body. */
 export default function BlogPostPreview({ form, dark = false }) {
+  const frame = useMobilePreviewFrame()
   const title = form?.title?.trim() || 'Article title'
   const bodyHtml = form?.body_html || '<p>Body content…</p>'
   const imageUrl = resolveCmsImageUrl(form?.cover_image_url)
-  const heroH = IMAGE_SPECS['page.blog_cover'].previewHeight || 200
+  const heroH = 200
   const textColor = dark ? '#f5f5f5' : '#1a1a2e'
 
   const docHtml = useMemo(
@@ -31,7 +32,7 @@ export default function BlogPostPreview({ form, dark = false }) {
           src={imageUrl}
           alt=''
           sx={{
-            width: MOBILE_FRAME.contentWidth,
+            width: frame.contentWidth,
             mx: 'auto',
             display: 'block',
             height: heroH,
@@ -39,7 +40,7 @@ export default function BlogPostPreview({ form, dark = false }) {
           }}
         />
       ) : (
-        <Box sx={{ height: heroH, bgcolor: '#e8eaf6', mx: `${MOBILE_FRAME.contentPadding}px`, borderRadius: 1 }} />
+        <Box sx={{ height: heroH, bgcolor: '#e8eaf6', mx: `${frame.contentPadding}px`, borderRadius: 1 }} />
       )}
       <Box sx={{ px: 2, py: 1 }}>
         <Typography fontWeight={800} fontSize={18} color={dark ? '#fff' : 'text.primary'}>

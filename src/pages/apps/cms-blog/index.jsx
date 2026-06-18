@@ -18,6 +18,8 @@ import {
   Typography
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import IconButton from '@mui/material/IconButton'
 import NextLink from 'next/link'
 import toast from 'react-hot-toast'
 
@@ -79,6 +81,7 @@ export default function CmsBlogPage() {
   const [editId, setEditId] = useState(null)
   const [form, setForm] = useState({ ...EMPTY })
   const [saving, setSaving] = useState(false)
+  const [previewRow, setPreviewRow] = useState(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -174,6 +177,17 @@ export default function CmsBlogPage() {
       width: 80,
       renderCell: ({ row }) => (
         <Chip label={row.is_active ? 'Yes' : 'No'} size='small' color={row.is_active ? 'success' : 'default'} />
+      )
+    },
+    {
+      field: 'preview',
+      headerName: '',
+      width: 52,
+      sortable: false,
+      renderCell: ({ row }) => (
+        <IconButton size='small' aria-label='Preview' onClick={() => setPreviewRow(row)}>
+          <VisibilityIcon fontSize='small' />
+        </IconButton>
       )
     },
     {
@@ -417,6 +431,35 @@ export default function CmsBlogPage() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Dialog open={!!previewRow} onClose={() => setPreviewRow(null)} maxWidth='sm' fullWidth>
+        <DialogTitle>
+          {previewRow
+            ? `Preview · ${previewRow.type === 'page' ? 'Static page' : 'Blog'} · ${previewRow.title}`
+            : 'Preview'}
+        </DialogTitle>
+        <DialogContent dividers>
+          {previewRow ? (
+            <MobileFramePreview label='Mobile preview' showDeviceToggle>
+              <CmsPagePlacementPreview form={previewRow} />
+            </MobileFramePreview>
+          ) : null}
+        </DialogContent>
+        <DialogActions>
+          {previewRow ? (
+            <Button
+              onClick={() => {
+                setPreviewRow(null)
+                openEdit(previewRow)
+              }}
+            >
+              Edit
+            </Button>
+          ) : null}
+          <Button onClick={() => setPreviewRow(null)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+
       {ConfirmDialog}
     </AdminPageShell>
   )

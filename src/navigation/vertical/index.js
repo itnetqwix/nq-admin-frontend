@@ -137,6 +137,13 @@ const navigation = () => [
   },
   { sectionTitle: 'Operations', auth: false },
   {
+    title: 'Platform health',
+    path: '/apps/platform-health',
+    icon: 'mdi:heart-pulse',
+    action: 'read',
+    subject: 'admin-nav-operations'
+  },
+  {
     title: 'Platform ops',
     icon: 'mdi:cog-outline',
     action: 'read',

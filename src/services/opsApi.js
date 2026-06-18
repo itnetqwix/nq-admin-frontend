@@ -50,6 +50,15 @@ export async function getOpsStats() {
   return parse(res)
 }
 
+export async function runOpsBackfill(body = {}) {
+  const res = await fetch(apiUrl('/admin/ops-events/backfill'), {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(body)
+  })
+  return parse(res)
+}
+
 export async function getOpsPlaybook() {
   const res = await fetch(apiUrl('/admin/ops-events/playbook'), { headers: getAuthHeaders() })
   return parse(res)

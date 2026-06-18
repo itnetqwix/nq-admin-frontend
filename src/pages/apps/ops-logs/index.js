@@ -22,7 +22,7 @@ import moment from 'moment'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
-import { getOpsEventDetail, getOpsEvents, resolveOpsEvent } from 'src/services/opsApi'
+import { getOpsEventDetail, getOpsEvents, getOpsStats, resolveOpsEvent, runOpsBackfill } from 'src/services/opsApi'
 
 const CATEGORIES = [
   'instant_lesson',
@@ -57,6 +57,11 @@ export default function OpsLogsPage() {
   const [sessionId, setSessionId] = useState('')
   const [instantOnly, setInstantOnly] = useState(false)
   const [refundRelated, setRefundRelated] = useState(false)
+  const [search, setSearch] = useState('')
+  const [fromDate, setFromDate] = useState('')
+  const [toDate, setToDate] = useState('')
+  const [stats, setStats] = useState(null)
+  const [backfillBusy, setBackfillBusy] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [detail, setDetail] = useState(null)
   const [resolveNote, setResolveNote] = useState('')
@@ -65,8 +70,28 @@ export default function OpsLogsPage() {
     if (router.isReady) {
       if (router.query.userId) setUserId(String(router.query.userId))
       if (router.query.sessionId) setSessionId(String(router.query.sessionId))
+      if (router.query.severity) setSeverity(String(router.query.severity))
+      if (router.query.resolution) setResolution(String(router.query.resolution))
+      if (router.query.category) setCategory(String(router.query.category))
+      if (router.query.instant_only === 'true') setInstantOnly(true)
+      if (router.query.search) setSearch(String(router.query.search))
     }
-  }, [router.isReady, router.query.userId, router.query.sessionId])
+  }, [
+    router.isReady,
+    router.query.userId,
+    router.query.sessionId,
+    router.query.severity,
+    router.query.resolution,
+    router.query.category,
+    router.query.instant_only,
+    router.query.search
+  ])
+
+  useEffect(() => {
+    void getOpsStats()
+      .then(setStats)
+      .catch(() => setStats(null))
+  }, [page])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -82,6 +107,9 @@ export default function OpsLogsPage() {
       if (sessionId.trim()) q.sessionId = sessionId.trim()
       if (instantOnly) q.instant_only = 'true'
       if (refundRelated) q.refund_related = 'true'
+      if (search.trim()) q.search = search.trim()
+      if (fromDate) q.from = new Date(fromDate).toISOString()
+      if (toDate) q.to = new Date(`${toDate}T23:59:59`).toISOString()
       const data = await getOpsEvents(q)
       setRows(
         (data?.items || []).map((r, i) => ({
@@ -98,7 +126,7 @@ export default function OpsLogsPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, pageSize, category, severity, resolution, userId, sessionId, instantOnly, refundRelated])
+  }, [page, pageSize, category, severity, resolution, userId, sessionId, instantOnly, refundRelated, search, fromDate, toDate])
 
   useEffect(() => {
     void load()
@@ -150,6 +178,24 @@ export default function OpsLogsPage() {
       { field: 'category', headerName: 'Category', width: 120 },
       { field: 'event_type', headerName: 'Type', width: 180 },
       { field: 'title', headerName: 'Title', flex: 1, minWidth: 200 },
+      {
+        field: 'session_id',
+        headerName: 'Session',
+        width: 100,
+        renderCell: params =>
+          params.row.session_id ? (
+            <Button
+              size='small'
+              component={Link}
+              href={`/apps/booking?bookingId=${params.row.session_id}`}
+              onClick={e => e.stopPropagation()}
+            >
+              Open
+            </Button>
+          ) : (
+            '—'
+          )
+      },
       { field: 'userLabel', headerName: 'User', width: 160 },
       { field: 'resolution_status', headerName: 'Status', width: 110 }
     ],
@@ -160,16 +206,95 @@ export default function OpsLogsPage() {
     <AdminPageShell
       title='Operations log'
       subtitle='Unified issues: instant lessons, calls, wallet, support, and admin actions.'
-      actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}
+      actions={
+        <Stack direction='row' spacing={1}>
+          <Button
+            size='small'
+            variant='outlined'
+            component={Link}
+            href='/apps/platform-health'
+          >
+            Platform health
+          </Button>
+          <AdminRefreshButton onClick={() => void load()} loading={loading} />
+        </Stack>
+      }
       contentSx={{ p: 0 }}
     >
       <AdminPageSection>
+        {stats ? (
+          <Grid container spacing={2} sx={{ mb: 2 }}>
+            <Grid item xs={12} sm={4}>
+              <Chip
+                label={`Critical open (24h): ${stats.criticalOpen ?? 0}`}
+                color={(stats.criticalOpen ?? 0) > 0 ? 'error' : 'default'}
+                variant='outlined'
+                onClick={() => {
+                  setSeverity('critical')
+                  setResolution('open')
+                  setPage(0)
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Chip
+                label={`Instant failures (24h): ${stats.instantFailures ?? 0}`}
+                variant='outlined'
+                onClick={() => {
+                  setInstantOnly(true)
+                  setPage(0)
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Chip
+                label={`Call preflight failures (24h): ${stats.callPreflightFailures ?? 0}`}
+                variant='outlined'
+                onClick={() => {
+                  setCategory('call')
+                  setPage(0)
+                }}
+              />
+            </Grid>
+          </Grid>
+        ) : null}
         <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={12} md={3}>
+            <TextField
+              size='small'
+              fullWidth
+              label='Search title / summary'
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </Grid>
           <Grid item xs={12} md={3}>
             <TextField size='small' fullWidth label='User id' value={userId} onChange={e => setUserId(e.target.value)} />
           </Grid>
           <Grid item xs={12} md={3}>
             <TextField size='small' fullWidth label='Session id' value={sessionId} onChange={e => setSessionId(e.target.value)} />
+          </Grid>
+          <Grid item xs={6} md={2}>
+            <TextField
+              size='small'
+              fullWidth
+              type='date'
+              label='From'
+              InputLabelProps={{ shrink: true }}
+              value={fromDate}
+              onChange={e => setFromDate(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={6} md={2}>
+            <TextField
+              size='small'
+              fullWidth
+              type='date'
+              label='To'
+              InputLabelProps={{ shrink: true }}
+              value={toDate}
+              onChange={e => setToDate(e.target.value)}
+            />
           </Grid>
           <Grid item xs={6} md={2}>
             <FormControl size='small' fullWidth>
@@ -224,6 +349,38 @@ export default function OpsLogsPage() {
               />
               <Button variant='contained' size='small' onClick={() => { setPage(0); void load() }}>
                 Apply
+              </Button>
+              <Button
+                variant='outlined'
+                size='small'
+                disabled={backfillBusy}
+                onClick={async () => {
+                  const ok = await confirm({
+                    title: 'Run ops backfill?',
+                    message: 'Re-scans recent sessions and wallet events into the ops log. Safe to run; may take a minute.',
+                    confirmLabel: 'Run backfill',
+                    variant: 'warning'
+                  })
+                  if (!ok) return
+                  setBackfillBusy(true)
+                  try {
+                    const result = await runOpsBackfill({ limit: 500 })
+                    const total = Object.values(result?.counts || result || {}).reduce(
+                      (a, b) => a + (Number(b) || 0),
+                      0
+                    )
+                    toast.success(`Backfill complete — ${total} events ingested`)
+                    void load()
+                    const s = await getOpsStats()
+                    setStats(s)
+                  } catch (e) {
+                    toast.error(e?.message || 'Backfill failed')
+                  } finally {
+                    setBackfillBusy(false)
+                  }
+                }}
+              >
+                Backfill
               </Button>
             </Stack>
           </Grid>

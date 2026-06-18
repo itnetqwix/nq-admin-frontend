@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box, Typography } from '@mui/material'
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined'
-import { MOBILE_FRAME } from './contentPlacementConfig'
+import { useMobilePreviewFrame } from './MobilePreviewFrameContext'
 
 const ICON_MAP = {
   'bulb-outline': LightbulbOutlinedIcon,
@@ -12,13 +12,14 @@ const ICON_MAP = {
  * Matches mobile TipsForYouSection row (trainer dashboard) — icon only, no image.
  */
 export default function TipListRowPreview({ form }) {
+  const frame = useMobilePreviewFrame()
   const title = form?.title?.trim() || 'Tip title'
   const body = form?.body?.trim()
   const iconKey = form?.icon?.trim() || 'bulb-outline'
   const Icon = ICON_MAP[iconKey] || LightbulbOutlinedIcon
 
   return (
-    <Box sx={{ px: `${MOBILE_FRAME.contentPadding}px`, py: 1 }}>
+    <Box sx={{ px: `${frame.contentPadding}px`, py: 1 }}>
       <Typography variant='caption' color='text.secondary' fontWeight={700} sx={{ mb: 0.75, display: 'block' }}>
         Tips for you (trainer home)
       </Typography>

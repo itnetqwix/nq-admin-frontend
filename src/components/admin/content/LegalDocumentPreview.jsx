@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { Box, FormControlLabel, Switch, Typography } from '@mui/material'
-import { MOBILE_FRAME } from './contentPlacementConfig'
+import { useMobilePreviewFrame } from './MobilePreviewFrameContext'
 
 /**
  * Legal document preview — matches mobile LegalDocumentScreen WebView.
@@ -12,6 +12,7 @@ export default function LegalDocumentPreview({
   dark: darkProp,
   onDarkChange
 }) {
+  const frame = useMobilePreviewFrame()
   const [darkInternal, setDarkInternal] = React.useState(false)
   const dark = darkProp !== undefined ? darkProp : darkInternal
   const setDark = onDarkChange || setDarkInternal
@@ -47,7 +48,7 @@ export default function LegalDocumentPreview({
         srcDoc={docHtml}
         sx={{
           width: '100%',
-          maxWidth: MOBILE_FRAME.width,
+          maxWidth: frame.width,
           height: 420,
           border: '1px solid',
           borderColor: 'divider',
