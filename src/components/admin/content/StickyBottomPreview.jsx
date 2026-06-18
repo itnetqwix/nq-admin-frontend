@@ -1,48 +1,54 @@
 import React from 'react'
 import { Box, IconButton, Typography } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { resolveCmsImageUrl } from 'src/utils/cmsImageUrl'
+import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined'
+import { MOBILE_FRAME } from './contentPlacementConfig'
 
 /**
- * Mirrors mobile StickyBottomPromoBar (slim bar above tab bar).
+ * Mirrors mobile StickyBottomPromoBar — pricetag icon, no CMS image.
  */
-export default function StickyBottomPreview({ form }) {
+export default function StickyBottomPreview({ form, embedded = false }) {
   const title = form?.title?.trim() || 'Promo title'
-  const imageUrl = resolveCmsImageUrl(form?.image_url)
+  const body = form?.body?.trim()
+  const line = body ? `${title} · ${body}` : title
 
   return (
-    <Box sx={{ px: 1, py: 1 }}>
-      <Typography variant='caption' color='text.secondary' sx={{ mb: 0.5, display: 'block' }}>
-        Sticky bottom promo
-      </Typography>
+    <Box sx={{ px: embedded ? `${MOBILE_FRAME.contentPadding}px` : 1, py: 1 }}>
+      {!embedded ? (
+        <Typography variant='caption' color='text.secondary' sx={{ mb: 0.5, display: 'block' }}>
+          Sticky bottom promo (above tab bar)
+        </Typography>
+      ) : null}
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
           gap: 1,
-          px: 1.5,
-          py: 1,
+          px: 2,
+          py: 1.25,
           borderRadius: 2,
           bgcolor: '#fff8e1',
           border: '1px solid #ffe082',
           boxShadow: '0 -2px 8px rgba(0,0,0,0.06)'
         }}
       >
-        {imageUrl ? (
-          <Box
-            component='img'
-            src={imageUrl}
-            alt=''
-            sx={{ width: 36, height: 36, borderRadius: 1, objectFit: 'cover', flexShrink: 0 }}
-          />
-        ) : null}
-        <Typography
-          variant='body2'
-          fontWeight={700}
-          sx={{ flex: 1, color: '#000080', fontSize: 13 }}
-          noWrap
+        <Box
+          sx={{
+            width: 32,
+            height: 32,
+            borderRadius: '50%',
+            bgcolor: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0
+          }}
         >
-          {title}
+          <LocalOfferOutlinedIcon sx={{ fontSize: 18, color: '#000080' }} />
+        </Box>
+        <Typography variant='body2' fontWeight={700} sx={{ flex: 1, color: '#000080', fontSize: 13 }} noWrap>
+          {line.slice(0, 72)}
+          {line.length > 72 ? '…' : ''}
         </Typography>
         {form?.dismissible !== false ? (
           <IconButton size='small' disabled sx={{ color: '#000080' }}>
@@ -50,6 +56,11 @@ export default function StickyBottomPreview({ form }) {
           </IconButton>
         ) : null}
       </Box>
+      {!embedded ? (
+        <Typography variant='caption' color='text.secondary' sx={{ mt: 0.5, display: 'block' }}>
+          Uploaded images are not displayed on this placement.
+        </Typography>
+      ) : null}
     </Box>
   )
 }

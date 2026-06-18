@@ -5,6 +5,7 @@ import BannerHeroPreview from './BannerHeroPreview'
 import BannerPreviewStrip from './BannerPreviewStrip'
 import StickyBottomPreview from './StickyBottomPreview'
 import { resolveCmsImageUrl } from 'src/utils/cmsImageUrl'
+import { BANNERS_PLACEMENT_HELP } from './contentPlacementConfig'
 
 const PLACEMENT_LABELS = {
   hero: 'Hero carousel',
@@ -19,30 +20,53 @@ function formWithResolvedImage(form) {
   return { ...form, image_url: resolved }
 }
 
-/**
- * Single placement-accurate preview (form editor + grid row drawer).
- */
-export default function BannerPlacementPreview({ form, showLabel = true }) {
-  const placement = form?.placement || 'hero'
+function renderPlacement(placement, form, embedded) {
   const resolvedForm = formWithResolvedImage(form)
+  if (placement === 'strip') return <BannerPreviewStrip form={resolvedForm} embedded={embedded} />
+  if (placement === 'sticky_bottom') return <StickyBottomPreview form={resolvedForm} embedded={embedded} />
+  return <BannerHeroPreview form={resolvedForm} embedded={embedded} />
+}
 
-  let preview = null
-  if (placement === 'strip') {
-    preview = <BannerPreviewStrip form={resolvedForm} />
-  } else if (placement === 'sticky_bottom') {
-    preview = <StickyBottomPreview form={resolvedForm} />
-  } else {
-    preview = <BannerHeroPreview form={resolvedForm} />
+/**
+ * Placement-accurate preview + optional all-placements test panel.
+ */
+export default function BannerPlacementPreview({
+  form,
+  showLabel = true,
+  compareAll = false,
+  embedded = false
+}) {
+  const placement = form?.placement || 'hero'
+  const help = BANNERS_PLACEMENT_HELP[placement]
+
+  if (compareAll) {
+    return (
+      <Box>
+        <Typography variant='subtitle2' fontWeight={700} sx={{ mb: 1 }}>
+          Test all placements
+        </Typography>
+        {['hero', 'strip', 'sticky_bottom'].map(p => (
+          <Box key={p} sx={{ mb: 2, opacity: p === placement ? 1 : 0.72 }}>
+            <Typography variant='caption' color={p === placement ? 'primary' : 'text.secondary'} fontWeight={700}>
+              {PLACEMENT_LABELS[p]}
+              {p === placement ? ' (selected)' : ''}
+            </Typography>
+            {renderPlacement(p, { ...form, placement: p }, true)}
+          </Box>
+        ))}
+      </Box>
+    )
   }
 
   return (
     <Box>
       {showLabel ? (
-        <Typography variant='caption' color='text.secondary' sx={{ px: 1, display: 'block', mb: 0.5 }}>
+        <Typography variant='caption' color='text.secondary' sx={{ px: embedded ? 2 : 1, display: 'block', mb: 0.5 }}>
           Preview · {PLACEMENT_LABELS[placement] || placement}
+          {help ? ` — ${help}` : ''}
         </Typography>
       ) : null}
-      {preview}
+      {renderPlacement(placement, form, embedded)}
     </Box>
   )
 }

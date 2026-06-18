@@ -1,15 +1,26 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Box, Button, TextField, Typography } from '@mui/material'
+import { Box, Button, Grid, TextField, Typography } from '@mui/material'
 import toast from 'react-hot-toast'
 
 import AdminTabs from 'src/components/admin/AdminTabs'
 import { useAdminConfirm } from 'src/components/admin'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
-import { listLegalDocuments, upsertLegalDocument } from 'src/services/cmsApi'
+import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
+import LegalDocumentPreview from 'src/components/admin/content/LegalDocumentPreview'
+import MobileFramePreview from 'src/components/admin/content/MobileFramePreview'
+import { listLegalDocuments, seedLegalDocuments, upsertLegalDocument } from 'src/services/cmsApi'
 
 const SLUGS = [
   { slug: 'terms', label: 'Terms & conditions' },
   { slug: 'privacy', label: 'Privacy policy' }
+]
+
+const WRITING_TIPS = [
+  'Use short paragraphs (2–4 sentences) for mobile readability.',
+  'Structure with <h2> section headings — users scan on phones.',
+  'Link support emails with <a href="mailto:..."> for tap-to-email.',
+  'Avoid inline styles; the app applies theme colors automatically.',
+  'Publish increments version — users see updates without a store release.'
 ]
 
 export default function CmsLegalPage() {
@@ -19,6 +30,8 @@ export default function CmsLegalPage() {
   const [title, setTitle] = useState('')
   const [bodyHtml, setBodyHtml] = useState('')
   const [saving, setSaving] = useState(false)
+  const [seeding, setSeeding] = useState(false)
+  const [previewDark, setPreviewDark] = useState(false)
 
   const slug = SLUGS[tab].slug
 
@@ -44,6 +57,26 @@ export default function CmsLegalPage() {
     setTitle(doc?.title || SLUGS[tab].label)
     setBodyHtml(doc?.body_html || '<p>Enter HTML content here.</p>')
   }, [docs, slug, tab])
+
+  const handleSeed = async () => {
+    const ok = await confirm({
+      title: 'Seed legal templates?',
+      message: 'Loads starter Terms & Privacy HTML. Skips documents that already exist unless you force overwrite.',
+      confirmLabel: 'Seed',
+      variant: 'info'
+    })
+    if (!ok) return
+    setSeeding(true)
+    try {
+      await seedLegalDocuments({ slug })
+      toast.success('Template loaded — review and publish when ready')
+      await load()
+    } catch (e) {
+      toast.error(e.message || 'Seed failed')
+    } finally {
+      setSeeding(false)
+    }
+  }
 
   const handlePublish = async () => {
     const ok = await confirm({
@@ -75,35 +108,68 @@ export default function CmsLegalPage() {
   return (
     <AdminPageShell title='Legal documents' subtitle='Terms & privacy — live in the app without a store update'>
       <AdminPageSection>
+        <ContentPlacementGuide kind='legal' />
         <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
           HTML is rendered in-app. Version {version ?? '—'} is shown to users after publish.
         </Typography>
+        <Box sx={{ mb: 2, p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
+          <Typography variant='subtitle2' sx={{ mb: 1 }}>
+            Writing tips
+          </Typography>
+          {WRITING_TIPS.map(tip => (
+            <Typography key={tip} variant='body2' color='text.secondary' sx={{ mb: 0.5 }}>
+              • {tip}
+            </Typography>
+          ))}
+        </Box>
         <AdminTabs
           value={tab}
           onChange={setTab}
           tabs={SLUGS.map((s, i) => ({ value: i, label: s.label }))}
         />
-        <TextField
-          fullWidth
-          label='Title'
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          fullWidth
-          multiline
-          minRows={16}
-          label='Body (HTML)'
-          value={bodyHtml}
-          onChange={e => setBodyHtml(e.target.value)}
-          sx={{ mb: 2, fontFamily: 'monospace' }}
-        />
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button variant='contained' onClick={() => void handlePublish()} disabled={saving}>
-            {saving ? 'Publishing…' : 'Publish to app'}
-          </Button>
-        </Box>
+        <Grid container spacing={2} sx={{ mt: 1 }}>
+          <Grid item xs={12} md={6}>
+            <TextField
+              fullWidth
+              label='Title'
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              fullWidth
+              multiline
+              minRows={18}
+              label='Body (HTML)'
+              value={bodyHtml}
+              onChange={e => setBodyHtml(e.target.value)}
+              sx={{ mb: 2, fontFamily: 'monospace' }}
+            />
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+              <Button variant='outlined' onClick={() => void handleSeed()} disabled={seeding}>
+                {seeding ? 'Loading…' : 'Load template'}
+              </Button>
+              <Button variant='contained' onClick={() => void handlePublish()} disabled={saving}>
+                {saving ? 'Publishing…' : 'Publish to app'}
+              </Button>
+            </Box>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <MobileFramePreview
+              label='App preview'
+              subtitle={`${SLUGS[tab].label} · Signup · Settings`}
+              dark={previewDark}
+            >
+              <LegalDocumentPreview
+                title={title}
+                bodyHtml={bodyHtml}
+                version={version}
+                dark={previewDark}
+                onDarkChange={setPreviewDark}
+              />
+            </MobileFramePreview>
+          </Grid>
+        </Grid>
       </AdminPageSection>
       {ConfirmDialog}
     </AdminPageShell>

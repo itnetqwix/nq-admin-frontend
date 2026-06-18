@@ -99,6 +99,15 @@ export const seedAdminFaq = async (body = {}) => {
   return handleRes(res)
 }
 
+export const seedLegalDocuments = async (body = {}) => {
+  const res = await fetch(apiUrl('/admin/cms/legal/seed'), {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(body)
+  })
+  return handleRes(res)
+}
+
 export const getCmsSummary = async () => {
   const res = await fetch(apiUrl('/admin/cms/summary'), { headers: getAuthHeaders() })
   return handleRes(res)

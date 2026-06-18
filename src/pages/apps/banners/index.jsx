@@ -37,8 +37,9 @@ import ContentPlacementGuide from 'src/components/admin/content/ContentPlacement
 import BannerCtaEditor from 'src/components/admin/content/BannerCtaEditor'
 import BannerPlacementPreview from 'src/components/admin/content/BannerPlacementPreview'
 import CmsImageUploader from 'src/components/admin/content/CmsImageUploader'
+import MobileFramePreview from 'src/components/admin/content/MobileFramePreview'
 import { computeScheduleStatus, scheduleStatusChip } from 'src/components/admin/content/scheduleStatus'
-import { BANNERS_AUDIENCE_HELP } from 'src/components/admin/content/contentPlacementConfig'
+import { BANNERS_AUDIENCE_HELP, BANNERS_PLACEMENT_HELP } from 'src/components/admin/content/contentPlacementConfig'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import {
   listBanners,
@@ -514,10 +515,12 @@ export default function BannersPage() {
         </AdminPageSection>
       </AdminPageShell>
 
-      <Dialog open={formOpen} onClose={() => setFormOpen(false)} maxWidth='md' fullWidth>
+      <Dialog open={formOpen} onClose={() => setFormOpen(false)} maxWidth='lg' fullWidth>
         <DialogTitle>{editId ? 'Edit banner' : 'Create banner'}</DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={2} sx={{ mt: 0.5 }}>
+            <Grid item xs={12} md={7}>
+              <Grid container spacing={2}>
             <Grid item xs={12} sm={8}>
               <TextField
                 label='Title'
@@ -538,7 +541,10 @@ export default function BannersPage() {
                 >
                   {PLACEMENTS.map(p => (
                     <MenuItem key={p.value} value={p.value}>
-                      <ListItemText primary={p.label} secondary={p.hint} />
+                      <ListItemText
+                        primary={p.label}
+                        secondary={BANNERS_PLACEMENT_HELP[p.value] || p.hint}
+                      />
                     </MenuItem>
                   ))}
                 </Select>
@@ -595,11 +601,8 @@ export default function BannersPage() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12}>
-              <BannerPlacementPreview form={form} />
-            </Grid>
             {form.placement === 'hero' ? (
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   label='Auto-advance (seconds)'
                   fullWidth
@@ -615,6 +618,7 @@ export default function BannersPage() {
             <Grid item xs={12}>
               <CmsImageUploader
                 kind='banners'
+                surfaceKey={`banner.${form.placement || 'hero'}`}
                 value={form.image_url}
                 onChange={v => handleFormChange('image_url', v)}
               />
@@ -703,6 +707,28 @@ export default function BannersPage() {
                 label='Active'
               />
             </Grid>
+              </Grid>
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              md={5}
+              sx={{
+                position: { md: 'sticky' },
+                top: { md: 8 },
+                alignSelf: 'flex-start'
+              }}
+            >
+              <MobileFramePreview
+                label='App preview'
+                subtitle={PLACEMENTS.find(p => p.value === form.placement)?.label}
+              >
+                <BannerPlacementPreview form={form} showLabel={false} embedded />
+              </MobileFramePreview>
+              <Box sx={{ mt: 2 }}>
+                <BannerPlacementPreview form={form} compareAll showLabel={false} />
+              </Box>
+            </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
@@ -725,7 +751,11 @@ export default function BannersPage() {
             : 'Banner preview'}
         </DialogTitle>
         <DialogContent>
-          {previewRow ? <BannerPlacementPreview form={previewRow} showLabel={false} /> : null}
+          {previewRow ? (
+            <MobileFramePreview showLabel={false} footer={false}>
+              <BannerPlacementPreview form={previewRow} showLabel={false} embedded />
+            </MobileFramePreview>
+          ) : null}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setPreviewRow(null)}>Close</Button>

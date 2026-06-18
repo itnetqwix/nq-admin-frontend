@@ -22,7 +22,7 @@ const SEVERITY_FG = {
 /**
  * Mirrors mobile HomeBannerStrip (approximate).
  */
-export default function BannerPreviewStrip({ form }) {
+export default function BannerPreviewStrip({ form, embedded = false }) {
   const severity = form?.severity || 'info'
   const bg = SEVERITY_BG[severity] || SEVERITY_BG.info
   const fg = SEVERITY_FG[severity] || SEVERITY_FG.info
@@ -33,9 +33,15 @@ export default function BannerPreviewStrip({ form }) {
     : form?.cta_label?.trim()
       ? [{ label: form.cta_label.trim() }]
       : []
+  const legacyCta = ctas[0]
 
   return (
-    <Box sx={{ px: 1, py: 1 }}>
+    <Box sx={{ px: embedded ? 2 : 1, py: 1 }}>
+      {!embedded ? (
+        <Typography variant='caption' color='text.secondary' sx={{ mb: 0.5, display: 'block' }}>
+          Announcement strip
+        </Typography>
+      ) : null}
       <Box
         sx={{
           display: 'flex',
@@ -70,14 +76,10 @@ export default function BannerPreviewStrip({ form }) {
               {body.length > 160 ? '…' : ''}
             </Typography>
           ) : null}
-          {ctas.length ? (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
-              {ctas.map((c, i) => (
-                <Typography key={i} variant='caption' sx={{ color: fg, fontWeight: 600 }}>
-                  {c.label} →
-                </Typography>
-              ))}
-            </Box>
+          {legacyCta ? (
+            <Typography variant='caption' sx={{ color: fg, fontWeight: 600, mt: 0.5, display: 'block' }}>
+              {legacyCta.label} →
+            </Typography>
           ) : null}
         </Box>
         {form?.dismissible !== false ? (

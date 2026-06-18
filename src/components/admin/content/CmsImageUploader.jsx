@@ -1,21 +1,23 @@
 import React, { useRef, useState } from 'react'
-import { Box, Button, CircularProgress, TextField, Typography } from '@mui/material'
+import { Alert, Box, Button, CircularProgress, TextField, Typography } from '@mui/material'
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined'
 import toast from 'react-hot-toast'
 
 import { presignCmsAsset } from 'src/services/cmsAssetApi'
 import { putPresigned } from 'src/utils/presignedUpload'
 import { resolveCmsImageUrl } from 'src/utils/cmsImageUrl'
+import { getImageSpec } from './contentPlacementConfig'
 
 const MAX_BYTES = 5 * 1024 * 1024
 const ACCEPT = 'image/jpeg,image/png,image/webp'
 
 /**
- * Upload CMS images to S3 (banners, tips, pages) with optional manual URL fallback.
+ * Upload CMS images to S3 with placement-aware preview frame + recommended dimensions.
  */
 export default function CmsImageUploader({
   label = 'Image',
   kind = 'banners',
+  surfaceKey,
   value = '',
   onChange,
   helperText
@@ -23,7 +25,9 @@ export default function CmsImageUploader({
   const inputRef = useRef(null)
   const [uploading, setUploading] = useState(false)
 
+  const spec = surfaceKey ? getImageSpec(surfaceKey) : null
   const previewUrl = resolveCmsImageUrl(value)
+  const usesImage = spec ? spec.usesImage !== false : true
 
   const handleFile = async file => {
     if (!file) return
@@ -55,11 +59,47 @@ export default function CmsImageUploader({
     }
   }
 
+  const previewSx = spec?.aspectRatio
+    ? {
+        width: '100%',
+        maxWidth: spec.previewSize ? spec.previewSize * 2 : 360,
+        aspectRatio: String(spec.aspectRatio),
+        objectFit: 'cover',
+        borderRadius: 1,
+        border: '2px solid',
+        borderColor: 'primary.main'
+      }
+    : {
+        width: '100%',
+        maxWidth: spec?.previewSize ? spec.previewSize * 2 : 320,
+        maxHeight: spec?.previewHeight || 140,
+        objectFit: 'cover',
+        borderRadius: 1,
+        border: '1px solid',
+        borderColor: 'divider'
+      }
+
+  const defaultHelper =
+    spec?.label ||
+    helperText ||
+    'Upload above or paste a URL / existing S3 key'
+
   return (
     <Box>
       <Typography variant='subtitle2' gutterBottom>
         {label}
       </Typography>
+      {spec && spec.usesImage === false ? (
+        <Alert severity='info' sx={{ mb: 1 }}>
+          {spec.label} — you can still upload for records, but the mobile app will not show this image
+          on this placement.
+        </Alert>
+      ) : spec?.label ? (
+        <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 1 }}>
+          Recommended: {spec.label}
+          {spec.width && spec.height ? ` (${spec.width}×${spec.height}px)` : ''}
+        </Typography>
+      ) : null}
       <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center', mb: 1 }}>
         <Button
           variant='outlined'
@@ -83,22 +123,15 @@ export default function CmsImageUploader({
           onChange={e => handleFile(e.target.files?.[0])}
         />
       </Box>
-      {previewUrl ? (
-        <Box
-          component='img'
-          src={previewUrl}
-          alt=''
-          sx={{
-            width: '100%',
-            maxWidth: 320,
-            maxHeight: 140,
-            objectFit: 'cover',
-            borderRadius: 1,
-            border: '1px solid',
-            borderColor: 'divider',
-            mb: 1
-          }}
-        />
+      {previewUrl && usesImage ? (
+        <Box sx={{ mb: 1, position: 'relative' }}>
+          <Box component='img' src={previewUrl} alt='' sx={previewSx} />
+          {spec?.aspectRatio ? (
+            <Typography variant='caption' color='primary' sx={{ mt: 0.5, display: 'block' }}>
+              Preview frame matches mobile aspect ratio
+            </Typography>
+          ) : null}
+        </Box>
       ) : null}
       <TextField
         label='Image URL or S3 key (optional)'
@@ -107,7 +140,7 @@ export default function CmsImageUploader({
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder='https://… or cms/banners/…'
-        helperText={helperText || 'Upload above or paste a URL / existing S3 key'}
+        helperText={helperText || defaultHelper}
       />
     </Box>
   )

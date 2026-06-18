@@ -25,6 +25,9 @@ import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminFilterBar from 'src/components/admin/AdminFilterBar'
 import { useAdminConfirm } from 'src/components/admin'
 import CmsImageUploader from 'src/components/admin/content/CmsImageUploader'
+import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
+import CmsPagePlacementPreview from 'src/components/admin/content/CmsPagePlacementPreview'
+import MobileFramePreview from 'src/components/admin/content/MobileFramePreview'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import {
   listCmsPages,
@@ -234,6 +237,7 @@ export default function CmsBlogPage() {
       }
     >
       <AdminPageSection>
+        <ContentPlacementGuide kind='blog' />
         <AdminFilterBar onRefresh={() => void load()} refreshLoading={loading} resultCount={rows.length}>
           <FormControl fullWidth size='small' sx={{ minWidth: 200 }}>
             <InputLabel>Filter type</InputLabel>
@@ -247,10 +251,12 @@ export default function CmsBlogPage() {
         <AdminDataGrid rows={rows} columns={columns} loading={loading} getRowId={r => r._id} autoHeight />
       </AdminPageSection>
 
-      <Dialog open={open} onClose={() => setOpen(false)} maxWidth='md' fullWidth>
+      <Dialog open={open} onClose={() => setOpen(false)} maxWidth='lg' fullWidth>
         <DialogTitle>{editId ? 'Edit page' : 'Create page'}</DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={2} sx={{ mt: 0.5 }}>
+            <Grid item xs={12} md={7}>
+              <Grid container spacing={2}>
             <Grid item xs={12} sm={4}>
               <FormControl fullWidth size='small'>
                 <InputLabel>Type</InputLabel>
@@ -318,6 +324,7 @@ export default function CmsBlogPage() {
               <CmsImageUploader
                 kind='pages'
                 label='Cover image'
+                surfaceKey={form.type === 'page' ? 'page.static' : 'page.blog_cover'}
                 value={form.cover_image_url}
                 onChange={v => setForm(f => ({ ...f, cover_image_url: v }))}
               />
@@ -390,6 +397,16 @@ export default function CmsBlogPage() {
                 }
                 label='Active'
               />
+            </Grid>
+              </Grid>
+            </Grid>
+            <Grid item xs={12} md={5} sx={{ position: { md: 'sticky' }, top: { md: 8 }, alignSelf: 'flex-start' }}>
+              <MobileFramePreview
+                label='App preview'
+                subtitle={form.type === 'page' ? 'Static WebView page' : 'Blog list + article'}
+              >
+                <CmsPagePlacementPreview form={form} />
+              </MobileFramePreview>
             </Grid>
           </Grid>
         </DialogContent>

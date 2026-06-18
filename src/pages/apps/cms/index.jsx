@@ -29,19 +29,19 @@ const SECTIONS = [
     title: 'Blog & pages',
     href: '/apps/cms-blog',
     description: 'Editorial posts and standalone screens like About / Methodology.',
-    metric: () => null
+    metric: s => (s?.pages?.live_blogs ?? 0) + (s?.pages?.live_static_pages ?? 0)
   },
   {
     title: 'FAQ',
     href: '/apps/cms-faq',
     description: 'Settings → FAQ content, instantly publishable to mobile.',
-    metric: () => null
+    metric: s => (s?.faq?.active ? 1 : 0)
   },
   {
     title: 'Legal',
     href: '/apps/cms-legal',
     description: 'Terms of service and Privacy policy — versioned for OTA refresh.',
-    metric: () => null
+    metric: s => s?.legal?.active_documents ?? 0
   }
 ]
 
@@ -82,6 +82,11 @@ export default function CmsOverviewPage() {
           <Chip label={`Scheduled (off-window): ${summary?.scheduled_off_window ?? '—'}`} />
           <Chip label={`Inactive banners: ${summary?.inactive?.banners ?? '—'}`} color='default' />
           <Chip label={`Inactive tips: ${summary?.inactive?.tips ?? '—'}`} color='default' />
+          <Chip label={`Legal docs: ${summary?.legal?.active_documents ?? '—'}`} />
+          <Chip label={`FAQ: ${summary?.faq?.active ? 'live' : '—'}`} />
+          <Chip
+            label={`Pages: ${(summary?.pages?.live_blogs ?? 0) + (summary?.pages?.live_static_pages ?? 0)} live`}
+          />
         </Stack>
 
         <Grid container spacing={2}>
@@ -111,14 +116,19 @@ export default function CmsOverviewPage() {
         </Grid>
 
         <Box sx={{ mt: 4 }}>
+          <Typography variant='subtitle1' fontWeight={700} gutterBottom>
+            Placement guides
+          </Typography>
+          <ContentPlacementGuide kind='banners' />
+          <ContentPlacementGuide kind='tips' />
+          <ContentPlacementGuide kind='blog' />
+          <ContentPlacementGuide kind='legal' />
+        </Box>
+        <Box sx={{ mt: 4 }}>
           <Typography variant='caption' color='text.secondary' display='block' sx={{ mb: 2 }}>
             Content version: {summary?.content_version ?? '—'} · Updated:{' '}
             {summary?.updated_at ? new Date(summary.updated_at).toLocaleString() : '—'}
           </Typography>
-          <Typography variant='subtitle1' fontWeight={700} gutterBottom>
-            Placement guide
-          </Typography>
-          <ContentPlacementGuide kind='banners' />
         </Box>
       </AdminPageSection>
     </AdminPageShell>

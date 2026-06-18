@@ -18,16 +18,24 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import NextLink from 'next/link'
 import {
   BANNERS_PLACEMENT,
+  BLOG_PLACEMENT,
+  LEGAL_PLACEMENT,
   TIPS_PLACEMENT
 } from './contentPlacementConfig'
 
+const CONFIG = {
+  tips: { rows: TIPS_PLACEMENT, otherHref: '/apps/banners', otherLabel: 'Banners', showPlacementKey: false },
+  banners: { rows: BANNERS_PLACEMENT, otherHref: '/apps/tips', otherLabel: 'Tips', showPlacementKey: true },
+  blog: { rows: BLOG_PLACEMENT, otherHref: '/apps/cms-legal', otherLabel: 'Legal', showPlacementKey: true },
+  legal: { rows: LEGAL_PLACEMENT, otherHref: '/apps/cms-blog', otherLabel: 'Blog & pages', showPlacementKey: false }
+}
+
 /**
- * @param {{ kind: 'tips' | 'banners' }} props
+ * @param {{ kind: 'tips' | 'banners' | 'blog' | 'legal' }} props
  */
 export default function ContentPlacementGuide({ kind }) {
-  const rows = kind === 'tips' ? TIPS_PLACEMENT : BANNERS_PLACEMENT
-  const otherHref = kind === 'tips' ? '/apps/banners' : '/apps/tips'
-  const otherLabel = kind === 'tips' ? 'Banners' : 'Tips'
+  const cfg = CONFIG[kind] || CONFIG.banners
+  const rows = cfg.rows
 
   return (
     <Accordion
@@ -47,24 +55,25 @@ export default function ContentPlacementGuide({ kind }) {
           <Typography fontWeight={700}>Where this appears in the app</Typography>
           <Typography variant='caption' color='text.secondary'>
             Match audience tags to the screens below.{' '}
-            <Link component={NextLink} href={otherHref} underline='hover'>
-              Manage {otherLabel}
+            <Link component={NextLink} href={cfg.otherHref} underline='hover'>
+              Manage {cfg.otherLabel}
             </Link>
           </Typography>
         </Box>
       </AccordionSummary>
       <AccordionDetails sx={{ pt: 0 }}>
         <Alert severity='info' sx={{ mb: 2 }}>
-          Mobile app is live today. Web dashboard uses the same API but UI is not wired yet — plan
-          audience tags the same way.
+          Use the mobile preview panel while editing — it matches real component sizes (390pt frame).
+          Changes publish instantly via CMS_UPDATED socket.
         </Alert>
         <Table size='small'>
           <TableHead>
             <TableRow>
               <TableCell>Surface</TableCell>
-              {kind === 'banners' ? <TableCell>Placement key</TableCell> : null}
+              {cfg.showPlacementKey ? <TableCell>Key</TableCell> : null}
               <TableCell>Path</TableCell>
-              <TableCell>Audience tags</TableCell>
+              <TableCell>Image spec</TableCell>
+              <TableCell>Audience</TableCell>
               <TableCell>Notes</TableCell>
             </TableRow>
           </TableHead>
@@ -76,12 +85,14 @@ export default function ContentPlacementGuide({ kind }) {
                     {row.surface}
                   </Typography>
                 </TableCell>
-                {kind === 'banners' && row.placement ? (
+                {cfg.showPlacementKey ? (
                   <TableCell>
-                    <Chip label={row.placement} size='small' variant='outlined' />
+                    {row.placement || row.previewKey ? (
+                      <Chip label={row.placement || row.previewKey} size='small' variant='outlined' />
+                    ) : (
+                      '—'
+                    )}
                   </TableCell>
-                ) : kind === 'banners' ? (
-                  <TableCell>—</TableCell>
                 ) : null}
                 <TableCell>
                   <Typography variant='body2' color='text.secondary'>
@@ -89,8 +100,13 @@ export default function ContentPlacementGuide({ kind }) {
                   </Typography>
                 </TableCell>
                 <TableCell>
+                  <Typography variant='caption' color='text.secondary'>
+                    {row.imageSpec?.label || '—'}
+                  </Typography>
+                </TableCell>
+                <TableCell>
                   <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                    {row.audiences.map(a => (
+                    {(row.audiences || []).map(a => (
                       <Chip key={a} label={a} size='small' variant='outlined' />
                     ))}
                   </Box>

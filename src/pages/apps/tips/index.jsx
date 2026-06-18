@@ -33,8 +33,9 @@ import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminFilterBar from 'src/components/admin/AdminFilterBar'
 import { useAdminConfirm } from 'src/components/admin'
 import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
-import TipPreviewCard from 'src/components/admin/content/TipPreviewCard'
+import TipPlacementPreview from 'src/components/admin/content/TipPlacementPreview'
 import CmsImageUploader from 'src/components/admin/content/CmsImageUploader'
+import MobileFramePreview from 'src/components/admin/content/MobileFramePreview'
 import { computeScheduleStatus, scheduleStatusChip } from 'src/components/admin/content/scheduleStatus'
 import { TIPS_AUDIENCE_HELP } from 'src/components/admin/content/contentPlacementConfig'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
@@ -425,10 +426,12 @@ export default function TipsPage() {
         </AdminPageSection>
       </AdminPageShell>
 
-      <Dialog open={formOpen} onClose={() => setFormOpen(false)} maxWidth='md' fullWidth>
+      <Dialog open={formOpen} onClose={() => setFormOpen(false)} maxWidth='lg' fullWidth>
         <DialogTitle>{editId ? 'Edit tip' : 'Create tip'}</DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={2} sx={{ mt: 0.5 }}>
+            <Grid item xs={12} md={7}>
+              <Grid container spacing={2}>
             <Grid item xs={12} sm={8}>
               <TextField
                 label='Title'
@@ -457,12 +460,6 @@ export default function TipsPage() {
               </FormControl>
             </Grid>
             <Grid item xs={12}>
-              <Typography variant='subtitle2' gutterBottom>
-                Mobile preview
-              </Typography>
-              <TipPreviewCard form={form} />
-            </Grid>
-            <Grid item xs={12}>
               <TextField
                 label='Body'
                 fullWidth
@@ -478,6 +475,8 @@ export default function TipsPage() {
             <Grid item xs={12}>
               <CmsImageUploader
                 kind='tips'
+                surfaceKey='tip.offers_carousel'
+                label='Offer image (carousel thumb)'
                 value={form.image_url}
                 onChange={v => handleFormChange('image_url', v)}
               />
@@ -555,6 +554,13 @@ export default function TipsPage() {
                 label='Active'
               />
             </Grid>
+              </Grid>
+            </Grid>
+            <Grid item xs={12} md={5} sx={{ position: { md: 'sticky' }, top: { md: 8 }, alignSelf: 'flex-start' }}>
+              <MobileFramePreview label='App preview' subtitle='Both mobile surfaces'>
+                <TipPlacementPreview form={form} />
+              </MobileFramePreview>
+            </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
@@ -570,10 +576,14 @@ export default function TipsPage() {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={!!previewRow} onClose={() => setPreviewRow(null)} maxWidth='xs' fullWidth>
+      <Dialog open={!!previewRow} onClose={() => setPreviewRow(null)} maxWidth='sm' fullWidth>
         <DialogTitle>Tip preview</DialogTitle>
         <DialogContent>
-          {previewRow ? <TipPreviewCard form={previewRow} /> : null}
+          {previewRow ? (
+            <MobileFramePreview label='App preview'>
+              <TipPlacementPreview form={previewRow} />
+            </MobileFramePreview>
+          ) : null}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setPreviewRow(null)}>Close</Button>
