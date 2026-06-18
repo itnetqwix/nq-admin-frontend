@@ -146,11 +146,11 @@ export default function ManageTrainer() {
     { field: 'wallet_amount', headerName: 'Wallet Amount', width: 150 },
     {
       field: 'view',
-      headerName: 'Trainer Clips',
-      width: 120,
+      headerName: 'Preview',
+      width: 90,
       sortable: false,
       renderCell: params => (
-        <IconButton onClick={() => handleCourseClick(params.row.id)} aria-label='Preview clips'>
+        <IconButton onClick={() => handleCourseClick(params.row.id)} aria-label='Quick preview'>
           <VisibilityIcon fontSize='small' />
         </IconButton>
       )
@@ -223,11 +223,14 @@ export default function ManageTrainer() {
           subtitle='Search the directory and click a row to open User 360.'
           actions={
             <>
+              <CustomButton component={Link} variant='outlined' href='/apps/users'>
+                All users
+              </CustomButton>
               <CustomButton component={Link} variant='outlined' href='/apps/trainer-verifications'>
                 Verifications queue
               </CustomButton>
               <CustomButton component={Link} variant='contained' href='/apps/manage-trainer' startIcon={<MenuIcon />}>
-                Settings
+                Directory
               </CustomButton>
             </>
           }

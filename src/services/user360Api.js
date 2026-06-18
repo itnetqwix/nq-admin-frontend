@@ -150,3 +150,27 @@ export const getCallDiagnostics = async (query = {}) => {
   if (isApiFailure(data, response)) throw new Error(readError(data))
   return data?.data || { diagnostics: [], total: 0, limit: 100, skip: 0 }
 }
+
+const unwrapData = data => data?.data ?? unwrap(data)
+
+export const getUserSupportTickets = async userId => {
+  if (!userId || userId === 'undefined') throw new Error('Invalid user id')
+  const response = await fetch(apiUrl(`/admin/users/${userId}/support-tickets`), {
+    method: 'GET',
+    headers: getAuthHeaders()
+  })
+  const data = await response.json()
+  if (isApiFailure(data, response)) throw new Error(readError(data))
+  return unwrapData(data) || { feedback: [], concerns: [] }
+}
+
+export const getUserReferrals = async userId => {
+  if (!userId || userId === 'undefined') throw new Error('Invalid user id')
+  const response = await fetch(apiUrl(`/admin/users/${userId}/referrals`), {
+    method: 'GET',
+    headers: getAuthHeaders()
+  })
+  const data = await response.json()
+  if (isApiFailure(data, response)) throw new Error(readError(data))
+  return unwrapData(data)
+}

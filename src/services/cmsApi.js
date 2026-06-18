@@ -90,6 +90,44 @@ export const publishAdminFaq = async body => {
   return handleRes(res)
 }
 
+/** Save FAQ editor state without going live. */
+export const saveFaqDraft = async body => {
+  const res = await fetch(apiUrl('/admin/cms/faq/draft'), {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(body)
+  })
+  return handleRes(res)
+}
+
+/** Publish draft (or optional body) to all apps. */
+export const publishFaq = async (body = {}) => {
+  const res = await fetch(apiUrl('/admin/cms/faq/publish'), {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(body)
+  })
+  return handleRes(res)
+}
+
+export const saveLegalDraft = async (slug, body) => {
+  const res = await fetch(apiUrl(`/admin/cms/legal/${slug}/draft`), {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(body)
+  })
+  return handleRes(res)
+}
+
+export const publishLegal = async (slug, body = {}) => {
+  const res = await fetch(apiUrl(`/admin/cms/legal/${slug}/publish`), {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(body)
+  })
+  return handleRes(res)
+}
+
 export const seedAdminFaq = async (body = {}) => {
   const res = await fetch(apiUrl('/admin/cms/faq/seed'), {
     method: 'POST',

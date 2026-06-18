@@ -77,9 +77,15 @@ export default function CmsOverviewPage() {
     >
       <AdminPageSection>
         <Stack direction='row' spacing={2} flexWrap='wrap' sx={{ mb: 3 }}>
-          <Chip label={`Live banners: ${summary?.live?.banners ?? '—'}`} color='primary' />
-          <Chip label={`Live tips: ${summary?.live?.tips ?? '—'}`} color='primary' />
-          <Chip label={`Scheduled (off-window): ${summary?.scheduled_off_window ?? '—'}`} />
+          <Chip label={`Live banners: ${summary?.live?.banners ?? '—'}`} color='primary' component={NextLink} href='/apps/banners' clickable />
+          <Chip label={`Live tips: ${summary?.live?.tips ?? '—'}`} color='primary' component={NextLink} href='/apps/tips' clickable />
+          <Chip
+            label={`Scheduled (off-window): ${summary?.scheduled_off_window ?? '—'}`}
+            component={NextLink}
+            href='/apps/banners'
+            clickable
+            variant='outlined'
+          />
           <Chip label={`Inactive banners: ${summary?.inactive?.banners ?? '—'}`} color='default' />
           <Chip label={`Inactive tips: ${summary?.inactive?.tips ?? '—'}`} color='default' />
           <Chip label={`Legal docs: ${summary?.legal?.active_documents ?? '—'}`} />
@@ -118,6 +124,9 @@ export default function CmsOverviewPage() {
         <Box sx={{ mt: 4 }}>
           <Typography variant='subtitle1' fontWeight={700} gutterBottom>
             Placement guides
+          </Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+            Collapsed by default on editor pages — expand here for the full reference.
           </Typography>
           <ContentPlacementGuide kind='banners' />
           <ContentPlacementGuide kind='tips' />

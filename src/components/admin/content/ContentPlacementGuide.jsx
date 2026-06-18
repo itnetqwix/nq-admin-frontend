@@ -19,6 +19,7 @@ import NextLink from 'next/link'
 import {
   BANNERS_PLACEMENT,
   BLOG_PLACEMENT,
+  FAQ_PLACEMENT,
   LEGAL_PLACEMENT,
   TIPS_PLACEMENT
 } from './contentPlacementConfig'
@@ -27,19 +28,20 @@ const CONFIG = {
   tips: { rows: TIPS_PLACEMENT, otherHref: '/apps/banners', otherLabel: 'Banners', showPlacementKey: false },
   banners: { rows: BANNERS_PLACEMENT, otherHref: '/apps/tips', otherLabel: 'Tips', showPlacementKey: true },
   blog: { rows: BLOG_PLACEMENT, otherHref: '/apps/cms-legal', otherLabel: 'Legal', showPlacementKey: true },
-  legal: { rows: LEGAL_PLACEMENT, otherHref: '/apps/cms-blog', otherLabel: 'Blog & pages', showPlacementKey: false }
+  legal: { rows: LEGAL_PLACEMENT, otherHref: '/apps/cms-blog', otherLabel: 'Blog & pages', showPlacementKey: false },
+  faq: { rows: FAQ_PLACEMENT, otherHref: '/apps/cms-blog', otherLabel: 'Blog & pages', showPlacementKey: false }
 }
 
 /**
- * @param {{ kind: 'tips' | 'banners' | 'blog' | 'legal' }} props
+ * @param {{ kind: 'tips' | 'banners' | 'blog' | 'legal' | 'faq', defaultExpanded?: boolean }} props
  */
-export default function ContentPlacementGuide({ kind }) {
+export default function ContentPlacementGuide({ kind, defaultExpanded = false }) {
   const cfg = CONFIG[kind] || CONFIG.banners
   const rows = cfg.rows
 
   return (
     <Accordion
-      defaultExpanded
+      defaultExpanded={defaultExpanded}
       disableGutters
       elevation={0}
       sx={{

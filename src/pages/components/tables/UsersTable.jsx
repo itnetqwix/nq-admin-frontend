@@ -1,11 +1,13 @@
 import { Avatar, Box, Button, Chip, Stack } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 import { AdminDataGrid, AdminFilterBar, AdminGridContainer } from 'src/components/admin'
 import { getImageUrl } from 'src/utils/utils'
 import { useAdminRealtime } from 'src/context/AdminRealtimeContext'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 
 export default function ActiveUsersTable() {
+  const router = useRouter()
   const { onlineUsers, socketConnected, refreshOnlineUsers } = useAdminRealtime()
   const [trainerList, setTrainerList] = useState([])
   const [tableData, setTableData] = useState([])
@@ -94,7 +96,16 @@ export default function ActiveUsersTable() {
             resultCount={tableData.length}
           />
           <AdminGridContainer>
-            <AdminDataGrid autoHeight={false} rows={tableData ?? []} columns={columns} />
+            <AdminDataGrid
+              autoHeight={false}
+              rows={tableData ?? []}
+              columns={columns}
+              onRowClick={p => {
+                const id = p.row?.id || p.row?._id
+                if (id) router.push(`/apps/users/${id}`)
+              }}
+              clickableRows
+            />
           </AdminGridContainer>
         </AdminPageSection>
       </AdminPageShell>

@@ -33,6 +33,7 @@ import toast from 'react-hot-toast'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminFilterBar from 'src/components/admin/AdminFilterBar'
 import { useAdminConfirm } from 'src/components/admin'
+import CmsEditorDrawer from 'src/components/admin/content/CmsEditorDrawer'
 import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
 import BannerCtaEditor from 'src/components/admin/content/BannerCtaEditor'
 import BannerPlacementPreview from 'src/components/admin/content/BannerPlacementPreview'
@@ -436,7 +437,7 @@ export default function BannersPage() {
         contentSx={{ p: 0 }}
       >
         <AdminPageSection>
-          <ContentPlacementGuide kind='banners' />
+          <ContentPlacementGuide kind='banners' defaultExpanded={false} />
           <AdminFilterBar
             searchPlaceholder='Search title, body, CTA, audience…'
             searchValue={searchInput}
@@ -515,10 +516,16 @@ export default function BannersPage() {
         </AdminPageSection>
       </AdminPageShell>
 
-      <Dialog open={formOpen} onClose={() => setFormOpen(false)} maxWidth='lg' fullWidth>
-        <DialogTitle>{editId ? 'Edit banner' : 'Create banner'}</DialogTitle>
-        <DialogContent dividers>
-          <Grid container spacing={2} sx={{ mt: 0.5 }}>
+      <CmsEditorDrawer
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        title={editId ? 'Edit banner' : 'Create banner'}
+        subtitle={PLACEMENTS.find(p => p.value === form.placement)?.label || form.placement}
+        onSave={handleSave}
+        saving={saving}
+        saveLabel={editId ? 'Update' : 'Create'}
+      >
+          <Grid container spacing={2}>
             <Grid item xs={12} md={7}>
               <Grid container spacing={2}>
             <Grid item xs={12} sm={8}>
@@ -730,19 +737,7 @@ export default function BannersPage() {
               </Box>
             </Grid>
           </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setFormOpen(false)}>Cancel</Button>
-          <Button
-            variant='contained'
-            onClick={handleSave}
-            disabled={saving}
-            sx={{ bgcolor: '#000080', '&:hover': { bgcolor: '#0000a0' } }}
-          >
-            {saving ? 'Saving…' : editId ? 'Update' : 'Create'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      </CmsEditorDrawer>
 
       <Dialog open={!!previewRow} onClose={() => setPreviewRow(null)} maxWidth='sm' fullWidth>
         <DialogTitle>

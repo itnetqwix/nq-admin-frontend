@@ -1,14 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Box, Button, Grid, TextField, Typography } from '@mui/material'
+import { Box, Button, Chip, Grid, Stack, TextField, Typography } from '@mui/material'
 import toast from 'react-hot-toast'
 
 import AdminTabs from 'src/components/admin/AdminTabs'
 import { useAdminConfirm } from 'src/components/admin'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import CmsHtmlEditor from 'src/components/admin/content/CmsHtmlEditor'
 import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
 import LegalDocumentPreview from 'src/components/admin/content/LegalDocumentPreview'
 import MobileFramePreview from 'src/components/admin/content/MobileFramePreview'
-import { listLegalDocuments, seedLegalDocuments, upsertLegalDocument } from 'src/services/cmsApi'
+import { listLegalDocuments, publishLegal, saveLegalDraft, seedLegalDocuments } from 'src/services/cmsApi'
 
 const SLUGS = [
   { slug: 'terms', label: 'Terms & conditions' },
@@ -30,8 +31,10 @@ export default function CmsLegalPage() {
   const [title, setTitle] = useState('')
   const [bodyHtml, setBodyHtml] = useState('')
   const [saving, setSaving] = useState(false)
+  const [publishing, setPublishing] = useState(false)
   const [seeding, setSeeding] = useState(false)
   const [previewDark, setPreviewDark] = useState(false)
+  const [dirty, setDirty] = useState(false)
 
   const slug = SLUGS[tab].slug
 
@@ -56,6 +59,7 @@ export default function CmsLegalPage() {
     const doc = docs[slug]
     setTitle(doc?.title || SLUGS[tab].label)
     setBodyHtml(doc?.body_html || '<p>Enter HTML content here.</p>')
+    setDirty(false)
   }, [docs, slug, tab])
 
   const handleSeed = async () => {
@@ -78,6 +82,23 @@ export default function CmsLegalPage() {
     }
   }
 
+  const handleSaveDraft = async () => {
+    setSaving(true)
+    try {
+      await saveLegalDraft(slug, {
+        title: title.trim(),
+        body_html: bodyHtml
+      })
+      toast.success('Draft saved — not visible in apps until you publish')
+      setDirty(false)
+      await load()
+    } catch (e) {
+      toast.error(e.message || 'Save draft failed')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const handlePublish = async () => {
     const ok = await confirm({
       title: `Publish ${SLUGS[tab].label}?`,
@@ -87,31 +108,39 @@ export default function CmsLegalPage() {
       variant: 'warning'
     })
     if (!ok) return
-    setSaving(true)
+    setPublishing(true)
     try {
-      await upsertLegalDocument(slug, {
-        title: title.trim(),
-        body_html: bodyHtml,
-        is_active: true
-      })
+      const body =
+        dirty
+          ? { title: title.trim(), body_html: bodyHtml, is_active: true }
+          : { is_active: true }
+      await publishLegal(slug, body)
       toast.success('Published — signed-in apps refresh instantly; guests within ~60s')
+      setDirty(false)
       await load()
     } catch (e) {
       toast.error(e.message || 'Publish failed')
     } finally {
-      setSaving(false)
+      setPublishing(false)
     }
   }
 
   const version = docs[slug]?.version
+  const hasUnpublished = Boolean(docs[slug]?.has_unpublished_changes)
 
   return (
     <AdminPageShell title='Legal documents' subtitle='Terms & privacy — live in the app without a store update'>
       <AdminPageSection>
-        <ContentPlacementGuide kind='legal' />
+        <ContentPlacementGuide kind='legal' defaultExpanded={false} />
         <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
           HTML is rendered in-app. Version {version ?? '—'} is shown to users after publish.
         </Typography>
+        <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
+          <Chip label={`Version ${version ?? '—'}`} size='small' variant='outlined' />
+          {dirty || hasUnpublished ? (
+            <Chip label='Unpublished changes' size='small' color='warning' />
+          ) : null}
+        </Stack>
         <Box sx={{ mb: 2, p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
           <Typography variant='subtitle2' sx={{ mb: 1 }}>
             Writing tips
@@ -133,24 +162,35 @@ export default function CmsLegalPage() {
               fullWidth
               label='Title'
               value={title}
-              onChange={e => setTitle(e.target.value)}
+              onChange={e => {
+                setDirty(true)
+                setTitle(e.target.value)
+              }}
               sx={{ mb: 2 }}
             />
-            <TextField
-              fullWidth
-              multiline
-              minRows={18}
-              label='Body (HTML)'
+            <CmsHtmlEditor
+              label='Body'
               value={bodyHtml}
-              onChange={e => setBodyHtml(e.target.value)}
-              sx={{ mb: 2, fontFamily: 'monospace' }}
+              onChange={html => {
+                setDirty(true)
+                setBodyHtml(html)
+              }}
+              minHeight={360}
+              helperText='Use headings for sections. Publish increments version for OTA refresh.'
             />
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
               <Button variant='outlined' onClick={() => void handleSeed()} disabled={seeding}>
                 {seeding ? 'Loading…' : 'Load template'}
               </Button>
-              <Button variant='contained' onClick={() => void handlePublish()} disabled={saving}>
-                {saving ? 'Publishing…' : 'Publish to app'}
+              <Button variant='outlined' onClick={() => void handleSaveDraft()} disabled={saving || !dirty}>
+                {saving ? 'Saving…' : 'Save draft'}
+              </Button>
+              <Button
+                variant='contained'
+                onClick={() => void handlePublish()}
+                disabled={publishing || (!dirty && !hasUnpublished)}
+              >
+                {publishing ? 'Publishing…' : 'Publish to app'}
               </Button>
             </Box>
           </Grid>

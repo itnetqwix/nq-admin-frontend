@@ -208,7 +208,7 @@ export default function User360Page() {
   }, [userId, tab, query.activity])
 
   useEffect(() => {
-    if (!userId || tab !== 6) return
+    if (!userId || tab !== 7) return
     let cancelled = false
     ;(async () => {
       setOpsEventsLoading(true)
@@ -244,7 +244,7 @@ export default function User360Page() {
         setAssets(await getUserAssets(userId, { ...query.assets, section: 'plans' }))
       } else if (tab === 5) {
         setTimeline(await getUserTimeline(userId, query.activity))
-      } else if (tab === 6) {
+      } else if (tab === 7) {
         const d = await getOpsEventsForUser(userId, { page: 1, limit: 50 })
         setOpsEvents({ items: d?.items || [], total: d?.total || 0 })
       }
@@ -263,6 +263,15 @@ export default function User360Page() {
     userData?.user?.fullname ||
     'User profile'
 
+  const accountType =
+    userData?.user?.account_type ||
+    userData?.overview?.identity?.account_type ||
+    'trainer'
+  const listHref =
+    accountType === 'trainee' ? '/apps/manage-trainee' : accountType === 'trainer' ? '/apps/manage-trainer' : '/apps/users'
+  const listLabel =
+    accountType === 'trainee' ? 'Trainees' : accountType === 'trainer' ? 'Trainers' : 'Users'
+
   if (!router.isReady) {
     return (
       <Box sx={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'grey.50' }}>
@@ -279,8 +288,8 @@ export default function User360Page() {
           <Typography variant='body2' color='text.secondary' sx={{ mb: 3 }}>
             The link may be invalid or the user id is missing.
           </Typography>
-          <Button component={Link} href='/apps/manage-trainer' variant='contained'>
-            Back to trainers
+          <Button component={Link} href='/apps/users' variant='contained'>
+            Back to users
           </Button>
         </Box>
       </Container>
@@ -294,8 +303,11 @@ export default function User360Page() {
           <MuiLink component={Link} href='/home' underline='hover' color='inherit' sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <HomeOutlinedIcon sx={{ fontSize: 18 }} /> Home
           </MuiLink>
-          <MuiLink component={Link} href='/apps/manage-trainer' underline='hover' color='inherit'>
-            Trainers
+          <MuiLink component={Link} href={listHref} underline='hover' color='inherit'>
+            {listLabel}
+          </MuiLink>
+          <MuiLink component={Link} href='/apps/users' underline='hover' color='inherit' sx={{ fontSize: 13 }}>
+            All users
           </MuiLink>
           <Typography color='text.primary' sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <PersonSearchOutlinedIcon sx={{ fontSize: 18 }} /> User console

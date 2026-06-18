@@ -18,6 +18,13 @@ const navigation = () => [
     subject: 'admin-nav-people',
     children: [
       {
+        title: 'All users',
+        path: '/apps/users',
+        icon: 'mdi:account-search-outline',
+        action: 'read',
+        subject: 'admin-nav-users-directory'
+      },
+      {
         title: 'Trainer verifications',
         path: '/apps/trainer-verifications',
         icon: 'mdi:account-check-outline',

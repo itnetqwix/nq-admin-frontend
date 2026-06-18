@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Box,
   Button,
@@ -10,27 +10,33 @@ import {
   FormControl,
   FormControlLabel,
   Grid,
+  IconButton,
   InputLabel,
   MenuItem,
   Select,
   Switch,
   TextField,
-  Typography
+  Tooltip
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import VisibilityIcon from '@mui/icons-material/Visibility'
-import IconButton from '@mui/material/IconButton'
+import ToggleOnIcon from '@mui/icons-material/ToggleOn'
 import NextLink from 'next/link'
 import toast from 'react-hot-toast'
 
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminFilterBar from 'src/components/admin/AdminFilterBar'
 import { useAdminConfirm } from 'src/components/admin'
+import CmsEditorDrawer from 'src/components/admin/content/CmsEditorDrawer'
+import CmsHtmlEditor from 'src/components/admin/content/CmsHtmlEditor'
 import CmsImageUploader from 'src/components/admin/content/CmsImageUploader'
 import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
 import CmsPagePlacementPreview from 'src/components/admin/content/CmsPagePlacementPreview'
 import MobileFramePreview from 'src/components/admin/content/MobileFramePreview'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import { slugify } from 'src/utils/slugify'
 import {
   listCmsPages,
   createCmsPage,
@@ -82,6 +88,19 @@ export default function CmsBlogPage() {
   const [form, setForm] = useState({ ...EMPTY })
   const [saving, setSaving] = useState(false)
   const [previewRow, setPreviewRow] = useState(null)
+  const [search, setSearch] = useState('')
+  const [slugTouched, setSlugTouched] = useState(false)
+
+  const filteredRows = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return rows
+    return rows.filter(
+      r =>
+        String(r.title || '').toLowerCase().includes(q) ||
+        String(r.slug || '').toLowerCase().includes(q) ||
+        String(r.excerpt || '').toLowerCase().includes(q)
+    )
+  }, [rows, search])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -102,12 +121,14 @@ export default function CmsBlogPage() {
   const openCreate = () => {
     setEditId(null)
     setForm({ ...EMPTY })
+    setSlugTouched(false)
     setOpen(true)
   }
 
   const openEdit = row => {
     setEditId(row._id)
     const pub = row.published_at ? String(row.published_at).slice(0, 10) : ''
+    setSlugTouched(true)
     setForm({
       type: row.type === 'page' ? 'page' : 'blog',
       title: row.title || '',
@@ -127,12 +148,21 @@ export default function CmsBlogPage() {
   }
 
   const handleSave = async () => {
+    if (!form.title.trim()) {
+      toast.error('Title is required')
+      return
+    }
+    const slug = (form.slug || slugify(form.title)).trim().toLowerCase()
+    if (!slug) {
+      toast.error('Slug is required')
+      return
+    }
     setSaving(true)
     try {
       const payload = {
         type: form.type === 'page' ? 'page' : 'blog',
         title: form.title.trim(),
-        slug: form.slug.trim().toLowerCase(),
+        slug,
         excerpt: form.excerpt.trim(),
         body_html: form.body_html,
         cover_image_url: form.cover_image_url || null,
@@ -193,40 +223,48 @@ export default function CmsBlogPage() {
     {
       field: 'actions',
       headerName: '',
-      width: 220,
+      width: 140,
       sortable: false,
       renderCell: ({ row }) => (
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button size='small' onClick={() => openEdit(row)}>
-            Edit
-          </Button>
-          <Button
-            size='small'
-            onClick={async () => {
-              await toggleCmsPage(row._id)
-              await load()
-            }}
-          >
-            Toggle
-          </Button>
-          <Button
-            size='small'
-            color='error'
-            onClick={async () => {
-              const ok = await confirm({
-                title: 'Delete this page?',
-                message: 'The blog or static page will be removed from the mobile app.',
-                detail: row.title,
-                confirmLabel: 'Delete',
-                variant: 'danger'
-              })
-              if (!ok) return
-              await deleteCmsPage(row._id)
-              await load()
-            }}
-          >
-            Del
-          </Button>
+        <Box sx={{ display: 'flex', gap: 0.5 }}>
+          <Tooltip title='Edit'>
+            <IconButton size='small' onClick={() => openEdit(row)}>
+              <EditIcon fontSize='small' />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title='Toggle active'>
+            <IconButton
+              size='small'
+              onClick={async e => {
+                e.stopPropagation()
+                await toggleCmsPage(row._id)
+                await load()
+              }}
+            >
+              <ToggleOnIcon fontSize='small' />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title='Delete'>
+            <IconButton
+              size='small'
+              color='error'
+              onClick={async e => {
+                e.stopPropagation()
+                const ok = await confirm({
+                  title: 'Delete this page?',
+                  message: 'The blog or static page will be removed from the mobile app.',
+                  detail: row.title,
+                  confirmLabel: 'Delete',
+                  variant: 'danger'
+                })
+                if (!ok) return
+                await deleteCmsPage(row._id)
+                await load()
+              }}
+            >
+              <DeleteOutlineIcon fontSize='small' />
+            </IconButton>
+          </Tooltip>
         </Box>
       )
     }
@@ -251,8 +289,15 @@ export default function CmsBlogPage() {
       }
     >
       <AdminPageSection>
-        <ContentPlacementGuide kind='blog' />
-        <AdminFilterBar onRefresh={() => void load()} refreshLoading={loading} resultCount={rows.length}>
+        <ContentPlacementGuide kind='blog' defaultExpanded={false} />
+        <AdminFilterBar
+          searchPlaceholder='Search title, slug, excerpt…'
+          searchValue={search}
+          onSearchChange={e => setSearch(e.target.value)}
+          onRefresh={() => void load()}
+          refreshLoading={loading}
+          resultCount={filteredRows.length}
+        >
           <FormControl fullWidth size='small' sx={{ minWidth: 200 }}>
             <InputLabel>Filter type</InputLabel>
             <Select label='Filter type' value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
@@ -262,15 +307,29 @@ export default function CmsBlogPage() {
             </Select>
           </FormControl>
         </AdminFilterBar>
-        <AdminDataGrid rows={rows} columns={columns} loading={loading} getRowId={r => r._id} autoHeight />
+        <AdminDataGrid
+          rows={filteredRows}
+          columns={columns}
+          loading={loading}
+          getRowId={r => r._id}
+          autoHeight
+          onRowClick={p => openEdit(p.row)}
+          clickableRows
+        />
       </AdminPageSection>
 
-      <Dialog open={open} onClose={() => setOpen(false)} maxWidth='lg' fullWidth>
-        <DialogTitle>{editId ? 'Edit page' : 'Create page'}</DialogTitle>
-        <DialogContent dividers>
-          <Grid container spacing={2} sx={{ mt: 0.5 }}>
-            <Grid item xs={12} md={7}>
-              <Grid container spacing={2}>
+      <CmsEditorDrawer
+        open={open}
+        onClose={() => setOpen(false)}
+        title={editId ? 'Edit page' : 'Create page'}
+        subtitle={form.type === 'page' ? 'Static WebView page' : 'Blog post with list card + article view'}
+        onSave={handleSave}
+        saving={saving}
+        saveLabel={editId ? 'Update' : 'Create'}
+      >
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={7}>
+            <Grid container spacing={2}>
             <Grid item xs={12} sm={4}>
               <FormControl fullWidth size='small'>
                 <InputLabel>Type</InputLabel>
@@ -293,7 +352,14 @@ export default function CmsBlogPage() {
                 fullWidth
                 size='small'
                 value={form.title}
-                onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                onChange={e => {
+                  const title = e.target.value
+                  setForm(f => ({
+                    ...f,
+                    title,
+                    slug: !slugTouched && !editId ? slugify(title) : f.slug
+                  }))
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -302,7 +368,11 @@ export default function CmsBlogPage() {
                 fullWidth
                 size='small'
                 value={form.slug}
-                onChange={e => setForm(f => ({ ...f, slug: e.target.value }))}
+                onChange={e => {
+                  setSlugTouched(true)
+                  setForm(f => ({ ...f, slug: e.target.value }))
+                }}
+                helperText='URL path in the app · auto-generated from title'
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -392,13 +462,12 @@ export default function CmsBlogPage() {
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
-                label='Body HTML'
-                fullWidth
-                multiline
-                minRows={10}
+              <CmsHtmlEditor
+                label='Body'
                 value={form.body_html}
-                onChange={e => setForm(f => ({ ...f, body_html: e.target.value }))}
+                onChange={html => setForm(f => ({ ...f, body_html: html }))}
+                minHeight={320}
+                helperText='Rendered in-app via WebView — use headings and lists for readability.'
               />
             </Grid>
             <Grid item xs={12}>
@@ -414,23 +483,19 @@ export default function CmsBlogPage() {
             </Grid>
               </Grid>
             </Grid>
-            <Grid item xs={12} md={5} sx={{ position: { md: 'sticky' }, top: { md: 8 }, alignSelf: 'flex-start' }}>
+            <Grid item xs={12} md={5}>
+              <Box sx={{ position: { md: 'sticky' }, top: { md: 8 } }}>
               <MobileFramePreview
                 label='App preview'
                 subtitle={form.type === 'page' ? 'Static WebView page' : 'Blog list + article'}
+                showDeviceToggle
               >
                 <CmsPagePlacementPreview form={form} />
               </MobileFramePreview>
+              </Box>
             </Grid>
           </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button variant='contained' onClick={handleSave} disabled={saving}>
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
+      </CmsEditorDrawer>
 
       <Dialog open={!!previewRow} onClose={() => setPreviewRow(null)} maxWidth='sm' fullWidth>
         <DialogTitle>

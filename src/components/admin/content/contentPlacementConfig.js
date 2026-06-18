@@ -202,6 +202,15 @@ export const LEGAL_PLACEMENT = [
   }
 ]
 
+export const FAQ_PLACEMENT = [
+  {
+    surface: 'Settings → FAQ',
+    path: 'Signed-in users · Settings tab',
+    audiences: ['trainee', 'trainer'],
+    notes: 'Accordion sections · rich-text answers · instant publish'
+  }
+]
+
 export const TIPS_AUDIENCE_HELP = {
   all: 'Everyone signed in + guest home (offers carousel)',
   trainer: 'Trainer home — carousel + dashboard tips list',
