@@ -9,7 +9,8 @@
     "export": "next export",
     "lint": "eslint --fix \"src/**/*.{js,jsx}\"",
     "format": "prettier --write \"src/**/*.{js,jsx}\"",
-    "build:icons": "node src/iconify-bundle/bundle-icons-react.js"
+    "build:icons": "node src/iconify-bundle/bundle-icons-react.js",
+    "test:payment-flow": "node scripts/validate-payment-flow.mjs"
   },
   "dependencies": {
     "@babel/core": "7.21.3",
