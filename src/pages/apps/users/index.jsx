@@ -24,7 +24,7 @@ import {
   useAdminConfirm
 } from 'src/components/admin'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
-import UserQuickPreviewModal from 'src/pages/components/user360/UserQuickPreviewModal'
+import UserQuickPreviewModal from 'src/components/user360/UserQuickPreviewModal'
 import { getUser360 } from 'src/services/user360Api'
 import { deleteUser, listUsers } from 'src/services/userAdminApi'
 import { getImageUrl } from 'src/utils/utils'

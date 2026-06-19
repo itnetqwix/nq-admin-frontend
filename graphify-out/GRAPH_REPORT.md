@@ -5,12 +5,12 @@
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1445 nodes · 1931 edges · 203 communities (153 shown, 50 thin omitted)
-- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 131 edges (avg confidence: 0.81)
+- 1427 nodes · 1909 edges · 204 communities (153 shown, 51 thin omitted)
+- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 130 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `bc9d3404`
+- Built from commit: `f0e0d354`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -132,6 +132,7 @@
 - [[_COMMUNITY_Community 200|Community 200]]
 - [[_COMMUNITY_Community 201|Community 201]]
 - [[_COMMUNITY_Community 202|Community 202]]
+- [[_COMMUNITY_Community 203|Community 203]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `api()` - 22 edges
@@ -150,17 +151,17 @@
   src/@core/components/customizer/index.js → src/@core/hooks/useSettings.js
 - `GlobalStyles()` --calls--> `useSettings()`  [INFERRED]
   src/@core/theme/globalStyles.js → src/@core/hooks/useSettings.js
+- `Navigation()` --calls--> `themeOptions()`  [INFERRED]
+  src/@core/layouts/components/vertical/navigation/index.js → src/@core/theme/ThemeOptions.js
 - `BannersPage()` --calls--> `useAdminConfirm()`  [INFERRED]
   src/pages/apps/banners/index.jsx → src/components/admin/useAdminConfirm.js
 - `BroadcastsPage()` --calls--> `useAdminConfirm()`  [INFERRED]
   src/pages/apps/broadcasts/index.jsx → src/components/admin/useAdminConfirm.js
-- `CmsBlogPage()` --calls--> `useAdminConfirm()`  [INFERRED]
-  src/pages/apps/cms-blog/index.jsx → src/components/admin/useAdminConfirm.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (203 total, 50 thin omitted)
+## Communities (204 total, 51 thin omitted)
 
 ### Community 0 - "Package Dependencies"
 Cohesion: 0.03
@@ -171,16 +172,16 @@ Cohesion: 0.05
 Nodes (22): fmt(), SessionTimelinePanel(), LibrarySubmissionsPanel(), proposedLabel(), STATUS_TABS, BookingDetailDrawer(), refundTransferLabel(), authConfig (+14 more)
 
 ### Community 2 - "Dev Dependencies & Config"
-Cohesion: 0.15
-Nodes (13): devDependencies, eslint, eslint-config-next, eslint-config-prettier, eslint-import-resolver-alias, eslint-import-resolver-typescript, eslint-plugin-import, @iconify/iconify (+5 more)
+Cohesion: 0.05
+Nodes (38): devDependencies, eslint, eslint-config-next, eslint-config-prettier, eslint-import-resolver-alias, eslint-import-resolver-typescript, eslint-plugin-import, @iconify/iconify (+30 more)
 
 ### Community 3 - "Auth Guards & Middleware"
 Cohesion: 0.07
 Nodes (28): AclGuard(), AuthGuard(), GuestGuard(), buildAbilityFor(), defaultACLObj, defineRulesFor(), getAdminApiEnvLabel(), AdminRealtimeContext (+20 more)
 
 ### Community 4 - "Layouts & Navigation UI"
-Cohesion: 0.06
-Nodes (12): UserLayout(), hasActiveChild(), HorizontalNavGroup(), ListItem, NavigationMenu, HorizontalNavItems(), ListItem, MenuItemTextWrapper (+4 more)
+Cohesion: 0.17
+Nodes (4): MenuItemTextWrapper, MenuItemTextMetaWrapper, MenuNavLink, ListSubheader
 
 ### Community 5 - "Commission Management"
 Cohesion: 0.17
@@ -195,8 +196,8 @@ Cohesion: 0.08
 Nodes (15): LinkStyled, AppBar, Toolbar, LinkStyled, ContentWrapper, HorizontalLayout(), HorizontalLayoutWrapper, MainContentWrapper (+7 more)
 
 ### Community 8 - "Theme & Responsive Layout"
-Cohesion: 0.08
-Nodes (13): breakpoints(), UserThemeOptions(), SwipeableDrawer, StyledBoxForShadow, HeaderTitle, LinkStyled, MenuHeaderWrapper, Shadows() (+5 more)
+Cohesion: 0.14
+Nodes (7): breakpoints(), UserThemeOptions(), Shadows(), GlobalStyles(), ThemeComponent(), themeOptions(), typography
 
 ### Community 9 - "VSCode & Editor Config"
 Cohesion: 0.12
@@ -267,8 +268,8 @@ Cohesion: 0.44
 Nodes (11): apiUrl(), fetchPricingConfig(), fetchPricingDefaults(), fetchPricingHistory(), fetchUnitEconomics(), fetchUnitEconomicsConfig(), fetchUnitEconomicsDefaults(), getAuthHeaders() (+3 more)
 
 ### Community 27 - "Services Bannersapi"
-Cohesion: 0.20
-Nodes (10): resolutions, @emotion/react/@emotion/babel-plugin/@babel/core, @emotion/react/@emotion/babel-plugin/@babel/plugin-syntax-jsx/@babel/core, minipass, @mui/x-data-grid/@mui/system, react-credit-cards/prop-types, react-draft-wysiwyg/draftjs-utils/immutable, react-draft-wysiwyg/html-to-draftjs/immutable (+2 more)
+Cohesion: 0.18
+Nodes (6): SwipeableDrawer, StyledBoxForShadow, HeaderTitle, LinkStyled, MenuHeaderWrapper, Navigation()
 
 ### Community 28 - "Services Tipsapi"
 Cohesion: 0.64
@@ -291,16 +292,16 @@ Cohesion: 0.25
 Nodes (5): { dirname }, { getIcons, stringToIcon, minifyIconSet }, { importDirectory, cleanupSVG, parseColors, isEmptyColor, runSVGO }, { promises: fs }, sources
 
 ### Community 33 - "Register Index"
-Cohesion: 0.22
-Nodes (9): scripts, build, build:icons, dev, export, format, lint, start (+1 more)
+Cohesion: 0.25
+Nodes (3): UserLayout(), HorizontalNavItems(), VerticalNavItems()
 
 ### Community 34 - "Services Pricingapi"
 Cohesion: 0.12
-Nodes (27): apiUrl(), getAdminBookingDetail(), getAdminSessionTimeline(), getAuthHeaders(), apiUrl(), getAuthHeaders(), presignCmsAsset(), apiUrl() (+19 more)
+Nodes (28): apiUrl(), createBanner(), deleteBanner(), getAuthHeaders(), handleRes(), listBanners(), toggleBanner(), updateBanner() (+20 more)
 
 ### Community 35 - "Services Verificationapi"
-Cohesion: 0.64
-Nodes (8): apiUrl(), createBanner(), deleteBanner(), getAuthHeaders(), handleRes(), listBanners(), toggleBanner(), updateBanner()
+Cohesion: 0.25
+Nodes (4): hasActiveChild(), HorizontalNavGroup(), ListItem, NavigationMenu
 
 ### Community 36 - "Utils Format"
 Cohesion: 0.36
@@ -399,8 +400,8 @@ Cohesion: 0.05
 Nodes (37): devDependencies, eslint, eslint-config-next, eslint-config-prettier, eslint-import-resolver-alias, eslint-import-resolver-typescript, eslint-plugin-import, @iconify/iconify (+29 more)
 
 ### Community 189 - "Community 189"
-Cohesion: 0.06
-Nodes (33): User360OverviewTab(), AdminUser360Tabs(), ExtraInfoTree(), formatPrimitive(), RATING_FIELD_LABELS, safeImg(), tabLabels, timelineDotBg() (+25 more)
+Cohesion: 0.10
+Nodes (25): User360OverviewTab(), USER360_TAB, USER360_TAB_LABELS, ClipPlayDialog(), DeleteActions(), ExtraInfoTree(), formatPrimitive(), KeyValueRow() (+17 more)
 
 ### Community 191 - "Community 191"
 Cohesion: 0.50
@@ -415,8 +416,8 @@ Cohesion: 0.29
 Nodes (6): BoxWrapper, ForgotPasswordIllustration, ForgotPasswordIllustrationWrapper, LinkStyled, RightWrapper, TypographyStyled
 
 ### Community 199 - "Community 199"
-Cohesion: 0.29
-Nodes (6): name, overrides, react-credit-cards, private, react, version
+Cohesion: 0.61
+Nodes (7): api(), approveTrainerVerification(), getPendingVerificationCount(), getTrainerVerificationDetail(), getTrainerVerifications(), headers(), rejectTrainerVerification()
 
 ### Community 200 - "Community 200"
 Cohesion: 0.40
@@ -431,23 +432,23 @@ Cohesion: 0.33
 Nodes (5): ColorBox, Customizer(), CustomizerSpacing, Drawer, Toggler
 
 ## Knowledge Gaps
-- **437 isolated node(s):** `editor.defaultFormatter`, `editor.defaultFormatter`, `source.fixAll.eslint`, `source.organizeImports`, `editor.defaultFormatter` (+432 more)
+- **435 isolated node(s):** `editor.defaultFormatter`, `editor.defaultFormatter`, `source.fixAll.eslint`, `source.organizeImports`, `editor.defaultFormatter` (+430 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **50 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **51 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `useAuth()` connect `Auth Guards & Middleware` to `Community 200`, `Content Contentplacementconfig`?**
-  _High betweenness centrality (0.124) - this node is a cross-community bridge._
+  _High betweenness centrality (0.118) - this node is a cross-community bridge._
 - **Why does `useAdminConfirm()` connect `Account Deletions Index` to `Booking & Clips Panel`, `Pricing Analytics UI`, `Finance Index`, `Promo Codes Index`, `Broadcasts Index`, `Cms Blog Index`, `Cms Faq Index`, `Cms Legal Index`, `Admin Admindatagrid`, `Customizer Index`, `Banners Index`, `NetQwix Library Index`, `Ops Logs Index`, `Content Contentplacementconfig`?**
-  _High betweenness centrality (0.121) - this node is a cross-community bridge._
+  _High betweenness centrality (0.101) - this node is a cross-community bridge._
 - **Why does `ManageTrainer()` connect `Content Contentplacementconfig` to `Auth Guards & Middleware`, `Account Deletions Index`?**
-  _High betweenness centrality (0.099) - this node is a cross-community bridge._
+  _High betweenness centrality (0.086) - this node is a cross-community bridge._
 - **Are the 19 inferred relationships involving `useAdminConfirm()` (e.g. with `AccountDeletionsPage()` and `BannersPage()`) actually correct?**
   _`useAdminConfirm()` has 19 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `editor.defaultFormatter`, `editor.defaultFormatter`, `source.fixAll.eslint` to the rest of the system?**
-  _437 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _435 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Package Dependencies` be split into smaller, more focused modules?**
   _Cohesion score 0.0273972602739726 - nodes in this community are weakly interconnected._
 - **Should `Booking & Clips Panel` be split into smaller, more focused modules?**

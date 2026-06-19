@@ -17,7 +17,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
-import AdminUser360Tabs from 'src/pages/components/user360/AdminUser360Tabs'
+import AdminUser360Tabs from 'src/components/user360/AdminUser360Tabs'
 import { getUser360, getUserAssets, getUserLessons, getUserReviews, getUserTimeline } from 'src/services/user360Api'
 import { getOpsEventsForUser } from 'src/services/opsApi'
 

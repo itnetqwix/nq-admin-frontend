@@ -1045,13 +1045,13 @@
     "semantic_hash": ""
   },
   "src/pages/apps/manage-trainee/index.jsx": {
-    "mtime": 1781768350.146278,
-    "ast_hash": "76b0b882d05c879f0f75fb279f347777",
+    "mtime": 1781847201.9061894,
+    "ast_hash": "1fa9ebc5e9ae0281d64e1c9feebea649",
     "semantic_hash": ""
   },
   "src/pages/apps/manage-trainer/index.jsx": {
-    "mtime": 1781809051.1403205,
-    "ast_hash": "5c20cbceb7850b2303d4cbb24eca194c",
+    "mtime": 1781847201.9486876,
+    "ast_hash": "fbfc6b18950dc07ad07abecf389a9af9",
     "semantic_hash": ""
   },
   "src/pages/apps/netqwix-library/index.jsx": {
@@ -1115,8 +1115,8 @@
     "semantic_hash": ""
   },
   "src/pages/apps/users/[id].jsx": {
-    "mtime": 1781809028.378574,
-    "ast_hash": "aba9ae44ea1378e1e3496f4625889186",
+    "mtime": 1781847201.9632254,
+    "ast_hash": "32cb1d15cba72dc644eee2806468198e",
     "semantic_hash": ""
   },
   "src/pages/apps/write-by-user/index.js": {
@@ -1192,16 +1192,6 @@
   "src/pages/components/trainer-status/index.jsx": {
     "mtime": 1777655847.2965238,
     "ast_hash": "3faf09f4632a3dd98422ef20ce7a8d2c",
-    "semantic_hash": ""
-  },
-  "src/pages/components/user360/AdminUser360Tabs.jsx": {
-    "mtime": 1781810444.1701808,
-    "ast_hash": "747b4124d7f9e501055f185f30410b89",
-    "semantic_hash": ""
-  },
-  "src/pages/components/user360/UserQuickPreviewModal.jsx": {
-    "mtime": 1780571283.5390446,
-    "ast_hash": "8b05128aac9014ccda6a143ef5d35fcb",
     "semantic_hash": ""
   },
   "src/pages/forgot-password/index.js": {
@@ -1684,16 +1674,6 @@
     "ast_hash": "f3fe80a7602619fd841724aeb9c0d41d",
     "semantic_hash": ""
   },
-  "src/pages/components/user360/User360AccountReviewActions.jsx": {
-    "mtime": 1781334148.6256166,
-    "ast_hash": "eb296bac9e68d7abc90b53d295dac4e2",
-    "semantic_hash": ""
-  },
-  "src/pages/components/user360/User360WalletTab.jsx": {
-    "mtime": 1781788810.43973,
-    "ast_hash": "c72433c50faac849dd6a6fc1b086860b",
-    "semantic_hash": ""
-  },
   "src/services/platformHealthApi.js": {
     "mtime": 1781808200.0734496,
     "ast_hash": "fcdc426a7e73bc5c82f11201926d2340",
@@ -1720,8 +1700,8 @@
     "semantic_hash": ""
   },
   "src/pages/apps/users/index.jsx": {
-    "mtime": 1781810318.2629166,
-    "ast_hash": "6323efbb9f9fdf5aee7bd7e1286fded6",
+    "mtime": 1781847200.3509853,
+    "ast_hash": "b7c870e8234b0510d0dcde6043cbafbd",
     "semantic_hash": ""
   },
   "src/services/userAdminApi.js": {
@@ -1739,67 +1719,87 @@
     "ast_hash": "1ab7375f87dbdb066d6eeb5c0960cbe7",
     "semantic_hash": ""
   },
-  "src/pages/components/user360/constants.js": {
+  "src/components/user360/AdminUser360Tabs.jsx": {
+    "mtime": 1781810444.1701808,
+    "ast_hash": "747b4124d7f9e501055f185f30410b89",
+    "semantic_hash": ""
+  },
+  "src/components/user360/User360AccountReviewActions.jsx": {
+    "mtime": 1781334148.6256166,
+    "ast_hash": "eb296bac9e68d7abc90b53d295dac4e2",
+    "semantic_hash": ""
+  },
+  "src/components/user360/User360WalletTab.jsx": {
+    "mtime": 1781788810.43973,
+    "ast_hash": "c72433c50faac849dd6a6fc1b086860b",
+    "semantic_hash": ""
+  },
+  "src/components/user360/UserQuickPreviewModal.jsx": {
+    "mtime": 1780571283.5390446,
+    "ast_hash": "8b05128aac9014ccda6a143ef5d35fcb",
+    "semantic_hash": ""
+  },
+  "src/components/user360/constants.js": {
     "mtime": 1781809980.8314197,
     "ast_hash": "313a348f18c23824e1feefc766d73f1e",
     "semantic_hash": ""
   },
-  "src/pages/components/user360/tabs/User360ActivityTab.jsx": {
+  "src/components/user360/tabs/User360ActivityTab.jsx": {
     "mtime": 1781810431.1000981,
     "ast_hash": "d32de074924b688fbf825f43e8949719",
     "semantic_hash": ""
   },
-  "src/pages/components/user360/tabs/User360ClipsTab.jsx": {
+  "src/components/user360/tabs/User360ClipsTab.jsx": {
     "mtime": 1781810416.1662173,
     "ast_hash": "686616b14963dfd9c5ea0101bad4b13e",
     "semantic_hash": ""
   },
-  "src/pages/components/user360/tabs/User360IssuesTab.jsx": {
+  "src/components/user360/tabs/User360IssuesTab.jsx": {
     "mtime": 1781810317.8266232,
     "ast_hash": "1e2ad1d5074b4061b1971a4020dcbd04",
     "semantic_hash": ""
   },
-  "src/pages/components/user360/tabs/User360LessonsTab.jsx": {
+  "src/components/user360/tabs/User360LessonsTab.jsx": {
     "mtime": 1781810405.2981732,
     "ast_hash": "a5676b25d52ae31f98cd7ad3ae63e29c",
     "semantic_hash": ""
   },
-  "src/pages/components/user360/tabs/User360OverviewTab.jsx": {
+  "src/components/user360/tabs/User360OverviewTab.jsx": {
     "mtime": 1781810399.5345674,
     "ast_hash": "26a3522b197a0a250a2987e8f00b8e1b",
     "semantic_hash": ""
   },
-  "src/pages/components/user360/tabs/User360PlansTab.jsx": {
+  "src/components/user360/tabs/User360PlansTab.jsx": {
     "mtime": 1781810424.3371444,
     "ast_hash": "76e31937f4ab323d948e716c5b1128e3",
     "semantic_hash": ""
   },
-  "src/pages/components/user360/tabs/User360ReferralsTab.jsx": {
+  "src/components/user360/tabs/User360ReferralsTab.jsx": {
     "mtime": 1781810012.0808516,
     "ast_hash": "4ea45c7b5536baff4c6e4042f926ddd3",
     "semantic_hash": ""
   },
-  "src/pages/components/user360/tabs/User360ReviewsTab.jsx": {
+  "src/components/user360/tabs/User360ReviewsTab.jsx": {
     "mtime": 1781810410.4012463,
     "ast_hash": "94c9220ccadeedf5673dc77313718d74",
     "semantic_hash": ""
   },
-  "src/pages/components/user360/tabs/User360TicketsTab.jsx": {
+  "src/components/user360/tabs/User360TicketsTab.jsx": {
     "mtime": 1781809997.6247458,
     "ast_hash": "32c9f20495b1ed832538d0863c53eca6",
     "semantic_hash": ""
   },
-  "src/pages/components/user360/user360Parts.jsx": {
+  "src/components/user360/user360Parts.jsx": {
     "mtime": 1781810370.527429,
     "ast_hash": "29f6b1e3bc30d0073b481c42ffc81a0c",
     "semantic_hash": ""
   },
-  "src/pages/components/user360/user360Shared.jsx": {
+  "src/components/user360/user360Shared.jsx": {
     "mtime": 1781810028.9565723,
     "ast_hash": "685cb43aee5abe0da94d6c378250e693",
     "semantic_hash": ""
   },
-  "src/pages/components/user360/user360Toolbars.jsx": {
+  "src/components/user360/user360Toolbars.jsx": {
     "mtime": 1781810384.3240623,
     "ast_hash": "4f36a3811b27f1e3ddda2cdf59f3cf6a",
     "semantic_hash": ""

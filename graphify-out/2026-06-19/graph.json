@@ -351,7 +351,7 @@
       "source_file": "package.json",
       "source_location": "L1",
       "id": "package",
-      "community": 2,
+      "community": 199,
       "norm_label": "package.json"
     },
     {
@@ -360,7 +360,7 @@
       "source_file": "package.json",
       "source_location": "L2",
       "id": "package_name",
-      "community": 2,
+      "community": 199,
       "norm_label": "name"
     },
     {
@@ -369,7 +369,7 @@
       "source_file": "package.json",
       "source_location": "L3",
       "id": "package_version",
-      "community": 2,
+      "community": 199,
       "norm_label": "version"
     },
     {
@@ -378,7 +378,7 @@
       "source_file": "package.json",
       "source_location": "L4",
       "id": "package_private",
-      "community": 2,
+      "community": 199,
       "norm_label": "private"
     },
     {
@@ -387,7 +387,7 @@
       "source_file": "package.json",
       "source_location": "L5",
       "id": "package_scripts",
-      "community": 2,
+      "community": 33,
       "norm_label": "scripts"
     },
     {
@@ -396,7 +396,7 @@
       "source_file": "package.json",
       "source_location": "L6",
       "id": "package_scripts_dev",
-      "community": 2,
+      "community": 33,
       "norm_label": "dev"
     },
     {
@@ -405,7 +405,7 @@
       "source_file": "package.json",
       "source_location": "L7",
       "id": "package_scripts_build",
-      "community": 2,
+      "community": 33,
       "norm_label": "build"
     },
     {
@@ -414,7 +414,7 @@
       "source_file": "package.json",
       "source_location": "L8",
       "id": "package_scripts_start",
-      "community": 2,
+      "community": 33,
       "norm_label": "start"
     },
     {
@@ -423,7 +423,7 @@
       "source_file": "package.json",
       "source_location": "L9",
       "id": "package_scripts_export",
-      "community": 2,
+      "community": 33,
       "norm_label": "export"
     },
     {
@@ -432,7 +432,7 @@
       "source_file": "package.json",
       "source_location": "L10",
       "id": "package_scripts_lint",
-      "community": 2,
+      "community": 33,
       "norm_label": "lint"
     },
     {
@@ -441,7 +441,7 @@
       "source_file": "package.json",
       "source_location": "L11",
       "id": "package_scripts_format",
-      "community": 2,
+      "community": 33,
       "norm_label": "format"
     },
     {
@@ -450,7 +450,7 @@
       "source_file": "package.json",
       "source_location": "L12",
       "id": "package_scripts_build_icons",
-      "community": 2,
+      "community": 33,
       "norm_label": "build:icons"
     },
     {
@@ -459,7 +459,7 @@
       "source_file": "package.json",
       "source_location": "L13",
       "id": "package_scripts_test_payment_flow",
-      "community": 2,
+      "community": 33,
       "norm_label": "test:payment-flow"
     },
     {
@@ -1242,7 +1242,7 @@
       "source_file": "package.json",
       "source_location": "L103",
       "id": "package_resolutions",
-      "community": 2,
+      "community": 27,
       "norm_label": "resolutions"
     },
     {
@@ -1251,7 +1251,7 @@
       "source_file": "package.json",
       "source_location": "L104",
       "id": "package_resolutions_minipass",
-      "community": 2,
+      "community": 27,
       "norm_label": "minipass"
     },
     {
@@ -1260,7 +1260,7 @@
       "source_file": "package.json",
       "source_location": "L105",
       "id": "package_resolutions_mui_x_data_grid_mui_system",
-      "community": 2,
+      "community": 27,
       "norm_label": "@mui/x-data-grid/@mui/system"
     },
     {
@@ -1269,7 +1269,7 @@
       "source_file": "package.json",
       "source_location": "L106",
       "id": "package_resolutions_react_credit_cards_prop_types",
-      "community": 2,
+      "community": 27,
       "norm_label": "react-credit-cards/prop-types"
     },
     {
@@ -1278,7 +1278,7 @@
       "source_file": "package.json",
       "source_location": "L107",
       "id": "package_resolutions_react_hot_toast_goober_csstype",
-      "community": 2,
+      "community": 27,
       "norm_label": "react-hot-toast/goober/csstype"
     },
     {
@@ -1287,7 +1287,7 @@
       "source_file": "package.json",
       "source_location": "L108",
       "id": "package_resolutions_recharts_react_smooth_prop_types",
-      "community": 2,
+      "community": 27,
       "norm_label": "recharts/react-smooth/prop-types"
     },
     {
@@ -1296,7 +1296,7 @@
       "source_file": "package.json",
       "source_location": "L109",
       "id": "package_resolutions_react_draft_wysiwyg_html_to_draftjs_immutable",
-      "community": 2,
+      "community": 27,
       "norm_label": "react-draft-wysiwyg/html-to-draftjs/immutable"
     },
     {
@@ -1305,7 +1305,7 @@
       "source_file": "package.json",
       "source_location": "L110",
       "id": "package_resolutions_react_draft_wysiwyg_draftjs_utils_immutable",
-      "community": 2,
+      "community": 27,
       "norm_label": "react-draft-wysiwyg/draftjs-utils/immutable"
     },
     {
@@ -1314,7 +1314,7 @@
       "source_file": "package.json",
       "source_location": "L111",
       "id": "package_resolutions_emotion_react_emotion_babel_plugin_babel_core",
-      "community": 2,
+      "community": 27,
       "norm_label": "@emotion/react/@emotion/babel-plugin/@babel/core"
     },
     {
@@ -1323,7 +1323,7 @@
       "source_file": "package.json",
       "source_location": "L112",
       "id": "package_resolutions_emotion_react_emotion_babel_plugin_babel_plugin_syntax_jsx_babel_core",
-      "community": 2,
+      "community": 27,
       "norm_label": "@emotion/react/@emotion/babel-plugin/@babel/plugin-syntax-jsx/@babel/core"
     },
     {
@@ -1332,7 +1332,7 @@
       "source_file": "package.json",
       "source_location": "L114",
       "id": "package_overrides",
-      "community": 2,
+      "community": 199,
       "norm_label": "overrides"
     },
     {
@@ -1341,7 +1341,7 @@
       "source_file": "package.json",
       "source_location": "L115",
       "id": "package_overrides_react_credit_cards",
-      "community": 2,
+      "community": 199,
       "norm_label": "react-credit-cards"
     },
     {
@@ -1350,7 +1350,7 @@
       "source_file": "package.json",
       "source_location": "L116",
       "id": "package_react_credit_cards_react",
-      "community": 2,
+      "community": 199,
       "norm_label": "react"
     },
     {
@@ -1629,7 +1629,7 @@
       "source_file": "src/@core/components/customizer/index.js",
       "source_location": "L1",
       "id": "customizer_index",
-      "community": 19,
+      "community": 202,
       "norm_label": "index.js"
     },
     {
@@ -1638,7 +1638,7 @@
       "source_file": "src/@core/components/customizer/index.js",
       "source_location": "L25",
       "id": "customizer_index_toggler",
-      "community": 19,
+      "community": 202,
       "norm_label": "toggler"
     },
     {
@@ -1647,7 +1647,7 @@
       "source_file": "src/@core/components/customizer/index.js",
       "source_location": "L40",
       "id": "customizer_index_drawer",
-      "community": 19,
+      "community": 202,
       "norm_label": "drawer"
     },
     {
@@ -1656,7 +1656,7 @@
       "source_file": "src/@core/components/customizer/index.js",
       "source_location": "L54",
       "id": "customizer_index_customizerspacing",
-      "community": 19,
+      "community": 202,
       "norm_label": "customizerspacing"
     },
     {
@@ -1665,7 +1665,7 @@
       "source_file": "src/@core/components/customizer/index.js",
       "source_location": "L58",
       "id": "customizer_index_colorbox",
-      "community": 19,
+      "community": 202,
       "norm_label": "colorbox"
     },
     {
@@ -1674,7 +1674,7 @@
       "source_file": "src/@core/components/customizer/index.js",
       "source_location": "L71",
       "id": "customizer_index_customizer",
-      "community": 19,
+      "community": 202,
       "norm_label": "customizer()"
     },
     {
@@ -1719,7 +1719,7 @@
       "source_file": "src/@core/components/mui/badge/index.js",
       "source_location": "L1",
       "id": "badge_index",
-      "community": 23,
+      "community": 39,
       "norm_label": "index.js"
     },
     {
@@ -1728,7 +1728,7 @@
       "source_file": "src/@core/components/mui/badge/index.js",
       "source_location": "L7",
       "id": "badge_index_badge",
-      "community": 23,
+      "community": 39,
       "norm_label": "badge()"
     },
     {
@@ -1737,7 +1737,7 @@
       "source_file": "src/@core/components/mui/chip/index.js",
       "source_location": "L1",
       "id": "chip_index",
-      "community": 23,
+      "community": 39,
       "norm_label": "index.js"
     },
     {
@@ -1746,7 +1746,7 @@
       "source_file": "src/@core/components/mui/chip/index.js",
       "source_location": "L10",
       "id": "chip_index_chip",
-      "community": 23,
+      "community": 39,
       "norm_label": "chip()"
     },
     {
@@ -1755,7 +1755,7 @@
       "source_file": "src/@core/components/mui/timeline-dot/index.js",
       "source_location": "L1",
       "id": "timeline_dot_index",
-      "community": 23,
+      "community": 39,
       "norm_label": "index.js"
     },
     {
@@ -1764,7 +1764,7 @@
       "source_file": "src/@core/components/mui/timeline-dot/index.js",
       "source_location": "L11",
       "id": "timeline_dot_index_timelinedot",
-      "community": 23,
+      "community": 39,
       "norm_label": "timelinedot()"
     },
     {
@@ -2052,7 +2052,7 @@
       "source_file": "src/@core/hooks/useBgColor.js",
       "source_location": "L1",
       "id": "hooks_usebgcolor",
-      "community": 23,
+      "community": 39,
       "norm_label": "usebgcolor.js"
     },
     {
@@ -2061,7 +2061,7 @@
       "source_file": "src/@core/hooks/useBgColor.js",
       "source_location": "L7",
       "id": "hooks_usebgcolor_usebgcolor",
-      "community": 23,
+      "community": 39,
       "norm_label": "usebgcolor()"
     },
     {
@@ -4648,6 +4648,60 @@
       "norm_label": "faqpreview()"
     },
     {
+      "label": "IoniconsPicker.jsx",
+      "file_type": "code",
+      "source_file": "src/components/admin/content/IoniconsPicker.jsx",
+      "source_location": "L1",
+      "id": "content_ioniconspicker",
+      "community": 201,
+      "norm_label": "ioniconspicker.jsx"
+    },
+    {
+      "label": "TIP_ICON_NAMES",
+      "file_type": "code",
+      "source_file": "src/components/admin/content/IoniconsPicker.jsx",
+      "source_location": "L18",
+      "id": "content_ioniconspicker_tip_icon_names",
+      "community": 201,
+      "norm_label": "tip_icon_names"
+    },
+    {
+      "label": "io5ComponentName()",
+      "file_type": "code",
+      "source_file": "src/components/admin/content/IoniconsPicker.jsx",
+      "source_location": "L51",
+      "id": "content_ioniconspicker_io5componentname",
+      "community": 201,
+      "norm_label": "io5componentname()"
+    },
+    {
+      "label": "resolveIcon()",
+      "file_type": "code",
+      "source_file": "src/components/admin/content/IoniconsPicker.jsx",
+      "source_location": "L60",
+      "id": "content_ioniconspicker_resolveicon",
+      "community": 201,
+      "norm_label": "resolveicon()"
+    },
+    {
+      "label": "IoniconsPreview()",
+      "file_type": "code",
+      "source_file": "src/components/admin/content/IoniconsPicker.jsx",
+      "source_location": "L65",
+      "id": "content_ioniconspicker_ioniconspreview",
+      "community": 201,
+      "norm_label": "ioniconspreview()"
+    },
+    {
+      "label": "IoniconsPicker()",
+      "file_type": "code",
+      "source_file": "src/components/admin/content/IoniconsPicker.jsx",
+      "source_location": "L70",
+      "id": "content_ioniconspicker_ioniconspicker",
+      "community": 201,
+      "norm_label": "ioniconspicker()"
+    },
+    {
       "label": "LegalDocumentPreview.jsx",
       "file_type": "code",
       "source_file": "src/components/admin/content/LegalDocumentPreview.jsx",
@@ -5103,7 +5157,7 @@
       "source_file": "src/components/clips/LibrarySubmissionsPanel.jsx",
       "source_location": "L1",
       "id": "clips_librarysubmissionspanel",
-      "community": 35,
+      "community": 1,
       "norm_label": "librarysubmissionspanel.jsx"
     },
     {
@@ -5112,7 +5166,7 @@
       "source_file": "src/components/clips/LibrarySubmissionsPanel.jsx",
       "source_location": "L36",
       "id": "clips_librarysubmissionspanel_status_tabs",
-      "community": 35,
+      "community": 1,
       "norm_label": "status_tabs"
     },
     {
@@ -5121,7 +5175,7 @@
       "source_file": "src/components/clips/LibrarySubmissionsPanel.jsx",
       "source_location": "L45",
       "id": "clips_librarysubmissionspanel_requesterlabel",
-      "community": 35,
+      "community": 1,
       "norm_label": "requesterlabel()"
     },
     {
@@ -5130,7 +5184,7 @@
       "source_file": "src/components/clips/LibrarySubmissionsPanel.jsx",
       "source_location": "L52",
       "id": "clips_librarysubmissionspanel_proposedlabel",
-      "community": 35,
+      "community": 1,
       "norm_label": "proposedlabel()"
     },
     {
@@ -5139,7 +5193,7 @@
       "source_file": "src/components/clips/LibrarySubmissionsPanel.jsx",
       "source_location": "L59",
       "id": "clips_librarysubmissionspanel_librarysubmissionspanel",
-      "community": 35,
+      "community": 1,
       "norm_label": "librarysubmissionspanel()"
     },
     {
@@ -5211,7 +5265,7 @@
       "source_file": "src/configs/adminEnv.js",
       "source_location": "L1",
       "id": "configs_adminenv",
-      "community": 19,
+      "community": 200,
       "norm_label": "adminenv.js"
     },
     {
@@ -5220,7 +5274,7 @@
       "source_file": "src/configs/adminEnv.js",
       "source_location": "L4",
       "id": "configs_adminenv_isadminregisterenabled",
-      "community": 19,
+      "community": 200,
       "norm_label": "isadminregisterenabled()"
     },
     {
@@ -5229,7 +5283,7 @@
       "source_file": "src/configs/adminEnv.js",
       "source_location": "L10",
       "id": "configs_adminenv_adminregisterenvhint",
-      "community": 19,
+      "community": 200,
       "norm_label": "adminregisterenvhint()"
     },
     {
@@ -5238,7 +5292,7 @@
       "source_file": "src/configs/adminEnv.js",
       "source_location": "L14",
       "id": "configs_adminenv_getadminapienvlabel",
-      "community": 5,
+      "community": 3,
       "norm_label": "getadminapienvlabel()"
     },
     {
@@ -5247,7 +5301,7 @@
       "source_file": "src/configs/adminEnv.js",
       "source_location": "L25",
       "id": "configs_adminenv_showadminmfanotice",
-      "community": 19,
+      "community": 200,
       "norm_label": "showadminmfanotice()"
     },
     {
@@ -5580,7 +5634,7 @@
       "source_file": "src/context/AdminRealtimeContext.js",
       "source_location": "L163",
       "id": "context_adminrealtimecontext_useadminrealtime",
-      "community": 5,
+      "community": 3,
       "norm_label": "useadminrealtime()"
     },
     {
@@ -6201,7 +6255,7 @@
       "source_file": "src/layouts/components/student/StudentDetail.js",
       "source_location": "L1",
       "id": "student_studentdetail",
-      "community": 39,
+      "community": 1,
       "norm_label": "studentdetail.js"
     },
     {
@@ -6210,7 +6264,7 @@
       "source_file": "src/layouts/components/student/StudentDetail.js",
       "source_location": "L6",
       "id": "student_studentdetail_studentdetail",
-      "community": 39,
+      "community": 1,
       "norm_label": "studentdetail()"
     },
     {
@@ -7585,7 +7639,7 @@
       "label": "EMPTY_FORM",
       "file_type": "code",
       "source_file": "src/pages/apps/tips/index.jsx",
-      "source_location": "L45",
+      "source_location": "L46",
       "id": "tips_index_empty_form",
       "community": 46,
       "norm_label": "empty_form"
@@ -7594,7 +7648,7 @@
       "label": "audienceChip()",
       "file_type": "code",
       "source_file": "src/pages/apps/tips/index.jsx",
-      "source_location": "L59",
+      "source_location": "L60",
       "id": "tips_index_audiencechip",
       "community": 46,
       "norm_label": "audiencechip()"
@@ -7603,7 +7657,7 @@
       "label": "TipsPage()",
       "file_type": "code",
       "source_file": "src/pages/apps/tips/index.jsx",
-      "source_location": "L65",
+      "source_location": "L66",
       "id": "tips_index_tipspage",
       "community": 46,
       "norm_label": "tipspage()"
@@ -7776,7 +7830,7 @@
       "source_file": "src/pages/components/booking/SessionTimelinePanel.jsx",
       "source_location": "L1",
       "id": "booking_sessiontimelinepanel",
-      "community": 27,
+      "community": 1,
       "norm_label": "sessiontimelinepanel.jsx"
     },
     {
@@ -7785,7 +7839,7 @@
       "source_file": "src/pages/components/booking/SessionTimelinePanel.jsx",
       "source_location": "L6",
       "id": "booking_sessiontimelinepanel_timelinerow",
-      "community": 27,
+      "community": 1,
       "norm_label": "timelinerow()"
     },
     {
@@ -7794,7 +7848,7 @@
       "source_file": "src/pages/components/booking/SessionTimelinePanel.jsx",
       "source_location": "L20",
       "id": "booking_sessiontimelinepanel_fmt",
-      "community": 27,
+      "community": 1,
       "norm_label": "fmt()"
     },
     {
@@ -7803,7 +7857,7 @@
       "source_file": "src/pages/components/booking/SessionTimelinePanel.jsx",
       "source_location": "L22",
       "id": "booking_sessiontimelinepanel_sessiontimelinepanel",
-      "community": 27,
+      "community": 1,
       "norm_label": "sessiontimelinepanel()"
     },
     {
@@ -7839,7 +7893,7 @@
       "source_file": "src/pages/components/modal/BookingDetailDrawer.jsx",
       "source_location": "L1",
       "id": "modal_bookingdetaildrawer",
-      "community": 27,
+      "community": 1,
       "norm_label": "bookingdetaildrawer.jsx"
     },
     {
@@ -7848,7 +7902,7 @@
       "source_file": "src/pages/components/modal/BookingDetailDrawer.jsx",
       "source_location": "L22",
       "id": "modal_bookingdetaildrawer_detailrow",
-      "community": 27,
+      "community": 1,
       "norm_label": "detailrow()"
     },
     {
@@ -7857,7 +7911,7 @@
       "source_file": "src/pages/components/modal/BookingDetailDrawer.jsx",
       "source_location": "L36",
       "id": "modal_bookingdetaildrawer_refundtransferlabel",
-      "community": 27,
+      "community": 1,
       "norm_label": "refundtransferlabel()"
     },
     {
@@ -7866,7 +7920,7 @@
       "source_file": "src/pages/components/modal/BookingDetailDrawer.jsx",
       "source_location": "L54",
       "id": "modal_bookingdetaildrawer_bookingdetaildrawer",
-      "community": 27,
+      "community": 1,
       "norm_label": "bookingdetaildrawer()"
     },
     {
@@ -7965,7 +8019,7 @@
       "source_file": "src/pages/components/tables/UsersTable.jsx",
       "source_location": "L1",
       "id": "tables_userstable",
-      "community": 5,
+      "community": 3,
       "norm_label": "userstable.jsx"
     },
     {
@@ -7974,7 +8028,7 @@
       "source_file": "src/pages/components/tables/UsersTable.jsx",
       "source_location": "L9",
       "id": "tables_userstable_activeuserstable",
-      "community": 5,
+      "community": 3,
       "norm_label": "activeuserstable()"
     },
     {
@@ -8041,174 +8095,12 @@
       "norm_label": "adminuser360tabs.jsx"
     },
     {
-      "label": "tabLabels",
-      "file_type": "code",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L54",
-      "id": "user360_adminuser360tabs_tablabels",
-      "community": 189,
-      "norm_label": "tablabels"
-    },
-    {
-      "label": "SectionShell()",
-      "file_type": "code",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L56",
-      "id": "user360_adminuser360tabs_sectionshell",
-      "community": 189,
-      "norm_label": "sectionshell()"
-    },
-    {
-      "label": "downloadCsv()",
-      "file_type": "code",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L85",
-      "id": "user360_adminuser360tabs_downloadcsv",
-      "community": 189,
-      "norm_label": "downloadcsv()"
-    },
-    {
-      "label": "lessonStatusColor()",
-      "file_type": "code",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L111",
-      "id": "user360_adminuser360tabs_lessonstatuscolor",
-      "community": 189,
-      "norm_label": "lessonstatuscolor()"
-    },
-    {
-      "label": "timelineDotColor()",
-      "file_type": "code",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L120",
-      "id": "user360_adminuser360tabs_timelinedotcolor",
-      "community": 189,
-      "norm_label": "timelinedotcolor()"
-    },
-    {
-      "label": "timelineDotBg()",
-      "file_type": "code",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L131",
-      "id": "user360_adminuser360tabs_timelinedotbg",
-      "community": 189,
-      "norm_label": "timelinedotbg()"
-    },
-    {
-      "label": "DeleteActions()",
-      "file_type": "code",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L142",
-      "id": "user360_adminuser360tabs_deleteactions",
-      "community": 189,
-      "norm_label": "deleteactions()"
-    },
-    {
-      "label": "renderParty()",
-      "file_type": "code",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L191",
-      "id": "user360_adminuser360tabs_renderparty",
-      "community": 189,
-      "norm_label": "renderparty()"
-    },
-    {
-      "label": "safeImg()",
-      "file_type": "code",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L193",
-      "id": "user360_adminuser360tabs_safeimg",
-      "community": 39,
-      "norm_label": "safeimg()"
-    },
-    {
-      "label": "EmptyHint()",
-      "file_type": "code",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L198",
-      "id": "user360_adminuser360tabs_emptyhint",
-      "community": 189,
-      "norm_label": "emptyhint()"
-    },
-    {
-      "label": "formatPrimitive()",
-      "file_type": "code",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L217",
-      "id": "user360_adminuser360tabs_formatprimitive",
-      "community": 189,
-      "norm_label": "formatprimitive()"
-    },
-    {
-      "label": "RATING_FIELD_LABELS",
-      "file_type": "code",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L230",
-      "id": "user360_adminuser360tabs_rating_field_labels",
-      "community": 189,
-      "norm_label": "rating_field_labels"
-    },
-    {
-      "label": "RatingSideCard()",
-      "file_type": "code",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L241",
-      "id": "user360_adminuser360tabs_ratingsidecard",
-      "community": 189,
-      "norm_label": "ratingsidecard()"
-    },
-    {
-      "label": "ReviewRatingsCell()",
-      "file_type": "code",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L307",
-      "id": "user360_adminuser360tabs_reviewratingscell",
-      "community": 189,
-      "norm_label": "reviewratingscell()"
-    },
-    {
-      "label": "NotificationPreferencesPanel()",
-      "file_type": "code",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L332",
-      "id": "user360_adminuser360tabs_notificationpreferencespanel",
-      "community": 189,
-      "norm_label": "notificationpreferencespanel()"
-    },
-    {
-      "label": "ExtraInfoTree()",
-      "file_type": "code",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L372",
-      "id": "user360_adminuser360tabs_extrainfotree",
-      "community": 189,
-      "norm_label": "extrainfotree()"
-    },
-    {
-      "label": "StatTile()",
-      "file_type": "code",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L424",
-      "id": "user360_adminuser360tabs_stattile",
-      "community": 189,
-      "norm_label": "stattile()"
-    },
-    {
-      "label": "ClipPlayDialog()",
-      "file_type": "code",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L449",
-      "id": "user360_adminuser360tabs_clipplaydialog",
-      "community": 189,
-      "norm_label": "clipplaydialog()"
-    },
-    {
       "label": "AdminUser360Tabs()",
       "file_type": "code",
       "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L507",
+      "source_location": "L20",
       "id": "user360_adminuser360tabs_adminuser360tabs",
-      "community": 39,
+      "community": 189,
       "norm_label": "adminuser360tabs()"
     },
     {
@@ -8217,7 +8109,7 @@
       "source_file": "src/pages/components/user360/User360AccountReviewActions.jsx",
       "source_location": "L1",
       "id": "user360_user360accountreviewactions",
-      "community": 197,
+      "community": 189,
       "norm_label": "user360accountreviewactions.jsx"
     },
     {
@@ -8226,7 +8118,7 @@
       "source_file": "src/pages/components/user360/User360AccountReviewActions.jsx",
       "source_location": "L13",
       "id": "user360_user360accountreviewactions_user360accountreviewactions",
-      "community": 197,
+      "community": 189,
       "norm_label": "user360accountreviewactions()"
     },
     {
@@ -8235,7 +8127,7 @@
       "source_file": "src/pages/components/user360/User360WalletTab.jsx",
       "source_location": "L1",
       "id": "user360_user360wallettab",
-      "community": 195,
+      "community": 189,
       "norm_label": "user360wallettab.jsx"
     },
     {
@@ -8244,7 +8136,7 @@
       "source_file": "src/pages/components/user360/User360WalletTab.jsx",
       "source_location": "L8",
       "id": "user360_user360wallettab_ledgercols",
-      "community": 195,
+      "community": 189,
       "norm_label": "ledgercols"
     },
     {
@@ -8253,7 +8145,7 @@
       "source_file": "src/pages/components/user360/User360WalletTab.jsx",
       "source_location": "L22",
       "id": "user360_user360wallettab_user360wallettab",
-      "community": 195,
+      "community": 189,
       "norm_label": "user360wallettab()"
     },
     {
@@ -8275,12 +8167,426 @@
       "norm_label": "userquickpreviewmodal()"
     },
     {
+      "label": "constants.js",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/constants.js",
+      "source_location": "L1",
+      "id": "user360_constants",
+      "community": 189,
+      "norm_label": "constants.js"
+    },
+    {
+      "label": "USER360_TAB",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/constants.js",
+      "source_location": "L1",
+      "id": "user360_constants_user360_tab",
+      "community": 189,
+      "norm_label": "user360_tab"
+    },
+    {
+      "label": "USER360_TAB_LABELS",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/constants.js",
+      "source_location": "L14",
+      "id": "user360_constants_user360_tab_labels",
+      "community": 189,
+      "norm_label": "user360_tab_labels"
+    },
+    {
+      "label": "User360ActivityTab.jsx",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/tabs/User360ActivityTab.jsx",
+      "source_location": "L1",
+      "id": "tabs_user360activitytab",
+      "community": 189,
+      "norm_label": "user360activitytab.jsx"
+    },
+    {
+      "label": "User360ActivityTab()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/tabs/User360ActivityTab.jsx",
+      "source_location": "L19",
+      "id": "tabs_user360activitytab_user360activitytab",
+      "community": 189,
+      "norm_label": "user360activitytab()"
+    },
+    {
+      "label": "User360ClipsTab.jsx",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/tabs/User360ClipsTab.jsx",
+      "source_location": "L1",
+      "id": "tabs_user360clipstab",
+      "community": 189,
+      "norm_label": "user360clipstab.jsx"
+    },
+    {
+      "label": "User360ClipsTab()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/tabs/User360ClipsTab.jsx",
+      "source_location": "L18",
+      "id": "tabs_user360clipstab_user360clipstab",
+      "community": 189,
+      "norm_label": "user360clipstab()"
+    },
+    {
+      "label": "User360IssuesTab.jsx",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/tabs/User360IssuesTab.jsx",
+      "source_location": "L1",
+      "id": "tabs_user360issuestab",
+      "community": 189,
+      "norm_label": "user360issuestab.jsx"
+    },
+    {
+      "label": "User360IssuesTab()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/tabs/User360IssuesTab.jsx",
+      "source_location": "L14",
+      "id": "tabs_user360issuestab_user360issuestab",
+      "community": 189,
+      "norm_label": "user360issuestab()"
+    },
+    {
+      "label": "User360LessonsTab.jsx",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/tabs/User360LessonsTab.jsx",
+      "source_location": "L1",
+      "id": "tabs_user360lessonstab",
+      "community": 189,
+      "norm_label": "user360lessonstab.jsx"
+    },
+    {
+      "label": "User360LessonsTab()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/tabs/User360LessonsTab.jsx",
+      "source_location": "L23",
+      "id": "tabs_user360lessonstab_user360lessonstab",
+      "community": 189,
+      "norm_label": "user360lessonstab()"
+    },
+    {
+      "label": "User360OverviewTab.jsx",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/tabs/User360OverviewTab.jsx",
+      "source_location": "L1",
+      "id": "tabs_user360overviewtab",
+      "community": 189,
+      "norm_label": "user360overviewtab.jsx"
+    },
+    {
+      "label": "User360OverviewTab()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/tabs/User360OverviewTab.jsx",
+      "source_location": "L22",
+      "id": "tabs_user360overviewtab_user360overviewtab",
+      "community": 189,
+      "norm_label": "user360overviewtab()"
+    },
+    {
+      "label": "User360PlansTab.jsx",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/tabs/User360PlansTab.jsx",
+      "source_location": "L1",
+      "id": "tabs_user360planstab",
+      "community": 189,
+      "norm_label": "user360planstab.jsx"
+    },
+    {
+      "label": "User360PlansTab()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/tabs/User360PlansTab.jsx",
+      "source_location": "L22",
+      "id": "tabs_user360planstab_user360planstab",
+      "community": 189,
+      "norm_label": "user360planstab()"
+    },
+    {
+      "label": "User360ReferralsTab.jsx",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/tabs/User360ReferralsTab.jsx",
+      "source_location": "L1",
+      "id": "tabs_user360referralstab",
+      "community": 189,
+      "norm_label": "user360referralstab.jsx"
+    },
+    {
+      "label": "User360ReferralsTab()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/tabs/User360ReferralsTab.jsx",
+      "source_location": "L18",
+      "id": "tabs_user360referralstab_user360referralstab",
+      "community": 189,
+      "norm_label": "user360referralstab()"
+    },
+    {
+      "label": "User360ReviewsTab.jsx",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/tabs/User360ReviewsTab.jsx",
+      "source_location": "L1",
+      "id": "tabs_user360reviewstab",
+      "community": 189,
+      "norm_label": "user360reviewstab.jsx"
+    },
+    {
+      "label": "User360ReviewsTab()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/tabs/User360ReviewsTab.jsx",
+      "source_location": "L20",
+      "id": "tabs_user360reviewstab_user360reviewstab",
+      "community": 189,
+      "norm_label": "user360reviewstab()"
+    },
+    {
+      "label": "User360TicketsTab.jsx",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/tabs/User360TicketsTab.jsx",
+      "source_location": "L1",
+      "id": "tabs_user360ticketstab",
+      "community": 189,
+      "norm_label": "user360ticketstab.jsx"
+    },
+    {
+      "label": "User360TicketsTab()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/tabs/User360TicketsTab.jsx",
+      "source_location": "L9",
+      "id": "tabs_user360ticketstab_user360ticketstab",
+      "community": 189,
+      "norm_label": "user360ticketstab()"
+    },
+    {
+      "label": "user360Parts.jsx",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L1",
+      "id": "user360_user360parts",
+      "community": 189,
+      "norm_label": "user360parts.jsx"
+    },
+    {
+      "label": "timelineDotColor()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L24",
+      "id": "user360_user360parts_timelinedotcolor",
+      "community": 189,
+      "norm_label": "timelinedotcolor()"
+    },
+    {
+      "label": "timelineDotBg()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L35",
+      "id": "user360_user360parts_timelinedotbg",
+      "community": 189,
+      "norm_label": "timelinedotbg()"
+    },
+    {
+      "label": "DeleteActions()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L46",
+      "id": "user360_user360parts_deleteactions",
+      "community": 189,
+      "norm_label": "deleteactions()"
+    },
+    {
+      "label": "renderParty()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L95",
+      "id": "user360_user360parts_renderparty",
+      "community": 189,
+      "norm_label": "renderparty()"
+    },
+    {
+      "label": "safeImg()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L97",
+      "id": "user360_user360parts_safeimg",
+      "community": 189,
+      "norm_label": "safeimg()"
+    },
+    {
+      "label": "formatPrimitive()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L102",
+      "id": "user360_user360parts_formatprimitive",
+      "community": 189,
+      "norm_label": "formatprimitive()"
+    },
+    {
+      "label": "RATING_FIELD_LABELS",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L115",
+      "id": "user360_user360parts_rating_field_labels",
+      "community": 189,
+      "norm_label": "rating_field_labels"
+    },
+    {
+      "label": "RatingSideCard()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L125",
+      "id": "user360_user360parts_ratingsidecard",
+      "community": 189,
+      "norm_label": "ratingsidecard()"
+    },
+    {
+      "label": "ReviewRatingsCell()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L190",
+      "id": "user360_user360parts_reviewratingscell",
+      "community": 189,
+      "norm_label": "reviewratingscell()"
+    },
+    {
+      "label": "NotificationPreferencesPanel()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L215",
+      "id": "user360_user360parts_notificationpreferencespanel",
+      "community": 189,
+      "norm_label": "notificationpreferencespanel()"
+    },
+    {
+      "label": "ExtraInfoTree()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L255",
+      "id": "user360_user360parts_extrainfotree",
+      "community": 189,
+      "norm_label": "extrainfotree()"
+    },
+    {
+      "label": "ClipPlayDialog()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L307",
+      "id": "user360_user360parts_clipplaydialog",
+      "community": 189,
+      "norm_label": "clipplaydialog()"
+    },
+    {
+      "label": "KeyValueRow()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L365",
+      "id": "user360_user360parts_keyvaluerow",
+      "community": 189,
+      "norm_label": "keyvaluerow()"
+    },
+    {
+      "label": "user360Shared.jsx",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Shared.jsx",
+      "source_location": "L1",
+      "id": "user360_user360shared",
+      "community": 189,
+      "norm_label": "user360shared.jsx"
+    },
+    {
+      "label": "SectionShell()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Shared.jsx",
+      "source_location": "L5",
+      "id": "user360_user360shared_sectionshell",
+      "community": 189,
+      "norm_label": "sectionshell()"
+    },
+    {
+      "label": "EmptyHint()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Shared.jsx",
+      "source_location": "L42",
+      "id": "user360_user360shared_emptyhint",
+      "community": 189,
+      "norm_label": "emptyhint()"
+    },
+    {
+      "label": "StatTile()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Shared.jsx",
+      "source_location": "L63",
+      "id": "user360_user360shared_stattile",
+      "community": 189,
+      "norm_label": "stattile()"
+    },
+    {
+      "label": "downloadCsv()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Shared.jsx",
+      "source_location": "L92",
+      "id": "user360_user360shared_downloadcsv",
+      "community": 189,
+      "norm_label": "downloadcsv()"
+    },
+    {
+      "label": "lessonStatusColor()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Shared.jsx",
+      "source_location": "L120",
+      "id": "user360_user360shared_lessonstatuscolor",
+      "community": 189,
+      "norm_label": "lessonstatuscolor()"
+    },
+    {
+      "label": "user360Toolbars.jsx",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Toolbars.jsx",
+      "source_location": "L1",
+      "id": "user360_user360toolbars",
+      "community": 189,
+      "norm_label": "user360toolbars.jsx"
+    },
+    {
+      "label": "ToolbarRefreshExport()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Toolbars.jsx",
+      "source_location": "L16",
+      "id": "user360_user360toolbars_toolbarrefreshexport",
+      "community": 189,
+      "norm_label": "toolbarrefreshexport()"
+    },
+    {
+      "label": "QueryToolbar()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Toolbars.jsx",
+      "source_location": "L41",
+      "id": "user360_user360toolbars_querytoolbar",
+      "community": 189,
+      "norm_label": "querytoolbar()"
+    },
+    {
+      "label": "ActivityToolbar()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Toolbars.jsx",
+      "source_location": "L129",
+      "id": "user360_user360toolbars_activitytoolbar",
+      "community": 189,
+      "norm_label": "activitytoolbar()"
+    },
+    {
+      "label": "PaginationBar()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/user360Toolbars.jsx",
+      "source_location": "L200",
+      "id": "user360_user360toolbars_paginationbar",
+      "community": 189,
+      "norm_label": "paginationbar()"
+    },
+    {
       "label": "index.js",
       "file_type": "code",
       "source_file": "src/pages/forgot-password/index.js",
       "source_location": "L1",
       "id": "forgot_password_index",
-      "community": 19,
+      "community": 197,
       "norm_label": "index.js"
     },
     {
@@ -8289,7 +8595,7 @@
       "source_file": "src/pages/forgot-password/index.js",
       "source_location": "L31",
       "id": "forgot_password_index_forgotpasswordillustrationwrapper",
-      "community": 19,
+      "community": 197,
       "norm_label": "forgotpasswordillustrationwrapper"
     },
     {
@@ -8298,7 +8604,7 @@
       "source_file": "src/pages/forgot-password/index.js",
       "source_location": "L39",
       "id": "forgot_password_index_forgotpasswordillustration",
-      "community": 19,
+      "community": 197,
       "norm_label": "forgotpasswordillustration"
     },
     {
@@ -8307,7 +8613,7 @@
       "source_file": "src/pages/forgot-password/index.js",
       "source_location": "L49",
       "id": "forgot_password_index_rightwrapper",
-      "community": 19,
+      "community": 197,
       "norm_label": "rightwrapper"
     },
     {
@@ -8316,7 +8622,7 @@
       "source_file": "src/pages/forgot-password/index.js",
       "source_location": "L59",
       "id": "forgot_password_index_boxwrapper",
-      "community": 19,
+      "community": 197,
       "norm_label": "boxwrapper"
     },
     {
@@ -8325,7 +8631,7 @@
       "source_file": "src/pages/forgot-password/index.js",
       "source_location": "L66",
       "id": "forgot_password_index_typographystyled",
-      "community": 19,
+      "community": 197,
       "norm_label": "typographystyled"
     },
     {
@@ -8334,7 +8640,7 @@
       "source_file": "src/pages/forgot-password/index.js",
       "source_location": "L73",
       "id": "forgot_password_index_linkstyled",
-      "community": 19,
+      "community": 197,
       "norm_label": "linkstyled"
     },
     {
@@ -8352,7 +8658,7 @@
       "source_file": "src/pages/home/index.js",
       "source_location": "L1",
       "id": "home_index",
-      "community": 5,
+      "community": 3,
       "norm_label": "index.js"
     },
     {
@@ -8361,7 +8667,7 @@
       "source_file": "src/pages/home/index.js",
       "source_location": "L39",
       "id": "home_index_home",
-      "community": 5,
+      "community": 3,
       "norm_label": "home()"
     },
     {
@@ -8388,7 +8694,7 @@
       "source_file": "src/pages/login/index.js",
       "source_location": "L1",
       "id": "login_index",
-      "community": 19,
+      "community": 30,
       "norm_label": "index.js"
     },
     {
@@ -8397,7 +8703,7 @@
       "source_file": "src/pages/login/index.js",
       "source_location": "L50",
       "id": "login_index_loginillustrationwrapper",
-      "community": 19,
+      "community": 30,
       "norm_label": "loginillustrationwrapper"
     },
     {
@@ -8406,7 +8712,7 @@
       "source_file": "src/pages/login/index.js",
       "source_location": "L58",
       "id": "login_index_loginillustration",
-      "community": 19,
+      "community": 30,
       "norm_label": "loginillustration"
     },
     {
@@ -8415,7 +8721,7 @@
       "source_file": "src/pages/login/index.js",
       "source_location": "L68",
       "id": "login_index_rightwrapper",
-      "community": 19,
+      "community": 30,
       "norm_label": "rightwrapper"
     },
     {
@@ -8424,7 +8730,7 @@
       "source_file": "src/pages/login/index.js",
       "source_location": "L78",
       "id": "login_index_boxwrapper",
-      "community": 19,
+      "community": 30,
       "norm_label": "boxwrapper"
     },
     {
@@ -8433,7 +8739,7 @@
       "source_file": "src/pages/login/index.js",
       "source_location": "L85",
       "id": "login_index_typographystyled",
-      "community": 19,
+      "community": 30,
       "norm_label": "typographystyled"
     },
     {
@@ -8442,7 +8748,7 @@
       "source_file": "src/pages/login/index.js",
       "source_location": "L92",
       "id": "login_index_formcontrollabel",
-      "community": 19,
+      "community": 30,
       "norm_label": "formcontrollabel"
     },
     {
@@ -8451,7 +8757,7 @@
       "source_file": "src/pages/login/index.js",
       "source_location": "L99",
       "id": "login_index_schema",
-      "community": 19,
+      "community": 30,
       "norm_label": "schema"
     },
     {
@@ -8460,7 +8766,7 @@
       "source_file": "src/pages/login/index.js",
       "source_location": "L104",
       "id": "login_index_defaultvalues",
-      "community": 19,
+      "community": 30,
       "norm_label": "defaultvalues"
     },
     {
@@ -8469,7 +8775,7 @@
       "source_file": "src/pages/login/index.js",
       "source_location": "L109",
       "id": "login_index_loginpage",
-      "community": 19,
+      "community": 200,
       "norm_label": "loginpage()"
     },
     {
@@ -8478,7 +8784,7 @@
       "source_file": "src/pages/register/index.js",
       "source_location": "L1",
       "id": "register_index",
-      "community": 19,
+      "community": 195,
       "norm_label": "index.js"
     },
     {
@@ -8487,7 +8793,7 @@
       "source_file": "src/pages/register/index.js",
       "source_location": "L45",
       "id": "register_index_registerillustrationwrapper",
-      "community": 19,
+      "community": 195,
       "norm_label": "registerillustrationwrapper"
     },
     {
@@ -8496,7 +8802,7 @@
       "source_file": "src/pages/register/index.js",
       "source_location": "L53",
       "id": "register_index_registerillustration",
-      "community": 19,
+      "community": 195,
       "norm_label": "registerillustration"
     },
     {
@@ -8505,7 +8811,7 @@
       "source_file": "src/pages/register/index.js",
       "source_location": "L63",
       "id": "register_index_rightwrapper",
-      "community": 19,
+      "community": 195,
       "norm_label": "rightwrapper"
     },
     {
@@ -8514,7 +8820,7 @@
       "source_file": "src/pages/register/index.js",
       "source_location": "L73",
       "id": "register_index_boxwrapper",
-      "community": 19,
+      "community": 195,
       "norm_label": "boxwrapper"
     },
     {
@@ -8523,7 +8829,7 @@
       "source_file": "src/pages/register/index.js",
       "source_location": "L80",
       "id": "register_index_typographystyled",
-      "community": 19,
+      "community": 195,
       "norm_label": "typographystyled"
     },
     {
@@ -8532,7 +8838,7 @@
       "source_file": "src/pages/register/index.js",
       "source_location": "L87",
       "id": "register_index_formcontrollabel",
-      "community": 19,
+      "community": 195,
       "norm_label": "formcontrollabel"
     },
     {
@@ -8541,7 +8847,7 @@
       "source_file": "src/pages/register/index.js",
       "source_location": "L95",
       "id": "register_index_linkstyled",
-      "community": 19,
+      "community": 195,
       "norm_label": "linkstyled"
     },
     {
@@ -8550,7 +8856,7 @@
       "source_file": "src/pages/register/index.js",
       "source_location": "L100",
       "id": "register_index_register",
-      "community": 19,
+      "community": 200,
       "norm_label": "register()"
     },
     {
@@ -8730,7 +9036,7 @@
       "source_file": "src/services/bannersApi.js",
       "source_location": "L1",
       "id": "services_bannersapi",
-      "community": 34,
+      "community": 35,
       "norm_label": "bannersapi.js"
     },
     {
@@ -8739,7 +9045,7 @@
       "source_file": "src/services/bannersApi.js",
       "source_location": "L4",
       "id": "services_bannersapi_getauthheaders",
-      "community": 34,
+      "community": 35,
       "norm_label": "getauthheaders()"
     },
     {
@@ -8748,7 +9054,7 @@
       "source_file": "src/services/bannersApi.js",
       "source_location": "L12",
       "id": "services_bannersapi_apiurl",
-      "community": 34,
+      "community": 35,
       "norm_label": "apiurl()"
     },
     {
@@ -8757,7 +9063,7 @@
       "source_file": "src/services/bannersApi.js",
       "source_location": "L14",
       "id": "services_bannersapi_handleres",
-      "community": 34,
+      "community": 35,
       "norm_label": "handleres()"
     },
     {
@@ -8766,7 +9072,7 @@
       "source_file": "src/services/bannersApi.js",
       "source_location": "L23",
       "id": "services_bannersapi_listbanners",
-      "community": 34,
+      "community": 35,
       "norm_label": "listbanners()"
     },
     {
@@ -8775,7 +9081,7 @@
       "source_file": "src/services/bannersApi.js",
       "source_location": "L34",
       "id": "services_bannersapi_createbanner",
-      "community": 34,
+      "community": 35,
       "norm_label": "createbanner()"
     },
     {
@@ -8784,7 +9090,7 @@
       "source_file": "src/services/bannersApi.js",
       "source_location": "L43",
       "id": "services_bannersapi_updatebanner",
-      "community": 34,
+      "community": 35,
       "norm_label": "updatebanner()"
     },
     {
@@ -8793,7 +9099,7 @@
       "source_file": "src/services/bannersApi.js",
       "source_location": "L52",
       "id": "services_bannersapi_togglebanner",
-      "community": 34,
+      "community": 35,
       "norm_label": "togglebanner()"
     },
     {
@@ -8802,7 +9108,7 @@
       "source_file": "src/services/bannersApi.js",
       "source_location": "L60",
       "id": "services_bannersapi_deletebanner",
-      "community": 34,
+      "community": 35,
       "norm_label": "deletebanner()"
     },
     {
@@ -9274,10 +9580,46 @@
       "norm_label": "publishadminfaq()"
     },
     {
+      "label": "saveFaqDraft()",
+      "file_type": "code",
+      "source_file": "src/services/cmsApi.js",
+      "source_location": "L94",
+      "id": "services_cmsapi_savefaqdraft",
+      "community": 17,
+      "norm_label": "savefaqdraft()"
+    },
+    {
+      "label": "publishFaq()",
+      "file_type": "code",
+      "source_file": "src/services/cmsApi.js",
+      "source_location": "L104",
+      "id": "services_cmsapi_publishfaq",
+      "community": 17,
+      "norm_label": "publishfaq()"
+    },
+    {
+      "label": "saveLegalDraft()",
+      "file_type": "code",
+      "source_file": "src/services/cmsApi.js",
+      "source_location": "L113",
+      "id": "services_cmsapi_savelegaldraft",
+      "community": 17,
+      "norm_label": "savelegaldraft()"
+    },
+    {
+      "label": "publishLegal()",
+      "file_type": "code",
+      "source_file": "src/services/cmsApi.js",
+      "source_location": "L122",
+      "id": "services_cmsapi_publishlegal",
+      "community": 17,
+      "norm_label": "publishlegal()"
+    },
+    {
       "label": "seedAdminFaq()",
       "file_type": "code",
       "source_file": "src/services/cmsApi.js",
-      "source_location": "L93",
+      "source_location": "L131",
       "id": "services_cmsapi_seedadminfaq",
       "community": 17,
       "norm_label": "seedadminfaq()"
@@ -9286,7 +9628,7 @@
       "label": "seedLegalDocuments()",
       "file_type": "code",
       "source_file": "src/services/cmsApi.js",
-      "source_location": "L102",
+      "source_location": "L140",
       "id": "services_cmsapi_seedlegaldocuments",
       "community": 17,
       "norm_label": "seedlegaldocuments()"
@@ -9295,7 +9637,7 @@
       "label": "getCmsSummary()",
       "file_type": "code",
       "source_file": "src/services/cmsApi.js",
-      "source_location": "L111",
+      "source_location": "L149",
       "id": "services_cmsapi_getcmssummary",
       "community": 17,
       "norm_label": "getcmssummary()"
@@ -9304,7 +9646,7 @@
       "label": "presignCmsAsset()",
       "file_type": "code",
       "source_file": "src/services/cmsApi.js",
-      "source_location": "L120",
+      "source_location": "L158",
       "id": "services_cmsapi_presigncmsasset",
       "community": 17,
       "norm_label": "presigncmsasset()"
@@ -9313,7 +9655,7 @@
       "label": "uploadCmsAsset()",
       "file_type": "code",
       "source_file": "src/services/cmsApi.js",
-      "source_location": "L133",
+      "source_location": "L171",
       "id": "services_cmsapi_uploadcmsasset",
       "community": 17,
       "norm_label": "uploadcmsasset()"
@@ -9963,7 +10305,7 @@
       "source_file": "src/services/referralAdminApi.js",
       "source_location": "L1",
       "id": "services_referraladminapi",
-      "community": 33,
+      "community": 34,
       "norm_label": "referraladminapi.js"
     },
     {
@@ -9972,7 +10314,7 @@
       "source_file": "src/services/referralAdminApi.js",
       "source_location": "L4",
       "id": "services_referraladminapi_getauthheaders",
-      "community": 33,
+      "community": 34,
       "norm_label": "getauthheaders()"
     },
     {
@@ -9981,7 +10323,7 @@
       "source_file": "src/services/referralAdminApi.js",
       "source_location": "L12",
       "id": "services_referraladminapi_apiurl",
-      "community": 33,
+      "community": 34,
       "norm_label": "apiurl()"
     },
     {
@@ -9990,7 +10332,7 @@
       "source_file": "src/services/referralAdminApi.js",
       "source_location": "L14",
       "id": "services_referraladminapi_unwrap",
-      "community": 33,
+      "community": 34,
       "norm_label": "unwrap()"
     },
     {
@@ -9999,7 +10341,7 @@
       "source_file": "src/services/referralAdminApi.js",
       "source_location": "L19",
       "id": "services_referraladminapi_getreferraldashboard",
-      "community": 33,
+      "community": 34,
       "norm_label": "getreferraldashboard()"
     },
     {
@@ -10008,7 +10350,7 @@
       "source_file": "src/services/referralAdminApi.js",
       "source_location": "L28",
       "id": "services_referraladminapi_getreferralrewards",
-      "community": 33,
+      "community": 34,
       "norm_label": "getreferralrewards()"
     },
     {
@@ -10237,6 +10579,33 @@
       "norm_label": "getcalldiagnostics()"
     },
     {
+      "label": "unwrapData()",
+      "file_type": "code",
+      "source_file": "src/services/user360Api.js",
+      "source_location": "L154",
+      "id": "services_user360api_unwrapdata",
+      "community": 16,
+      "norm_label": "unwrapdata()"
+    },
+    {
+      "label": "getUserSupportTickets()",
+      "file_type": "code",
+      "source_file": "src/services/user360Api.js",
+      "source_location": "L156",
+      "id": "services_user360api_getusersupporttickets",
+      "community": 16,
+      "norm_label": "getusersupporttickets()"
+    },
+    {
+      "label": "getUserReferrals()",
+      "file_type": "code",
+      "source_file": "src/services/user360Api.js",
+      "source_location": "L167",
+      "id": "services_user360api_getuserreferrals",
+      "community": 16,
+      "norm_label": "getuserreferrals()"
+    },
+    {
       "label": "userAdminApi.js",
       "file_type": "code",
       "source_file": "src/services/userAdminApi.js",
@@ -10264,10 +10633,19 @@
       "norm_label": "fetchuserlist()"
     },
     {
+      "label": "listUsers()",
+      "file_type": "code",
+      "source_file": "src/services/userAdminApi.js",
+      "source_location": "L28",
+      "id": "services_useradminapi_listusers",
+      "community": 34,
+      "norm_label": "listusers()"
+    },
+    {
       "label": "listTrainers()",
       "file_type": "code",
       "source_file": "src/services/userAdminApi.js",
-      "source_location": "L27",
+      "source_location": "L57",
       "id": "services_useradminapi_listtrainers",
       "community": 34,
       "norm_label": "listtrainers()"
@@ -10276,7 +10654,7 @@
       "label": "listTrainees()",
       "file_type": "code",
       "source_file": "src/services/userAdminApi.js",
-      "source_location": "L31",
+      "source_location": "L61",
       "id": "services_useradminapi_listtrainees",
       "community": 34,
       "norm_label": "listtrainees()"
@@ -10285,7 +10663,7 @@
       "label": "deleteUser()",
       "file_type": "code",
       "source_file": "src/services/userAdminApi.js",
-      "source_location": "L35",
+      "source_location": "L65",
       "id": "services_useradminapi_deleteuser",
       "community": 34,
       "norm_label": "deleteuser()"
@@ -10566,7 +10944,7 @@
       "source_file": "src/utils/utils.js",
       "source_location": "L1",
       "id": "utils_utils",
-      "community": 30,
+      "community": 1,
       "norm_label": "utils.js"
     },
     {
@@ -10575,7 +10953,7 @@
       "source_file": "src/utils/utils.js",
       "source_location": "L3",
       "id": "utils_utils_debounce",
-      "community": 30,
+      "community": 1,
       "norm_label": "debounce()"
     },
     {
@@ -10584,7 +10962,7 @@
       "source_file": "src/utils/utils.js",
       "source_location": "L17",
       "id": "utils_utils_searchmedicine",
-      "community": 30,
+      "community": 1,
       "norm_label": "searchmedicine()"
     },
     {
@@ -10593,7 +10971,7 @@
       "source_file": "src/utils/utils.js",
       "source_location": "L23",
       "id": "utils_utils_debouncedsearchmedicine",
-      "community": 30,
+      "community": 1,
       "norm_label": "debouncedsearchmedicine"
     },
     {
@@ -10602,7 +10980,7 @@
       "source_file": "src/utils/utils.js",
       "source_location": "L34",
       "id": "utils_utils_getimageurl",
-      "community": 39,
+      "community": 1,
       "norm_label": "getimageurl()"
     },
     {
@@ -10611,7 +10989,7 @@
       "source_file": "src/utils/utils.js",
       "source_location": "L55",
       "id": "utils_utils_bookedsession",
-      "community": 30,
+      "community": 1,
       "norm_label": "bookedsession"
     },
     {
@@ -10620,7 +10998,7 @@
       "source_file": "src/utils/utils.js",
       "source_location": "L64",
       "id": "utils_utils_iscurrentdatebefore",
-      "community": 27,
+      "community": 1,
       "norm_label": "iscurrentdatebefore()"
     },
     {
@@ -10629,7 +11007,7 @@
       "source_file": "src/utils/utils.js",
       "source_location": "L70",
       "id": "utils_utils_updateticketbaseurl",
-      "community": 30,
+      "community": 1,
       "norm_label": "updateticketbaseurl"
     },
     {
@@ -10638,7 +11016,7 @@
       "source_file": "src/utils/utils.js",
       "source_location": "L74",
       "id": "utils_utils_getsignedurl",
-      "community": 30,
+      "community": 1,
       "norm_label": "getsignedurl()"
     },
     {
@@ -10647,7 +11025,7 @@
       "source_file": "src/utils/utils.js",
       "source_location": "L82",
       "id": "utils_utils_statuscolors",
-      "community": 30,
+      "community": 1,
       "norm_label": "statuscolors"
     },
     {
@@ -10656,7 +11034,7 @@
       "source_file": "src/utils/utils.js",
       "source_location": "L88",
       "id": "utils_utils_trainerstatuscolors",
-      "community": 30,
+      "community": 1,
       "norm_label": "trainerstatuscolors"
     },
     {
@@ -11036,6 +11414,168 @@
       "id": "configs_acl_appability",
       "community": 179,
       "norm_label": "appability"
+    },
+    {
+      "label": "tabLabels",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L54",
+      "community": 189,
+      "norm_label": "tablabels",
+      "id": "user360_adminuser360tabs_tablabels"
+    },
+    {
+      "label": "SectionShell()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L56",
+      "community": 189,
+      "norm_label": "sectionshell()",
+      "id": "user360_adminuser360tabs_sectionshell"
+    },
+    {
+      "label": "downloadCsv()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L85",
+      "community": 189,
+      "norm_label": "downloadcsv()",
+      "id": "user360_adminuser360tabs_downloadcsv"
+    },
+    {
+      "label": "lessonStatusColor()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L111",
+      "community": 189,
+      "norm_label": "lessonstatuscolor()",
+      "id": "user360_adminuser360tabs_lessonstatuscolor"
+    },
+    {
+      "label": "timelineDotColor()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L120",
+      "community": 189,
+      "norm_label": "timelinedotcolor()",
+      "id": "user360_adminuser360tabs_timelinedotcolor"
+    },
+    {
+      "label": "timelineDotBg()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L131",
+      "community": 189,
+      "norm_label": "timelinedotbg()",
+      "id": "user360_adminuser360tabs_timelinedotbg"
+    },
+    {
+      "label": "DeleteActions()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L142",
+      "community": 189,
+      "norm_label": "deleteactions()",
+      "id": "user360_adminuser360tabs_deleteactions"
+    },
+    {
+      "label": "renderParty()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L191",
+      "community": 189,
+      "norm_label": "renderparty()",
+      "id": "user360_adminuser360tabs_renderparty"
+    },
+    {
+      "label": "safeImg()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L193",
+      "community": 189,
+      "norm_label": "safeimg()",
+      "id": "user360_adminuser360tabs_safeimg"
+    },
+    {
+      "label": "EmptyHint()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L198",
+      "community": 189,
+      "norm_label": "emptyhint()",
+      "id": "user360_adminuser360tabs_emptyhint"
+    },
+    {
+      "label": "formatPrimitive()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L217",
+      "community": 189,
+      "norm_label": "formatprimitive()",
+      "id": "user360_adminuser360tabs_formatprimitive"
+    },
+    {
+      "label": "RATING_FIELD_LABELS",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L230",
+      "community": 189,
+      "norm_label": "rating_field_labels",
+      "id": "user360_adminuser360tabs_rating_field_labels"
+    },
+    {
+      "label": "RatingSideCard()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L241",
+      "community": 189,
+      "norm_label": "ratingsidecard()",
+      "id": "user360_adminuser360tabs_ratingsidecard"
+    },
+    {
+      "label": "ReviewRatingsCell()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L307",
+      "community": 189,
+      "norm_label": "reviewratingscell()",
+      "id": "user360_adminuser360tabs_reviewratingscell"
+    },
+    {
+      "label": "NotificationPreferencesPanel()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L332",
+      "community": 189,
+      "norm_label": "notificationpreferencespanel()",
+      "id": "user360_adminuser360tabs_notificationpreferencespanel"
+    },
+    {
+      "label": "ExtraInfoTree()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L372",
+      "community": 189,
+      "norm_label": "extrainfotree()",
+      "id": "user360_adminuser360tabs_extrainfotree"
+    },
+    {
+      "label": "StatTile()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L424",
+      "community": 189,
+      "norm_label": "stattile()",
+      "id": "user360_adminuser360tabs_stattile"
+    },
+    {
+      "label": "ClipPlayDialog()",
+      "file_type": "code",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L449",
+      "community": 189,
+      "norm_label": "clipplaydialog()",
+      "id": "user360_adminuser360tabs_clipplaydialog"
     },
     {
       "label": "extensions.json",
@@ -17835,9 +18375,9 @@
       "source_file": "src/components/admin/content/CmsEditorDrawer.jsx",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "content_cmseditordrawer",
-      "target": "content_cmseditordrawer_cmseditordrawer",
-      "confidence_score": 1.0
+      "target": "content_cmseditordrawer_cmseditordrawer"
     },
     {
       "relation": "contains",
@@ -17845,9 +18385,9 @@
       "source_file": "src/components/admin/content/CmsHtmlEditor.jsx",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "content_cmshtmleditor",
-      "target": "content_cmshtmleditor_cmshtmleditor",
-      "confidence_score": 1.0
+      "target": "content_cmshtmleditor_cmshtmleditor"
     },
     {
       "relation": "contains",
@@ -17855,9 +18395,9 @@
       "source_file": "src/components/admin/content/CmsHtmlEditor.jsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "content_cmshtmleditor",
-      "target": "content_cmshtmleditor_editor",
-      "confidence_score": 1.0
+      "target": "content_cmshtmleditor_editor"
     },
     {
       "relation": "contains",
@@ -17865,9 +18405,9 @@
       "source_file": "src/components/admin/content/CmsHtmlEditor.jsx",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "content_cmshtmleditor",
-      "target": "content_cmshtmleditor_htmltoeditorstate",
-      "confidence_score": 1.0
+      "target": "content_cmshtmleditor_htmltoeditorstate"
     },
     {
       "relation": "contains",
@@ -17875,9 +18415,9 @@
       "source_file": "src/components/admin/content/CmsHtmlEditor.jsx",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "content_cmshtmleditor",
-      "target": "content_cmshtmleditor_toolbar",
-      "confidence_score": 1.0
+      "target": "content_cmshtmleditor_toolbar"
     },
     {
       "relation": "contains",
@@ -17994,9 +18534,9 @@
       "source_file": "src/components/admin/content/ContentPlacementGuide.jsx",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "content_contentplacementguide",
-      "target": "content_contentplacementconfig_faq_placement",
-      "confidence_score": 1.0
+      "target": "content_contentplacementconfig_faq_placement"
     },
     {
       "relation": "imports",
@@ -18046,9 +18586,9 @@
       "source_file": "src/components/admin/content/FaqPreview.jsx",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "content_faqpreview",
-      "target": "content_faqpreview_faqpreview",
-      "confidence_score": 1.0
+      "target": "content_faqpreview_faqpreview"
     },
     {
       "relation": "imports_from",
@@ -18057,9 +18597,9 @@
       "source_file": "src/components/admin/content/FaqPreview.jsx",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "content_faqpreview",
-      "target": "content_mobilepreviewframecontext",
-      "confidence_score": 1.0
+      "target": "content_mobilepreviewframecontext"
     },
     {
       "relation": "imports",
@@ -18068,9 +18608,9 @@
       "source_file": "src/components/admin/content/FaqPreview.jsx",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "content_faqpreview",
-      "target": "content_mobilepreviewframecontext_usemobilepreviewframe",
-      "confidence_score": 1.0
+      "target": "content_mobilepreviewframecontext_usemobilepreviewframe"
     },
     {
       "relation": "calls",
@@ -18082,6 +18622,78 @@
       "weight": 1.0,
       "source": "content_faqpreview_faqpreview",
       "target": "content_mobilepreviewframecontext_usemobilepreviewframe"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/content/IoniconsPicker.jsx",
+      "source_location": "L51",
+      "weight": 1.0,
+      "source": "content_ioniconspicker",
+      "target": "content_ioniconspicker_io5componentname",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/content/IoniconsPicker.jsx",
+      "source_location": "L70",
+      "weight": 1.0,
+      "source": "content_ioniconspicker",
+      "target": "content_ioniconspicker_ioniconspicker",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/content/IoniconsPicker.jsx",
+      "source_location": "L65",
+      "weight": 1.0,
+      "source": "content_ioniconspicker",
+      "target": "content_ioniconspicker_ioniconspreview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/content/IoniconsPicker.jsx",
+      "source_location": "L60",
+      "weight": 1.0,
+      "source": "content_ioniconspicker",
+      "target": "content_ioniconspicker_resolveicon",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/content/IoniconsPicker.jsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "content_ioniconspicker",
+      "target": "content_ioniconspicker_tip_icon_names",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/content/IoniconsPicker.jsx",
+      "source_location": "L61",
+      "weight": 1.0,
+      "source": "content_ioniconspicker_resolveicon",
+      "target": "content_ioniconspicker_io5componentname",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/admin/content/IoniconsPicker.jsx",
+      "source_location": "L66",
+      "weight": 1.0,
+      "source": "content_ioniconspicker_ioniconspreview",
+      "target": "content_ioniconspicker_resolveicon",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -18576,9 +19188,9 @@
       "source_file": "src/components/admin/content/contentPlacementConfig.js",
       "source_location": "L205",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "content_contentplacementconfig",
-      "target": "content_contentplacementconfig_faq_placement",
-      "confidence_score": 1.0
+      "target": "content_contentplacementconfig_faq_placement"
     },
     {
       "relation": "contains",
@@ -20925,9 +21537,9 @@
       "source_file": "src/pages/apps/cms-faq/index.jsx",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "cms_faq_index",
-      "target": "cms_faq_index_newid",
-      "confidence_score": 1.0
+      "target": "cms_faq_index_newid"
     },
     {
       "relation": "contains",
@@ -20946,9 +21558,9 @@
       "source_file": "src/pages/apps/cms-faq/index.jsx",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "cms_faq_index_emptyitem",
-      "target": "cms_faq_index_newid",
-      "confidence_score": 1.0
+      "target": "cms_faq_index_newid"
     },
     {
       "relation": "calls",
@@ -20957,9 +21569,9 @@
       "source_file": "src/pages/apps/cms-faq/index.jsx",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "cms_faq_index_emptysection",
-      "target": "cms_faq_index_newid",
-      "confidence_score": 1.0
+      "target": "cms_faq_index_newid"
     },
     {
       "relation": "calls",
@@ -21797,9 +22409,9 @@
       "source_file": "src/pages/apps/users/index.jsx",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "users_index",
-      "target": "users_index_status_colors",
-      "confidence_score": 1.0
+      "target": "users_index_status_colors"
     },
     {
       "relation": "contains",
@@ -21807,9 +22419,9 @@
       "source_file": "src/pages/apps/users/index.jsx",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "users_index",
-      "target": "users_index_type_filters",
-      "confidence_score": 1.0
+      "target": "users_index_type_filters"
     },
     {
       "relation": "contains",
@@ -21817,9 +22429,9 @@
       "source_file": "src/pages/apps/users/index.jsx",
       "source_location": "L45",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "users_index",
-      "target": "users_index_usersdirectorypage",
-      "confidence_score": 1.0
+      "target": "users_index_usersdirectorypage"
     },
     {
       "relation": "contains",
@@ -22249,6 +22861,105 @@
       "target": "trainer_status_index_trainerstatus"
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "user360_adminuser360tabs",
+      "target": "tabs_user360activitytab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "user360_adminuser360tabs",
+      "target": "tabs_user360clipstab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "user360_adminuser360tabs",
+      "target": "tabs_user360issuestab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "user360_adminuser360tabs",
+      "target": "tabs_user360lessonstab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "user360_adminuser360tabs",
+      "target": "tabs_user360overviewtab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "user360_adminuser360tabs",
+      "target": "tabs_user360planstab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "user360_adminuser360tabs",
+      "target": "tabs_user360referralstab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "user360_adminuser360tabs",
+      "target": "tabs_user360reviewstab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "user360_adminuser360tabs",
+      "target": "tabs_user360ticketstab",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
@@ -22443,11 +23154,77 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "user360_adminuser360tabs",
+      "target": "user360_constants",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "user360_adminuser360tabs",
+      "target": "user360_constants_user360_tab_labels",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
       "source_location": "L8",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "user360_adminuser360tabs",
       "target": "user360_user360accountreviewactions"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "user360_adminuser360tabs",
+      "target": "user360_user360parts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "user360_adminuser360tabs",
+      "target": "user360_user360parts_clipplaydialog",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "user360_adminuser360tabs",
+      "target": "user360_user360shared",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "user360_adminuser360tabs",
+      "target": "user360_user360shared_sectionshell",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -22465,17 +23242,6 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L130",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "user360_adminuser360tabs_timelinedotbg",
-      "target": "user360_adminuser360tabs_timelinedotcolor"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
       "source_location": "L808",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -22483,26 +23249,15 @@
       "target": "user360_adminuser360tabs_safeimg"
     },
     {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L192",
-      "weight": 1.0,
-      "source": "user360_adminuser360tabs_safeimg",
-      "target": "utils_utils_getimageurl"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
+      "relation": "imports_from",
+      "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
-      "source_location": "L374",
+      "source_file": "src/pages/components/user360/tabs/User360OverviewTab.jsx",
+      "source_location": "L18",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "user360_adminuser360tabs_extrainfotree",
-      "target": "user360_adminuser360tabs_formatprimitive"
+      "source": "tabs_user360overviewtab",
+      "target": "user360_user360accountreviewactions",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -22543,6 +23298,1205 @@
       "confidence_score": 1.0,
       "source": "user360_userquickpreviewmodal",
       "target": "user360_userquickpreviewmodal_userquickpreviewmodal"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/constants.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "user360_constants",
+      "target": "user360_constants_user360_tab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/constants.js",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "user360_constants",
+      "target": "user360_constants_user360_tab_labels",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ActivityTab.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "tabs_user360activitytab",
+      "target": "tabs_user360activitytab_user360activitytab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ActivityTab.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "tabs_user360activitytab",
+      "target": "user360_user360parts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ActivityTab.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "tabs_user360activitytab",
+      "target": "user360_user360parts_timelinedotbg",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ActivityTab.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "tabs_user360activitytab",
+      "target": "user360_user360parts_timelinedotcolor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ActivityTab.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "tabs_user360activitytab",
+      "target": "user360_user360shared",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ActivityTab.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "tabs_user360activitytab",
+      "target": "user360_user360shared_downloadcsv",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ActivityTab.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "tabs_user360activitytab",
+      "target": "user360_user360shared_emptyhint",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ActivityTab.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "tabs_user360activitytab",
+      "target": "user360_user360shared_sectionshell",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ActivityTab.jsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "tabs_user360activitytab",
+      "target": "user360_user360toolbars",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ActivityTab.jsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "tabs_user360activitytab",
+      "target": "user360_user360toolbars_activitytoolbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ActivityTab.jsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "tabs_user360activitytab",
+      "target": "user360_user360toolbars_paginationbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ActivityTab.jsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "tabs_user360activitytab",
+      "target": "user360_user360toolbars_toolbarrefreshexport",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ClipsTab.jsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "tabs_user360clipstab",
+      "target": "tabs_user360clipstab_user360clipstab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ClipsTab.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "tabs_user360clipstab",
+      "target": "user360_user360parts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ClipsTab.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "tabs_user360clipstab",
+      "target": "user360_user360parts_deleteactions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ClipsTab.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "tabs_user360clipstab",
+      "target": "user360_user360parts_safeimg",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ClipsTab.jsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "tabs_user360clipstab",
+      "target": "user360_user360shared",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ClipsTab.jsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "tabs_user360clipstab",
+      "target": "user360_user360shared_downloadcsv",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ClipsTab.jsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "tabs_user360clipstab",
+      "target": "user360_user360shared_emptyhint",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ClipsTab.jsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "tabs_user360clipstab",
+      "target": "user360_user360shared_sectionshell",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ClipsTab.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "tabs_user360clipstab",
+      "target": "user360_user360toolbars",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ClipsTab.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "tabs_user360clipstab",
+      "target": "user360_user360toolbars_paginationbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ClipsTab.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "tabs_user360clipstab",
+      "target": "user360_user360toolbars_querytoolbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ClipsTab.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "tabs_user360clipstab",
+      "target": "user360_user360toolbars_toolbarrefreshexport",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360IssuesTab.jsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "tabs_user360issuestab",
+      "target": "tabs_user360issuestab_user360issuestab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360IssuesTab.jsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "tabs_user360issuestab",
+      "target": "user360_user360shared",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360IssuesTab.jsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "tabs_user360issuestab",
+      "target": "user360_user360shared_emptyhint",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360IssuesTab.jsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "tabs_user360issuestab",
+      "target": "user360_user360shared_sectionshell",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360LessonsTab.jsx",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "tabs_user360lessonstab",
+      "target": "tabs_user360lessonstab_user360lessonstab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360LessonsTab.jsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "tabs_user360lessonstab",
+      "target": "user360_user360parts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360LessonsTab.jsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "tabs_user360lessonstab",
+      "target": "user360_user360parts_deleteactions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360LessonsTab.jsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "tabs_user360lessonstab",
+      "target": "user360_user360parts_renderparty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360LessonsTab.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "tabs_user360lessonstab",
+      "target": "user360_user360shared",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360LessonsTab.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "tabs_user360lessonstab",
+      "target": "user360_user360shared_downloadcsv",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360LessonsTab.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "tabs_user360lessonstab",
+      "target": "user360_user360shared_emptyhint",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360LessonsTab.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "tabs_user360lessonstab",
+      "target": "user360_user360shared_lessonstatuscolor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360LessonsTab.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "tabs_user360lessonstab",
+      "target": "user360_user360shared_sectionshell",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360LessonsTab.jsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "tabs_user360lessonstab",
+      "target": "user360_user360toolbars",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360LessonsTab.jsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "tabs_user360lessonstab",
+      "target": "user360_user360toolbars_paginationbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360LessonsTab.jsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "tabs_user360lessonstab",
+      "target": "user360_user360toolbars_querytoolbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360LessonsTab.jsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "tabs_user360lessonstab",
+      "target": "user360_user360toolbars_toolbarrefreshexport",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360OverviewTab.jsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "tabs_user360overviewtab",
+      "target": "tabs_user360overviewtab_user360overviewtab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360OverviewTab.jsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "tabs_user360overviewtab",
+      "target": "user360_user360parts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360OverviewTab.jsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "tabs_user360overviewtab",
+      "target": "user360_user360parts_extrainfotree",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360OverviewTab.jsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "tabs_user360overviewtab",
+      "target": "user360_user360parts_keyvaluerow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360OverviewTab.jsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "tabs_user360overviewtab",
+      "target": "user360_user360parts_notificationpreferencespanel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360OverviewTab.jsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "tabs_user360overviewtab",
+      "target": "user360_user360parts_safeimg",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360OverviewTab.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "tabs_user360overviewtab",
+      "target": "user360_user360shared",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360OverviewTab.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "tabs_user360overviewtab",
+      "target": "user360_user360shared_sectionshell",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360OverviewTab.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "tabs_user360overviewtab",
+      "target": "user360_user360shared_stattile",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/components/user360/tabs/User360OverviewTab.jsx",
+      "source_location": "L108",
+      "weight": 1.0,
+      "source": "tabs_user360overviewtab_user360overviewtab",
+      "target": "user360_user360parts_keyvaluerow"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/pages/components/user360/tabs/User360OverviewTab.jsx",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "tabs_user360overviewtab_user360overviewtab",
+      "target": "user360_user360parts_safeimg"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360PlansTab.jsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "tabs_user360planstab",
+      "target": "tabs_user360planstab_user360planstab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360PlansTab.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "tabs_user360planstab",
+      "target": "user360_user360parts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360PlansTab.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "tabs_user360planstab",
+      "target": "user360_user360parts_deleteactions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360PlansTab.jsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "tabs_user360planstab",
+      "target": "user360_user360shared",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360PlansTab.jsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "tabs_user360planstab",
+      "target": "user360_user360shared_downloadcsv",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360PlansTab.jsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "tabs_user360planstab",
+      "target": "user360_user360shared_emptyhint",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360PlansTab.jsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "tabs_user360planstab",
+      "target": "user360_user360shared_sectionshell",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360PlansTab.jsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "tabs_user360planstab",
+      "target": "user360_user360toolbars",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360PlansTab.jsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "tabs_user360planstab",
+      "target": "user360_user360toolbars_paginationbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360PlansTab.jsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "tabs_user360planstab",
+      "target": "user360_user360toolbars_querytoolbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360PlansTab.jsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "tabs_user360planstab",
+      "target": "user360_user360toolbars_toolbarrefreshexport",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ReferralsTab.jsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "tabs_user360referralstab",
+      "target": "tabs_user360referralstab_user360referralstab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ReferralsTab.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "tabs_user360referralstab",
+      "target": "user360_user360shared",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ReferralsTab.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "tabs_user360referralstab",
+      "target": "user360_user360shared_emptyhint",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ReferralsTab.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "tabs_user360referralstab",
+      "target": "user360_user360shared_sectionshell",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ReferralsTab.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "tabs_user360referralstab",
+      "target": "user360_user360shared_stattile",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ReviewsTab.jsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "tabs_user360reviewstab",
+      "target": "tabs_user360reviewstab_user360reviewstab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ReviewsTab.jsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "tabs_user360reviewstab",
+      "target": "user360_user360parts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ReviewsTab.jsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "tabs_user360reviewstab",
+      "target": "user360_user360parts_renderparty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ReviewsTab.jsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "tabs_user360reviewstab",
+      "target": "user360_user360parts_reviewratingscell",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ReviewsTab.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "tabs_user360reviewstab",
+      "target": "user360_user360shared",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ReviewsTab.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "tabs_user360reviewstab",
+      "target": "user360_user360shared_downloadcsv",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ReviewsTab.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "tabs_user360reviewstab",
+      "target": "user360_user360shared_emptyhint",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ReviewsTab.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "tabs_user360reviewstab",
+      "target": "user360_user360shared_lessonstatuscolor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ReviewsTab.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "tabs_user360reviewstab",
+      "target": "user360_user360shared_sectionshell",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ReviewsTab.jsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "tabs_user360reviewstab",
+      "target": "user360_user360toolbars",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ReviewsTab.jsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "tabs_user360reviewstab",
+      "target": "user360_user360toolbars_paginationbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ReviewsTab.jsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "tabs_user360reviewstab",
+      "target": "user360_user360toolbars_querytoolbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360ReviewsTab.jsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "tabs_user360reviewstab",
+      "target": "user360_user360toolbars_toolbarrefreshexport",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360TicketsTab.jsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "tabs_user360ticketstab",
+      "target": "tabs_user360ticketstab_user360ticketstab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360TicketsTab.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "tabs_user360ticketstab",
+      "target": "user360_user360shared",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360TicketsTab.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "tabs_user360ticketstab",
+      "target": "user360_user360shared_emptyhint",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/tabs/User360TicketsTab.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "tabs_user360ticketstab",
+      "target": "user360_user360shared_sectionshell",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L307",
+      "weight": 1.0,
+      "source": "user360_user360parts",
+      "target": "user360_user360parts_clipplaydialog",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L46",
+      "weight": 1.0,
+      "source": "user360_user360parts",
+      "target": "user360_user360parts_deleteactions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L255",
+      "weight": 1.0,
+      "source": "user360_user360parts",
+      "target": "user360_user360parts_extrainfotree",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L102",
+      "weight": 1.0,
+      "source": "user360_user360parts",
+      "target": "user360_user360parts_formatprimitive",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L365",
+      "weight": 1.0,
+      "source": "user360_user360parts",
+      "target": "user360_user360parts_keyvaluerow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L215",
+      "weight": 1.0,
+      "source": "user360_user360parts",
+      "target": "user360_user360parts_notificationpreferencespanel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L115",
+      "weight": 1.0,
+      "source": "user360_user360parts",
+      "target": "user360_user360parts_rating_field_labels",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L125",
+      "weight": 1.0,
+      "source": "user360_user360parts",
+      "target": "user360_user360parts_ratingsidecard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L95",
+      "weight": 1.0,
+      "source": "user360_user360parts",
+      "target": "user360_user360parts_renderparty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L190",
+      "weight": 1.0,
+      "source": "user360_user360parts",
+      "target": "user360_user360parts_reviewratingscell",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L97",
+      "weight": 1.0,
+      "source": "user360_user360parts",
+      "target": "user360_user360parts_safeimg",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "user360_user360parts",
+      "target": "user360_user360parts_timelinedotbg",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "user360_user360parts",
+      "target": "user360_user360parts_timelinedotcolor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "user360_user360parts_timelinedotbg",
+      "target": "user360_user360parts_timelinedotcolor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L98",
+      "weight": 1.0,
+      "source": "user360_user360parts_safeimg",
+      "target": "utils_utils_getimageurl"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Parts.jsx",
+      "source_location": "L259",
+      "weight": 1.0,
+      "source": "user360_user360parts_extrainfotree",
+      "target": "user360_user360parts_formatprimitive",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Shared.jsx",
+      "source_location": "L92",
+      "weight": 1.0,
+      "source": "user360_user360shared",
+      "target": "user360_user360shared_downloadcsv",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Shared.jsx",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "user360_user360shared",
+      "target": "user360_user360shared_emptyhint",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Shared.jsx",
+      "source_location": "L120",
+      "weight": 1.0,
+      "source": "user360_user360shared",
+      "target": "user360_user360shared_lessonstatuscolor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Shared.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "user360_user360shared",
+      "target": "user360_user360shared_sectionshell",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Shared.jsx",
+      "source_location": "L63",
+      "weight": 1.0,
+      "source": "user360_user360shared",
+      "target": "user360_user360shared_stattile",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Toolbars.jsx",
+      "source_location": "L129",
+      "weight": 1.0,
+      "source": "user360_user360toolbars",
+      "target": "user360_user360toolbars_activitytoolbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Toolbars.jsx",
+      "source_location": "L200",
+      "weight": 1.0,
+      "source": "user360_user360toolbars",
+      "target": "user360_user360toolbars_paginationbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Toolbars.jsx",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "user360_user360toolbars",
+      "target": "user360_user360toolbars_querytoolbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/user360Toolbars.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "user360_user360toolbars",
+      "target": "user360_user360toolbars_toolbarrefreshexport",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -24784,6 +26738,46 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/services/cmsApi.js",
+      "source_location": "L104",
+      "weight": 1.0,
+      "source": "services_cmsapi",
+      "target": "services_cmsapi_publishfaq",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/cmsApi.js",
+      "source_location": "L122",
+      "weight": 1.0,
+      "source": "services_cmsapi",
+      "target": "services_cmsapi_publishlegal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/cmsApi.js",
+      "source_location": "L94",
+      "weight": 1.0,
+      "source": "services_cmsapi",
+      "target": "services_cmsapi_savefaqdraft",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/cmsApi.js",
+      "source_location": "L113",
+      "weight": 1.0,
+      "source": "services_cmsapi",
+      "target": "services_cmsapi_savelegaldraft",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/cmsApi.js",
       "source_location": "L93",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -24927,6 +26921,50 @@
       "confidence_score": 1.0,
       "source": "services_cmsapi_publishadminfaq",
       "target": "services_cmsapi_getauthheaders"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/cmsApi.js",
+      "source_location": "L107",
+      "weight": 1.0,
+      "source": "services_cmsapi_publishfaq",
+      "target": "services_cmsapi_getauthheaders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/cmsApi.js",
+      "source_location": "L125",
+      "weight": 1.0,
+      "source": "services_cmsapi_publishlegal",
+      "target": "services_cmsapi_getauthheaders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/cmsApi.js",
+      "source_location": "L97",
+      "weight": 1.0,
+      "source": "services_cmsapi_savefaqdraft",
+      "target": "services_cmsapi_getauthheaders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/cmsApi.js",
+      "source_location": "L116",
+      "weight": 1.0,
+      "source": "services_cmsapi_savelegaldraft",
+      "target": "services_cmsapi_getauthheaders",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -25087,6 +27125,50 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/services/cmsApi.js",
+      "source_location": "L105",
+      "weight": 1.0,
+      "source": "services_cmsapi_publishfaq",
+      "target": "services_cmsapi_apiurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/cmsApi.js",
+      "source_location": "L123",
+      "weight": 1.0,
+      "source": "services_cmsapi_publishlegal",
+      "target": "services_cmsapi_apiurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/cmsApi.js",
+      "source_location": "L95",
+      "weight": 1.0,
+      "source": "services_cmsapi_savefaqdraft",
+      "target": "services_cmsapi_apiurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/cmsApi.js",
+      "source_location": "L114",
+      "weight": 1.0,
+      "source": "services_cmsapi_savelegaldraft",
+      "target": "services_cmsapi_apiurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/cmsApi.js",
       "source_location": "L94",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -25224,6 +27306,50 @@
       "confidence_score": 1.0,
       "source": "services_cmsapi_publishadminfaq",
       "target": "services_cmsapi_handleres"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/cmsApi.js",
+      "source_location": "L110",
+      "weight": 1.0,
+      "source": "services_cmsapi_publishfaq",
+      "target": "services_cmsapi_handleres",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/cmsApi.js",
+      "source_location": "L128",
+      "weight": 1.0,
+      "source": "services_cmsapi_publishlegal",
+      "target": "services_cmsapi_handleres",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/cmsApi.js",
+      "source_location": "L100",
+      "weight": 1.0,
+      "source": "services_cmsapi_savefaqdraft",
+      "target": "services_cmsapi_handleres",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/cmsApi.js",
+      "source_location": "L119",
+      "weight": 1.0,
+      "source": "services_cmsapi_savelegaldraft",
+      "target": "services_cmsapi_handleres",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -27694,11 +29820,31 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/services/user360Api.js",
+      "source_location": "L167",
+      "weight": 1.0,
+      "source": "services_user360api",
+      "target": "services_user360api_getuserreferrals",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/user360Api.js",
       "source_location": "L69",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "services_user360api",
       "target": "services_user360api_getuserreviews"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/user360Api.js",
+      "source_location": "L156",
+      "weight": 1.0,
+      "source": "services_user360api",
+      "target": "services_user360api_getusersupporttickets",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -27749,6 +29895,16 @@
       "confidence_score": 1.0,
       "source": "services_user360api",
       "target": "services_user360api_unwrap"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/user360Api.js",
+      "source_location": "L154",
+      "weight": 1.0,
+      "source": "services_user360api",
+      "target": "services_user360api_unwrapdata",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -27832,11 +29988,33 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/services/user360Api.js",
+      "source_location": "L171",
+      "weight": 1.0,
+      "source": "services_user360api_getuserreferrals",
+      "target": "services_user360api_getauthheaders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/user360Api.js",
       "source_location": "L73",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "services_user360api_getuserreviews",
       "target": "services_user360api_getauthheaders"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/user360Api.js",
+      "source_location": "L160",
+      "weight": 1.0,
+      "source": "services_user360api_getusersupporttickets",
+      "target": "services_user360api_getauthheaders",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -27942,11 +30120,33 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/services/user360Api.js",
+      "source_location": "L169",
+      "weight": 1.0,
+      "source": "services_user360api_getuserreferrals",
+      "target": "services_user360api_apiurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/user360Api.js",
       "source_location": "L71",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "services_user360api_getuserreviews",
       "target": "services_user360api_apiurl"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/user360Api.js",
+      "source_location": "L158",
+      "weight": 1.0,
+      "source": "services_user360api_getusersupporttickets",
+      "target": "services_user360api_apiurl",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -28041,11 +30241,33 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/services/user360Api.js",
+      "source_location": "L174",
+      "weight": 1.0,
+      "source": "services_user360api_getuserreferrals",
+      "target": "services_user360api_isapifailure",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/user360Api.js",
       "source_location": "L76",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "services_user360api_getuserreviews",
       "target": "services_user360api_isapifailure"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/user360Api.js",
+      "source_location": "L163",
+      "weight": 1.0,
+      "source": "services_user360api_getusersupporttickets",
+      "target": "services_user360api_isapifailure",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -28140,11 +30362,33 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/services/user360Api.js",
+      "source_location": "L174",
+      "weight": 1.0,
+      "source": "services_user360api_getuserreferrals",
+      "target": "services_user360api_readerror",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/user360Api.js",
       "source_location": "L76",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "services_user360api_getuserreviews",
       "target": "services_user360api_readerror"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/user360Api.js",
+      "source_location": "L163",
+      "weight": 1.0,
+      "source": "services_user360api_getusersupporttickets",
+      "target": "services_user360api_readerror",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -28250,6 +30494,17 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/services/user360Api.js",
+      "source_location": "L154",
+      "weight": 1.0,
+      "source": "services_user360api_unwrapdata",
+      "target": "services_user360api_unwrap",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/user360Api.js",
       "source_location": "L135",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -28312,14 +30567,36 @@
       "target": "services_user360api_toquerystring"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/user360Api.js",
+      "source_location": "L175",
+      "weight": 1.0,
+      "source": "services_user360api_getuserreferrals",
+      "target": "services_user360api_unwrapdata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/user360Api.js",
+      "source_location": "L164",
+      "weight": 1.0,
+      "source": "services_user360api_getusersupporttickets",
+      "target": "services_user360api_unwrapdata",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/services/userAdminApi.js",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_useradminapi",
-      "target": "services_useradminapi_deleteuser",
-      "confidence_score": 1.0
+      "target": "services_useradminapi_deleteuser"
     },
     {
       "relation": "contains",
@@ -28327,9 +30604,9 @@
       "source_file": "src/services/userAdminApi.js",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_useradminapi",
-      "target": "services_useradminapi_fetchuserlist",
-      "confidence_score": 1.0
+      "target": "services_useradminapi_fetchuserlist"
     },
     {
       "relation": "contains",
@@ -28337,9 +30614,9 @@
       "source_file": "src/services/userAdminApi.js",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_useradminapi",
-      "target": "services_useradminapi_headers",
-      "confidence_score": 1.0
+      "target": "services_useradminapi_headers"
     },
     {
       "relation": "contains",
@@ -28347,9 +30624,9 @@
       "source_file": "src/services/userAdminApi.js",
       "source_location": "L31",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_useradminapi",
-      "target": "services_useradminapi_listtrainees",
-      "confidence_score": 1.0
+      "target": "services_useradminapi_listtrainees"
     },
     {
       "relation": "contains",
@@ -28357,8 +30634,18 @@
       "source_file": "src/services/userAdminApi.js",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_useradminapi",
-      "target": "services_useradminapi_listtrainers",
+      "target": "services_useradminapi_listtrainers"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/userAdminApi.js",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "services_useradminapi",
+      "target": "services_useradminapi_listusers",
       "confidence_score": 1.0
     },
     {
@@ -28368,9 +30655,9 @@
       "source_file": "src/services/userAdminApi.js",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_useradminapi_deleteuser",
-      "target": "services_useradminapi_headers",
-      "confidence_score": 1.0
+      "target": "services_useradminapi_headers"
     },
     {
       "relation": "calls",
@@ -28379,7 +30666,18 @@
       "source_file": "src/services/userAdminApi.js",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_useradminapi_fetchuserlist",
+      "target": "services_useradminapi_headers"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/services/userAdminApi.js",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "services_useradminapi_listusers",
       "target": "services_useradminapi_headers",
       "confidence_score": 1.0
     },
@@ -28401,9 +30699,9 @@
       "source_file": "src/services/userAdminApi.js",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_useradminapi_listtrainees",
-      "target": "services_useradminapi_fetchuserlist",
-      "confidence_score": 1.0
+      "target": "services_useradminapi_fetchuserlist"
     },
     {
       "relation": "calls",
@@ -28412,9 +30710,20 @@
       "source_file": "src/services/userAdminApi.js",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_useradminapi_listtrainers",
-      "target": "services_useradminapi_fetchuserlist",
-      "confidence_score": 1.0
+      "target": "services_useradminapi_fetchuserlist"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/services/userAdminApi.js",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "services_useradminapi_listusers",
+      "target": "utils_apibase_getapibaseurl"
     },
     {
       "relation": "calls",
@@ -28797,9 +31106,9 @@
       "source_file": "src/utils/slugify.js",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "utils_slugify",
-      "target": "utils_slugify_slugify",
-      "confidence_score": 1.0
+      "target": "utils_slugify_slugify"
     },
     {
       "relation": "contains",
@@ -28900,6 +31209,17 @@
       "confidence_score": 1.0,
       "source": "utils_utils",
       "target": "utils_utils_updateticketbaseurl"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L192",
+      "weight": 1.0,
+      "source": "user360_adminuser360tabs_safeimg",
+      "target": "utils_utils_getimageurl"
     },
     {
       "relation": "contains",
@@ -29531,6 +31851,28 @@
       "confidence_score": 1.0,
       "source": "misc_footerillustrations",
       "target": "misc_footerillustrations_shapeimg"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L130",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "user360_adminuser360tabs_timelinedotbg",
+      "target": "user360_adminuser360tabs_timelinedotcolor"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/pages/components/user360/AdminUser360Tabs.jsx",
+      "source_location": "L374",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "user360_adminuser360tabs_extrainfotree",
+      "target": "user360_adminuser360tabs_formatprimitive"
     },
     {
       "relation": "contains",
