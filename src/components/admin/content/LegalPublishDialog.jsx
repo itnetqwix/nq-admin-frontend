@@ -37,6 +37,7 @@ export default function LegalPublishDialog({
 }) {
   const canNotify = NOTIFY_SLUGS.has(slug)
   const [notifyUsers, setNotifyUsers] = useState(canNotify)
+  const [notifyPush, setNotifyPush] = useState(true)
   const [emailSubject, setEmailSubject] = useState('')
   const [emailIntro, setEmailIntro] = useState('')
   const [summaryLines, setSummaryLines] = useState([''])
@@ -46,6 +47,7 @@ export default function LegalPublishDialog({
   useEffect(() => {
     if (!open) return
     setNotifyUsers(canNotify)
+    setNotifyPush(true)
     setEmailSubject(`We're updating our ${documentTitle}`)
     setEmailIntro(DEFAULT_INTRO[slug] || `We're writing to inform you about updates to our ${documentTitle}.`)
     setSummaryLines([''])
@@ -83,6 +85,7 @@ export default function LegalPublishDialog({
   const handleConfirm = () => {
     const payload = {
       notify_users: canNotify && notifyUsers,
+      notify_push: canNotify && notifyUsers && notifyPush,
       email_subject: emailSubject.trim() || undefined,
       email_intro: emailIntro.trim() || undefined,
       email_summary_lines: summaryLines.map(l => l.trim()).filter(Boolean)
@@ -126,6 +129,12 @@ export default function LegalPublishDialog({
 
             {notifyUsers ? (
               <>
+                <FormControlLabel
+                  control={
+                    <Checkbox checked={notifyPush} onChange={e => setNotifyPush(e.target.checked)} />
+                  }
+                  label='Also send push notification to open the app'
+                />
                 <TextField
                   fullWidth
                   label='Email subject'

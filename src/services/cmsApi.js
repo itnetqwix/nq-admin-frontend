@@ -119,6 +119,11 @@ export const saveLegalDraft = async (slug, body) => {
   return handleRes(res)
 }
 
+export const getCmsAssetHealth = async () => {
+  const res = await fetch(apiUrl('/admin/cms/asset-health'), { headers: getAuthHeaders() })
+  return handleRes(res)
+}
+
 export const getLegalNotifyCount = async () => {
   const res = await fetch(apiUrl('/admin/cms/legal/notify-count'), { headers: getAuthHeaders() })
   return handleRes(res)

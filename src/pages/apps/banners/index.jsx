@@ -16,6 +16,7 @@ import {
   ListItemText,
   MenuItem,
   Select,
+  Stack,
   Switch,
   TextField,
   Tooltip,
@@ -39,6 +40,7 @@ import BannerCtaEditor from 'src/components/admin/content/BannerCtaEditor'
 import BannerPlacementPreview from 'src/components/admin/content/BannerPlacementPreview'
 import CmsImageUploader from 'src/components/admin/content/CmsImageUploader'
 import MobileFramePreview from 'src/components/admin/content/MobileFramePreview'
+import BannerScheduleCalendar from 'src/components/admin/content/BannerScheduleCalendar'
 import PreviewAudienceToggle, { bannerVisibleForAudience } from 'src/components/admin/content/PreviewAudienceToggle'
 import { computeScheduleStatus, scheduleStatusChip } from 'src/components/admin/content/scheduleStatus'
 import { BANNERS_AUDIENCE_HELP, BANNERS_PLACEMENT_HELP } from 'src/components/admin/content/contentPlacementConfig'
@@ -74,7 +76,9 @@ const EMPTY_FORM = {
   is_active: true,
   sort_order: '0',
   start_date: '',
-  end_date: ''
+  end_date: '',
+  experiment_key: '',
+  variant_label: ''
 }
 
 function normalizeCtasFromRow(row) {
@@ -218,7 +222,9 @@ export default function BannersPage() {
       is_active: row.is_active ?? true,
       sort_order: String(row.sort_order ?? '0'),
       start_date: row.start_date ? row.start_date.slice(0, 10) : '',
-      end_date: row.end_date ? row.end_date.slice(0, 10) : ''
+      end_date: row.end_date ? row.end_date.slice(0, 10) : '',
+      experiment_key: row.experiment_key || '',
+      variant_label: row.variant_label || ''
     })
     setFormOpen(true)
   }
@@ -248,7 +254,9 @@ export default function BannersPage() {
         is_active: form.is_active,
         sort_order: Number(form.sort_order) || 0,
         start_date: form.start_date ? new Date(form.start_date).toISOString() : null,
-        end_date: form.end_date ? new Date(form.end_date + 'T23:59:59').toISOString() : null
+        end_date: form.end_date ? new Date(form.end_date + 'T23:59:59').toISOString() : null,
+        experiment_key: form.experiment_key?.trim() || null,
+        variant_label: form.variant_label?.trim() || null
       }
       if (editId) {
         await updateBanner(editId, body)
@@ -440,6 +448,9 @@ export default function BannersPage() {
       >
         <AdminPageSection>
           <ContentPlacementGuide kind='banners' defaultExpanded={false} />
+          <Box sx={{ mb: 3 }}>
+            <BannerScheduleCalendar banners={banners} />
+          </Box>
           <AdminFilterBar
             searchPlaceholder='Search title, body, CTA, audience…'
             searchValue={searchInput}
@@ -714,6 +725,26 @@ export default function BannersPage() {
                   />
                 }
                 label='Active'
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label='A/B experiment key'
+                fullWidth
+                size='small'
+                value={form.experiment_key}
+                onChange={e => handleFormChange('experiment_key', e.target.value)}
+                placeholder='e.g. spring-hero-test'
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label='Variant label'
+                fullWidth
+                size='small'
+                value={form.variant_label}
+                onChange={e => handleFormChange('variant_label', e.target.value)}
+                placeholder='A, B, control…'
               />
             </Grid>
               </Grid>

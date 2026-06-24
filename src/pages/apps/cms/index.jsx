@@ -17,7 +17,7 @@ import toast from 'react-hot-toast'
 
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
-import { getCmsSummary } from 'src/services/cmsApi'
+import { getCmsSummary, getCmsAssetHealth } from 'src/services/cmsApi'
 
 const SECTIONS = [
   {
@@ -63,7 +63,7 @@ const SECTIONS = [
   }
 ]
 
-function HealthAlerts({ summary }) {
+function HealthAlerts({ summary, assetHealth }) {
   const alerts = []
   if (summary?.health?.hero_empty) {
     alerts.push({ severity: 'warning', text: 'No live hero banners — home carousel may be empty.' })
@@ -76,6 +76,12 @@ function HealthAlerts({ summary }) {
   }
   if (summary?.health?.faq_draft_pending) {
     alerts.push({ severity: 'warning', text: 'FAQ has unpublished draft changes.' })
+  }
+  if (assetHealth?.broken?.length) {
+    alerts.push({
+      severity: 'error',
+      text: `${assetHealth.broken.length} broken CMS image link(s) detected — check banners, tips, and blog covers.`
+    })
   }
   if (!alerts.length) return null
   return (
@@ -93,11 +99,17 @@ export default function CmsOverviewPage() {
   const [summary, setSummary] = useState(null)
   const [loading, setLoading] = useState(false)
 
+  const [assetHealth, setAssetHealth] = useState(null)
+
   const load = async () => {
     setLoading(true)
     try {
-      const res = await getCmsSummary()
-      setSummary(res.data || null)
+      const [summaryRes, healthRes] = await Promise.all([
+        getCmsSummary(),
+        getCmsAssetHealth().catch(() => null)
+      ])
+      setSummary(summaryRes.data || null)
+      setAssetHealth(healthRes?.data || null)
     } catch (e) {
       toast.error(e.message || 'Failed to load CMS summary')
     } finally {
@@ -129,7 +141,7 @@ export default function CmsOverviewPage() {
       }
     >
       <AdminPageSection>
-        <HealthAlerts summary={summary} />
+        <HealthAlerts summary={summary} assetHealth={assetHealth} />
 
         <Typography variant='subtitle2' fontWeight={700} sx={{ mb: 1 }}>
           Live counts

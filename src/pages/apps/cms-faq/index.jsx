@@ -1,25 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import {
-  Box,
-  Button,
-  Chip,
-  Grid,
-  IconButton,
-  Stack,
-  TextField,
-  Typography
-} from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
+import { Box, Button, Chip, Grid, Stack, Typography } from '@mui/material'
 import toast from 'react-hot-toast'
 
 import { useAdminConfirm } from 'src/components/admin'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
 import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
-import CmsHtmlEditor from 'src/components/admin/content/CmsHtmlEditor'
+import FaqDndEditor from 'src/components/admin/content/FaqDndEditor'
 import FaqPreview from 'src/components/admin/content/FaqPreview'
 import MobileFramePreview from 'src/components/admin/content/MobileFramePreview'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
@@ -94,22 +80,6 @@ export default function CmsFaqPage() {
     updater()
   }
 
-  const updateSection = (id, field, value) => {
-    markDirty(() => setSections(prev => prev.map(s => (s.id === id ? { ...s, [field]: value } : s))))
-  }
-
-  const updateItem = (sectionId, itemId, field, value) => {
-    markDirty(() =>
-      setSections(prev =>
-        prev.map(s =>
-          s.id === sectionId
-            ? { ...s, items: s.items.map(it => (it.id === itemId ? { ...it, [field]: value } : it)) }
-            : s
-        )
-      )
-    )
-  }
-
   const addSection = () => markDirty(() => setSections(prev => [...prev, emptySection()]))
 
   const removeSection = async id => {
@@ -148,33 +118,6 @@ export default function CmsFaqPage() {
             ? { ...s, items: s.items.length <= 1 ? [emptyItem()] : s.items.filter(i => i.id !== itemId) }
             : s
         )
-      )
-    )
-  }
-
-  const moveSection = (index, direction) => {
-    markDirty(() =>
-      setSections(prev => {
-        const next = [...prev]
-        const target = index + direction
-        if (target < 0 || target >= next.length) return prev
-        ;[next[index], next[target]] = [next[target], next[index]]
-        return next
-      })
-    )
-  }
-
-  const moveItem = (sectionId, itemIndex, direction) => {
-    markDirty(() =>
-      setSections(prev =>
-        prev.map(s => {
-          if (s.id !== sectionId) return s
-          const items = [...(s.items || [])]
-          const target = itemIndex + direction
-          if (target < 0 || target >= items.length) return s
-          ;[items[itemIndex], items[target]] = [items[target], items[itemIndex]]
-          return { ...s, items }
-        })
       )
     )
   }
@@ -291,101 +234,15 @@ export default function CmsFaqPage() {
 
         <Grid container spacing={3}>
           <Grid item xs={12} lg={7}>
-            <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mb: 2 }}>
-              <Typography variant='subtitle1' fontWeight={700}>
-                Editor
-              </Typography>
-              <Button size='small' startIcon={<AddIcon />} onClick={addSection}>
-                Add section
-              </Button>
-            </Stack>
-
-            {sections.map((sec, si) => (
-              <Box
-                key={sec.id}
-                sx={{ mb: 2.5, p: 2, border: 1, borderColor: 'divider', borderRadius: 2, bgcolor: 'background.paper' }}
-              >
-                <Stack direction='row' spacing={0.5} alignItems='flex-start' sx={{ mb: 2 }}>
-                  <Stack spacing={0.25} sx={{ pt: 0.5 }}>
-                    <IconButton size='small' disabled={si === 0} onClick={() => moveSection(si, -1)} aria-label='Move section up'>
-                      <ArrowUpwardIcon fontSize='small' />
-                    </IconButton>
-                    <IconButton
-                      size='small'
-                      disabled={si === sections.length - 1}
-                      onClick={() => moveSection(si, 1)}
-                      aria-label='Move section down'
-                    >
-                      <ArrowDownwardIcon fontSize='small' />
-                    </IconButton>
-                  </Stack>
-                  <DragIndicatorIcon sx={{ color: 'text.disabled', mt: 1 }} fontSize='small' />
-                  <TextField
-                    label={`Section ${si + 1} title`}
-                    fullWidth
-                    size='small'
-                    value={sec.title}
-                    onChange={e => updateSection(sec.id, 'title', e.target.value)}
-                    placeholder='e.g. Getting started'
-                  />
-                  <IconButton color='error' onClick={() => void removeSection(sec.id)} aria-label='Remove section'>
-                    <DeleteOutlineIcon />
-                  </IconButton>
-                </Stack>
-
-                {(sec.items || []).map((it, ii) => (
-                  <Box key={it.id} sx={{ mb: 2, pl: 3, borderLeft: '2px solid', borderColor: 'divider' }}>
-                    <Stack direction='row' spacing={0.5} alignItems='flex-start'>
-                      <Stack spacing={0.25} sx={{ pt: 0.75 }}>
-                        <IconButton
-                          size='small'
-                          disabled={ii === 0}
-                          onClick={() => moveItem(sec.id, ii, -1)}
-                          aria-label='Move question up'
-                        >
-                          <ArrowUpwardIcon fontSize='small' />
-                        </IconButton>
-                        <IconButton
-                          size='small'
-                          disabled={ii === (sec.items || []).length - 1}
-                          onClick={() => moveItem(sec.id, ii, 1)}
-                          aria-label='Move question down'
-                        >
-                          <ArrowDownwardIcon fontSize='small' />
-                        </IconButton>
-                      </Stack>
-                      <Box sx={{ flex: 1 }}>
-                    <TextField
-                      label={`Question ${ii + 1}`}
-                      fullWidth
-                      size='small'
-                      value={it.q}
-                      onChange={e => updateItem(sec.id, it.id, 'q', e.target.value)}
-                      sx={{ mb: 1.5 }}
-                    />
-                    <CmsHtmlEditor
-                      label='Answer'
-                      value={it.a}
-                      onChange={html => updateItem(sec.id, it.id, 'a', html)}
-                      minHeight={160}
-                      helperText='Rich text supported — links and lists render in the app.'
-                    />
-                    <Stack direction='row' spacing={1} sx={{ mt: 1 }}>
-                      <Button size='small' onClick={() => addItem(sec.id)}>
-                        Add question
-                      </Button>
-                      {(sec.items || []).length > 1 ? (
-                        <Button size='small' color='error' onClick={() => void removeItem(sec.id, it.id)}>
-                          Remove
-                        </Button>
-                      ) : null}
-                    </Stack>
-                      </Box>
-                    </Stack>
-                  </Box>
-                ))}
-              </Box>
-            ))}
+            <FaqDndEditor
+              sections={sections}
+              setSections={setSections}
+              markDirty={markDirty}
+              onRemoveSection={removeSection}
+              onAddSection={addSection}
+              onAddItem={addItem}
+              onRemoveItem={removeItem}
+            />
           </Grid>
 
           <Grid item xs={12} lg={5}>

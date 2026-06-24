@@ -114,9 +114,11 @@ export default function CmsLegalPage() {
       const res = await publishLegal(slug, body)
       const emailNotify = res.data?.email_notify
       if (emailNotify?.queued > 0) {
+        const pushPart =
+          emailNotify.push_sent > 0 ? ` · push ${emailNotify.push_sent}` : ''
         toast.success(
-          `Published · emails sent to ${emailNotify.sent}/${emailNotify.queued} users` +
-            (emailNotify.failed ? ` (${emailNotify.failed} failed)` : '')
+          `Published · emails ${emailNotify.sent}/${emailNotify.queued}${pushPart}` +
+            (emailNotify.failed ? ` (${emailNotify.failed} email failed)` : '')
         )
       } else {
         toast.success('Published — signed-in apps refresh instantly; guests within ~60s')

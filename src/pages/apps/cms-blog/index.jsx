@@ -31,7 +31,7 @@ import AdminFilterBar from 'src/components/admin/AdminFilterBar'
 import { useAdminConfirm } from 'src/components/admin'
 import CmsEditorDrawer from 'src/components/admin/content/CmsEditorDrawer'
 import CmsHtmlEditor from 'src/components/admin/content/CmsHtmlEditor'
-import CmsImageUploader from 'src/components/admin/content/CmsImageUploader'
+import CmsCoverCropUploader from 'src/components/admin/content/CmsCoverCropUploader'
 import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
 import CmsPagePlacementPreview from 'src/components/admin/content/CmsPagePlacementPreview'
 import MobileFramePreview from 'src/components/admin/content/MobileFramePreview'
@@ -64,7 +64,10 @@ const EMPTY = {
   audience: ['all'],
   sort_order: '0',
   published_at: '',
-  is_active: true
+  is_active: true,
+  seo_title: '',
+  seo_description: '',
+  og_image_url: ''
 }
 
 function audienceChip(audience) {
@@ -142,7 +145,10 @@ export default function CmsBlogPage() {
       audience: Array.isArray(row.audience) && row.audience.length ? row.audience : ['all'],
       sort_order: String(row.sort_order ?? 0),
       published_at: pub,
-      is_active: row.is_active !== false
+      is_active: row.is_active !== false,
+      seo_title: row.seo_title || '',
+      seo_description: row.seo_description || '',
+      og_image_url: row.og_image_url || ''
     })
     setOpen(true)
   }
@@ -172,7 +178,10 @@ export default function CmsBlogPage() {
         sort_order: parseInt(form.sort_order, 10) || 0,
         is_active: form.is_active,
         audience: form.audience?.length ? form.audience : ['all'],
-        published_at: form.published_at ? new Date(form.published_at).toISOString() : null
+        published_at: form.published_at ? new Date(form.published_at).toISOString() : null,
+        seo_title: form.seo_title?.trim() || null,
+        seo_description: form.seo_description?.trim() || null,
+        og_image_url: form.og_image_url || null
       }
       if (editId) await updateCmsPage(editId, payload)
       else await createCmsPage(payload)
@@ -405,12 +414,45 @@ export default function CmsBlogPage() {
               />
             </Grid>
             <Grid item xs={12}>
-              <CmsImageUploader
-                kind='pages'
+              <CmsCoverCropUploader
                 label='Cover image'
-                surfaceKey={form.type === 'page' ? 'page.static' : 'page.blog_cover'}
+                kind='pages'
                 value={form.cover_image_url}
                 onChange={v => setForm(f => ({ ...f, cover_image_url: v }))}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label='SEO title'
+                fullWidth
+                size='small'
+                value={form.seo_title}
+                onChange={e => setForm(f => ({ ...f, seo_title: e.target.value }))}
+                inputProps={{ maxLength: 70 }}
+                helperText={`${(form.seo_title || '').length}/70`}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label='SEO description'
+                fullWidth
+                size='small'
+                multiline
+                minRows={2}
+                value={form.seo_description}
+                onChange={e => setForm(f => ({ ...f, seo_description: e.target.value }))}
+                inputProps={{ maxLength: 160 }}
+                helperText={`${(form.seo_description || '').length}/160`}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label='Open Graph image URL (optional)'
+                fullWidth
+                size='small'
+                value={form.og_image_url}
+                onChange={e => setForm(f => ({ ...f, og_image_url: e.target.value }))}
+                placeholder='Defaults to cover image when empty'
               />
             </Grid>
             <Grid item xs={12} sm={6}>
