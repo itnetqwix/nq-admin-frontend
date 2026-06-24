@@ -1,6 +1,7 @@
 const typography = {
   fontFamily: [
-    'Inter',
+    'Poppins',
+    'Poppins Fallback',
     'sans-serif',
     '-apple-system',
     'BlinkMacSystemFont',
