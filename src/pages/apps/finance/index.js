@@ -20,6 +20,7 @@ import AdminTabs from 'src/components/admin/AdminTabs'
 import { useAdminConfirm } from 'src/components/admin/useAdminConfirm'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import FinanceOverviewPanel from 'src/components/admin/finance/FinanceOverviewPanel'
+import FinanceTabGuide, { FinanceTabLegend } from 'src/components/admin/finance/FinanceTabGuide'
 import {
   getFinanceLedger,
   getEscrowHolds,
@@ -716,7 +717,7 @@ const FinancePage = () => {
   return (
     <AdminPageShell
       title='Finance'
-      subtitle='Ledger, escrow, payouts, wallet ops, and audit trail.'
+      subtitle='Escrow holds, wallet ledger, payouts, and support tools — start on Overview, then drill into tabs.'
       actions={
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
           <Button size='small' variant='outlined' component={Link} href='/apps/platform-health'>
@@ -847,7 +848,7 @@ const FinancePage = () => {
           ) : null}
         </Stack>
 
-        {opsDashboard ? (
+        {tab !== TAB.OVERVIEW && opsDashboard ? (
           <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
             <Chip
               label={`Held: ${opsDashboard.heldCount ?? 0}`}
@@ -912,6 +913,8 @@ const FinancePage = () => {
           onChange={setTab}
           tabs={tabLabels.map((label, index) => ({ value: index, label }))}
         />
+        <FinanceTabGuide tab={tab} />
+        {tab === TAB.OVERVIEW ? <FinanceTabLegend /> : null}
         {tab !== TAB.OVERVIEW ? (
         <Stack direction='row' spacing={1} sx={{ mb: 2, alignItems: 'center' }}>
           <Button size='small' disabled={page <= 1 || loading} onClick={() => setPage(p => Math.max(1, p - 1))}>

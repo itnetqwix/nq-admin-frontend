@@ -117,6 +117,33 @@ export default function FinanceOverviewPanel({
         </Grid>
       </Grid>
 
+      <Card variant='outlined'>
+        <CardContent>
+          <Typography variant='subtitle1' fontWeight={700} sx={{ mb: 1.5 }}>
+            Quick navigation
+          </Typography>
+          <Grid container spacing={1}>
+            {[
+              { label: 'Ledger', tab: 'ledger' },
+              { label: 'Transactions', tab: 'transactions' },
+              { label: 'Escrow', tab: 'escrow', status: 'held' },
+              { label: 'Refunds', tab: 'refunds' },
+              { label: 'Payouts', tab: 'payouts' },
+              { label: 'Stuck top-ups', tab: 'stuck_topups' }
+            ].map((item) => (
+              <Grid item key={item.label}>
+                <Chip
+                  label={item.label}
+                  variant='outlined'
+                  onClick={() => onGoTab?.(item.tab, item.status ? { status: item.status } : undefined)}
+                  sx={{ cursor: 'pointer' }}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        </CardContent>
+      </Card>
+
       {escrowSummary ? (
         <Card variant='outlined'>
           <CardContent>

@@ -13,6 +13,7 @@ import Typography from '@mui/material/Typography'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import PricingRegionTab from './PricingRegionTab'
 import PricingProductsTab from './PricingProductsTab'
+import PricingFeeExplainer from './PricingFeeExplainer'
 
 export default function PricingRatesTab({
   config,
@@ -30,6 +31,8 @@ export default function PricingRatesTab({
 
   return (
     <Stack spacing={3}>
+      <PricingFeeExplainer />
+
       <Alert severity='info'>
         Start with <strong>commission %</strong> and the two <strong>platform fees</strong>. Everything
         else is optional — expand Advanced only when you need Stripe bps, storage plans, or per-product

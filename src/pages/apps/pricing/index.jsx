@@ -85,7 +85,7 @@ const PricingPage = () => {
     <>
       <AdminPageShell
         title='Pricing & fees'
-        subtitle='Set commission and platform fees, preview checkout totals, and confirm each lesson is profitable.'
+        subtitle='Commission, platform fees, surge rules, and profit checks — saved config applies to all future checkouts.'
         actions={
           <Stack direction='row' spacing={1} flexWrap='wrap'>
             {canEdit ? (
