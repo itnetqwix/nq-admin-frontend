@@ -10,6 +10,8 @@ import {
   Typography
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
 import toast from 'react-hot-toast'
@@ -150,6 +152,33 @@ export default function CmsFaqPage() {
     )
   }
 
+  const moveSection = (index, direction) => {
+    markDirty(() =>
+      setSections(prev => {
+        const next = [...prev]
+        const target = index + direction
+        if (target < 0 || target >= next.length) return prev
+        ;[next[index], next[target]] = [next[target], next[index]]
+        return next
+      })
+    )
+  }
+
+  const moveItem = (sectionId, itemIndex, direction) => {
+    markDirty(() =>
+      setSections(prev =>
+        prev.map(s => {
+          if (s.id !== sectionId) return s
+          const items = [...(s.items || [])]
+          const target = itemIndex + direction
+          if (target < 0 || target >= items.length) return s
+          ;[items[itemIndex], items[target]] = [items[target], items[itemIndex]]
+          return { ...s, items }
+        })
+      )
+    )
+  }
+
   const stats = useMemo(() => {
     const sectionCount = sections.filter(s => s.title?.trim()).length
     const qCount = sections.reduce(
@@ -276,7 +305,20 @@ export default function CmsFaqPage() {
                 key={sec.id}
                 sx={{ mb: 2.5, p: 2, border: 1, borderColor: 'divider', borderRadius: 2, bgcolor: 'background.paper' }}
               >
-                <Stack direction='row' spacing={1} alignItems='flex-start' sx={{ mb: 2 }}>
+                <Stack direction='row' spacing={0.5} alignItems='flex-start' sx={{ mb: 2 }}>
+                  <Stack spacing={0.25} sx={{ pt: 0.5 }}>
+                    <IconButton size='small' disabled={si === 0} onClick={() => moveSection(si, -1)} aria-label='Move section up'>
+                      <ArrowUpwardIcon fontSize='small' />
+                    </IconButton>
+                    <IconButton
+                      size='small'
+                      disabled={si === sections.length - 1}
+                      onClick={() => moveSection(si, 1)}
+                      aria-label='Move section down'
+                    >
+                      <ArrowDownwardIcon fontSize='small' />
+                    </IconButton>
+                  </Stack>
                   <DragIndicatorIcon sx={{ color: 'text.disabled', mt: 1 }} fontSize='small' />
                   <TextField
                     label={`Section ${si + 1} title`}
@@ -293,6 +335,26 @@ export default function CmsFaqPage() {
 
                 {(sec.items || []).map((it, ii) => (
                   <Box key={it.id} sx={{ mb: 2, pl: 3, borderLeft: '2px solid', borderColor: 'divider' }}>
+                    <Stack direction='row' spacing={0.5} alignItems='flex-start'>
+                      <Stack spacing={0.25} sx={{ pt: 0.75 }}>
+                        <IconButton
+                          size='small'
+                          disabled={ii === 0}
+                          onClick={() => moveItem(sec.id, ii, -1)}
+                          aria-label='Move question up'
+                        >
+                          <ArrowUpwardIcon fontSize='small' />
+                        </IconButton>
+                        <IconButton
+                          size='small'
+                          disabled={ii === (sec.items || []).length - 1}
+                          onClick={() => moveItem(sec.id, ii, 1)}
+                          aria-label='Move question down'
+                        >
+                          <ArrowDownwardIcon fontSize='small' />
+                        </IconButton>
+                      </Stack>
+                      <Box sx={{ flex: 1 }}>
                     <TextField
                       label={`Question ${ii + 1}`}
                       fullWidth
@@ -317,6 +379,8 @@ export default function CmsFaqPage() {
                           Remove
                         </Button>
                       ) : null}
+                    </Stack>
+                      </Box>
                     </Stack>
                   </Box>
                 ))}

@@ -72,9 +72,18 @@ export default function FaqPreview({ sections = [] }) {
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails sx={{ pt: 0 }}>
-                    <Typography variant='body2' color='text.secondary' fontSize={13} sx={{ whiteSpace: 'pre-wrap' }}>
-                      {it.a}
-                    </Typography>
+                    <Box
+                      className='faq-preview-answer'
+                      sx={{
+                        fontSize: 13,
+                        color: 'text.secondary',
+                        lineHeight: 1.55,
+                        '& p': { m: 0, mb: 1 },
+                        '& ul, & ol': { m: 0, mb: 1, pl: 2.5 },
+                        '& a': { color: '#000080', textDecoration: 'underline' }
+                      }}
+                      dangerouslySetInnerHTML={{ __html: it.a }}
+                    />
                   </AccordionDetails>
                 </Accordion>
               )

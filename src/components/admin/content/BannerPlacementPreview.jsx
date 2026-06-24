@@ -1,9 +1,10 @@
 import React from 'react'
-import { Box, Typography } from '@mui/material'
+import { Alert, Box, Typography } from '@mui/material'
 
 import BannerHeroPreview from './BannerHeroPreview'
 import BannerPreviewStrip from './BannerPreviewStrip'
 import StickyBottomPreview from './StickyBottomPreview'
+import { bannerVisibleForAudience } from './PreviewAudienceToggle'
 import { resolveCmsImageUrl } from 'src/utils/cmsImageUrl'
 import { BANNERS_PLACEMENT_HELP } from './contentPlacementConfig'
 
@@ -20,11 +21,23 @@ function formWithResolvedImage(form) {
   return { ...form, image_url: resolved }
 }
 
-function renderPlacement(placement, form, embedded) {
+function renderPlacement(placement, form, embedded, previewAudience) {
   const resolvedForm = formWithResolvedImage(form)
-  if (placement === 'strip') return <BannerPreviewStrip form={resolvedForm} embedded={embedded} />
-  if (placement === 'sticky_bottom') return <StickyBottomPreview form={resolvedForm} embedded={embedded} />
-  return <BannerHeroPreview form={resolvedForm} embedded={embedded} />
+  const visible = bannerVisibleForAudience(form?.audience, previewAudience)
+  const inner = (() => {
+    if (placement === 'strip') return <BannerPreviewStrip form={resolvedForm} embedded={embedded} />
+    if (placement === 'sticky_bottom') return <StickyBottomPreview form={resolvedForm} embedded={embedded} />
+    return <BannerHeroPreview form={resolvedForm} embedded={embedded} />
+  })()
+  if (visible) return inner
+  return (
+    <Box sx={{ position: 'relative' }}>
+      <Box sx={{ opacity: 0.35, pointerEvents: 'none' }}>{inner}</Box>
+      <Alert severity='info' sx={{ mt: 1, fontSize: 12 }}>
+        Hidden for {previewAudience} — audience is {Array.isArray(form?.audience) ? form.audience.join(', ') : 'all'}.
+      </Alert>
+    </Box>
+  )
 }
 
 /**
@@ -34,7 +47,8 @@ export default function BannerPlacementPreview({
   form,
   showLabel = true,
   compareAll = false,
-  embedded = false
+  embedded = false,
+  previewAudience = 'trainee'
 }) {
   const placement = form?.placement || 'hero'
   const help = BANNERS_PLACEMENT_HELP[placement]
@@ -51,7 +65,7 @@ export default function BannerPlacementPreview({
               {PLACEMENT_LABELS[p]}
               {p === placement ? ' (selected)' : ''}
             </Typography>
-            {renderPlacement(p, { ...form, placement: p }, true)}
+            {renderPlacement(p, { ...form, placement: p }, true, previewAudience)}
           </Box>
         ))}
       </Box>
@@ -66,7 +80,7 @@ export default function BannerPlacementPreview({
           {help ? ` — ${help}` : ''}
         </Typography>
       ) : null}
-      {renderPlacement(placement, form, embedded)}
+      {renderPlacement(placement, form, embedded, previewAudience)}
     </Box>
   )
 }

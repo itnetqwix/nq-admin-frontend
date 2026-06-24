@@ -39,6 +39,7 @@ import BannerCtaEditor from 'src/components/admin/content/BannerCtaEditor'
 import BannerPlacementPreview from 'src/components/admin/content/BannerPlacementPreview'
 import CmsImageUploader from 'src/components/admin/content/CmsImageUploader'
 import MobileFramePreview from 'src/components/admin/content/MobileFramePreview'
+import PreviewAudienceToggle, { bannerVisibleForAudience } from 'src/components/admin/content/PreviewAudienceToggle'
 import { computeScheduleStatus, scheduleStatusChip } from 'src/components/admin/content/scheduleStatus'
 import { BANNERS_AUDIENCE_HELP, BANNERS_PLACEMENT_HELP } from 'src/components/admin/content/contentPlacementConfig'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
@@ -131,6 +132,7 @@ export default function BannersPage() {
   const [form, setForm] = useState({ ...EMPTY_FORM })
   const [saving, setSaving] = useState(false)
   const [previewRow, setPreviewRow] = useState(null)
+  const [previewAudience, setPreviewAudience] = useState('trainee')
 
   const searchTimer = useRef(null)
 
@@ -726,14 +728,22 @@ export default function BannersPage() {
                 alignSelf: 'flex-start'
               }}
             >
+              <Stack direction='row' alignItems='center' flexWrap='wrap' useFlexGap sx={{ mb: 1 }}>
+                <PreviewAudienceToggle value={previewAudience} onChange={setPreviewAudience} />
+              </Stack>
               <MobileFramePreview
                 label='App preview'
                 subtitle={PLACEMENTS.find(p => p.value === form.placement)?.label}
               >
-                <BannerPlacementPreview form={form} showLabel={false} embedded />
+                <BannerPlacementPreview
+                  form={form}
+                  showLabel={false}
+                  embedded
+                  previewAudience={previewAudience}
+                />
               </MobileFramePreview>
               <Box sx={{ mt: 2 }}>
-                <BannerPlacementPreview form={form} compareAll showLabel={false} />
+                <BannerPlacementPreview form={form} compareAll showLabel={false} previewAudience={previewAudience} />
               </Box>
             </Grid>
           </Grid>

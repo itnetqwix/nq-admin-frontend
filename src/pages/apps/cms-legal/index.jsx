@@ -8,6 +8,7 @@ import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPa
 import CmsHtmlEditor from 'src/components/admin/content/CmsHtmlEditor'
 import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
 import LegalDocumentPreview from 'src/components/admin/content/LegalDocumentPreview'
+import LegalPublishDialog from 'src/components/admin/content/LegalPublishDialog'
 import MobileFramePreview from 'src/components/admin/content/MobileFramePreview'
 import { listLegalDocuments, publishLegal, saveLegalDraft, seedLegalDocuments } from 'src/services/cmsApi'
 
@@ -37,6 +38,7 @@ export default function CmsLegalPage() {
   const [seeding, setSeeding] = useState(false)
   const [previewDark, setPreviewDark] = useState(false)
   const [dirty, setDirty] = useState(false)
+  const [publishOpen, setPublishOpen] = useState(false)
 
   const slug = SLUGS[tab].slug
 
@@ -101,24 +103,26 @@ export default function CmsLegalPage() {
     }
   }
 
-  const handlePublish = async () => {
-    const ok = await confirm({
-      title: `Publish ${SLUGS[tab].label}?`,
-      message: 'This replaces the live document in all mobile apps.',
-      detail: `Slug: ${slug} · version ${docs[slug]?.version ?? 'new'}`,
-      confirmLabel: 'Publish',
-      variant: 'warning'
-    })
-    if (!ok) return
+  const handlePublish = async (notifyPayload = {}) => {
     setPublishing(true)
     try {
-      const body =
-        dirty
-          ? { title: title.trim(), body_html: bodyHtml, is_active: true }
-          : { is_active: true }
-      await publishLegal(slug, body)
-      toast.success('Published — signed-in apps refresh instantly; guests within ~60s')
+      const body = {
+        ...(dirty ? { title: title.trim(), body_html: bodyHtml } : {}),
+        is_active: true,
+        ...notifyPayload
+      }
+      const res = await publishLegal(slug, body)
+      const emailNotify = res.data?.email_notify
+      if (emailNotify?.queued > 0) {
+        toast.success(
+          `Published · emails sent to ${emailNotify.sent}/${emailNotify.queued} users` +
+            (emailNotify.failed ? ` (${emailNotify.failed} failed)` : '')
+        )
+      } else {
+        toast.success('Published — signed-in apps refresh instantly; guests within ~60s')
+      }
       setDirty(false)
+      setPublishOpen(false)
       await load()
     } catch (e) {
       toast.error(e.message || 'Publish failed')
@@ -131,7 +135,10 @@ export default function CmsLegalPage() {
   const hasUnpublished = Boolean(docs[slug]?.has_unpublished_changes)
 
   return (
-    <AdminPageShell title='Legal documents' subtitle='Terms & privacy — live in the app without a store update'>
+    <AdminPageShell
+      title='Legal documents'
+      subtitle='Terms, privacy, cancellation & refund — live in the app without a store update. Terms and privacy can trigger user emails on publish.'
+    >
       <AdminPageSection>
         <ContentPlacementGuide kind='legal' defaultExpanded={false} />
         <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
@@ -189,7 +196,7 @@ export default function CmsLegalPage() {
               </Button>
               <Button
                 variant='contained'
-                onClick={() => void handlePublish()}
+                onClick={() => setPublishOpen(true)}
                 disabled={publishing || (!dirty && !hasUnpublished)}
               >
                 {publishing ? 'Publishing…' : 'Publish to app'}
@@ -213,6 +220,15 @@ export default function CmsLegalPage() {
           </Grid>
         </Grid>
       </AdminPageSection>
+      <LegalPublishDialog
+        open={publishOpen}
+        onClose={() => !publishing && setPublishOpen(false)}
+        onConfirm={payload => void handlePublish(payload)}
+        slug={slug}
+        documentTitle={title || SLUGS[tab].label}
+        version={(docs[slug]?.version ?? 0) + 1}
+        publishing={publishing}
+      />
       {ConfirmDialog}
     </AdminPageShell>
   )

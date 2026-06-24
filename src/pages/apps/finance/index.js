@@ -7,7 +7,10 @@ import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
+import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
+import ListItemText from '@mui/material/ListItemText'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
@@ -122,6 +125,7 @@ const FinancePage = () => {
   const [migrateBusy, setMigrateBusy] = useState(false)
   const [adjustOpen, setAdjustOpen] = useState(false)
   const [walletRefundOpen, setWalletRefundOpen] = useState(false)
+  const [opsMenuAnchor, setOpsMenuAnchor] = useState(null)
   const [adjustForm, setAdjustForm] = useState({
     walletAccountId: '',
     amount_minor: '',
@@ -719,10 +723,7 @@ const FinancePage = () => {
       title='Finance'
       subtitle='Escrow holds, wallet ledger, payouts, and support tools — start on Overview, then drill into tabs.'
       actions={
-        <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-          <Button size='small' variant='outlined' component={Link} href='/apps/platform-health'>
-            Platform health
-          </Button>
+        <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
           <Button size='small' variant='outlined' component={Link} href='/apps/finance/connect'>
             Stripe Connect
           </Button>
@@ -737,36 +738,55 @@ const FinancePage = () => {
           <Button
             size='small'
             variant='outlined'
-            onClick={() => {
-              setMigrateOpen(true)
-              setMigrateResult(null)
-            }}
+            endIcon={<ExpandMoreIcon />}
+            onClick={e => setOpsMenuAnchor(e.currentTarget)}
           >
-            Migrate legacy balances
+            More
           </Button>
-          <Button
-            size='small'
-            variant='outlined'
-            onClick={() => runReconcile('Reconcile top-ups', () => reconcileStuckTopUps(30), load)}
+          <Menu
+            anchorEl={opsMenuAnchor}
+            open={Boolean(opsMenuAnchor)}
+            onClose={() => setOpsMenuAnchor(null)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
           >
-            Reconcile top-ups
-          </Button>
-          <Button
-            size='small'
-            variant='outlined'
-            onClick={() => runReconcile('Reconcile refunds', () => reconcileFailedRefunds(), load)}
-          >
-            Reconcile refunds
-          </Button>
-          <Button
-            size='small'
-            variant='outlined'
-            onClick={() =>
-              runReconcile('Reconcile releasing', () => reconcileStuckReleasingHolds(60), load)
-            }
-          >
-            Reconcile releasing
-          </Button>
+            <MenuItem component={Link} href='/apps/platform-health' onClick={() => setOpsMenuAnchor(null)}>
+              <ListItemText primary='Platform health' secondary='Messaging & service checks' />
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setOpsMenuAnchor(null)
+                setMigrateOpen(true)
+                setMigrateResult(null)
+              }}
+            >
+              <ListItemText primary='Migrate legacy balances' secondary='One-time wallet migration' />
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setOpsMenuAnchor(null)
+                void runReconcile('Reconcile top-ups', () => reconcileStuckTopUps(30), load)
+              }}
+            >
+              <ListItemText primary='Reconcile top-ups' />
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setOpsMenuAnchor(null)
+                void runReconcile('Reconcile refunds', () => reconcileFailedRefunds(), load)
+              }}
+            >
+              <ListItemText primary='Reconcile refunds' />
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setOpsMenuAnchor(null)
+                void runReconcile('Reconcile releasing', () => reconcileStuckReleasingHolds(60), load)
+              }}
+            >
+              <ListItemText primary='Reconcile releasing holds' />
+            </MenuItem>
+          </Menu>
           <AdminRefreshButton onClick={() => void load()} loading={loading} />
         </Stack>
       }

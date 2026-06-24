@@ -42,7 +42,21 @@ export default function AdminPageShell({
           </Typography>
         ) : null}
       </Box>
-      {headerActions ? <Box sx={{ flexShrink: 0 }}>{headerActions}</Box> : null}
+      {headerActions ? (
+        <Box
+          sx={{
+            flexShrink: 0,
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 1,
+            alignItems: 'center',
+            justifyContent: { xs: 'flex-start', sm: 'flex-end' },
+            maxWidth: { sm: '58%', md: '52%' }
+          }}
+        >
+          {headerActions}
+        </Box>
+      ) : null}
     </Stack>
   )
 
