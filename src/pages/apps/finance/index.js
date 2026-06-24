@@ -283,6 +283,30 @@ const FinancePage = () => {
       valueGetter: p => formatMinor(p.row.gross_minor)
     },
     {
+      field: 'session_subtotal_minor',
+      headerName: 'Subtotal',
+      width: 90,
+      valueGetter: p => formatMinor(p.row.session_subtotal_minor)
+    },
+    {
+      field: 'surge_minor',
+      headerName: 'Surge',
+      width: 80,
+      valueGetter: p => formatMinor(p.row.surge_minor)
+    },
+    {
+      field: 'processing_fee_minor',
+      headerName: 'Processing',
+      width: 90,
+      valueGetter: p => formatMinor(p.row.processing_fee_minor)
+    },
+    {
+      field: 'tax_minor',
+      headerName: 'Tax',
+      width: 80,
+      valueGetter: p => formatMinor(p.row.tax_minor)
+    },
+    {
       field: 'platform_fee_minor',
       headerName: 'Platform fee',
       width: 100,
