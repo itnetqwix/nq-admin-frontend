@@ -4,6 +4,8 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import InputLabel from "@mui/material/InputLabel";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
 import CheckIcon from '@mui/icons-material/Check';
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -14,6 +16,8 @@ import { useCommon } from 'src/hooks/useCommon';
 
 const defaultValues = {
   commission: '',
+  surge_multiplier_cap_bps: '',
+  surge_opt_out: false,
 };
 
 const schema = yup.object().shape({
@@ -22,6 +26,13 @@ const schema = yup.object().shape({
     .min(0, "Commission should be at list 0")
     .max(100, "Commission should be maximul 100")
     .required("Commission is Required"),
+  surge_multiplier_cap_bps: yup
+    .number()
+    .nullable()
+    .transform((v, o) => (o === '' ? null : v))
+    .min(0, 'Cap must be ≥ 0')
+    .max(10000, 'Cap is in basis points (10000 = 100%)'),
+  surge_opt_out: yup.boolean(),
 });
 
 export default function AddEditCommision({ handleClose, trainer_id }) {
@@ -49,7 +60,15 @@ export default function AddEditCommision({ handleClose, trainer_id }) {
   const updateCommision = (data) => {
     console.log("data ===", data)
 
-    const payload = { trainer_id, commission: data.commission }
+    const payload = {
+      trainer_id,
+      commission: data.commission,
+      surge_multiplier_cap_bps:
+        data.surge_multiplier_cap_bps === '' || data.surge_multiplier_cap_bps == null
+          ? null
+          : data.surge_multiplier_cap_bps,
+      surge_opt_out: !!data.surge_opt_out,
+    }
 
     updateCommission(payload);
   }
@@ -90,6 +109,35 @@ export default function AddEditCommision({ handleClose, trainer_id }) {
                       value={value}
                       onChange={onChange}
                       helperText={errors?.commission?.message}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12}>
+                <Controller
+                  name='surge_multiplier_cap_bps'
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <TextField
+                      fullWidth
+                      type='number'
+                      size='small'
+                      label='Surge cap (bps, optional)'
+                      helperText='Max surge uplift in basis points (1500 = 15%). Leave empty for no cap.'
+                      value={value ?? ''}
+                      onChange={onChange}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12}>
+                <Controller
+                  name='surge_opt_out'
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <FormControlLabel
+                      control={<Switch checked={!!value} onChange={e => onChange(e.target.checked)} />}
+                      label='Coach absorbs surge (trainee price unchanged)'
                     />
                   )}
                 />

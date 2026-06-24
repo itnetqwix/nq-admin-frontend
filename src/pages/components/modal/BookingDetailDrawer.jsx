@@ -461,6 +461,14 @@ export default function BookingDetailDrawer({
                   }
                 />
                 <DetailRow
+                  label='Surge'
+                  value={
+                    detail.escrow.surge_minor
+                      ? `$${(detail.escrow.surge_minor / 100).toFixed(2)}`
+                      : null
+                  }
+                />
+                <DetailRow
                   label='Trainee platform fee'
                   value={
                     detail.escrow.trainee_platform_fee_minor
@@ -509,6 +517,14 @@ export default function BookingDetailDrawer({
                   }
                 />
                 <DetailRow label='Funding' value={detail.escrow.funding_source} />
+                <DetailRow label='Quote ID' value={detail.escrow.quote_id} />
+                {Array.isArray(detail.escrow.release_blockers) &&
+                detail.escrow.release_blockers.length > 0 ? (
+                  <DetailRow
+                    label='Release blockers'
+                    value={detail.escrow.release_blockers.join('; ')}
+                  />
+                ) : null}
                 <DetailRow label='Release eligible' value={fmt(detail.escrow.release_eligible_at)} />
                 <DetailRow label='Released at' value={fmt(detail.escrow.released_at)} />
               </>

@@ -15,8 +15,9 @@ import PricingDashboardTab from './components/PricingDashboardTab'
 import PricingRatesTab from './components/PricingRatesTab'
 import PricingProfitCheckTab from './components/PricingProfitCheckTab'
 import PricingHistoryTab from './components/PricingHistoryTab'
+import PricingSurgeTab from './components/PricingSurgeTab'
 
-const TAB_LABELS = ['Overview', 'Rates & fees', 'Profit check', 'History']
+const TAB_LABELS = ['Overview', 'Rates & fees', 'Surge & peak', 'Profit check', 'History']
 
 const PricingPage = () => {
   const ability = useContext(AbilityContext)
@@ -130,8 +131,16 @@ const PricingPage = () => {
             onPatchGlobal={patchGlobal}
           />
         ) : null}
-        {tab === 2 ? <PricingProfitCheckTab config={config} isDirty={isDirty} /> : null}
-        {tab === 3 ? <PricingHistoryTab /> : null}
+        {tab === 2 ? (
+          <PricingSurgeTab
+            config={config}
+            canEdit={canEdit}
+            onPatchGlobal={patchGlobal}
+            isDirty={isDirty}
+          />
+        ) : null}
+        {tab === 3 ? <PricingProfitCheckTab config={config} isDirty={isDirty} /> : null}
+        {tab === 4 ? <PricingHistoryTab /> : null}
       </AdminPageShell>
 
       {isDirty && canEdit ? (

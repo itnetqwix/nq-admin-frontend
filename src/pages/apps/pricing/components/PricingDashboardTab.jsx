@@ -72,6 +72,9 @@ export default function PricingDashboardTab({ config, onGoTab }) {
               Set commission & fees
             </Button>
             <Button variant='outlined' onClick={() => onGoTab(2)}>
+              Surge & peak pricing
+            </Button>
+            <Button variant='outlined' onClick={() => onGoTab(3)}>
               Check profit on a session
             </Button>
           </Stack>
