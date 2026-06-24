@@ -222,6 +222,12 @@ export default function PlatformHealthPage() {
                 href: '/apps/booking'
               },
               {
+                key: 'extensionReconcileAlerts7d',
+                label: 'Extension reconcile alerts (7d)',
+                href: '/apps/ops-logs?category=payment',
+                warn: true
+              },
+              {
                 key: 'transferFailuresLast7d',
                 label: 'Transfer failures (7d)',
                 href: '/apps/finance?tab=audit'
