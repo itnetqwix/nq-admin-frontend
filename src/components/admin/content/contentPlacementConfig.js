@@ -195,10 +195,10 @@ export const BLOG_PLACEMENT = [
 
 export const LEGAL_PLACEMENT = [
   {
-    surface: 'Terms & Privacy',
+    surface: 'Legal policies',
     path: 'Signup · Settings · Guest settings',
     audiences: ['guest', 'trainee', 'trainer'],
-    notes: 'In-app WebView · versioned OTA refresh · no store update'
+    notes: 'Terms, Privacy, Cancellation, Refund — in-app WebView · versioned OTA refresh'
   }
 ]
 

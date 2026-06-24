@@ -13,7 +13,9 @@ import { listLegalDocuments, publishLegal, saveLegalDraft, seedLegalDocuments } 
 
 const SLUGS = [
   { slug: 'terms', label: 'Terms & conditions' },
-  { slug: 'privacy', label: 'Privacy policy' }
+  { slug: 'privacy', label: 'Privacy policy' },
+  { slug: 'cancellation', label: 'Cancellation policy' },
+  { slug: 'refund', label: 'Refund policy' }
 ]
 
 const WRITING_TIPS = [
@@ -65,7 +67,7 @@ export default function CmsLegalPage() {
   const handleSeed = async () => {
     const ok = await confirm({
       title: 'Seed legal templates?',
-      message: 'Loads starter Terms & Privacy HTML. Skips documents that already exist unless you force overwrite.',
+      message: 'Loads starter Terms, Privacy, Cancellation & Refund HTML. Skips documents that already exist unless you force overwrite.',
       confirmLabel: 'Seed',
       variant: 'info'
     })
