@@ -248,6 +248,12 @@ export default function FinanceOverviewPanel({
             <Button size='small' variant='outlined' onClick={() => onReconcile?.('releasing')}>
               Reconcile releasing holds
             </Button>
+            <Button size='small' variant='outlined' onClick={() => onReconcile?.('escrow_backfill_dry')}>
+              Preview escrow backfill
+            </Button>
+            <Button size='small' variant='outlined' color='warning' onClick={() => onReconcile?.('escrow_backfill')}>
+              Backfill legacy escrow
+            </Button>
             <Button size='small' variant='outlined' component={Link} href='/apps/finance/connect'>
               Stripe Connect
             </Button>

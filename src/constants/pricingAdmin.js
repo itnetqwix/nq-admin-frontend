@@ -56,11 +56,40 @@ export const taxPctInputToDecimal = v => Number(v || 0) / 100
 
 export const STORAGE_PLAN_IDS = ['free', 'plus_5gb', 'pro_10gb', 'max_25gb']
 
+export const PRICING_REGIONS = [
+  { key: 'US', label: 'United States', currency: 'USD' },
+  { key: 'CA', label: 'Canada', currency: 'CAD' },
+  { key: 'GB', label: 'United Kingdom', currency: 'GBP' },
+  { key: 'EU', label: 'European Union', currency: 'EUR' }
+]
+
+export const GB_PAYMENT_METHODS = [
+  { id: 'card_domestic_gb', label: 'UK card (domestic)' },
+  { id: 'card_international_gb', label: 'International card' },
+  { id: 'apple_pay_gb', label: 'Apple Pay' },
+  { id: 'google_pay_gb', label: 'Google Pay' },
+  { id: 'link_gb', label: 'Link' },
+  { id: 'wallet_gb', label: 'NetQwix Wallet' },
+  { id: 'wallet_mixed_gb', label: 'Wallet + card' }
+]
+
+export const EU_PAYMENT_METHODS = [
+  { id: 'card_domestic_eu', label: 'EU card (domestic)' },
+  { id: 'card_international_eu', label: 'International card' },
+  { id: 'apple_pay_eu', label: 'Apple Pay' },
+  { id: 'google_pay_eu', label: 'Google Pay' },
+  { id: 'link_eu', label: 'Link' },
+  { id: 'wallet_eu', label: 'NetQwix Wallet' },
+  { id: 'wallet_mixed_eu', label: 'Wallet + card' }
+]
+
 export const fmtMoney = (minor, currency = 'USD') => {
   const n = Number(minor || 0) / 100
+  const code =
+    currency === 'CAD' ? 'CAD' : currency === 'GBP' ? 'GBP' : currency === 'EUR' ? 'EUR' : 'USD'
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: currency === 'CAD' ? 'CAD' : 'USD'
+    currency: code
   }).format(n)
 }
 

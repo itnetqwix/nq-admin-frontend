@@ -42,6 +42,7 @@ import {
   reconcileStuckReleasingHolds,
   approvePayout,
   migrateLegacyBalances,
+  backfillLegacyEscrowHolds,
   disputeEscrowHold,
   resolveDisputeEscrow,
   getTopUpHistory,
@@ -712,6 +713,10 @@ const FinancePage = () => {
       void runReconcile('Reconcile refunds', () => reconcileFailedRefunds(), load)
     } else if (kind === 'releasing') {
       void runReconcile('Reconcile releasing', () => reconcileStuckReleasingHolds(60), load)
+    } else if (kind === 'escrow_backfill_dry') {
+      void runReconcile('Preview escrow backfill', () => backfillLegacyEscrowHolds({ dryRun: true, limit: 50 }), load)
+    } else if (kind === 'escrow_backfill') {
+      void runReconcile('Backfill legacy escrow', () => backfillLegacyEscrowHolds({ dryRun: false, limit: 50 }), load)
     }
   }
 

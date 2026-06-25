@@ -160,6 +160,10 @@ export async function migrateLegacyBalances(dryRun = true) {
   return postFinance('/admin/finance/migrate-legacy-balances', { dry_run: dryRun })
 }
 
+export async function backfillLegacyEscrowHolds({ dryRun = true, limit = 50 } = {}) {
+  return postFinance('/admin/finance/backfill-escrow-holds', { dry_run: dryRun, limit })
+}
+
 export async function getConnectAccounts(query = {}) {
   const params = new URLSearchParams(
     Object.fromEntries(Object.entries(query).filter(([, v]) => v != null && v !== ''))

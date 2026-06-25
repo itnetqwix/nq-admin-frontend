@@ -80,7 +80,7 @@ export default function PricingFeeExplainer() {
         </Grid>
       </Grid>
       <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mt: 2 }}>
-        <Chip size='small' variant='outlined' label='US + CA regions' />
+        <Chip size='small' variant='outlined' label='US · CA · GB · EU regions' />
         <Chip size='small' variant='outlined' label='Per-coach commission override' />
         <Chip size='small' variant='outlined' label='Quote preview in Profit check' />
       </Stack>

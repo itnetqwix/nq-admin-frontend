@@ -14,6 +14,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import PricingRegionTab from './PricingRegionTab'
 import PricingProductsTab from './PricingProductsTab'
 import PricingFeeExplainer from './PricingFeeExplainer'
+import PricingEscrowPolicyTab from './PricingEscrowPolicyTab'
+import { PRICING_REGIONS } from 'src/constants/pricingAdmin'
 
 export default function PricingRatesTab({
   config,
@@ -23,16 +25,24 @@ export default function PricingRatesTab({
   onPatchStoragePlan,
   onPatchProductFee,
   onPatchGlobal,
-  onPatchTaxRate
+  onPatchTaxRate,
+  onPatchEscrowPolicy
 }) {
   const [region, setRegion] = useState('US')
-  const title = region === 'CA' ? 'Canada' : 'United States'
-  const currency = region === 'CA' ? 'CAD' : 'USD'
+  const regionMeta = PRICING_REGIONS.find(r => r.key === region) || PRICING_REGIONS[0]
+  const title = regionMeta.label
+  const currency = regionMeta.currency
   const regionData = config.regions?.[region]
 
   return (
     <Stack spacing={3}>
       <PricingFeeExplainer />
+
+      <PricingEscrowPolicyTab
+        policy={config.escrowPolicy}
+        canEdit={canEdit}
+        onPatch={onPatchEscrowPolicy}
+      />
 
       <Alert severity='info'>
         Start with <strong>commission %</strong> and the two <strong>platform fees</strong>. Everything
@@ -47,8 +57,11 @@ export default function PricingRatesTab({
         size='small'
         color='primary'
       >
-        <ToggleButton value='US'>United States (USD)</ToggleButton>
-        <ToggleButton value='CA'>Canada (CAD)</ToggleButton>
+        {PRICING_REGIONS.map(r => (
+          <ToggleButton key={r.key} value={r.key}>
+            {r.label} ({r.currency})
+          </ToggleButton>
+        ))}
       </ToggleButtonGroup>
 
       <Card variant='outlined'>

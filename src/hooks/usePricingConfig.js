@@ -80,6 +80,12 @@ export function usePricingConfig() {
     })
   }, [patch])
 
+  const patchEscrowPolicy = useCallback(partial => {
+    patch(cfg => {
+      cfg.escrowPolicy = { ...(cfg.escrowPolicy || {}), ...partial }
+    })
+  }, [patch])
+
   const patchGlobal = useCallback(partial => {
     patch(cfg => Object.assign(cfg, partial))
   }, [patch])
@@ -132,6 +138,7 @@ export function usePricingConfig() {
     patchPaymentMethod,
     patchStoragePlan,
     patchTaxRate,
+    patchEscrowPolicy,
     patchGlobal
   }
 }

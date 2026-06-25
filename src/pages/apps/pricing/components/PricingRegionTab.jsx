@@ -11,6 +11,9 @@ import { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import {
   CA_PAYMENT_METHODS,
   US_PAYMENT_METHODS,
+  GB_PAYMENT_METHODS,
+  EU_PAYMENT_METHODS,
+  PRICING_REGIONS,
   STORAGE_PLAN_IDS,
   centsToInput,
   decimalToPctInput,
@@ -41,8 +44,16 @@ export default function PricingRegionTab({
   const showPayments = section === 'all' || section === 'payments'
   const showStorage = section === 'all' || section === 'storage'
 
-  const paymentMethods = regionKey === 'CA' ? CA_PAYMENT_METHODS : US_PAYMENT_METHODS
-  const currencySymbol = currency === 'CAD' ? 'C$' : '$'
+  const paymentMethods =
+    regionKey === 'CA'
+      ? CA_PAYMENT_METHODS
+      : regionKey === 'GB'
+        ? GB_PAYMENT_METHODS
+        : regionKey === 'EU'
+          ? EU_PAYMENT_METHODS
+          : US_PAYMENT_METHODS
+  const currencySymbol =
+    currency === 'CAD' ? 'C$' : currency === 'GBP' ? '£' : currency === 'EUR' ? '€' : '$'
 
   const pmRows = paymentMethods.map(m => {
     const fee = region.paymentMethodFees?.[m.id] || { bps: 0, fixedMinor: 0 }
@@ -250,7 +261,7 @@ export default function PricingRegionTab({
                 displayRate: `${(Number(rate || 0) * 100).toFixed(3)}%`
               }))}
             columns={[
-              { field: 'code', headerName: regionKey === 'CA' ? 'Province' : 'State', width: 120 },
+              { field: 'code', headerName: regionKey === 'CA' ? 'Province' : regionKey === 'US' ? 'State' : 'Country', width: 120 },
               {
                 field: 'ratePct',
                 headerName: 'Rate (%)',

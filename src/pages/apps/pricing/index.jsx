@@ -12,6 +12,7 @@ import { useAdminConfirm } from 'src/components/admin'
 import { AbilityContext } from 'src/layouts/components/acl/Can'
 import { usePricingConfig } from 'src/hooks/usePricingConfig'
 import PricingDashboardTab from './components/PricingDashboardTab'
+import PricingPromoSponsorTab from './components/PricingPromoSponsorTab'
 import PricingRatesTab from './components/PricingRatesTab'
 import PricingProfitCheckTab from './components/PricingProfitCheckTab'
 import PricingHistoryTab from './components/PricingHistoryTab'
@@ -38,6 +39,7 @@ const PricingPage = () => {
     patchPaymentMethod,
     patchStoragePlan,
     patchTaxRate,
+    patchEscrowPolicy,
     patchGlobal
   } = usePricingConfig()
 
@@ -120,7 +122,12 @@ const PricingPage = () => {
           sx={{ mb: 3 }}
         />
 
-        {tab === 0 ? <PricingDashboardTab config={config} onGoTab={setTab} /> : null}
+        {tab === 0 ? (
+          <Stack spacing={3}>
+            <PricingDashboardTab config={config} onGoTab={setTab} />
+            <PricingPromoSponsorTab />
+          </Stack>
+        ) : null}
         {tab === 1 ? (
           <PricingRatesTab
             config={config}
@@ -131,6 +138,7 @@ const PricingPage = () => {
             onPatchProductFee={patchProductFee}
             onPatchGlobal={patchGlobal}
             onPatchTaxRate={patchTaxRate}
+            onPatchEscrowPolicy={patchEscrowPolicy}
           />
         ) : null}
         {tab === 2 ? (

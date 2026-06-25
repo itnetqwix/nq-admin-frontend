@@ -15,10 +15,17 @@ const PLACEMENT_LABELS = {
 }
 
 function formWithResolvedImage(form) {
-  if (!form?.image_url) return form
-  const resolved = resolveCmsImageUrl(form.image_url)
-  if (!resolved || resolved === form.image_url) return form
-  return { ...form, image_url: resolved }
+  if (!form) return form
+  const next = { ...form }
+  if (form.image_url) {
+    const resolved = resolveCmsImageUrl(form.image_url)
+    if (resolved && resolved !== form.image_url) next.image_url = resolved
+  }
+  if (form.background_image_url) {
+    const resolved = resolveCmsImageUrl(form.background_image_url)
+    if (resolved && resolved !== form.background_image_url) next.background_image_url = resolved
+  }
+  return next
 }
 
 function renderPlacement(placement, form, embedded, previewAudience) {

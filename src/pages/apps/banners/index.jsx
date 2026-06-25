@@ -65,6 +65,12 @@ const EMPTY_FORM = {
   title: '',
   body: '',
   image_url: '',
+  background_image_url: '',
+  background_color: '',
+  image_height: '140',
+  image_fit: 'cover',
+  text_align: 'left',
+  overlay_opacity: '0.45',
   audience: ['all'],
   placement: 'hero',
   auto_advance_sec: '5',
@@ -211,6 +217,12 @@ export default function BannersPage() {
       title: row.title || '',
       body: row.body || '',
       image_url: row.image_url || '',
+      background_image_url: row.background_image_url || '',
+      background_color: row.background_color || '',
+      image_height: String(row.image_height ?? 140),
+      image_fit: row.image_fit || 'cover',
+      text_align: row.text_align || 'left',
+      overlay_opacity: String(row.overlay_opacity ?? 0.45),
       audience: Array.isArray(row.audience) && row.audience.length ? row.audience : ['all'],
       severity: row.severity || 'info',
       placement: row.placement || 'hero',
@@ -243,6 +255,12 @@ export default function BannersPage() {
         title: form.title.trim(),
         body: form.body.trim(),
         image_url: form.image_url || null,
+        background_image_url: form.background_image_url || null,
+        background_color: form.background_color?.trim() || null,
+        image_height: Number(form.image_height) || 140,
+        image_fit: form.image_fit === 'contain' ? 'contain' : 'cover',
+        text_align: form.text_align === 'center' ? 'center' : 'left',
+        overlay_opacity: Math.min(1, Math.max(0, Number(form.overlay_opacity) || 0.45)),
         audience: form.audience,
         severity: form.severity,
         placement: form.placement || 'hero',
@@ -639,9 +657,79 @@ export default function BannersPage() {
               <CmsImageUploader
                 kind='banners'
                 surfaceKey={`banner.${form.placement || 'hero'}`}
+                label='Foreground image'
                 value={form.image_url}
                 onChange={v => handleFormChange('image_url', v)}
               />
+            </Grid>
+            <Grid item xs={12}>
+              <CmsImageUploader
+                kind='banners'
+                surfaceKey={`banner.${form.placement || 'hero'}.background`}
+                label='Background image (optional)'
+                value={form.background_image_url}
+                onChange={v => handleFormChange('background_image_url', v)}
+                helperText='Full-bleed behind text — great for hero promos'
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                label='Background color'
+                fullWidth
+                size='small'
+                value={form.background_color}
+                onChange={e => handleFormChange('background_color', e.target.value)}
+                placeholder='#1a237e or transparent'
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                label='Image height (px)'
+                fullWidth
+                size='small'
+                type='number'
+                inputProps={{ min: 64, max: 320 }}
+                value={form.image_height}
+                onChange={e => handleFormChange('image_height', e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                label='Overlay opacity'
+                fullWidth
+                size='small'
+                type='number'
+                inputProps={{ min: 0, max: 1, step: 0.05 }}
+                value={form.overlay_opacity}
+                onChange={e => handleFormChange('overlay_opacity', e.target.value)}
+                helperText='Darken background image for readable text'
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth size='small'>
+                <InputLabel>Image fit</InputLabel>
+                <Select
+                  label='Image fit'
+                  value={form.image_fit}
+                  onChange={e => handleFormChange('image_fit', e.target.value)}
+                >
+                  <MenuItem value='cover'>Cover (crop to fill)</MenuItem>
+                  <MenuItem value='contain'>Contain (fit inside)</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth size='small'>
+                <InputLabel>Text align</InputLabel>
+                <Select
+                  label='Text align'
+                  value={form.text_align}
+                  onChange={e => handleFormChange('text_align', e.target.value)}
+                >
+                  <MenuItem value='left'>Left</MenuItem>
+                  <MenuItem value='center'>Center</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12}>
               <BannerCtaEditor
