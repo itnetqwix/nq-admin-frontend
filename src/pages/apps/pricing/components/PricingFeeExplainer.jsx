@@ -61,7 +61,7 @@ export default function PricingFeeExplainer() {
           <FeeCard
             label='4 · Checkout'
             title='Card processing & tax'
-            body='Stripe bps + per-charge fee; tax via Stripe Tax when enabled. Wallet-only checkouts skip card processing.'
+            body='Stripe bps + per-charge fee; tax via Stripe Tax when enabled, or editable state/province rates below. Wallet-only checkouts skip card processing.'
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>

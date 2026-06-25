@@ -50,6 +50,10 @@ export const CA_PROVINCE_OPTIONS = [
   { code: 'NS', label: 'Nova Scotia HST (15%)' }
 ]
 
+/** Decimal rate (0.0825) ↔ percent input for admin tax grids */
+export const decimalToTaxPctInput = v => (Number(v || 0) * 100).toFixed(3)
+export const taxPctInputToDecimal = v => Number(v || 0) / 100
+
 export const STORAGE_PLAN_IDS = ['free', 'plus_5gb', 'pro_10gb', 'max_25gb']
 
 export const fmtMoney = (minor, currency = 'USD') => {

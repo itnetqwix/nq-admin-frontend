@@ -37,6 +37,7 @@ const PricingPage = () => {
     patchProductFee,
     patchPaymentMethod,
     patchStoragePlan,
+    patchTaxRate,
     patchGlobal
   } = usePricingConfig()
 
@@ -129,6 +130,7 @@ const PricingPage = () => {
             onPatchStoragePlan={patchStoragePlan}
             onPatchProductFee={patchProductFee}
             onPatchGlobal={patchGlobal}
+            onPatchTaxRate={patchTaxRate}
           />
         ) : null}
         {tab === 2 ? (

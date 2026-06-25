@@ -22,7 +22,8 @@ export default function PricingRatesTab({
   onPatchPaymentMethod,
   onPatchStoragePlan,
   onPatchProductFee,
-  onPatchGlobal
+  onPatchGlobal,
+  onPatchTaxRate
 }) {
   const [region, setRegion] = useState('US')
   const title = region === 'CA' ? 'Canada' : 'United States'
@@ -68,6 +69,7 @@ export default function PricingRatesTab({
             onPatchRegion={onPatchRegion}
             onPatchPaymentMethod={onPatchPaymentMethod}
             onPatchStoragePlan={onPatchStoragePlan}
+            onPatchTaxRate={onPatchTaxRate}
           />
           <PricingRegionTab
             regionKey={region}
@@ -79,6 +81,19 @@ export default function PricingRatesTab({
             onPatchRegion={onPatchRegion}
             onPatchPaymentMethod={onPatchPaymentMethod}
             onPatchStoragePlan={onPatchStoragePlan}
+            onPatchTaxRate={onPatchTaxRate}
+          />
+          <PricingRegionTab
+            regionKey={region}
+            title={title}
+            currency={currency}
+            region={regionData}
+            canEdit={canEdit}
+            section='tax'
+            onPatchRegion={onPatchRegion}
+            onPatchPaymentMethod={onPatchPaymentMethod}
+            onPatchStoragePlan={onPatchStoragePlan}
+            onPatchTaxRate={onPatchTaxRate}
           />
         </CardContent>
       </Card>

@@ -72,6 +72,14 @@ export function usePricingConfig() {
     })
   }, [patch])
 
+  const patchTaxRate = useCallback((regionKey, jurisdictionCode, rateDecimal) => {
+    patch(cfg => {
+      const rates = { ...(cfg.regions[regionKey].salesTaxRates || {}) }
+      rates[jurisdictionCode] = Number(rateDecimal) || 0
+      cfg.regions[regionKey].salesTaxRates = rates
+    })
+  }, [patch])
+
   const patchGlobal = useCallback(partial => {
     patch(cfg => Object.assign(cfg, partial))
   }, [patch])
@@ -123,6 +131,7 @@ export function usePricingConfig() {
     patchProductFee,
     patchPaymentMethod,
     patchStoragePlan,
+    patchTaxRate,
     patchGlobal
   }
 }
