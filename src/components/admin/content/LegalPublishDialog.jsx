@@ -17,13 +17,17 @@ import AddIcon from '@mui/icons-material/Add'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import { getLegalNotifyCount } from 'src/services/cmsApi'
 
-const NOTIFY_SLUGS = new Set(['terms', 'privacy'])
+const NOTIFY_SLUGS = new Set(['terms', 'privacy', 'cancellation', 'refund'])
 
 const DEFAULT_INTRO = {
   privacy:
     "We're writing to inform you about some updates to our Privacy Policy.\n\nWe encourage you to read the updated policy in full. A summary of key changes is below.",
   terms:
-    "We're writing to inform you about some updates to our Terms & Conditions.\n\nPlease review the updated terms at your convenience."
+    "We're writing to inform you about some updates to our Terms & Conditions.\n\nPlease review the updated terms at your convenience.",
+  cancellation:
+    "We're writing to inform you about updates to our Cancellation Policy.\n\nPlease review how session cancellations and no-shows are handled.",
+  refund:
+    "We're writing to inform you about updates to our Refund Policy.\n\nPlease review how refunds and credits are processed."
 }
 
 export default function LegalPublishDialog({
@@ -232,7 +236,8 @@ export default function LegalPublishDialog({
           </Stack>
         ) : (
           <Typography variant='body2' color='text.secondary'>
-            Cancellation and refund policies update in-app only — user emails are sent for Terms and Privacy.
+            Publish updates the in-app document for all users. Enable email notification above to
+            notify trainers and trainees about this change.
           </Typography>
         )}
       </DialogContent>
