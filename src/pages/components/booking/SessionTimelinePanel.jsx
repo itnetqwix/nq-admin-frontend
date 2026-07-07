@@ -112,6 +112,46 @@ export default function SessionTimelinePanel({ bookingId, refreshKey = 0 }) {
             </>
           ) : null}
 
+          {Array.isArray(timeline.opsEvents) && timeline.opsEvents.length > 0 ? (
+            <>
+              <Typography variant='caption' sx={{ display: 'block', mt: 1.5, mb: 0.5, fontWeight: 700 }}>
+                Lesson ops log
+              </Typography>
+              {timeline.opsEvents.map((ev, idx) => (
+                <Box
+                  key={`ops-${idx}`}
+                  sx={{
+                    mb: 1,
+                    pl: 1,
+                    borderLeft: 2,
+                    borderColor:
+                      ev.severity === 'error' || ev.severity === 'critical'
+                        ? 'error.main'
+                        : ev.severity === 'warning'
+                          ? 'warning.main'
+                          : 'info.main'
+                  }}
+                >
+                  <Typography variant='caption' fontWeight={600}>
+                    {ev.title}
+                    {ev.eventType ? ` · ${ev.eventType}` : ''}
+                  </Typography>
+                  {ev.summary ? (
+                    <Typography variant='caption' color='text.secondary' display='block'>
+                      {ev.summary}
+                    </Typography>
+                  ) : null}
+                  <Typography variant='caption' color='text.secondary' display='block'>
+                    {fmt(ev.at)}
+                    {ev.role ? ` · ${ev.role}` : ''}
+                    {ev.leaveKind ? ` · ${ev.leaveKind}` : ''}
+                    {ev.timerPaused === true ? ' · timer paused' : ev.timerPaused === false ? ' · timer running' : ''}
+                  </Typography>
+                </Box>
+              ))}
+            </>
+          ) : null}
+
           {Array.isArray(timeline.lessonClientKinds) && timeline.lessonClientKinds.length > 0 ? (
             <TimelineRow
               label='Client kinds'
