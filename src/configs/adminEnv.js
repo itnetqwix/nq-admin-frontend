@@ -1,5 +1,9 @@
 /** Admin UI feature flags (Next.js: NEXT_PUBLIC_* only). */
 
+/** LogRocket session replay app id (web admin). */
+export const LOGROCKET_APP_ID =
+  String(process.env.NEXT_PUBLIC_LOGROCKET_APP_ID ?? 'kzg9vc/netqwix').trim()
+
 /** Enabled unless explicitly set to "false" (avoids missing env after .env edits without restart). */
 export const isAdminRegisterEnabled = () => {
   const raw = String(process.env.NEXT_PUBLIC_ADMIN_REGISTER_ENABLED ?? 'true').trim().toLowerCase()

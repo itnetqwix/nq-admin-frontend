@@ -1,5 +1,6 @@
 import { getApiBaseUrl } from 'src/utils/apiBase'
 import { handleSessionExpired, isUnauthorizedResponse } from 'src/utils/sessionExpired'
+import { getLogRocketSessionUrlSync, LOGROCKET_SESSION_HEADER } from 'src/lib/logrocket'
 
 let installed = false
 
@@ -25,9 +26,22 @@ export function installApiAuthHandler() {
   const originalFetch = window.fetch.bind(window)
 
   window.fetch = async (...args) => {
-    const response = await originalFetch(...args)
     const url = resolveRequestUrl(args[0])
     const apiBase = getApiBaseUrl()
+    const shouldTag =
+      isApiRequest(url, apiBase) && !isAuthLoginRequest(url)
+
+    if (shouldTag) {
+      const sessionUrl = getLogRocketSessionUrlSync()
+      if (sessionUrl) {
+        const [input, init] = args
+        const headers = new Headers(init?.headers || {})
+        headers.set(LOGROCKET_SESSION_HEADER, sessionUrl)
+        args[1] = { ...(init || {}), headers }
+      }
+    }
+
+    const response = await originalFetch(...args)
 
     if (
       isApiRequest(url, apiBase) &&

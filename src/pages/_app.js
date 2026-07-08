@@ -1,4 +1,5 @@
-// ** Next Imports
+// ** React Imports
+import { useEffect } from 'react'
 import Head from 'next/head'
 import { Router } from 'next/router'
 
@@ -44,6 +45,7 @@ import ReactHotToast from 'src/@core/styles/libs/react-hot-toast'
 
 // ** Utils Imports
 import { createEmotionCache } from 'src/@core/utils/create-emotion-cache'
+import { initLogRocket } from 'src/lib/logrocket'
 
 // ** Prismjs Styles
 import 'prismjs'
@@ -97,6 +99,10 @@ const App = props => {
   const authGuard = Component.authGuard ?? true
   const guestGuard = Component.guestGuard ?? false
   const aclAbilities = Component.acl ?? defaultACLObj
+
+  useEffect(() => {
+    initLogRocket()
+  }, [])
 
   return (
 

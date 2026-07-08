@@ -1,16 +1,16 @@
-# Graph Report - nq-admin  (2026-07-08)
+# Graph Report - nq-admin  (2026-06-19)
 
 ## Corpus Check
-- 341 files · ~529,864 words
+- 330 files · ~522,768 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1486 nodes · 1978 edges · 216 communities (161 shown, 55 thin omitted)
-- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 133 edges (avg confidence: 0.81)
+- 1427 nodes · 1909 edges · 204 communities (153 shown, 51 thin omitted)
+- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 130 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f83870bf`
+- Built from commit: `f0e0d354`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -133,27 +133,16 @@
 - [[_COMMUNITY_Community 201|Community 201]]
 - [[_COMMUNITY_Community 202|Community 202]]
 - [[_COMMUNITY_Community 203|Community 203]]
-- [[_COMMUNITY_Community 204|Community 204]]
-- [[_COMMUNITY_Community 205|Community 205]]
-- [[_COMMUNITY_Community 206|Community 206]]
-- [[_COMMUNITY_Community 207|Community 207]]
-- [[_COMMUNITY_Community 208|Community 208]]
-- [[_COMMUNITY_Community 209|Community 209]]
-- [[_COMMUNITY_Community 210|Community 210]]
-- [[_COMMUNITY_Community 211|Community 211]]
-- [[_COMMUNITY_Community 212|Community 212]]
-- [[_COMMUNITY_Community 213|Community 213]]
-- [[_COMMUNITY_Community 215|Community 215]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `api()` - 22 edges
 2. `useAdminConfirm()` - 21 edges
 3. `headers()` - 21 edges
-4. `apiUrl()` - 21 edges
-5. `getAuthHeaders()` - 20 edges
-6. `handleRes()` - 20 edges
-7. `useMobilePreviewFrame()` - 19 edges
-8. `requireApiBaseUrl()` - 19 edges
+4. `useMobilePreviewFrame()` - 19 edges
+5. `apiUrl()` - 19 edges
+6. `requireApiBaseUrl()` - 19 edges
+7. `getAuthHeaders()` - 18 edges
+8. `handleRes()` - 18 edges
 9. `parseJson()` - 16 edges
 10. `apiUrl()` - 16 edges
 
@@ -172,11 +161,11 @@
 ## Import Cycles
 - None detected.
 
-## Communities (216 total, 55 thin omitted)
+## Communities (204 total, 51 thin omitted)
 
 ### Community 0 - "Package Dependencies"
 Cohesion: 0.03
-Nodes (78): dependencies, apexcharts-clevision, axios, axios-mock-adapter, @babel/core, babel-eslint, @babel/eslint-parser, bootstrap-icons (+70 more)
+Nodes (73): dependencies, apexcharts-clevision, axios, axios-mock-adapter, @babel/core, babel-eslint, @babel/eslint-parser, bootstrap-icons (+65 more)
 
 ### Community 1 - "Booking & Clips Panel"
 Cohesion: 0.05
@@ -187,20 +176,20 @@ Cohesion: 0.05
 Nodes (38): devDependencies, eslint, eslint-config-next, eslint-config-prettier, eslint-import-resolver-alias, eslint-import-resolver-typescript, eslint-plugin-import, @iconify/iconify (+30 more)
 
 ### Community 3 - "Auth Guards & Middleware"
-Cohesion: 0.08
-Nodes (24): AclGuard(), AuthGuard(), GuestGuard(), buildAbilityFor(), defaultACLObj, defineRulesFor(), AdminRealtimeContext, AdminRealtimeProvider() (+16 more)
+Cohesion: 0.07
+Nodes (28): AclGuard(), AuthGuard(), GuestGuard(), buildAbilityFor(), defaultACLObj, defineRulesFor(), getAdminApiEnvLabel(), AdminRealtimeContext (+20 more)
 
 ### Community 4 - "Layouts & Navigation UI"
 Cohesion: 0.17
 Nodes (4): MenuItemTextWrapper, MenuItemTextMetaWrapper, MenuNavLink, ListSubheader
 
 ### Community 5 - "Commission Management"
-Cohesion: 0.12
-Nodes (9): AddEditCommision(), defaultValues, schema, CustomButton, getAdminApiEnvLabel(), useAdminRealtime(), Home(), ModalDialog (+1 more)
+Cohesion: 0.17
+Nodes (5): AddEditCommision(), defaultValues, schema, CustomButton, ModalDialog
 
 ### Community 6 - "Pricing Analytics UI"
-Cohesion: 0.11
-Nodes (14): PricingRegionTab(), CA_PAYMENT_METHODS, CA_PROVINCE_OPTIONS, centsToInput(), decimalToPctInput(), decimalToTaxPctInput(), EU_PAYMENT_METHODS, GB_PAYMENT_METHODS (+6 more)
+Cohesion: 0.05
+Nodes (21): PricingDashboardTab(), PricingOverviewTab(), PricingRegionTab(), DEFAULT_INPUT, PricingSimulatorTab(), DEFAULT_CUSTOM, PricingUnitEconomicsTab(), ScenarioInfraRow() (+13 more)
 
 ### Community 7 - "App Bar Components"
 Cohesion: 0.08
@@ -219,16 +208,16 @@ Cohesion: 0.15
 Nodes (17): Editor, editorFromHtml(), emptyEditor(), STEPS, BroadcastDetailDrawer(), AUDIENCE_OPTIONS, CHANNELS, HISTORY_STATUS_FILTERS (+9 more)
 
 ### Community 11 - "Booking API Services"
-Cohesion: 0.14
-Nodes (31): adjustWallet(), apiUrl(), approvePayout(), backfillLegacyEscrowHolds(), disputeEscrowHold(), getAuthHeaders(), getConnectAccounts(), getEscrowHolds() (+23 more)
+Cohesion: 0.19
+Nodes (26): adjustWallet(), apiUrl(), approvePayout(), disputeEscrowHold(), getAuthHeaders(), getConnectAccounts(), getEscrowHolds(), getEscrowSummary() (+18 more)
 
 ### Community 12 - "Clips Admin API"
 Cohesion: 0.28
 Nodes (23): api(), approveLibrarySubmission(), approveTraineeAccount(), confirmLibraryClip(), createClipCategory(), createClipSubcategory(), deleteClipCategory(), deleteClipSubcategory() (+15 more)
 
 ### Community 13 - "CMS Banner Content"
-Cohesion: 0.15
-Nodes (10): BannerHeroPreview(), BlogListCardPreview(), BlogPostPreview(), FaqPreview(), LegalDocumentPreview(), useMobilePreviewFrame(), StaticPagePreview(), StickyBottomPreview() (+2 more)
+Cohesion: 0.06
+Nodes (39): BannerHeroPreview(), BannerPlacementPreview(), formWithResolvedImage(), PLACEMENT_LABELS, renderPlacement(), SEVERITY_BG, SEVERITY_FG, BlogListCardPreview() (+31 more)
 
 ### Community 14 - "Student Clips Management"
 Cohesion: 0.03
@@ -243,8 +232,8 @@ Cohesion: 0.46
 Nodes (18): apiUrl(), deleteAdminEntity(), getAuditLogs(), getAuthHeaders(), getCallDiagnostics(), getClipPlayUrl(), getUser360(), getUserAssets() (+10 more)
 
 ### Community 17 - "Services Cmsapi"
-Cohesion: 0.29
-Nodes (23): apiUrl(), createCmsPage(), deleteCmsPage(), getAdminFaq(), getAuthHeaders(), getCmsAssetHealth(), getCmsSummary(), getLegalNotifyCount() (+15 more)
+Cohesion: 0.32
+Nodes (21): apiUrl(), createCmsPage(), deleteCmsPage(), getAdminFaq(), getAuthHeaders(), getCmsSummary(), handleRes(), listCmsPages() (+13 more)
 
 ### Community 18 - "Services Promocodeapi"
 Cohesion: 0.53
@@ -263,8 +252,8 @@ Cohesion: 0.60
 Nodes (9): apiUrl(), createBroadcast(), deleteBroadcast(), getAuthHeaders(), getBroadcastById(), getRecipientPreviewCount(), handleRes(), listBroadcasts() (+1 more)
 
 ### Community 22 - "Services Opsapi"
-Cohesion: 0.56
-Nodes (10): apiUrl(), getAuthHeaders(), getOpsEventDetail(), getOpsEvents(), getOpsEventsForUser(), getOpsPlaybook(), getOpsStats(), parse() (+2 more)
+Cohesion: 0.33
+Nodes (14): apiUrl(), getAuthHeaders(), getOpsEventDetail(), getOpsEvents(), getOpsEventsForUser(), getOpsPlaybook(), getOpsStats(), parse() (+6 more)
 
 ### Community 23 - "Analytics Analyticsoverview"
 Cohesion: 0.22
@@ -283,8 +272,8 @@ Cohesion: 0.18
 Nodes (6): SwipeableDrawer, StyledBoxForShadow, HeaderTitle, LinkStyled, MenuHeaderWrapper, Navigation()
 
 ### Community 28 - "Services Tipsapi"
-Cohesion: 0.17
-Nodes (14): CmsImageUploader(), bannerImageSpec(), BANNERS_AUDIENCE_HELP, BANNERS_PLACEMENT, BLOG_PLACEMENT, blogImageSpec(), FAQ_PLACEMENT, getImageSpec() (+6 more)
+Cohesion: 0.64
+Nodes (8): apiUrl(), createTip(), deleteTip(), getAuthHeaders(), handleRes(), listTips(), toggleTip(), updateTip()
 
 ### Community 29 - "Shared Components Notificationdropdown"
 Cohesion: 0.22
@@ -307,8 +296,8 @@ Cohesion: 0.25
 Nodes (3): UserLayout(), HorizontalNavItems(), VerticalNavItems()
 
 ### Community 34 - "Services Pricingapi"
-Cohesion: 0.10
-Nodes (37): addAccountDeletionNote(), apiUrl(), getAuthHeaders(), handleRes(), listAccountDeletions(), restoreAccountDeletion(), apiUrl(), createBanner() (+29 more)
+Cohesion: 0.12
+Nodes (28): apiUrl(), createBanner(), deleteBanner(), getAuthHeaders(), handleRes(), listBanners(), toggleBanner(), updateBanner() (+20 more)
 
 ### Community 35 - "Services Verificationapi"
 Cohesion: 0.25
@@ -331,8 +320,8 @@ Cohesion: 0.33
 Nodes (4): EMPTY_FORM, getStatusChip(), PromoCodesPage(), SPONSOR_TABS
 
 ### Community 41 - "Services Accountdeletionsapi"
-Cohesion: 0.20
-Nodes (9): BannerPlacementPreview(), formWithResolvedImage(), PLACEMENT_LABELS, renderPlacement(), SEVERITY_BG, SEVERITY_FG, BANNERS_PLACEMENT_HELP, bannerVisibleForAudience() (+1 more)
+Cohesion: 0.71
+Nodes (6): addAccountDeletionNote(), apiUrl(), getAuthHeaders(), handleRes(), listAccountDeletions(), restoreAccountDeletion()
 
 ### Community 42 - "Auth Jwt"
 Cohesion: 0.33
@@ -357,10 +346,6 @@ Nodes (3): Menu, MenuItem, PerfectScrollbar
 ### Community 48 - "Workflows Deploy Production"
 Cohesion: 0.33
 Nodes (6): main branch trigger, Deploy Admin — Production Workflow, Vercel Production Deployment, staging branch trigger, Deploy Admin — Staging Workflow, Vercel Preview Deployment
-
-### Community 51 - "Utils Sessionexpired"
-Cohesion: 0.22
-Nodes (5): clearLogRocketUser(), initLogRocket(), readAppId(), clearAuthStorage(), handleSessionExpired()
 
 ### Community 52 - "Account Deletions Index"
 Cohesion: 0.14
@@ -435,8 +420,8 @@ Cohesion: 0.61
 Nodes (7): api(), approveTrainerVerification(), getPendingVerificationCount(), getTrainerVerificationDetail(), getTrainerVerifications(), headers(), rejectTrainerVerification()
 
 ### Community 200 - "Community 200"
-Cohesion: 0.33
-Nodes (6): adminRegisterEnvHint(), isAdminRegisterEnabled(), LOGROCKET_APP_ID, showAdminMfaNotice(), LoginPage(), Register()
+Cohesion: 0.40
+Nodes (5): adminRegisterEnvHint(), isAdminRegisterEnabled(), showAdminMfaNotice(), LoginPage(), Register()
 
 ### Community 201 - "Community 201"
 Cohesion: 0.47
@@ -446,49 +431,25 @@ Nodes (4): io5ComponentName(), IoniconsPreview(), resolveIcon(), TIP_ICON_NAMES
 Cohesion: 0.33
 Nodes (5): ColorBox, Customizer(), CustomizerSpacing, Drawer, Toggler
 
-### Community 205 - "Community 205"
-Cohesion: 0.18
-Nodes (6): PricingDashboardTab(), PricingOverviewTab(), DEFAULT_CUSTOM, PricingUnitEconomicsTab(), ScenarioInfraRow(), fmtPct()
-
-### Community 206 - "Community 206"
-Cohesion: 0.18
-Nodes (5): CmsCoverCropUploader(), TipOffersCarouselPreview(), TipPreviewCard(), resolveCmsImageUrl(), S3_BASE
-
-### Community 207 - "Community 207"
-Cohesion: 0.38
-Nodes (4): DEVICE_PRESETS, getDeviceFrame(), MobilePreviewFrameContext, MobilePreviewFrameProvider()
-
-### Community 208 - "Community 208"
-Cohesion: 0.33
-Nodes (3): DAYS, DEMAND_METRICS, PRODUCT_TYPES
-
-### Community 209 - "Community 209"
-Cohesion: 0.47
-Nodes (3): bannerActiveOnDay(), parseDay(), startOfMonth()
-
-### Community 210 - "Community 210"
-Cohesion: 0.73
-Nodes (5): apiUrl(), getAuthHeaders(), getReferralDashboard(), getReferralRewards(), unwrap()
-
 ## Knowledge Gaps
-- **451 isolated node(s):** `editor.defaultFormatter`, `editor.defaultFormatter`, `source.fixAll.eslint`, `source.organizeImports`, `editor.defaultFormatter` (+446 more)
+- **435 isolated node(s):** `editor.defaultFormatter`, `editor.defaultFormatter`, `source.fixAll.eslint`, `source.organizeImports`, `editor.defaultFormatter` (+430 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **55 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **51 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `useAuth()` connect `Auth Guards & Middleware` to `Community 200`, `Content Contentplacementconfig`?**
-  _High betweenness centrality (0.139) - this node is a cross-community bridge._
-- **Why does `useAdminConfirm()` connect `Account Deletions Index` to `Booking & Clips Panel`, `Finance Index`, `Promo Codes Index`, `Broadcasts Index`, `Cms Blog Index`, `Cms Faq Index`, `Cms Legal Index`, `Admin Admindatagrid`, `Customizer Index`, `Community 215`, `Banners Index`, `NetQwix Library Index`, `Ops Logs Index`, `Content Contentplacementconfig`?**
   _High betweenness centrality (0.118) - this node is a cross-community bridge._
+- **Why does `useAdminConfirm()` connect `Account Deletions Index` to `Booking & Clips Panel`, `Pricing Analytics UI`, `Finance Index`, `Promo Codes Index`, `Broadcasts Index`, `Cms Blog Index`, `Cms Faq Index`, `Cms Legal Index`, `Admin Admindatagrid`, `Customizer Index`, `Banners Index`, `NetQwix Library Index`, `Ops Logs Index`, `Content Contentplacementconfig`?**
+  _High betweenness centrality (0.101) - this node is a cross-community bridge._
 - **Why does `ManageTrainer()` connect `Content Contentplacementconfig` to `Auth Guards & Middleware`, `Account Deletions Index`?**
-  _High betweenness centrality (0.099) - this node is a cross-community bridge._
+  _High betweenness centrality (0.086) - this node is a cross-community bridge._
 - **Are the 19 inferred relationships involving `useAdminConfirm()` (e.g. with `AccountDeletionsPage()` and `BannersPage()`) actually correct?**
   _`useAdminConfirm()` has 19 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `editor.defaultFormatter`, `editor.defaultFormatter`, `source.fixAll.eslint` to the rest of the system?**
-  _451 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _435 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Package Dependencies` be split into smaller, more focused modules?**
-  _Cohesion score 0.02564102564102564 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.0273972602739726 - nodes in this community are weakly interconnected._
 - **Should `Booking & Clips Panel` be split into smaller, more focused modules?**
   _Cohesion score 0.05496828752642706 - nodes in this community are weakly interconnected._

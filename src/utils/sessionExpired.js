@@ -1,5 +1,6 @@
 import authConfig from 'src/configs/auth'
 import toast from 'react-hot-toast'
+import { clearLogRocketUser } from 'src/lib/logrocket'
 
 let sessionExpiredCallback = null
 let handlingSessionExpired = false
@@ -23,6 +24,7 @@ export function handleSessionExpired(message = 'Session expired. Please sign in 
   handlingSessionExpired = true
 
   clearAuthStorage()
+  clearLogRocketUser()
   sessionExpiredCallback?.()
 
   if (!window.location.pathname.includes('/login')) {
