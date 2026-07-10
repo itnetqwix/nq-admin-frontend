@@ -1,10 +1,12 @@
 // ** React Imports
-import { useState, Fragment } from 'react'
+import { useCallback, useEffect, useState, Fragment } from 'react'
+import { useRouter } from 'next/router'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import Badge from '@mui/material/Badge'
 import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
 import IconButton from '@mui/material/IconButton'
 import { styled } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
@@ -21,9 +23,7 @@ import PerfectScrollbarComponent from 'react-perfect-scrollbar'
 // ** Custom Components Imports
 import CustomChip from 'src/@core/components/mui/chip'
 import CustomAvatar from 'src/@core/components/mui/avatar'
-
-// ** Util Import
-import { getInitials } from 'src/@core/utils/get-initials'
+import { fetchAdminActionAlerts } from 'src/services/adminAlertsApi'
 
 // ** Styled Menu component
 const Menu = styled(MuiMenu)(({ theme }) => ({
@@ -83,58 +83,71 @@ const MenuItemSubtitle = styled(Typography)({
 const ScrollWrapper = ({ children, hidden }) => {
   if (hidden) {
     return <Box sx={{ maxHeight: 349, overflowY: 'auto', overflowX: 'hidden' }}>{children}</Box>
-  } else {
-    return <PerfectScrollbar options={{ wheelPropagation: false, suppressScrollX: true }}>{children}</PerfectScrollbar>
   }
+
+  return <PerfectScrollbar options={{ wheelPropagation: false, suppressScrollX: true }}>{children}</PerfectScrollbar>
 }
 
-const NotificationDropdown = props => {
-  // ** Props
-  const { settings, notifications } = props
-
-  // ** States
+const NotificationDropdown = ({ settings }) => {
+  const router = useRouter()
   const [anchorEl, setAnchorEl] = useState(null)
+  const [alerts, setAlerts] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
-  // ** Hook
   const hidden = useMediaQuery(theme => theme.breakpoints.down('lg'))
-
-  // ** Vars
   const { direction } = settings
+
+  const loadAlerts = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const rows = await fetchAdminActionAlerts()
+      setAlerts(rows)
+    } catch (err) {
+      setError(err?.message || 'Failed to load admin alerts')
+      setAlerts([])
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    void loadAlerts()
+  }, [loadAlerts])
 
   const handleDropdownOpen = event => {
     setAnchorEl(event.currentTarget)
+    void loadAlerts()
   }
 
   const handleDropdownClose = () => {
     setAnchorEl(null)
   }
 
+  const openAlert = href => {
+    handleDropdownClose()
+    if (href) void router.push(href)
+  }
+
+  const actionableCount = alerts.filter(a => a.href?.includes('trainer-verifications') || a.href?.includes('trainee-account')).length
+
   const RenderAvatar = ({ notification }) => {
-    const { avatarAlt, avatarImg, avatarIcon, avatarText, avatarColor } = notification
-    if (avatarImg) {
-      return <Avatar alt={avatarAlt} src={avatarImg} />
-    } else if (avatarIcon) {
-      return (
-        <Avatar skin='light' color={avatarColor}>
-          {avatarIcon}
-        </Avatar>
-      )
-    } else {
-      return (
-        <Avatar skin='light' color={avatarColor}>
-          {getInitials(avatarText)}
-        </Avatar>
-      )
-    }
+    const { avatarIcon, avatarColor } = notification
+  return (
+      <Avatar skin='light' color={avatarColor || 'primary'}>
+        <Icon icon={avatarIcon || 'mdi:bell-outline'} fontSize='1.25rem' />
+      </Avatar>
+    )
   }
 
   return (
     <Fragment>
-      <IconButton color='inherit' aria-haspopup='true' onClick={handleDropdownOpen} aria-controls='customized-menu'>
+      <IconButton color='inherit' aria-haspopup='true' onClick={handleDropdownOpen} aria-controls='admin-alerts-menu'>
         <Badge
           color='error'
           variant='dot'
-          invisible={!notifications.length}
+          invisible={actionableCount === 0}
           sx={{
             '& .MuiBadge-badge': { top: 4, right: 4, boxShadow: theme => `0 0 0 2px ${theme.palette.background.paper}` }
           }}
@@ -155,31 +168,49 @@ const NotificationDropdown = props => {
           sx={{ cursor: 'default', userSelect: 'auto', backgroundColor: 'transparent !important' }}
         >
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-            <Typography sx={{ cursor: 'text', fontWeight: 600 }}>Notifications</Typography>
+            <Typography sx={{ cursor: 'text', fontWeight: 600 }}>Admin alerts</Typography>
             <CustomChip
               skin='light'
               size='small'
               color='primary'
-              label={`${notifications.length} New`}
+              label={`${alerts.length} item${alerts.length === 1 ? '' : 's'}`}
               sx={{ height: 20, fontSize: '0.75rem', fontWeight: 500, borderRadius: '10px' }}
             />
           </Box>
         </MenuItem>
         <ScrollWrapper hidden={hidden}>
-          {notifications.map((notification, index) => (
-            <MenuItem key={index} onClick={handleDropdownClose}>
-              <Box sx={{ width: '100%', display: 'flex', alignItems: 'center' }}>
-                <RenderAvatar notification={notification} />
-                <Box sx={{ mx: 4, flex: '1 1', display: 'flex', overflow: 'hidden', flexDirection: 'column' }}>
-                  <MenuItemTitle>{notification.title}</MenuItemTitle>
-                  <MenuItemSubtitle variant='body2'>{notification.subtitle}</MenuItemSubtitle>
-                </Box>
-                <Typography variant='caption' sx={{ color: 'text.disabled' }}>
-                  {notification.meta}
-                </Typography>
-              </Box>
+          {loading ? (
+            <MenuItem disableRipple sx={{ justifyContent: 'center', cursor: 'default' }}>
+              <CircularProgress size={22} />
             </MenuItem>
-          ))}
+          ) : error ? (
+            <MenuItem disableRipple sx={{ cursor: 'default', whiteSpace: 'normal' }}>
+              <Typography variant='body2' color='error'>
+                {error}
+              </Typography>
+            </MenuItem>
+          ) : alerts.length === 0 ? (
+            <MenuItem disableRipple sx={{ cursor: 'default' }}>
+              <Typography variant='body2' color='text.secondary'>
+                No pending reviews or recent broadcasts.
+              </Typography>
+            </MenuItem>
+          ) : (
+            alerts.map(notification => (
+              <MenuItem key={notification.id} onClick={() => openAlert(notification.href)}>
+                <Box sx={{ width: '100%', display: 'flex', alignItems: 'center' }}>
+                  <RenderAvatar notification={notification} />
+                  <Box sx={{ mx: 4, flex: '1 1', display: 'flex', overflow: 'hidden', flexDirection: 'column' }}>
+                    <MenuItemTitle>{notification.title}</MenuItemTitle>
+                    <MenuItemSubtitle variant='body2'>{notification.subtitle}</MenuItemSubtitle>
+                  </Box>
+                  <Typography variant='caption' sx={{ color: 'text.disabled' }}>
+                    {notification.meta}
+                  </Typography>
+                </Box>
+              </MenuItem>
+            ))
+          )}
         </ScrollWrapper>
         <MenuItem
           disableRipple
@@ -193,8 +224,8 @@ const NotificationDropdown = props => {
             borderTop: theme => `1px solid ${theme.palette.divider}`
           }}
         >
-          <Button fullWidth variant='contained' onClick={handleDropdownClose}>
-            Read All Notifications
+          <Button fullWidth variant='contained' onClick={() => openAlert('/apps/broadcasts')}>
+            Open broadcasts
           </Button>
         </MenuItem>
       </Menu>

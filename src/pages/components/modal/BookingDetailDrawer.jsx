@@ -8,7 +8,8 @@ import {
   Drawer,
   IconButton,
   Stack,
-  Typography
+  Typography,
+  Alert
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import moment from 'moment'
@@ -31,6 +32,11 @@ function DetailRow({ label, value }) {
       </Typography>
     </Box>
   )
+}
+
+function formatEscrowMinor(minor) {
+  if (minor == null) return null
+  return `$${(Number(minor) / 100).toFixed(2)}`
 }
 
 function refundTransferLabel(transfer) {
@@ -454,52 +460,19 @@ export default function BookingDetailDrawer({
                 />
                 <DetailRow
                   label='Session subtotal'
-                  value={
-                    detail.escrow.session_subtotal_minor
-                      ? `$${(detail.escrow.session_subtotal_minor / 100).toFixed(2)}`
-                      : null
-                  }
+                  value={formatEscrowMinor(detail.escrow.session_subtotal_minor)}
                 />
-                <DetailRow
-                  label='Surge'
-                  value={
-                    detail.escrow.surge_minor
-                      ? `$${(detail.escrow.surge_minor / 100).toFixed(2)}`
-                      : null
-                  }
-                />
+                <DetailRow label='Surge' value={formatEscrowMinor(detail.escrow.surge_minor)} />
                 <DetailRow
                   label='Trainee platform fee'
-                  value={
-                    detail.escrow.trainee_platform_fee_minor
-                      ? `$${(detail.escrow.trainee_platform_fee_minor / 100).toFixed(2)}`
-                      : null
-                  }
+                  value={formatEscrowMinor(detail.escrow.trainee_platform_fee_minor)}
                 />
                 <DetailRow
                   label='Coach platform fee'
-                  value={
-                    detail.escrow.trainer_platform_fee_minor
-                      ? `$${(detail.escrow.trainer_platform_fee_minor / 100).toFixed(2)}`
-                      : null
-                  }
+                  value={formatEscrowMinor(detail.escrow.trainer_platform_fee_minor)}
                 />
-                <DetailRow
-                  label='Processing'
-                  value={
-                    detail.escrow.processing_fee_minor
-                      ? `$${(detail.escrow.processing_fee_minor / 100).toFixed(2)}`
-                      : null
-                  }
-                />
-                <DetailRow
-                  label='Tax'
-                  value={
-                    detail.escrow.tax_minor
-                      ? `$${(detail.escrow.tax_minor / 100).toFixed(2)}`
-                      : null
-                  }
-                />
+                <DetailRow label='Processing' value={formatEscrowMinor(detail.escrow.processing_fee_minor)} />
+                <DetailRow label='Tax' value={formatEscrowMinor(detail.escrow.tax_minor)} />
                 <DetailRow
                   label='% commission'
                   value={
@@ -518,12 +491,57 @@ export default function BookingDetailDrawer({
                 />
                 <DetailRow label='Funding' value={detail.escrow.funding_source} />
                 <DetailRow label='Quote ID' value={detail.escrow.quote_id} />
-                {Array.isArray(detail.escrow.release_blockers) &&
-                detail.escrow.release_blockers.length > 0 ? (
-                  <DetailRow
-                    label='Release blockers'
-                    value={detail.escrow.release_blockers.join('; ')}
-                  />
+                {detail.escrow.hold_count > 1 ? (
+                  <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 1 }}>
+                    This session has {detail.escrow.hold_count} escrow holds (booking + extensions).
+                  </Typography>
+                ) : null}
+                {detail.escrow.status === 'held' ? (
+                  Array.isArray(detail.escrow.release_blockers) &&
+                  detail.escrow.release_blockers.length > 0 ? (
+                    <Alert severity='warning' sx={{ my: 1 }}>
+                      <Typography variant='subtitle2' sx={{ mb: 0.5 }}>
+                        Release blockers
+                      </Typography>
+                      {detail.escrow.release_blockers.map((blocker) => (
+                        <Typography key={blocker} variant='body2'>
+                          • {blocker}
+                        </Typography>
+                      ))}
+                    </Alert>
+                  ) : (
+                    <Chip size='small' color='success' label='No release blockers' sx={{ mb: 1 }} />
+                  )
+                ) : null}
+                {Array.isArray(detail.escrow_holds) && detail.escrow_holds.length > 1 ? (
+                  <>
+                    <Divider sx={{ my: 1.5 }} />
+                    <Typography variant='subtitle2' sx={{ mb: 1 }}>
+                      Escrow holds
+                    </Typography>
+                    {detail.escrow_holds.map((hold) => (
+                      <Box
+                        key={hold.hold_id || hold._id}
+                        sx={{
+                          mb: 1,
+                          p: 1.25,
+                          borderRadius: 1,
+                          border: '1px solid',
+                          borderColor: 'divider'
+                        }}
+                      >
+                        <Typography variant='body2' fontWeight={700}>
+                          {(hold.kind || 'payment').toString()} · {hold.status}
+                        </Typography>
+                        <Typography variant='caption' color='text.secondary'>
+                          Subtotal {formatEscrowMinor(hold.session_subtotal_minor)} · Surge{' '}
+                          {formatEscrowMinor(hold.surge_minor)} · Processing{' '}
+                          {formatEscrowMinor(hold.processing_fee_minor)} · Tax{' '}
+                          {formatEscrowMinor(hold.tax_minor)}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </>
                 ) : null}
                 <DetailRow label='Release eligible' value={fmt(detail.escrow.release_eligible_at)} />
                 <DetailRow label='Released at' value={fmt(detail.escrow.released_at)} />

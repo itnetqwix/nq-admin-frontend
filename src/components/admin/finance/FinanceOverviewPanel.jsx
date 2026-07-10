@@ -66,7 +66,8 @@ export default function FinanceOverviewPanel({
     (ops.disputedCount ?? 0) +
     (ops.stuckTopUpsPending30m ?? 0) +
     (ops.paidUnappliedExtensions ?? 0) +
-    (ops.transferFailuresLast7d ?? 0)
+    (ops.transferFailuresLast7d ?? 0) +
+    (ops.extensionReconcileAlerts7d ?? 0)
 
   return (
     <Stack spacing={3}>
@@ -216,6 +217,22 @@ export default function FinanceOverviewPanel({
                 <Typography variant='caption' color='text.secondary'>
                   Sessions with paid extensions not yet applied to booking time
                 </Typography>
+              </Stack>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Stack spacing={0.5}>
+                <Typography variant='body2' fontWeight={600}>
+                  Extension reconcile alerts (7d)
+                </Typography>
+                <Typography variant='h5'>{ops.extensionReconcileAlerts7d ?? 0}</Typography>
+                <Button
+                  size='small'
+                  variant='text'
+                  component={Link}
+                  href='/apps/ops-logs?category=payment&event_type=EXTENSION_RECONCILE_ALERT'
+                >
+                  View alerts →
+                </Button>
               </Stack>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>

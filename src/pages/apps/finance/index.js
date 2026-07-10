@@ -904,6 +904,15 @@ const FinancePage = () => {
               variant='outlined'
             />
             <Chip
+              label={`Extension reconcile alerts (7d): ${opsDashboard.extensionReconcileAlerts7d ?? 0}`}
+              color={(opsDashboard.extensionReconcileAlerts7d ?? 0) > 0 ? 'error' : 'default'}
+              size='small'
+              variant='outlined'
+              component='a'
+              href='/apps/ops-logs?category=payment&event_type=EXTENSION_RECONCILE_ALERT'
+              clickable
+            />
+            <Chip
               label={`Paid-unapplied extensions: ${opsDashboard.paidUnappliedExtensions ?? 0}`}
               size='small'
               variant='outlined'

@@ -6,6 +6,7 @@ import Icon from 'src/@core/components/icon'
 
 // ** Components
 import ModeToggler from 'src/@core/layouts/components/shared-components/ModeToggler'
+import NotificationDropdown from 'src/@core/layouts/components/shared-components/NotificationDropdown'
 import UserDropdown from 'src/@core/layouts/components/shared-components/UserDropdown'
 import AdminCommandPalette from 'src/layouts/components/AdminCommandPalette'
 
@@ -21,6 +22,7 @@ const AppBarContent = props => {
       </IconButton>
       <AdminCommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
       <ModeToggler settings={settings} saveSettings={saveSettings} />
+      <NotificationDropdown settings={settings} />
       <UserDropdown settings={settings} />
     </Box>
   )

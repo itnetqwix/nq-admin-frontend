@@ -217,9 +217,25 @@ export const NotificationPreferencesPanel = ({ notifications }) => {
     return <Typography variant='body2' color='text.secondary'>No notification preferences stored.</Typography>
   }
 
-  const groups = ['promotional', 'transactional'].filter(g => notifications[g] && typeof notifications[g] === 'object')
+  const channels = notifications.channels && typeof notifications.channels === 'object' ? notifications.channels : null
+  const muteUntil = notifications.mute_until ? new Date(notifications.mute_until) : null
+  const quietHours = notifications.quiet_hours && typeof notifications.quiet_hours === 'object' ? notifications.quiet_hours : null
+  const cadence = notifications.bookingReminderCadence
+  const legacyGroups = ['promotional', 'transactional'].filter(g => notifications[g] && typeof notifications[g] === 'object')
 
-  if (!groups.length) {
+  const formatMinutes = (m) => {
+    const mins = Number(m)
+    if (!Number.isFinite(mins)) return '—'
+    const h = Math.floor(mins / 60)
+    const mm = mins % 60
+    const ampm = h >= 12 ? 'PM' : 'AM'
+    const h12 = ((h + 11) % 12) + 1
+    return `${h12}:${String(mm).padStart(2, '0')} ${ampm}`
+  }
+
+  const hasStructuredPrefs = channels || muteUntil || quietHours || cadence || legacyGroups.length
+
+  if (!hasStructuredPrefs) {
     return (
       <Typography variant='body2' color='text.secondary'>
         Preferences are in an unexpected shape; use “Technical (raw)” below if needed.
@@ -228,27 +244,97 @@ export const NotificationPreferencesPanel = ({ notifications }) => {
   }
 
   return (
-    <Grid container spacing={2}>
-      {groups.map(group => (
-        <Grid item xs={12} md={6} key={group}>
-          <Typography variant='subtitle2' sx={{ mb: 1, fontWeight: 700, textTransform: 'capitalize' }}>
-            {group}
+    <Stack spacing={2}>
+      {cadence ? (
+        <Box>
+          <Typography variant='subtitle2' sx={{ mb: 0.75, fontWeight: 700 }}>
+            Session reminder cadence
           </Typography>
-          <Stack direction='row' flexWrap='wrap' useFlexGap spacing={1}>
-            {Object.entries(notifications[group]).map(([channel, on]) => (
-              <Chip
-                key={`${group}-${channel}`}
-                size='small'
-                label={`${channel}: ${on ? 'On' : 'Off'}`}
-                color={on ? 'success' : 'default'}
-                variant={on ? 'filled' : 'outlined'}
-                sx={{ fontWeight: 600 }}
-              />
+          <Chip size='small' label={String(cadence)} color='primary' variant='outlined' sx={{ fontWeight: 600 }} />
+        </Box>
+      ) : null}
+
+      {muteUntil && muteUntil.getTime() > Date.now() ? (
+        <Box>
+          <Typography variant='subtitle2' sx={{ mb: 0.75, fontWeight: 700 }}>
+            Muted until
+          </Typography>
+          <Chip
+            size='small'
+            label={muteUntil.toLocaleString()}
+            color='warning'
+            variant='filled'
+            sx={{ fontWeight: 600 }}
+          />
+        </Box>
+      ) : null}
+
+      {quietHours ? (
+        <Box>
+          <Typography variant='subtitle2' sx={{ mb: 0.75, fontWeight: 700 }}>
+            Quiet hours
+          </Typography>
+          <Typography variant='body2' color='text.secondary'>
+            {quietHours.enabled
+              ? `${formatMinutes(quietHours.start_minutes)} – ${formatMinutes(quietHours.end_minutes)} (${quietHours.timezone || 'UTC'})`
+              : 'Off'}
+          </Typography>
+        </Box>
+      ) : null}
+
+      {channels ? (
+        <Box>
+          <Typography variant='subtitle2' sx={{ mb: 1, fontWeight: 700 }}>
+            Channel matrix
+          </Typography>
+          <Grid container spacing={2}>
+            {Object.entries(channels).map(([category, row]) => (
+              <Grid item xs={12} md={6} key={category}>
+                <Typography variant='caption' sx={{ fontWeight: 700, textTransform: 'capitalize', display: 'block', mb: 0.5 }}>
+                  {category}
+                </Typography>
+                <Stack direction='row' flexWrap='wrap' useFlexGap spacing={1}>
+                  {Object.entries(row || {}).map(([channel, on]) => (
+                    <Chip
+                      key={`${category}-${channel}`}
+                      size='small'
+                      label={`${channel}: ${on ? 'On' : 'Off'}`}
+                      color={on ? 'success' : 'default'}
+                      variant={on ? 'filled' : 'outlined'}
+                      sx={{ fontWeight: 600 }}
+                    />
+                  ))}
+                </Stack>
+              </Grid>
             ))}
-          </Stack>
+          </Grid>
+        </Box>
+      ) : null}
+
+      {legacyGroups.length ? (
+        <Grid container spacing={2}>
+          {legacyGroups.map(group => (
+            <Grid item xs={12} md={6} key={group}>
+              <Typography variant='subtitle2' sx={{ mb: 1, fontWeight: 700, textTransform: 'capitalize' }}>
+                {group}
+              </Typography>
+              <Stack direction='row' flexWrap='wrap' useFlexGap spacing={1}>
+                {Object.entries(notifications[group]).map(([channel, on]) => (
+                  <Chip
+                    key={`${group}-${channel}`}
+                    size='small'
+                    label={`${channel}: ${on ? 'On' : 'Off'}`}
+                    color={on ? 'success' : 'default'}
+                    variant={on ? 'filled' : 'outlined'}
+                    sx={{ fontWeight: 600 }}
+                  />
+                ))}
+              </Stack>
+            </Grid>
+          ))}
         </Grid>
-      ))}
-    </Grid>
+      ) : null}
+    </Stack>
   )
 }
 

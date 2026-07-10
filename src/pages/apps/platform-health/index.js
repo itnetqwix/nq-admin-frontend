@@ -224,7 +224,7 @@ export default function PlatformHealthPage() {
               {
                 key: 'extensionReconcileAlerts7d',
                 label: 'Extension reconcile alerts (7d)',
-                href: '/apps/ops-logs?category=payment',
+                href: '/apps/ops-logs?category=payment&event_type=EXTENSION_RECONCILE_ALERT',
                 warn: true
               },
               {

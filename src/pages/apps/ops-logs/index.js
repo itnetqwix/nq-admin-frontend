@@ -35,6 +35,15 @@ const CATEGORIES = [
   'admin'
 ]
 
+const EVENT_TYPE_PRESETS = [
+  {
+    key: 'extension_reconcile',
+    label: 'Extension reconcile alerts',
+    eventType: 'EXTENSION_RECONCILE_ALERT',
+    category: 'payment'
+  }
+]
+
 const severityColor = s => {
   if (s === 'critical') return 'error'
   if (s === 'error') return 'error'
@@ -58,6 +67,7 @@ export default function OpsLogsPage() {
   const [instantOnly, setInstantOnly] = useState(false)
   const [refundRelated, setRefundRelated] = useState(false)
   const [search, setSearch] = useState('')
+  const [eventType, setEventType] = useState('')
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
   const [stats, setStats] = useState(null)
@@ -75,6 +85,13 @@ export default function OpsLogsPage() {
       if (router.query.category) setCategory(String(router.query.category))
       if (router.query.instant_only === 'true') setInstantOnly(true)
       if (router.query.search) setSearch(String(router.query.search))
+      if (router.query.event_type) {
+        setEventType(String(router.query.event_type))
+      } else if (router.query.search === 'EXTENSION_RECONCILE_ALERT') {
+        setEventType('EXTENSION_RECONCILE_ALERT')
+        setCategory('payment')
+        setSearch('')
+      }
     }
   }, [
     router.isReady,
@@ -84,7 +101,8 @@ export default function OpsLogsPage() {
     router.query.resolution,
     router.query.category,
     router.query.instant_only,
-    router.query.search
+    router.query.search,
+    router.query.event_type
   ])
 
   useEffect(() => {
@@ -107,6 +125,7 @@ export default function OpsLogsPage() {
       if (sessionId.trim()) q.sessionId = sessionId.trim()
       if (instantOnly) q.instant_only = 'true'
       if (refundRelated) q.refund_related = 'true'
+      if (eventType.trim()) q.event_type = eventType.trim()
       if (search.trim()) q.search = search.trim()
       if (fromDate) q.from = new Date(fromDate).toISOString()
       if (toDate) q.to = new Date(`${toDate}T23:59:59`).toISOString()
@@ -126,7 +145,7 @@ export default function OpsLogsPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, pageSize, category, severity, resolution, userId, sessionId, instantOnly, refundRelated, search, fromDate, toDate])
+  }, [page, pageSize, category, severity, resolution, userId, sessionId, instantOnly, refundRelated, eventType, search, fromDate, toDate])
 
   useEffect(() => {
     void load()
@@ -263,6 +282,16 @@ export default function OpsLogsPage() {
             <TextField
               size='small'
               fullWidth
+              label='Event type'
+              placeholder='e.g. EXTENSION_RECONCILE_ALERT'
+              value={eventType}
+              onChange={e => setEventType(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <TextField
+              size='small'
+              fullWidth
               label='Search title / summary'
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -347,6 +376,29 @@ export default function OpsLogsPage() {
                 onClick={() => setRefundRelated(v => !v)}
                 variant={refundRelated ? 'filled' : 'outlined'}
               />
+              {EVENT_TYPE_PRESETS.map(preset => {
+                const active =
+                  eventType === preset.eventType &&
+                  (!preset.category || category === preset.category)
+                return (
+                  <Chip
+                    key={preset.key}
+                    label={preset.label}
+                    color={active ? 'warning' : 'default'}
+                    onClick={() => {
+                      if (active) {
+                        setEventType('')
+                        if (preset.category) setCategory('')
+                      } else {
+                        setEventType(preset.eventType)
+                        if (preset.category) setCategory(preset.category)
+                      }
+                      setPage(0)
+                    }}
+                    variant={active ? 'filled' : 'outlined'}
+                  />
+                )
+              })}
               <Button variant='contained' size='small' onClick={() => { setPage(0); void load() }}>
                 Apply
               </Button>
