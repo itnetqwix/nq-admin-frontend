@@ -266,6 +266,15 @@ export default function BookingDetailDrawer({
             <DetailRow label='Actual end' value={fmt(s.actual_end_at)} />
             <DetailRow label='Early end (trainer ack)' value={fmt(s.early_end_trainer_ack_at)} />
             <DetailRow label='Early end (trainee ack)' value={fmt(s.early_end_trainee_ack_at)} />
+            {Array.isArray(s.early_end_reasons) && s.early_end_reasons.length > 0
+              ? s.early_end_reasons.map((r, idx) => (
+                  <DetailRow
+                    key={`early-reason-${idx}`}
+                    label={`Early end reason (${r.by_role || 'user'})`}
+                    value={[r.code, r.text].filter(Boolean).join(' — ') || '—'}
+                  />
+                ))
+              : null}
 
             {detail?.live_state || detail?.departure ? (
               <>
