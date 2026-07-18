@@ -56,7 +56,7 @@ function proposedLabel(sub) {
   return cat || subcat || '—'
 }
 
-export default function LibrarySubmissionsPanel() {
+export default function LibrarySubmissionsPanel({ onCountsChange }) {
   const { confirm, ConfirmDialog } = useAdminConfirm()
   const [statusFilter, setStatusFilter] = useState('')
   const [rows, setRows] = useState([])
@@ -91,6 +91,10 @@ export default function LibrarySubmissionsPanel() {
         pending: data?.pendingCount ?? 0,
         underReview: data?.underReviewCount ?? 0
       })
+      onCountsChange?.({
+        pending: data?.pendingCount ?? 0,
+        underReview: data?.underReviewCount ?? 0
+      })
       setRows(
         (data?.items || []).map((r, i) => ({
           id: r._id || i,
@@ -110,7 +114,7 @@ export default function LibrarySubmissionsPanel() {
     } finally {
       setLoading(false)
     }
-  }, [statusFilter])
+  }, [statusFilter, onCountsChange])
 
   useEffect(() => {
     void loadTaxonomy()

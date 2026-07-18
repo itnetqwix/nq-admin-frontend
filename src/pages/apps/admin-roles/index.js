@@ -171,6 +171,7 @@ export default function AdminRolesPage() {
 
   return (
     <AdminPageShell
+      bare
       eyebrow='Settings · RBAC'
       icon='mdi:shield-account-outline'
       title='Admin roles.'

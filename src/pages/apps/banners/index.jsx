@@ -29,10 +29,14 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import NextLink from 'next/link'
+import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
 
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminFilterBar from 'src/components/admin/AdminFilterBar'
+import AdminGridContainer from 'src/components/admin/AdminGridContainer'
+import OpsMetricTile from 'src/components/admin/OpsMetricTile'
+import OpsSurfaceCard from 'src/components/admin/OpsSurfaceCard'
 import { useAdminConfirm } from 'src/components/admin'
 import CmsEditorDrawer from 'src/components/admin/content/CmsEditorDrawer'
 import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
@@ -52,6 +56,8 @@ import {
   deleteBanner,
   toggleBanner
 } from 'src/services/bannersApi'
+import { getCmsSummary } from 'src/services/cmsApi'
+import { ops } from 'src/styles/opsSurface'
 
 const SEVERITIES = ['info', 'promo', 'maintenance', 'critical', 'success']
 const AUDIENCES = ['guest', 'trainee', 'trainer', 'all']
@@ -113,21 +119,49 @@ function buildCtasPayload(ctas) {
 }
 
 function severityChip(s) {
-  const colorMap = {
-    info: 'info',
-    promo: 'secondary',
-    maintenance: 'warning',
-    critical: 'error',
-    success: 'success'
+  const map = {
+    info: { bg: ops.softIndigo, color: ops.indigoDeep },
+    promo: { bg: '#ebe6ff', color: ops.indigo },
+    maintenance: { bg: '#ffefcf', color: '#ab570a' },
+    critical: { bg: ops.errorSoft, color: ops.error },
+    success: { bg: '#AAFFEC', color: '#1A8F76' }
   }
+  const t = map[s] || { bg: ops.canvasSoft2, color: ops.body }
+  return (
+    <Chip
+      label={s}
+      size='small'
+      sx={{ height: 22, fontFamily: ops.mono, fontSize: 10, bgcolor: t.bg, color: t.color, fontWeight: 600 }}
+    />
+  )
+}
 
-  return <Chip label={s} size='small' color={colorMap[s] || 'default'} />
+function FilterChip({ active, label, onClick }) {
+  return (
+    <Chip
+      size='small'
+      clickable
+      onClick={onClick}
+      label={label}
+      sx={{
+        height: 28,
+        fontFamily: ops.mono,
+        fontSize: 11,
+        fontWeight: active ? 600 : 500,
+        bgcolor: active ? ops.softIndigo : ops.canvas,
+        color: active ? ops.indigoDeep : ops.body,
+        border: `1px solid ${active ? ops.indigo : ops.hairline}`
+      }}
+    />
+  )
 }
 
 export default function BannersPage() {
+  const router = useRouter()
   const { confirm, ConfirmDialog } = useAdminConfirm()
   const [banners, setBanners] = useState([])
   const [total, setTotal] = useState(0)
+  const [summary, setSummary] = useState(null)
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
@@ -147,6 +181,18 @@ export default function BannersPage() {
   const searchTimer = useRef(null)
 
   useEffect(() => {
+    if (!router.isReady) return
+    const q = router.query
+    if (q.placement != null) setPlacementFilter(String(q.placement))
+    if (q.status != null) setStatusFilter(String(q.status))
+    if (q.audience != null) setAudienceFilter(String(q.audience))
+    if (q.search != null) {
+      setSearchInput(String(q.search))
+      setSearch(String(q.search))
+    }
+  }, [router.isReady]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
     setSearchInput(search)
   }, [search])
 
@@ -156,6 +202,15 @@ export default function BannersPage() {
     },
     []
   )
+
+  const fetchSummary = useCallback(async () => {
+    try {
+      const res = await getCmsSummary()
+      setSummary(res?.data || null)
+    } catch {
+      /* ignore */
+    }
+  }, [])
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -179,8 +234,43 @@ export default function BannersPage() {
   }, [search, audienceFilter, placementFilter, statusFilter, page, pageSize])
 
   useEffect(() => {
-    fetchData()
+    void fetchData()
   }, [fetchData])
+
+  useEffect(() => {
+    void fetchSummary()
+  }, [fetchSummary])
+
+  const pushQuery = useCallback(
+    next => {
+      const q = {
+        ...(next.placement ? { placement: next.placement } : {}),
+        ...(next.status ? { status: next.status } : {}),
+        ...(next.audience ? { audience: next.audience } : {}),
+        ...(next.search ? { search: next.search } : {})
+      }
+      void router.replace({ pathname: '/apps/banners', query: q }, undefined, { shallow: true })
+    },
+    [router]
+  )
+
+  const setPlacement = value => {
+    setPlacementFilter(value)
+    setPage(1)
+    pushQuery({ placement: value, status: statusFilter, audience: audienceFilter, search })
+  }
+
+  const setStatus = value => {
+    setStatusFilter(value)
+    setPage(1)
+    pushQuery({ placement: placementFilter, status: value, audience: audienceFilter, search })
+  }
+
+  const setAudience = value => {
+    setAudienceFilter(value)
+    setPage(1)
+    pushQuery({ placement: placementFilter, status: statusFilter, audience: value, search })
+  }
 
   const handleSearchChange = value => {
     const val = value
@@ -189,6 +279,12 @@ export default function BannersPage() {
     searchTimer.current = setTimeout(() => {
       setSearch(val.trim())
       setPage(1)
+      pushQuery({
+        placement: placementFilter,
+        status: statusFilter,
+        audience: audienceFilter,
+        search: val.trim()
+      })
     }, 400)
   }
 
@@ -196,6 +292,12 @@ export default function BannersPage() {
     if (searchTimer.current) clearTimeout(searchTimer.current)
     setSearch(searchInput.trim())
     setPage(1)
+    pushQuery({
+      placement: placementFilter,
+      status: statusFilter,
+      audience: audienceFilter,
+      search: searchInput.trim()
+    })
   }
 
   const clearSearch = () => {
@@ -284,7 +386,8 @@ export default function BannersPage() {
         toast.success('Banner created.')
       }
       setFormOpen(false)
-      fetchData()
+      void fetchData()
+      void fetchSummary()
     } catch (err) {
       toast.error(err.message || 'Save failed')
     } finally {
@@ -303,7 +406,8 @@ export default function BannersPage() {
     try {
       await deleteBanner(row._id)
       toast.success('Banner deleted.')
-      fetchData()
+      void fetchData()
+      void fetchSummary()
     } catch (err) {
       toast.error(err.message || 'Delete failed')
     }
@@ -312,7 +416,8 @@ export default function BannersPage() {
   const handleToggle = async row => {
     try {
       await toggleBanner(row._id)
-      fetchData()
+      void fetchData()
+      void fetchSummary()
     } catch (err) {
       toast.error(err.message || 'Toggle failed')
     }
@@ -322,13 +427,15 @@ export default function BannersPage() {
     () => [
       {
         field: 'title',
-        headerName: 'Title',
+        headerName: 'Banner',
         flex: 1.6,
         minWidth: 240,
         renderCell: p => (
-          <Box>
-            <Typography fontWeight={600}>{p.value}</Typography>
-            <Typography variant='caption' color='text.secondary' noWrap>
+          <Box sx={{ minWidth: 0, py: 0.5 }}>
+            <Typography sx={{ fontSize: 13, fontWeight: 600, color: ops.ink }} noWrap>
+              {p.value}
+            </Typography>
+            <Typography sx={{ fontSize: 11, color: ops.mute }} noWrap>
               {p.row.body?.slice(0, 80)}
               {p.row.body?.length > 80 ? '…' : ''}
             </Typography>
@@ -342,38 +449,61 @@ export default function BannersPage() {
         renderCell: p => {
           const status = computeScheduleStatus(p.row)
           const meta = scheduleStatusChip(status)
-
-          return <Chip label={meta.label} size='small' color={meta.color} />
+          return (
+            <Chip
+              label={meta.label}
+              size='small'
+              sx={{ height: 22, fontFamily: ops.mono, fontSize: 10 }}
+              color={meta.color}
+            />
+          )
         }
       },
       {
         field: 'placement',
         headerName: 'Placement',
         width: 130,
-        renderCell: p => <Chip label={p.value || 'hero'} size='small' color='primary' variant='outlined' />
+        renderCell: p => (
+          <Chip
+            label={p.value || 'hero'}
+            size='small'
+            sx={{
+              height: 22,
+              fontFamily: ops.mono,
+              fontSize: 10,
+              bgcolor: ops.softIndigo,
+              color: ops.indigoDeep
+            }}
+          />
+        )
       },
       {
         field: 'audience',
         headerName: 'Audience',
-        width: 200,
+        width: 180,
         renderCell: p => (
-          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+          <Stack direction='row' spacing={0.5} flexWrap='wrap' useFlexGap>
             {(p.value || []).map(a => (
-              <Chip key={a} label={a} size='small' />
+              <Chip
+                key={a}
+                label={a}
+                size='small'
+                sx={{ height: 20, fontFamily: ops.mono, fontSize: 9, bgcolor: ops.canvasSoft2 }}
+              />
             ))}
-          </Box>
+          </Stack>
         )
       },
       {
         field: 'severity',
         headerName: 'Severity',
-        width: 120,
+        width: 110,
         renderCell: p => severityChip(p.value)
       },
       {
         field: 'is_active',
         headerName: 'Active',
-        width: 100,
+        width: 90,
         renderCell: p => (
           <Switch
             size='small'
@@ -386,21 +516,24 @@ export default function BannersPage() {
       {
         field: 'date_range',
         headerName: 'Window',
-        width: 190,
+        width: 170,
         renderCell: p => {
           const s = p.row.start_date ? new Date(p.row.start_date).toLocaleDateString() : 'Always'
           const e = p.row.end_date ? new Date(p.row.end_date).toLocaleDateString() : 'Always'
-
-          return `${s} - ${e}`
+          return (
+            <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute }}>
+              {s} – {e}
+            </Typography>
+          )
         }
       },
       {
         field: 'actions',
-        headerName: 'Actions',
-        width: 140,
+        headerName: '',
+        width: 120,
         sortable: false,
         renderCell: p => (
-          <Box>
+          <Stack direction='row' spacing={0.25}>
             <Tooltip title='Preview'>
               <IconButton
                 size='small'
@@ -435,117 +568,156 @@ export default function BannersPage() {
                 <DeleteOutlineIcon fontSize='small' />
               </IconButton>
             </Tooltip>
-          </Box>
+          </Stack>
         )
       }
     ],
     []
   )
 
+  const fmtInt = v => new Intl.NumberFormat('en-US').format(Number(v) || 0)
+
   return (
     <>
       <AdminPageShell
+        bare
         icon='mdi:image-multiple-outline'
-        title='Banners'
-        subtitle='Hero carousel, announcement strip, and sticky promo on mobile + web dashboard home. Upload images or paste URL/S3 key. Use guest + all for sign-in promos.'
+        eyebrow='CMS'
+        title='Banners & placements'
+        subtitle='Hero, strip, and sticky promos — filter by placement, audience, and schedule status.'
         actions={
-          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-            <Button component={NextLink} href='/apps/tips' variant='outlined' size='small'>
-              Manage tips
-            </Button>
+          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+            <Chip component={NextLink} href='/apps/cms' label='CMS overview' clickable variant='outlined' size='small' />
+            <Chip component={NextLink} href='/apps/tips' label='Tips' clickable variant='outlined' size='small' />
             <Button
               variant='contained'
+              size='small'
               startIcon={<AddIcon />}
               onClick={openCreate}
-              sx={{ bgcolor: '#000080', '&:hover': { bgcolor: '#0000a0' } }}
+              sx={{ textTransform: 'none', bgcolor: ops.indigo, boxShadow: 'none' }}
             >
               New banner
             </Button>
-          </Box>
+          </Stack>
         }
-        contentSx={{ p: 0 }}
       >
-        <AdminPageSection>
-          <ContentPlacementGuide kind='banners' defaultExpanded={false} />
-          <Box sx={{ mb: 3 }}>
-            <BannerScheduleCalendar banners={banners} />
-          </Box>
-          <AdminFilterBar
-            searchPlaceholder='Search title, body, CTA, audience…'
-            searchValue={searchInput}
-            onSearchChange={e => handleSearchChange(e.target.value)}
-            onSearchSubmit={applySearchImmediately}
-            resultCount={total}
-            onRefresh={() => void fetchData()}
-            refreshLoading={loading}
-          >
-            <FormControl size='small' sx={{ minWidth: 160 }}>
-              <InputLabel>Audience</InputLabel>
-              <Select
-                label='Audience'
-                value={audienceFilter}
-                onChange={e => {
-                  setAudienceFilter(e.target.value)
-                  setPage(1)
+        <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
+          <Grid item xs={6} sm={4} md={2}>
+            <OpsMetricTile
+              icon='mdi:view-carousel-outline'
+              label='Hero live'
+              value={summary ? fmtInt(summary.live?.banners_hero) : '—'}
+              hint='Carousel'
+              tone={summary?.health?.hero_empty ? 'danger' : 'accent'}
+              onClick={() => setPlacement('hero')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={4} md={2}>
+            <OpsMetricTile
+              icon='mdi:page-layout-header'
+              label='Strip live'
+              value={summary ? fmtInt(summary.live?.banners_strip) : '—'}
+              hint='Announcement'
+              onClick={() => setPlacement('strip')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={4} md={2}>
+            <OpsMetricTile
+              icon='mdi:dock-bottom'
+              label='Sticky live'
+              value={summary ? fmtInt(summary.live?.banners_sticky_bottom) : '—'}
+              hint='Tab bar'
+              onClick={() => setPlacement('sticky_bottom')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={4} md={2}>
+            <OpsMetricTile
+              icon='mdi:check-circle-outline'
+              label='Active total'
+              value={summary ? fmtInt(summary.live?.banners) : '—'}
+              hint='All placements'
+              tone='success'
+              onClick={() => setStatus('active')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={4} md={2}>
+            <OpsMetricTile
+              icon='mdi:pause-circle-outline'
+              label='Inactive'
+              value={summary ? fmtInt(summary.inactive?.banners) : '—'}
+              hint='Paused'
+              tone='warn'
+              onClick={() => setStatus('inactive')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={4} md={2}>
+            <OpsMetricTile
+              icon='mdi:calendar-clock'
+              label='Off-window'
+              value={summary ? fmtInt(summary.scheduled_off_window) : '—'}
+              hint='Outside dates'
+              tone={(summary?.scheduled_off_window || 0) > 0 ? 'warn' : 'default'}
+            />
+          </Grid>
+        </Grid>
+
+        <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden', mb: 2 }}>
+          <AdminPageSection>
+            <ContentPlacementGuide kind='banners' defaultExpanded={false} />
+            <Box sx={{ mb: 2 }}>
+              <BannerScheduleCalendar banners={banners} />
+            </Box>
+            <AdminFilterBar
+              searchPlaceholder='Title, body, CTA, audience…'
+              searchValue={searchInput}
+              onSearchChange={e => handleSearchChange(e.target.value)}
+              onSearchSubmit={applySearchImmediately}
+              resultCount={total}
+              onRefresh={() => {
+                void fetchData()
+                void fetchSummary()
+              }}
+              refreshLoading={loading}
+              helperText='Placement chips sync to the URL — shareable with CMS overview deep links.'
+            >
+              <FilterChip active={placementFilter === ''} label='All placements' onClick={() => setPlacement('')} />
+              {PLACEMENTS.map(p => (
+                <FilterChip
+                  key={p.value}
+                  active={placementFilter === p.value}
+                  label={p.label}
+                  onClick={() => setPlacement(p.value)}
+                />
+              ))}
+              <FilterChip active={statusFilter === ''} label='Any status' onClick={() => setStatus('')} />
+              <FilterChip active={statusFilter === 'active'} label='Active' onClick={() => setStatus('active')} />
+              <FilterChip active={statusFilter === 'inactive'} label='Inactive' onClick={() => setStatus('inactive')} />
+              <FilterChip active={audienceFilter === ''} label='Any audience' onClick={() => setAudience('')} />
+              {AUDIENCES.map(a => (
+                <FilterChip key={a} active={audienceFilter === a} label={a} onClick={() => setAudience(a)} />
+              ))}
+            </AdminFilterBar>
+
+            <AdminGridContainer>
+              <AdminDataGrid
+                autoHeight={false}
+                rows={banners}
+                columns={columns}
+                loading={loading}
+                rowCount={total}
+                paginationMode='server'
+                paginationModel={{ page: page - 1, pageSize }}
+                onPaginationModelChange={m => {
+                  setPage(m.page + 1)
+                  setPageSize(m.pageSize)
                 }}
-              >
-                <MenuItem value=''>All</MenuItem>
-                {AUDIENCES.map(a => (
-                  <MenuItem key={a} value={a}>
-                    {a}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl size='small' sx={{ minWidth: 180 }}>
-              <InputLabel>Placement</InputLabel>
-              <Select
-                label='Placement'
-                value={placementFilter}
-                onChange={e => {
-                  setPlacementFilter(e.target.value)
-                  setPage(1)
-                }}
-              >
-                <MenuItem value=''>All</MenuItem>
-                {PLACEMENTS.map(p => (
-                  <MenuItem key={p.value} value={p.value}>
-                    {p.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl size='small' sx={{ minWidth: 160 }}>
-              <InputLabel>Status</InputLabel>
-              <Select
-                label='Status'
-                value={statusFilter}
-                onChange={e => {
-                  setStatusFilter(e.target.value)
-                  setPage(1)
-                }}
-              >
-                <MenuItem value=''>All</MenuItem>
-                <MenuItem value='active'>Active</MenuItem>
-                <MenuItem value='inactive'>Inactive</MenuItem>
-              </Select>
-            </FormControl>
-          </AdminFilterBar>
-          <AdminDataGrid
-            rows={banners}
-            columns={columns}
-            loading={loading}
-            rowCount={total}
-            paginationMode='server'
-            paginationModel={{ page: page - 1, pageSize }}
-            onPaginationModelChange={m => {
-              setPage(m.page + 1)
-              setPageSize(m.pageSize)
-            }}
-            sx={{ '& .MuiDataGrid-cell': { py: 1 } }}
-            getRowHeight={() => 72}
-          />
-        </AdminPageSection>
+                getRowHeight={() => 72}
+                emptyMessage='No banners match'
+                emptyDescription='Try clearing placement or status chips.'
+              />
+            </AdminGridContainer>
+          </AdminPageSection>
+        </OpsSurfaceCard>
       </AdminPageShell>
 
       <CmsEditorDrawer

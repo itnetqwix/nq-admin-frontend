@@ -15,6 +15,7 @@ import {
   InputAdornment,
   MenuItem,
   Select,
+  Stack,
   Switch,
   TextField,
   Tooltip,
@@ -27,10 +28,14 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import NextLink from 'next/link'
+import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
 
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminFilterBar from 'src/components/admin/AdminFilterBar'
+import AdminGridContainer from 'src/components/admin/AdminGridContainer'
+import OpsMetricTile from 'src/components/admin/OpsMetricTile'
+import OpsSurfaceCard from 'src/components/admin/OpsSurfaceCard'
 import { useAdminConfirm } from 'src/components/admin'
 import CmsEditorDrawer from 'src/components/admin/content/CmsEditorDrawer'
 import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
@@ -42,6 +47,8 @@ import { computeScheduleStatus, scheduleStatusChip } from 'src/components/admin/
 import { TIPS_AUDIENCE_HELP } from 'src/components/admin/content/contentPlacementConfig'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import { listTips, createTip, updateTip, deleteTip, toggleTip } from 'src/services/tipsApi'
+import { getCmsSummary } from 'src/services/cmsApi'
+import { ops } from 'src/styles/opsSurface'
 
 const EMPTY_FORM = {
   title: '',
@@ -57,16 +64,57 @@ const EMPTY_FORM = {
   end_date: ''
 }
 
-function audienceChip(audience) {
-  const color = audience === 'trainer' ? 'primary' : audience === 'trainee' ? 'secondary' : 'default'
+const AUDIENCE_FILTERS = [
+  { value: '', label: 'Any audience' },
+  { value: 'all', label: 'Everyone' },
+  { value: 'trainer', label: 'Trainers' },
+  { value: 'trainee', label: 'Trainees' }
+]
 
-  return <Chip label={audience} size='small' color={color} />
+const fmtInt = v => new Intl.NumberFormat('en-US').format(Number(v) || 0)
+
+function FilterChip({ active, label, onClick }) {
+  return (
+    <Chip
+      size='small'
+      clickable
+      onClick={onClick}
+      label={label}
+      sx={{
+        height: 28,
+        fontFamily: ops.mono,
+        fontSize: 11,
+        fontWeight: active ? 600 : 500,
+        bgcolor: active ? ops.softIndigo : ops.canvas,
+        color: active ? ops.indigoDeep : ops.body,
+        border: `1px solid ${active ? ops.indigo : ops.hairline}`
+      }}
+    />
+  )
+}
+
+function audienceChip(audience) {
+  const tone =
+    audience === 'trainer'
+      ? { bg: ops.softIndigo, color: ops.indigoDeep }
+      : audience === 'trainee'
+        ? { bg: ops.canvasSoft2, color: ops.body }
+        : { bg: '#AAFFEC', color: '#1A8F76' }
+  return (
+    <Chip
+      label={audience}
+      size='small'
+      sx={{ height: 22, fontFamily: ops.mono, fontSize: 10, bgcolor: tone.bg, color: tone.color }}
+    />
+  )
 }
 
 export default function TipsPage() {
+  const router = useRouter()
   const { confirm, ConfirmDialog } = useAdminConfirm()
   const [tips, setTips] = useState([])
   const [total, setTotal] = useState(0)
+  const [summary, setSummary] = useState(null)
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
@@ -94,6 +142,15 @@ export default function TipsPage() {
     []
   )
 
+  const fetchSummary = useCallback(async () => {
+    try {
+      const res = await getCmsSummary()
+      setSummary(res?.data || null)
+    } catch {
+      /* ignore */
+    }
+  }, [])
+
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
@@ -115,8 +172,17 @@ export default function TipsPage() {
   }, [search, audienceFilter, statusFilter, page, pageSize])
 
   useEffect(() => {
-    fetchData()
+    void fetchData()
   }, [fetchData])
+
+  useEffect(() => {
+    void fetchSummary()
+  }, [fetchSummary])
+
+  const refreshAll = () => {
+    void fetchData()
+    void fetchSummary()
+  }
 
   const handleSearchChange = value => {
     const val = value
@@ -195,7 +261,7 @@ export default function TipsPage() {
         toast.success('Tip created.')
       }
       setFormOpen(false)
-      fetchData()
+      refreshAll()
     } catch (err) {
       toast.error(err.message || 'Save failed')
     } finally {
@@ -214,7 +280,7 @@ export default function TipsPage() {
     try {
       await deleteTip(row._id)
       toast.success('Tip deleted.')
-      fetchData()
+      refreshAll()
     } catch (err) {
       toast.error(err.message || 'Delete failed')
     }
@@ -223,7 +289,7 @@ export default function TipsPage() {
   const handleToggle = async row => {
     try {
       await toggleTip(row._id)
-      fetchData()
+      refreshAll()
     } catch (err) {
       toast.error(err.message || 'Toggle failed')
     }
@@ -233,13 +299,15 @@ export default function TipsPage() {
     () => [
       {
         field: 'title',
-        headerName: 'Title',
+        headerName: 'Tip',
         flex: 1.4,
         minWidth: 200,
         renderCell: p => (
-          <Box>
-            <Typography fontWeight={600}>{p.value}</Typography>
-            <Typography variant='caption' color='text.secondary' noWrap>
+          <Box sx={{ minWidth: 0, py: 0.5 }}>
+            <Typography sx={{ fontSize: 13, fontWeight: 600, color: ops.ink }} noWrap>
+              {p.value}
+            </Typography>
+            <Typography sx={{ fontSize: 11, color: ops.mute }} noWrap>
               {p.row.body?.slice(0, 80)}
               {p.row.body?.length > 80 ? '…' : ''}
             </Typography>
@@ -253,8 +321,14 @@ export default function TipsPage() {
         renderCell: p => {
           const status = computeScheduleStatus(p.row)
           const meta = scheduleStatusChip(status)
-
-          return <Chip label={meta.label} size='small' color={meta.color} />
+          return (
+            <Chip
+              label={meta.label}
+              size='small'
+              color={meta.color}
+              sx={{ height: 22, fontFamily: ops.mono, fontSize: 10 }}
+            />
+          )
         }
       },
       {
@@ -267,17 +341,22 @@ export default function TipsPage() {
         field: 'cta_label',
         headerName: 'CTA',
         width: 140,
-        renderCell: p => p.value || <Typography color='text.disabled'>--</Typography>
+        renderCell: p => (
+          <Typography sx={{ fontSize: 12, color: p.value ? ops.body : ops.mute }}>{p.value || '—'}</Typography>
+        )
       },
       {
         field: 'sort_order',
         headerName: 'Order',
-        width: 80
+        width: 80,
+        renderCell: p => (
+          <Typography sx={{ fontFamily: ops.mono, fontSize: 12 }}>{p.value ?? 0}</Typography>
+        )
       },
       {
         field: 'is_active',
         headerName: 'Active',
-        width: 100,
+        width: 90,
         renderCell: p => (
           <Switch
             size='small'
@@ -290,21 +369,24 @@ export default function TipsPage() {
       {
         field: 'date_range',
         headerName: 'Window',
-        width: 190,
+        width: 170,
         renderCell: p => {
           const s = p.row.start_date ? new Date(p.row.start_date).toLocaleDateString() : 'Always'
           const e = p.row.end_date ? new Date(p.row.end_date).toLocaleDateString() : 'Always'
-
-          return `${s} - ${e}`
+          return (
+            <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute }}>
+              {s} – {e}
+            </Typography>
+          )
         }
       },
       {
         field: 'actions',
-        headerName: 'Actions',
-        width: 140,
+        headerName: '',
+        width: 120,
         sortable: false,
         renderCell: p => (
-          <Box>
+          <Stack direction='row' spacing={0.25}>
             <Tooltip title='Preview'>
               <IconButton
                 size='small'
@@ -339,7 +421,7 @@ export default function TipsPage() {
                 <DeleteOutlineIcon fontSize='small' />
               </IconButton>
             </Tooltip>
-          </Box>
+          </Stack>
         )
       }
     ],
@@ -349,84 +431,143 @@ export default function TipsPage() {
   return (
     <>
       <AdminPageShell
+        bare
         icon='mdi:lightbulb-on-outline'
-        title='Tips'
-        subtitle='Coaching cards in the mobile home “Tips for you” carousel. Use audience + schedule to target trainee vs trainer homes (and guest browse for “Everyone”).'
+        eyebrow='CMS'
+        title='Tips (offers)'
+        subtitle='Home “Tips for you” carousel — filter by audience and schedule. Preview matches mobile frame.'
         actions={
-          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-            <Button component={NextLink} href='/apps/banners' variant='outlined' size='small'>
-              Manage banners
-            </Button>
+          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+            <Chip component={NextLink} href='/apps/cms' label='CMS overview' clickable variant='outlined' size='small' />
+            <Chip component={NextLink} href='/apps/banners' label='Banners' clickable variant='outlined' size='small' />
             <Button
               variant='contained'
+              size='small'
               startIcon={<AddIcon />}
               onClick={openCreate}
-              sx={{ bgcolor: '#000080', '&:hover': { bgcolor: '#0000a0' } }}
+              sx={{ textTransform: 'none', bgcolor: ops.indigo, boxShadow: 'none' }}
             >
               New tip
             </Button>
-          </Box>
+          </Stack>
         }
-        contentSx={{ p: 0 }}
       >
-        <AdminPageSection>
-          <ContentPlacementGuide kind='tips' defaultExpanded={false} />
-          <AdminFilterBar
-            searchPlaceholder='Search title, body, CTA, audience…'
-            searchValue={searchInput}
-            onSearchChange={e => handleSearchChange(e.target.value)}
-            onSearchSubmit={applySearchImmediately}
-            resultCount={total}
-            onRefresh={() => void fetchData()}
-            refreshLoading={loading}
-          >
-            <FormControl size='small' sx={{ minWidth: 160 }}>
-              <InputLabel>Audience</InputLabel>
-              <Select
-                label='Audience'
-                value={audienceFilter}
-                onChange={e => {
-                  setAudienceFilter(e.target.value)
+        <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:lightbulb-on-outline'
+              label='Live tips'
+              value={summary ? fmtInt(summary.live?.tips) : '—'}
+              hint='Active now'
+              tone='success'
+              onClick={() => {
+                setStatusFilter('active')
+                setPage(1)
+              }}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:pause-circle-outline'
+              label='Inactive'
+              value={summary ? fmtInt(summary.inactive?.tips) : '—'}
+              hint='Paused'
+              tone='warn'
+              onClick={() => {
+                setStatusFilter('inactive')
+                setPage(1)
+              }}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:filter-variant'
+              label='In this view'
+              value={fmtInt(total)}
+              hint='Matching filters'
+              tone='accent'
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:image-multiple-outline'
+              label='Banners live'
+              value={summary ? fmtInt(summary.live?.banners) : '—'}
+              hint='Open placements'
+              onClick={() => router.push('/apps/banners')}
+            />
+          </Grid>
+        </Grid>
+
+        <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
+          <AdminPageSection>
+            <ContentPlacementGuide kind='tips' defaultExpanded={false} />
+            <AdminFilterBar
+              searchPlaceholder='Title, body, CTA, audience…'
+              searchValue={searchInput}
+              onSearchChange={e => handleSearchChange(e.target.value)}
+              onSearchSubmit={applySearchImmediately}
+              resultCount={total}
+              onRefresh={refreshAll}
+              refreshLoading={loading}
+              helperText='Audience chips target who sees the tip on home.'
+            >
+              {AUDIENCE_FILTERS.map(a => (
+                <FilterChip
+                  key={a.value || 'any'}
+                  active={audienceFilter === a.value}
+                  label={a.label}
+                  onClick={() => {
+                    setAudienceFilter(a.value)
+                    setPage(1)
+                  }}
+                />
+              ))}
+              <FilterChip
+                active={statusFilter === ''}
+                label='Any status'
+                onClick={() => {
+                  setStatusFilter('')
                   setPage(1)
                 }}
-              >
-                <MenuItem value=''>All</MenuItem>
-                <MenuItem value='all'>Everyone</MenuItem>
-                <MenuItem value='trainer'>Trainers only</MenuItem>
-                <MenuItem value='trainee'>Trainees only</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl size='small' sx={{ minWidth: 160 }}>
-              <InputLabel>Status</InputLabel>
-              <Select
-                label='Status'
-                value={statusFilter}
-                onChange={e => {
-                  setStatusFilter(e.target.value)
+              />
+              <FilterChip
+                active={statusFilter === 'active'}
+                label='Active'
+                onClick={() => {
+                  setStatusFilter('active')
                   setPage(1)
                 }}
-              >
-                <MenuItem value=''>All</MenuItem>
-                <MenuItem value='active'>Active</MenuItem>
-                <MenuItem value='inactive'>Inactive</MenuItem>
-              </Select>
-            </FormControl>
-          </AdminFilterBar>
-          <AdminDataGrid
-            rows={tips}
-            columns={columns}
-            loading={loading}
-            rowCount={total}
-            paginationMode='server'
-            paginationModel={{ page: page - 1, pageSize }}
-            onPaginationModelChange={m => {
-              setPage(m.page + 1)
-              setPageSize(m.pageSize)
-            }}
-            sx={{ '& .MuiDataGrid-cell': { py: 1 } }}
-            getRowHeight={() => 72}
-          />
-        </AdminPageSection>
+              />
+              <FilterChip
+                active={statusFilter === 'inactive'}
+                label='Inactive'
+                onClick={() => {
+                  setStatusFilter('inactive')
+                  setPage(1)
+                }}
+              />
+            </AdminFilterBar>
+            <AdminGridContainer>
+              <AdminDataGrid
+                autoHeight={false}
+                rows={tips}
+                columns={columns}
+                loading={loading}
+                rowCount={total}
+                paginationMode='server'
+                paginationModel={{ page: page - 1, pageSize }}
+                onPaginationModelChange={m => {
+                  setPage(m.page + 1)
+                  setPageSize(m.pageSize)
+                }}
+                getRowHeight={() => 72}
+                emptyMessage='No tips match'
+                emptyDescription='Try clearing audience or status chips.'
+              />
+            </AdminGridContainer>
+          </AdminPageSection>
+        </OpsSurfaceCard>
       </AdminPageShell>
 
       <CmsEditorDrawer

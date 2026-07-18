@@ -14,9 +14,11 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Stack,
   Switch,
   TextField,
-  Tooltip
+  Tooltip,
+  Typography
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
@@ -28,6 +30,9 @@ import toast from 'react-hot-toast'
 
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminFilterBar from 'src/components/admin/AdminFilterBar'
+import AdminGridContainer from 'src/components/admin/AdminGridContainer'
+import OpsMetricTile from 'src/components/admin/OpsMetricTile'
+import OpsSurfaceCard from 'src/components/admin/OpsSurfaceCard'
 import { useAdminConfirm } from 'src/components/admin'
 import CmsEditorDrawer from 'src/components/admin/content/CmsEditorDrawer'
 import CmsHtmlEditor from 'src/components/admin/content/CmsHtmlEditor'
@@ -42,14 +47,38 @@ import {
   createCmsPage,
   updateCmsPage,
   toggleCmsPage,
-  deleteCmsPage
+  deleteCmsPage,
+  getCmsSummary
 } from 'src/services/cmsApi'
+import { ops } from 'src/styles/opsSurface'
 
 const AUDIENCES = ['guest', 'trainee', 'trainer', 'all']
 const PAGE_TYPES = [
   { value: 'blog', label: 'Blog post' },
   { value: 'page', label: 'Static page' }
 ]
+
+const fmtInt = v => new Intl.NumberFormat('en-US').format(Number(v) || 0)
+
+function FilterChip({ active, label, onClick }) {
+  return (
+    <Chip
+      size='small'
+      clickable
+      onClick={onClick}
+      label={label}
+      sx={{
+        height: 28,
+        fontFamily: ops.mono,
+        fontSize: 11,
+        fontWeight: active ? 600 : 500,
+        bgcolor: active ? ops.softIndigo : ops.canvas,
+        color: active ? ops.indigoDeep : ops.body,
+        border: `1px solid ${active ? ops.indigo : ops.hairline}`
+      }}
+    />
+  )
+}
 
 const EMPTY = {
   type: 'blog',
@@ -73,19 +102,26 @@ const EMPTY = {
 function audienceChip(audience) {
   const list = Array.isArray(audience) ? audience : [audience]
   return (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+    <Stack direction='row' spacing={0.5} flexWrap='wrap' useFlexGap>
       {list.map(a => (
-        <Chip key={a} label={a} size='small' />
+        <Chip
+          key={a}
+          label={a}
+          size='small'
+          sx={{ height: 20, fontFamily: ops.mono, fontSize: 9, bgcolor: ops.canvasSoft2 }}
+        />
       ))}
-    </Box>
+    </Stack>
   )
 }
 
 export default function CmsBlogPage() {
   const { confirm, ConfirmDialog } = useAdminConfirm()
   const [rows, setRows] = useState([])
+  const [summary, setSummary] = useState(null)
   const [loading, setLoading] = useState(false)
   const [typeFilter, setTypeFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState('') // '' | active | inactive
   const [open, setOpen] = useState(false)
   const [editId, setEditId] = useState(null)
   const [form, setForm] = useState({ ...EMPTY })
@@ -96,20 +132,27 @@ export default function CmsBlogPage() {
 
   const filteredRows = useMemo(() => {
     const q = search.trim().toLowerCase()
-    if (!q) return rows
-    return rows.filter(
-      r =>
+    return rows.filter(r => {
+      if (statusFilter === 'active' && !r.is_active) return false
+      if (statusFilter === 'inactive' && r.is_active) return false
+      if (!q) return true
+      return (
         String(r.title || '').toLowerCase().includes(q) ||
         String(r.slug || '').toLowerCase().includes(q) ||
         String(r.excerpt || '').toLowerCase().includes(q)
-    )
-  }, [rows, search])
+      )
+    })
+  }, [rows, search, statusFilter])
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await listCmsPages(typeFilter || undefined)
+      const [res, sum] = await Promise.all([
+        listCmsPages(typeFilter || undefined),
+        getCmsSummary().catch(() => null)
+      ])
       setRows(res.data || [])
+      setSummary(sum?.data || null)
     } catch (e) {
       toast.error(e.message || 'Failed to load pages')
     } finally {
@@ -196,26 +239,62 @@ export default function CmsBlogPage() {
   }
 
   const columns = [
-    { field: 'title', headerName: 'Title', flex: 1, minWidth: 160 },
-    { field: 'slug', headerName: 'Slug', width: 120 },
+    {
+      field: 'title',
+      headerName: 'Content',
+      flex: 1.4,
+      minWidth: 200,
+      renderCell: ({ row }) => (
+        <Box sx={{ minWidth: 0, py: 0.5 }}>
+          <Typography sx={{ fontSize: 13, fontWeight: 600 }} noWrap>
+            {row.title || '—'}
+          </Typography>
+          <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute }} noWrap>
+            /{row.slug || '—'}
+          </Typography>
+        </Box>
+      )
+    },
     {
       field: 'type',
       headerName: 'Type',
-      width: 90,
-      renderCell: ({ row }) => <Chip label={row.type || 'blog'} size='small' />
+      width: 100,
+      renderCell: ({ row }) => (
+        <Chip
+          label={row.type || 'blog'}
+          size='small'
+          sx={{
+            height: 22,
+            fontFamily: ops.mono,
+            fontSize: 10,
+            bgcolor: row.type === 'page' ? ops.canvasSoft2 : ops.softIndigo,
+            color: row.type === 'page' ? ops.body : ops.indigoDeep
+          }}
+        />
+      )
     },
     {
       field: 'audience',
       headerName: 'Audience',
-      width: 140,
+      width: 160,
       renderCell: ({ row }) => audienceChip(row.audience)
     },
     {
       field: 'is_active',
       headerName: 'Active',
-      width: 80,
+      width: 90,
       renderCell: ({ row }) => (
-        <Chip label={row.is_active ? 'Yes' : 'No'} size='small' color={row.is_active ? 'success' : 'default'} />
+        <Chip
+          label={row.is_active ? 'Live' : 'Off'}
+          size='small'
+          sx={{
+            height: 22,
+            fontFamily: ops.mono,
+            fontSize: 10,
+            bgcolor: row.is_active ? '#AAFFEC' : ops.canvasSoft2,
+            color: row.is_active ? '#1A8F76' : ops.mute
+          }}
+        />
       )
     },
     {
@@ -224,7 +303,14 @@ export default function CmsBlogPage() {
       width: 52,
       sortable: false,
       renderCell: ({ row }) => (
-        <IconButton size='small' aria-label='Preview' onClick={() => setPreviewRow(row)}>
+        <IconButton
+          size='small'
+          aria-label='Preview'
+          onClick={e => {
+            e.stopPropagation()
+            setPreviewRow(row)
+          }}
+        >
           <VisibilityIcon fontSize='small' />
         </IconButton>
       )
@@ -235,7 +321,7 @@ export default function CmsBlogPage() {
       width: 140,
       sortable: false,
       renderCell: ({ row }) => (
-        <Box sx={{ display: 'flex', gap: 0.5 }}>
+        <Stack direction='row' spacing={0.25} onClick={e => e.stopPropagation()}>
           <Tooltip title='Edit'>
             <IconButton size='small' onClick={() => openEdit(row)}>
               <EditIcon fontSize='small' />
@@ -244,8 +330,7 @@ export default function CmsBlogPage() {
           <Tooltip title='Toggle active'>
             <IconButton
               size='small'
-              onClick={async e => {
-                e.stopPropagation()
+              onClick={async () => {
                 await toggleCmsPage(row._id)
                 await load()
               }}
@@ -257,8 +342,7 @@ export default function CmsBlogPage() {
             <IconButton
               size='small'
               color='error'
-              onClick={async e => {
-                e.stopPropagation()
+              onClick={async () => {
                 const ok = await confirm({
                   title: 'Delete this page?',
                   message: 'The blog or static page will be removed from the mobile app.',
@@ -274,59 +358,119 @@ export default function CmsBlogPage() {
               <DeleteOutlineIcon fontSize='small' />
             </IconButton>
           </Tooltip>
-        </Box>
+        </Stack>
       )
     }
   ]
 
+  const blogCount = rows.filter(r => r.type === 'blog').length
+  const pageCount = rows.filter(r => r.type === 'page').length
+  const liveCount = rows.filter(r => r.is_active).length
+
   return (
-    <AdminPageShell
-      icon='mdi:post-outline'
-      title='Blog & pages'
-      subtitle='Articles and static pages in the mobile app'
-      actions={
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          <Button component={NextLink} href='/apps/cms' variant='outlined' size='small'>
-            CMS overview
-          </Button>
-          <Button component={NextLink} href='/apps/banners' variant='outlined' size='small'>
-            Banners
-          </Button>
-          <Button variant='contained' startIcon={<AddIcon />} onClick={openCreate}>
-            New
-          </Button>
-        </Box>
-      }
-    >
-      <AdminPageSection>
-        <ContentPlacementGuide kind='blog' defaultExpanded={false} />
-        <AdminFilterBar
-          searchPlaceholder='Search title, slug, excerpt…'
-          searchValue={search}
-          onSearchChange={e => setSearch(e.target.value)}
-          onRefresh={() => void load()}
-          refreshLoading={loading}
-          resultCount={filteredRows.length}
-        >
-          <FormControl fullWidth size='small' sx={{ minWidth: 200 }}>
-            <InputLabel>Filter type</InputLabel>
-            <Select label='Filter type' value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
-              <MenuItem value=''>All</MenuItem>
-              <MenuItem value='blog'>Blog</MenuItem>
-              <MenuItem value='page'>Page</MenuItem>
-            </Select>
-          </FormControl>
-        </AdminFilterBar>
-        <AdminDataGrid
-          rows={filteredRows}
-          columns={columns}
-          loading={loading}
-          getRowId={r => r._id}
-          autoHeight
-          onRowClick={p => openEdit(p.row)}
-          clickableRows
-        />
-      </AdminPageSection>
+    <>
+      <AdminPageShell
+        bare
+        icon='mdi:post-outline'
+        eyebrow='CMS'
+        title='Blog & pages'
+        subtitle='Editorial posts and static WebView screens — search, filter by type/status, preview in frame.'
+        actions={
+          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+            <Chip component={NextLink} href='/apps/cms' label='CMS overview' clickable variant='outlined' size='small' />
+            <Chip component={NextLink} href='/apps/banners' label='Banners' clickable variant='outlined' size='small' />
+            <Button
+              variant='contained'
+              size='small'
+              startIcon={<AddIcon />}
+              onClick={openCreate}
+              sx={{ textTransform: 'none', bgcolor: ops.indigo, boxShadow: 'none' }}
+            >
+              New
+            </Button>
+          </Stack>
+        }
+      >
+        <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:post-outline'
+              label='Blog posts'
+              value={fmtInt(summary?.pages?.live_blogs ?? blogCount)}
+              hint='Live blogs'
+              tone='accent'
+              onClick={() => setTypeFilter('blog')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:file-document-outline'
+              label='Static pages'
+              value={fmtInt(summary?.pages?.live_static_pages ?? pageCount)}
+              hint='Live pages'
+              onClick={() => setTypeFilter('page')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:check-circle-outline'
+              label='Active in list'
+              value={fmtInt(liveCount)}
+              hint='is_active'
+              tone='success'
+              onClick={() => setStatusFilter('active')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:filter-variant'
+              label='Showing'
+              value={fmtInt(filteredRows.length)}
+              hint='After filters'
+            />
+          </Grid>
+        </Grid>
+
+        <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
+          <AdminPageSection>
+            <ContentPlacementGuide kind='blog' defaultExpanded={false} />
+            <AdminFilterBar
+              searchPlaceholder='Title, slug, excerpt…'
+              searchValue={search}
+              onSearchChange={e => setSearch(e.target.value)}
+              onRefresh={() => void load()}
+              refreshLoading={loading}
+              resultCount={filteredRows.length}
+              helperText='Row click opens the editor. Type chips sync the server list.'
+            >
+              <FilterChip active={typeFilter === ''} label='All types' onClick={() => setTypeFilter('')} />
+              <FilterChip active={typeFilter === 'blog'} label='Blog' onClick={() => setTypeFilter('blog')} />
+              <FilterChip active={typeFilter === 'page'} label='Page' onClick={() => setTypeFilter('page')} />
+              <FilterChip active={statusFilter === ''} label='Any status' onClick={() => setStatusFilter('')} />
+              <FilterChip active={statusFilter === 'active'} label='Active' onClick={() => setStatusFilter('active')} />
+              <FilterChip
+                active={statusFilter === 'inactive'}
+                label='Inactive'
+                onClick={() => setStatusFilter('inactive')}
+              />
+            </AdminFilterBar>
+            <AdminGridContainer>
+              <AdminDataGrid
+                autoHeight={false}
+                rows={filteredRows}
+                columns={columns}
+                loading={loading}
+                getRowId={r => r._id}
+                getRowHeight={() => 64}
+                onRowClick={p => openEdit(p.row)}
+                clickableRows
+                emptyMessage='No pages match'
+                emptyDescription='Try clearing type or status chips.'
+              />
+            </AdminGridContainer>
+          </AdminPageSection>
+        </OpsSurfaceCard>
+      </AdminPageShell>
 
       <CmsEditorDrawer
         open={open}
@@ -569,6 +713,6 @@ export default function CmsBlogPage() {
       </Dialog>
 
       {ConfirmDialog}
-    </AdminPageShell>
+    </>
   )
 }

@@ -1,44 +1,45 @@
-import { Avatar, Box, Button, Chip, Stack } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { Avatar, Box, Button, Chip, Stack, Typography } from '@mui/material'
+import { useMemo, useState } from 'react'
 import { useRouter } from 'next/router'
 import { AdminDataGrid, AdminFilterBar, AdminGridContainer } from 'src/components/admin'
 import { getImageUrl } from 'src/utils/utils'
 import { useAdminRealtime } from 'src/context/AdminRealtimeContext'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import OpsSurfaceCard from 'src/components/admin/OpsSurfaceCard'
 import { ops } from 'src/styles/opsSurface'
 
-export default function ActiveUsersTable() {
+/**
+ * Online trainers/trainees table.
+ * `embedded` — render as a dashboard panel (no nested page shell).
+ */
+export default function ActiveUsersTable({ embedded = false }) {
   const router = useRouter()
   const { onlineUsers, socketConnected, refreshOnlineUsers } = useAdminRealtime()
-  const [trainerList, setTrainerList] = useState([])
-  const [tableData, setTableData] = useState([])
   const [search, setSearch] = useState('')
 
-  useEffect(() => {
-    const rows = (onlineUsers || []).map(u => ({
+  const rows = useMemo(() => {
+    const base = (onlineUsers || []).map(u => ({
       ...u,
       id: u._id || u.id,
       presence: 'Online'
     }))
-    setTrainerList(rows)
-  }, [onlineUsers])
-
-  useEffect(() => {
-    setTableData(trainerList)
-  }, [trainerList])
-
-  const handleSearch = searchText => {
-    const filteredData = trainerList.filter(trainer =>
-      trainer.fullname.toLowerCase().includes(searchText.toLowerCase())
-    )
-    setTableData(filteredData)
-  }
+    const q = search.trim().toLowerCase()
+    if (!q) return base
+    return base.filter(u => {
+      const blob = [u.fullname, u.email, u.account_type, u.category, u.mobile_no]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+      return blob.includes(q)
+    })
+  }, [onlineUsers, search])
 
   const columns = [
     {
       field: 'image',
-      headerName: 'Image',
-      width: 100,
+      headerName: 'Avatar',
+      width: 80,
+      sortable: false,
       renderCell: params => (
         <Avatar
           alt={params?.row?.fullname || 'User'}
@@ -46,25 +47,127 @@ export default function ActiveUsersTable() {
             getImageUrl(params?.row?.profile_picture) ??
             'https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png'
           }
-          sx={{ width: 44, height: 44 }}
+          sx={{ width: 40, height: 40 }}
         />
       )
     },
-    { field: 'fullname', headerName: 'Full Name', width: 180 },
-    { field: 'email', headerName: 'Email', width: 200 },
-    { field: 'mobile_no', headerName: 'Mobile Number', width: 150 },
+    {
+      field: 'fullname',
+      headerName: 'Name',
+      flex: 1,
+      minWidth: 140,
+      renderCell: p => (
+        <Box sx={{ minWidth: 0 }}>
+          <Typography sx={{ fontSize: 13, fontWeight: 500 }} noWrap>
+            {p.row.fullname || '—'}
+          </Typography>
+          <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute }} noWrap>
+            {p.row.email || ''}
+          </Typography>
+        </Box>
+      )
+    },
+    {
+      field: 'account_type',
+      headerName: 'Role',
+      width: 110,
+      renderCell: p => (
+        <Chip
+          size='small'
+          label={p.row.account_type || '—'}
+          sx={{ fontFamily: ops.mono, fontSize: 10, height: 22 }}
+        />
+      )
+    },
     { field: 'category', headerName: 'Category', width: 100 },
-    { field: 'wallet_amount', headerName: 'Wallet Amount', width: 150 },
-    { field: 'commission', headerName: 'Commission (%)', width: 150 },
-    { field: 'login_type', headerName: 'Login Type', width: 150 },
-    { field: 'account_type', headerName: 'Account Type', width: 150 },
+    {
+      field: 'wallet_amount',
+      headerName: 'Wallet',
+      width: 100,
+      valueGetter: p =>
+        p.row.wallet_amount != null ? `$${Number(p.row.wallet_amount).toFixed(0)}` : '—'
+    },
     {
       field: 'presence',
       headerName: 'Presence',
-      width: 110,
-      renderCell: () => <Chip size='small' label='Online' color='success' variant='outlined' />
+      width: 100,
+      renderCell: () => (
+        <Chip
+          size='small'
+          label='Online'
+          sx={{
+            fontFamily: ops.mono,
+            fontSize: 10,
+            height: 22,
+            bgcolor: '#AAFFEC',
+            color: '#1A8F76'
+          }}
+        />
+      )
     }
   ]
+
+  const filterBar = (
+    <AdminFilterBar
+      searchPlaceholder='Name, email, role…'
+      searchValue={search}
+      onSearchChange={e => setSearch(e.target.value)}
+      onRefresh={() => void refreshOnlineUsers()}
+      resultCount={rows.length}
+      helperText='Click a row to open User 360.'
+    />
+  )
+
+  const grid = (
+    <AdminGridContainer height={embedded ? 360 : undefined}>
+      <AdminDataGrid
+        autoHeight={false}
+        rows={rows}
+        columns={columns}
+        onRowClick={p => {
+          const id = p.row?.id || p.row?._id
+          if (id) router.push(`/apps/users/${id}`)
+        }}
+        clickableRows
+        emptyMessage='Nobody online right now'
+        emptyDescription='Presence updates when trainers or trainees connect.'
+      />
+    </AdminGridContainer>
+  )
+
+  if (embedded) {
+    return (
+      <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
+        <Box sx={{ px: 2.5, pt: 2.5, pb: 1 }}>
+          <Stack direction='row' justifyContent='space-between' alignItems='flex-start' spacing={2}>
+            <Box>
+              <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', fontSize: 16 }}>
+                Who is online
+              </Typography>
+              <Typography sx={{ fontSize: 13, color: ops.mute, mt: 0.5 }}>
+                Trainers and trainees with an active session
+              </Typography>
+            </Box>
+            <Chip
+              size='small'
+              label={socketConnected ? 'Live' : 'Polling'}
+              sx={{
+                fontFamily: ops.mono,
+                fontSize: 10,
+                fontWeight: 700,
+                bgcolor: socketConnected ? ops.lime : ops.canvasSoft2,
+                color: ops.night
+              }}
+            />
+          </Stack>
+        </Box>
+        <Box sx={{ px: 2.5, pb: 2 }}>
+          {filterBar}
+          {grid}
+        </Box>
+      </OpsSurfaceCard>
+    )
+  }
 
   return (
     <Box sx={{ mt: 4, width: '100%' }}>
@@ -76,7 +179,7 @@ export default function ActiveUsersTable() {
           <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
             <Chip
               size='small'
-              label={socketConnected ? 'Live · WebSocket' : 'Connecting…'}
+              label={socketConnected ? 'Live · connected' : 'Connecting…'}
               sx={{
                 fontFamily: ops.mono,
                 fontSize: 11,
@@ -86,34 +189,15 @@ export default function ActiveUsersTable() {
               }}
             />
             <Button size='small' variant='outlined' onClick={() => void refreshOnlineUsers()}>
-              Refresh from API
+              Refresh
             </Button>
           </Stack>
         }
         contentSx={{ p: 0 }}
       >
         <AdminPageSection>
-          <AdminFilterBar
-            searchPlaceholder='Name…'
-            searchValue={search}
-            onSearchChange={e => {
-              setSearch(e.target.value)
-              handleSearch(e.target.value)
-            }}
-            resultCount={tableData.length}
-          />
-          <AdminGridContainer>
-            <AdminDataGrid
-              autoHeight={false}
-              rows={tableData ?? []}
-              columns={columns}
-              onRowClick={p => {
-                const id = p.row?.id || p.row?._id
-                if (id) router.push(`/apps/users/${id}`)
-              }}
-              clickableRows
-            />
-          </AdminGridContainer>
+          {filterBar}
+          {grid}
         </AdminPageSection>
       </AdminPageShell>
     </Box>

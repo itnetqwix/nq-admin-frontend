@@ -474,6 +474,7 @@ export default function LogsHubPage() {
 
   return (
       <AdminPageShell
+        bare
         eyebrow='Logs · hub'
         icon='mdi:text-box-search-outline'
         title='Platform logs.'

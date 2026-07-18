@@ -1,17 +1,17 @@
-import { Box, Button, Chip, Link as MuiLink, Stack } from '@mui/material'
-import React, { useContext, useEffect, useState } from 'react'
+import { Box, Button, Chip, Grid, Link as MuiLink, Stack, Typography } from '@mui/material'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { AbilityContext } from 'src/layouts/components/acl/Can'
 
 import {
   AdminDataGrid,
   AdminFilterBar,
   AdminGridContainer,
+  OpsMetricTile,
+  OpsSurfaceCard,
   useAdminConfirm
 } from 'src/components/admin'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
-import MenuIcon from '@mui/icons-material/Menu'
 import Link from 'next/link'
-import { CustomButton } from 'src/pages/components/common'
 import { useCommon } from 'src/hooks/useCommon'
 import moment from 'moment'
 import RefundPopups from 'src/pages/components/modal/RefundPopups'
@@ -20,12 +20,35 @@ import authConfig from 'src/configs/auth'
 import { refundWalletSession } from 'src/services/financeApi'
 import { BookedSession, debouncedSearchMedicine, isCurrentDateBefore } from 'src/utils/utils'
 import BookingDetailDrawer from 'src/pages/components/modal/BookingDetailDrawer'
+import { ops } from 'src/styles/opsSurface'
 
 const STATUS_COLORS = {
   canceled: 'error',
   booked: 'info',
   confirmed: 'success',
   completed: 'warning'
+}
+
+const fmtInt = v => new Intl.NumberFormat('en-US').format(Number(v) || 0)
+
+function FilterChip({ active, label, onClick, count }) {
+  return (
+    <Chip
+      size='small'
+      clickable
+      onClick={onClick}
+      label={count != null ? `${label} · ${fmtInt(count)}` : label}
+      sx={{
+        height: 28,
+        fontFamily: ops.mono,
+        fontSize: 11,
+        fontWeight: active ? 600 : 500,
+        bgcolor: active ? ops.softIndigo : ops.canvas,
+        color: active ? ops.indigoDeep : ops.body,
+        border: `1px solid ${active ? ops.indigo : ops.hairline}`
+      }}
+    />
+  )
 }
 
 export default function Booking() {
@@ -313,6 +336,7 @@ export default function Booking() {
 
   const [tableData, setTableData] = useState([])
   const [searchText, setSearchText] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
 
   useEffect(() => {
     if (bookingList) setTableData(bookingList)
@@ -323,20 +347,98 @@ export default function Booking() {
     setTableData(searchResults)
   }
 
+  const statusCounts = useMemo(() => {
+    const rows = bookingList || []
+    const c = { booked: 0, confirmed: 0, completed: 0, canceled: 0, refundPending: 0 }
+    for (const r of rows) {
+      const s = String(r.status || '')
+      if (c[s] != null) c[s] += 1
+      if (s === 'canceled' && r.refund_status !== 'refunded' && r.payment_intent_id) c.refundPending += 1
+    }
+    return c
+  }, [bookingList])
+
+  const visibleRows = useMemo(() => {
+    if (!statusFilter) return tableData ?? []
+    return (tableData ?? []).filter(r => String(r.status) === statusFilter)
+  }, [tableData, statusFilter])
+
   return (
     <>
-      <form noValidate autoComplete='off'>
-        <AdminPageShell
-          icon='mdi:calendar-check-outline'
-          title='Bookings'
-          subtitle='Sessions, confirmations, cancellations, and refunds. Search by booking id.'
-          actions={
-            <CustomButton component={Link} variant='contained' href='/apps/booking' startIcon={<MenuIcon />}>
-              Settings
-            </CustomButton>
-          }
-          contentSx={{ p: 0 }}
-        >
+      <AdminPageShell
+        bare
+        icon='mdi:calendar-check-outline'
+        eyebrow='Operations'
+        title='Bookings'
+        subtitle='Sessions, confirmations, cancellations, and refunds. Click a row for detail + finance.'
+        actions={
+          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+            <Chip component={Link} href='/apps/platform-health' label='Platform health' clickable variant='outlined' size='small' />
+            <Chip component={Link} href='/apps/finance' label='Finance' clickable variant='outlined' size='small' />
+          </Stack>
+        }
+      >
+        <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
+          <Grid item xs={6} sm={4} md={2}>
+            <OpsMetricTile
+              icon='mdi:calendar-clock'
+              label='Booked'
+              value={fmtInt(statusCounts.booked)}
+              hint='Awaiting confirm'
+              tone='accent'
+              onClick={() => setStatusFilter('booked')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={4} md={2}>
+            <OpsMetricTile
+              icon='mdi:check-circle-outline'
+              label='Confirmed'
+              value={fmtInt(statusCounts.confirmed)}
+              hint='Upcoming'
+              tone='success'
+              onClick={() => setStatusFilter('confirmed')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={4} md={2}>
+            <OpsMetricTile
+              icon='mdi:flag-checkered'
+              label='Completed'
+              value={fmtInt(statusCounts.completed)}
+              hint='Done'
+              onClick={() => setStatusFilter('completed')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={4} md={2}>
+            <OpsMetricTile
+              icon='mdi:cancel'
+              label='Canceled'
+              value={fmtInt(statusCounts.canceled)}
+              hint='All canceled'
+              tone='warn'
+              onClick={() => setStatusFilter('canceled')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={4} md={2}>
+            <OpsMetricTile
+              icon='mdi:cash-refund'
+              label='Refund due'
+              value={fmtInt(statusCounts.refundPending)}
+              hint='Canceled + unpaid refund'
+              tone={statusCounts.refundPending > 0 ? 'danger' : 'default'}
+              onClick={() => setStatusFilter('canceled')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={4} md={2}>
+            <OpsMetricTile
+              icon='mdi:filter-variant'
+              label='Showing'
+              value={fmtInt(visibleRows.length)}
+              hint='After filters'
+            />
+          </Grid>
+        </Grid>
+
+        <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
           <AdminPageSection>
             <AdminFilterBar
               searchPlaceholder='Booking id…'
@@ -345,23 +447,47 @@ export default function Booking() {
                 setSearchText(e.target.value)
                 void getSearchValue(e.target.value)
               }}
-              resultCount={tableData?.length}
-              helperText='Click a booking id to open the detail drawer with escrow and finance links.'
-            />
+              onRefresh={() => getBookingList()}
+              resultCount={visibleRows.length}
+              helperText='Click a booking id or row for the detail drawer (escrow + finance).'
+            >
+              <FilterChip active={statusFilter === ''} label='All' count={(bookingList || []).length} onClick={() => setStatusFilter('')} />
+              <FilterChip active={statusFilter === 'booked'} label='Booked' count={statusCounts.booked} onClick={() => setStatusFilter('booked')} />
+              <FilterChip
+                active={statusFilter === 'confirmed'}
+                label='Confirmed'
+                count={statusCounts.confirmed}
+                onClick={() => setStatusFilter('confirmed')}
+              />
+              <FilterChip
+                active={statusFilter === 'completed'}
+                label='Completed'
+                count={statusCounts.completed}
+                onClick={() => setStatusFilter('completed')}
+              />
+              <FilterChip
+                active={statusFilter === 'canceled'}
+                label='Canceled'
+                count={statusCounts.canceled}
+                onClick={() => setStatusFilter('canceled')}
+              />
+            </AdminFilterBar>
             <AdminGridContainer>
               <AdminDataGrid
                 autoHeight={false}
-                rows={tableData ?? []}
+                rows={visibleRows}
                 columns={columns}
                 getRowHeight={() => 56}
                 columnHeaderHeight={48}
                 clickableRows
                 onRowClick={p => openBookingDetail(p.row)}
+                emptyMessage='No bookings match'
+                emptyDescription='Try clearing status chips or search.'
               />
             </AdminGridContainer>
           </AdminPageSection>
-        </AdminPageShell>
-      </form>
+        </OpsSurfaceCard>
+      </AdminPageShell>
 
       <RefundPopups
         paymentIntentDetails={paymentIntentDetails}

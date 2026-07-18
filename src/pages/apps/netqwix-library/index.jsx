@@ -4,6 +4,7 @@ import {
   Button,
   Chip,
   FormControl,
+  Grid,
   InputLabel,
   LinearProgress,
   MenuItem,
@@ -12,19 +13,24 @@ import {
   TextField,
   Typography
 } from '@mui/material'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
 import { AdminLoadingState, OpsSurfaceCard, useAdminConfirm } from 'src/components/admin'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
+import OpsMetricTile from 'src/components/admin/OpsMetricTile'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import { ops } from 'src/styles/opsSurface'
 import {
   confirmLibraryClip,
   getClipTaxonomyAdmin,
   getLibraryClipsGrouped,
+  getLibrarySubmissions,
   presignLibraryClip
 } from 'src/services/clipsAdminApi'
 
 const MAX_BYTES = 50 * 1024 * 1024
+const fmtInt = v => new Intl.NumberFormat('en-US').format(Number(v) || 0)
 
 async function putPresigned(url, body, contentType) {
   const res = await fetch(url, {
@@ -80,9 +86,11 @@ function captureVideoThumbnail(file) {
 }
 
 export default function NetqwixLibraryPage() {
+  const router = useRouter()
   const { confirm, ConfirmDialog } = useAdminConfirm()
   const [groups, setGroups] = useState([])
   const [taxonomy, setTaxonomy] = useState([])
+  const [pendingQueue, setPendingQueue] = useState(0)
   const [title, setTitle] = useState('')
   const [categoryId, setCategoryId] = useState('')
   const [subcategoryId, setSubcategoryId] = useState('')
@@ -90,12 +98,18 @@ export default function NetqwixLibraryPage() {
   const [uploading, setUploading] = useState(false)
   const [uploadStep, setUploadStep] = useState('')
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('')
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await getLibraryClipsGrouped()
+      const [data, queue] = await Promise.all([
+        getLibraryClipsGrouped(),
+        getLibrarySubmissions({ limit: 1 }).catch(() => null)
+      ])
       setGroups(Array.isArray(data) ? data : [])
+      setPendingQueue((queue?.pendingCount || 0) + (queue?.underReviewCount || 0))
     } catch (e) {
       toast.error(e?.message || 'Failed to load library')
       setGroups([])
@@ -125,6 +139,33 @@ export default function NetqwixLibraryPage() {
     setCategoryId(id)
     setSubcategoryId('')
   }
+
+  let clipCount = 0
+  const categoryCount = groups.length
+  for (const g of groups) {
+    for (const s of g.subcategories || []) clipCount += (s.clips || []).length
+  }
+
+  const filteredGroups = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    return groups
+      .filter(g => !categoryFilter || String(g.categoryId || g.categoryName) === categoryFilter)
+      .map(g => {
+        if (!q) return g
+        const subsFiltered = (g.subcategories || [])
+          .map(sub => ({
+            ...sub,
+            clips: (sub.clips || []).filter(c => String(c.title || '').toLowerCase().includes(q))
+          }))
+          .filter(
+            sub =>
+              (sub.clips || []).length > 0 || String(sub.subcategoryName || '').toLowerCase().includes(q)
+          )
+        if (!subsFiltered.length && !String(g.categoryName || '').toLowerCase().includes(q)) return null
+        return { ...g, subcategories: subsFiltered.length ? subsFiltered : g.subcategories }
+      })
+      .filter(Boolean)
+  }, [groups, search, categoryFilter])
 
   const upload = async () => {
     if (!file || !title.trim() || !categoryId || !subcategoryId) {
@@ -198,26 +239,67 @@ export default function NetqwixLibraryPage() {
     }
   }
 
-  let clipCount = 0
-  for (const g of groups) {
-    for (const s of g.subcategories || []) clipCount += (s.clips || []).length
-  }
-
   const fileSizeMb = file ? (file.size / (1024 * 1024)).toFixed(1) : null
+  const showingCount = filteredGroups.reduce(
+    (n, g) => n + (g.subcategories || []).reduce((m, s) => m + (s.clips || []).length, 0),
+    0
+  )
 
   return (
     <AdminPageShell
+      bare
       icon='mdi:library-outline'
-      title='NetQwix Library'
-      subtitle={loading ? 'Loading published clips…' : `${clipCount} published clips`}
-      actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}
+      eyebrow='Library'
+      title='Published clips'
+      subtitle='Public NetQwix Library — upload admin clips or browse by category.'
+      actions={
+        <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
+          <Chip
+            component={Link}
+            href='/apps/library-submissions'
+            label={pendingQueue ? `Requests · ${pendingQueue}` : 'Requests'}
+            clickable
+            variant='outlined'
+            size='small'
+          />
+          <Chip component={Link} href='/apps/clip-taxonomy' label='Categories' clickable variant='outlined' size='small' />
+          <AdminRefreshButton onClick={() => void load()} loading={loading} />
+        </Stack>
+      }
     >
+      <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
+        <Grid item xs={6} sm={3}>
+          <OpsMetricTile
+            icon='mdi:play-box-multiple-outline'
+            label='Published'
+            value={fmtInt(clipCount)}
+            hint='All clips'
+            tone='accent'
+          />
+        </Grid>
+        <Grid item xs={6} sm={3}>
+          <OpsMetricTile icon='mdi:folder-outline' label='Categories' value={fmtInt(categoryCount)} hint='With clips' />
+        </Grid>
+        <Grid item xs={6} sm={3}>
+          <OpsMetricTile
+            icon='mdi:clipboard-check-outline'
+            label='Open requests'
+            value={fmtInt(pendingQueue)}
+            hint='Pending + review'
+            tone={pendingQueue > 0 ? 'warn' : 'success'}
+            onClick={() => router.push('/apps/library-submissions')}
+          />
+        </Grid>
+        <Grid item xs={6} sm={3}>
+          <OpsMetricTile icon='mdi:filter-variant' label='Showing' value={fmtInt(showingCount)} hint='After search' />
+        </Grid>
+      </Grid>
+
       <AdminPageSection title='Upload library clip'>
         <OpsSurfaceCard sx={{ maxWidth: 720 }}>
           <Stack spacing={2.5}>
             <Typography sx={{ fontSize: 13, color: ops.body, lineHeight: 1.5 }}>
-              Upload a coaching clip to the public NetQwix library. Max size 50 MB. Clips appear in the
-              mobile app under Locker → NetQwix Library.
+              Upload a coaching clip to the public library. Max 50 MB. Appears under Locker → NetQwix Library.
             </Typography>
 
             <TextField
@@ -242,11 +324,7 @@ export default function NetqwixLibraryPage() {
               </FormControl>
               <FormControl fullWidth size='small' disabled={uploading || !categoryId}>
                 <InputLabel>Subcategory</InputLabel>
-                <Select
-                  label='Subcategory'
-                  value={subcategoryId}
-                  onChange={e => setSubcategoryId(e.target.value)}
-                >
+                <Select label='Subcategory' value={subcategoryId} onChange={e => setSubcategoryId(e.target.value)}>
                   {subs.map(s => (
                     <MenuItem key={s.id || s._id} value={s.id || s._id}>
                       {s.name}
@@ -257,8 +335,8 @@ export default function NetqwixLibraryPage() {
             </Stack>
 
             {!activeCategories.length ? (
-              <Typography sx={{ fontSize: 13, color: ops.warning }}>
-                No active clip categories. Add categories under Clip Taxonomy first.
+              <Typography sx={{ fontSize: 13, color: '#ab570a' }}>
+                No active categories — add some under Categories first.
               </Typography>
             ) : null}
 
@@ -271,7 +349,7 @@ export default function NetqwixLibraryPage() {
                 bgcolor: ops.canvasSoft
               }}
             >
-              <Button variant='outlined' component='label' disabled={uploading}>
+              <Button variant='outlined' component='label' disabled={uploading} sx={{ textTransform: 'none' }}>
                 {file ? 'Replace video' : 'Choose video file'}
                 <input
                   type='file'
@@ -294,25 +372,24 @@ export default function NetqwixLibraryPage() {
 
             {uploading ? (
               <Box>
-                <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute, mb: 1 }}>
-                  {uploadStep}
-                </Typography>
-                <LinearProgress sx={{ borderRadius: 1, bgcolor: ops.canvasSoft2, '& .MuiLinearProgress-bar': { bgcolor: ops.ink } }} />
+                <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute, mb: 1 }}>{uploadStep}</Typography>
+                <LinearProgress
+                  sx={{
+                    borderRadius: 1,
+                    bgcolor: ops.canvasSoft2,
+                    '& .MuiLinearProgress-bar': { bgcolor: ops.indigo }
+                  }}
+                />
               </Box>
             ) : null}
 
             <Button
               variant='contained'
               disabled={
-                uploading ||
-                !file ||
-                !title.trim() ||
-                !categoryId ||
-                !subcategoryId ||
-                !activeCategories.length
+                uploading || !file || !title.trim() || !categoryId || !subcategoryId || !activeCategories.length
               }
               onClick={() => void upload()}
-              sx={{ bgcolor: ops.ink, '&:hover': { bgcolor: '#000' }, textTransform: 'none', fontWeight: 500 }}
+              sx={{ bgcolor: ops.indigo, boxShadow: 'none', textTransform: 'none', fontWeight: 500 }}
             >
               {uploading ? 'Uploading…' : 'Publish to library'}
             </Button>
@@ -320,44 +397,67 @@ export default function NetqwixLibraryPage() {
         </OpsSurfaceCard>
       </AdminPageSection>
 
-      <AdminPageSection title='Published clips'>
-        {loading ? (
-          <AdminLoadingState message='Loading library…' minHeight={200} />
-        ) : groups.length === 0 ? (
-          <Typography sx={{ color: ops.mute, fontSize: 13 }}>No library clips yet.</Typography>
-        ) : (
-          <Stack spacing={2}>
-            {groups.map(cat => (
-              <OpsSurfaceCard key={cat.categoryId || cat.categoryName}>
-                <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', mb: 1 }}>
-                  {cat.categoryName}
-                </Typography>
-                {(cat.subcategories || []).map(sub => (
-                  <Box key={sub.subcategoryId || sub.subcategoryName} sx={{ pl: 0.5, mt: 1.5 }}>
-                    <Stack direction='row' spacing={1} alignItems='center'>
-                      <Typography sx={{ fontSize: 13, color: ops.body, fontWeight: 600 }}>
-                        {sub.subcategoryName}
-                      </Typography>
-                      <Chip
-                        size='small'
-                        label={(sub.clips || []).length}
-                        sx={{ fontFamily: ops.mono, fontSize: 11, height: 20 }}
-                      />
-                    </Stack>
-                    <Stack component='ul' sx={{ m: 0, pl: 2.5, mt: 0.5 }} spacing={0.25}>
-                      {(sub.clips || []).map(c => (
-                        <Typography component='li' key={c._id} sx={{ fontSize: 13, color: ops.ink }}>
-                          {c.title}
-                        </Typography>
-                      ))}
-                    </Stack>
-                  </Box>
+      <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden', mt: 2 }}>
+        <AdminPageSection title='Browse published' subtitle='Search titles or filter by category.'>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 2 }}>
+            <TextField
+              size='small'
+              placeholder='Search clip titles…'
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              sx={{ minWidth: 240, flex: 1 }}
+            />
+            <FormControl size='small' sx={{ minWidth: 200 }}>
+              <InputLabel>Category</InputLabel>
+              <Select label='Category' value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
+                <MenuItem value=''>All categories</MenuItem>
+                {groups.map(g => (
+                  <MenuItem key={g.categoryId || g.categoryName} value={String(g.categoryId || g.categoryName)}>
+                    {g.categoryName}
+                  </MenuItem>
                 ))}
-              </OpsSurfaceCard>
-            ))}
+              </Select>
+            </FormControl>
           </Stack>
-        )}
-      </AdminPageSection>
+
+          {loading ? (
+            <AdminLoadingState message='Loading library…' minHeight={200} />
+          ) : filteredGroups.length === 0 ? (
+            <Typography sx={{ color: ops.mute, fontSize: 13 }}>No clips match.</Typography>
+          ) : (
+            <Stack spacing={2}>
+              {filteredGroups.map(cat => (
+                <OpsSurfaceCard key={cat.categoryId || cat.categoryName} sx={{ bgcolor: ops.canvas }}>
+                  <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', mb: 1 }}>
+                    {cat.categoryName}
+                  </Typography>
+                  {(cat.subcategories || []).map(sub => (
+                    <Box key={sub.subcategoryId || sub.subcategoryName} sx={{ pl: 0.5, mt: 1.5 }}>
+                      <Stack direction='row' spacing={1} alignItems='center'>
+                        <Typography sx={{ fontSize: 13, color: ops.body, fontWeight: 600 }}>
+                          {sub.subcategoryName}
+                        </Typography>
+                        <Chip
+                          size='small'
+                          label={(sub.clips || []).length}
+                          sx={{ fontFamily: ops.mono, fontSize: 11, height: 20 }}
+                        />
+                      </Stack>
+                      <Stack component='ul' sx={{ m: 0, pl: 2.5, mt: 0.5 }} spacing={0.25}>
+                        {(sub.clips || []).map(c => (
+                          <Typography component='li' key={c._id} sx={{ fontSize: 13, color: ops.ink }}>
+                            {c.title}
+                          </Typography>
+                        ))}
+                      </Stack>
+                    </Box>
+                  ))}
+                </OpsSurfaceCard>
+              ))}
+            </Stack>
+          )}
+        </AdminPageSection>
+      </OpsSurfaceCard>
       {ConfirmDialog}
     </AdminPageShell>
   )

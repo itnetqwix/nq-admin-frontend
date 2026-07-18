@@ -1,15 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Box, Button, Chip, Grid, Stack, Typography } from '@mui/material'
+import NextLink from 'next/link'
 import toast from 'react-hot-toast'
 
 import { useAdminConfirm } from 'src/components/admin'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
+import OpsMetricTile from 'src/components/admin/OpsMetricTile'
+import OpsSurfaceCard from 'src/components/admin/OpsSurfaceCard'
 import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
 import FaqDndEditor from 'src/components/admin/content/FaqDndEditor'
 import FaqPreview from 'src/components/admin/content/FaqPreview'
 import MobileFramePreview from 'src/components/admin/content/MobileFramePreview'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import { getAdminFaq, publishFaq, saveFaqDraft, seedAdminFaq } from 'src/services/cmsApi'
+import { ops } from 'src/styles/opsSurface'
 
 const newId = () => `faq-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 const emptyItem = () => ({ id: newId(), q: '', a: '' })
@@ -204,57 +208,110 @@ export default function CmsFaqPage() {
 
   return (
     <AdminPageShell
+      bare
       icon='mdi:help-circle-outline'
+      eyebrow='CMS'
       title='FAQ'
-      subtitle='Help content in Settings → FAQ — publish without an app store update'
+      subtitle='Settings → FAQ — save drafts, then publish OTA to signed-in apps.'
       actions={
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+          <Chip component={NextLink} href='/apps/cms' label='CMS overview' clickable variant='outlined' size='small' />
           <AdminRefreshButton onClick={() => void load()} />
-          <Button variant='outlined' onClick={() => void handleSeed()} disabled={seeding}>
+          <Button variant='outlined' size='small' onClick={() => void handleSeed()} disabled={seeding} sx={{ textTransform: 'none' }}>
             {seeding ? 'Importing…' : 'Import defaults'}
           </Button>
-          <Button variant='outlined' onClick={() => void handleSaveDraft()} disabled={saving || !dirty}>
+          <Button
+            variant='outlined'
+            size='small'
+            onClick={() => void handleSaveDraft()}
+            disabled={saving || !dirty}
+            sx={{ textTransform: 'none' }}
+          >
             {saving ? 'Saving…' : 'Save draft'}
           </Button>
-          <Button variant='contained' onClick={() => void handlePublish()} disabled={publishing || (!dirty && !hasUnpublished)}>
+          <Button
+            variant='contained'
+            size='small'
+            onClick={() => void handlePublish()}
+            disabled={publishing || (!dirty && !hasUnpublished)}
+            sx={{ textTransform: 'none', bgcolor: ops.indigo, boxShadow: 'none' }}
+          >
             {publishing ? 'Publishing…' : 'Publish to app'}
           </Button>
         </Stack>
       }
     >
-      <AdminPageSection>
-        <ContentPlacementGuide kind='faq' defaultExpanded={false} />
-        <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
-          <Chip label={`Version ${version || '—'}`} size='small' variant='outlined' />
-          <Chip label={`${stats.sectionCount} sections`} size='small' />
-          <Chip label={`${stats.qCount} Q&As`} size='small' color='primary' variant='outlined' />
-          {dirty || hasUnpublished ? (
-            <Chip label='Unpublished changes' size='small' color='warning' />
-          ) : null}
-        </Stack>
-
-        <Grid container spacing={3}>
-          <Grid item xs={12} lg={7}>
-            <FaqDndEditor
-              sections={sections}
-              setSections={setSections}
-              markDirty={markDirty}
-              onRemoveSection={removeSection}
-              onAddSection={addSection}
-              onAddItem={addItem}
-              onRemoveItem={removeItem}
-            />
-          </Grid>
-
-          <Grid item xs={12} lg={5}>
-            <Box sx={{ position: { lg: 'sticky' }, top: { lg: 16 } }}>
-              <MobileFramePreview label='Mobile preview' subtitle='Settings → FAQ accordion' showDeviceToggle>
-                <FaqPreview sections={sections} />
-              </MobileFramePreview>
-            </Box>
-          </Grid>
+      <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
+        <Grid item xs={6} sm={3}>
+          <OpsMetricTile
+            icon='mdi:tag-outline'
+            label='Version'
+            value={version || '—'}
+            hint='Live after publish'
+            tone='accent'
+          />
         </Grid>
-      </AdminPageSection>
+        <Grid item xs={6} sm={3}>
+          <OpsMetricTile
+            icon='mdi:folder-outline'
+            label='Sections'
+            value={stats.sectionCount}
+            hint='With titles'
+          />
+        </Grid>
+        <Grid item xs={6} sm={3}>
+          <OpsMetricTile
+            icon='mdi:help-circle-outline'
+            label='Q&As'
+            value={stats.qCount}
+            hint='Complete pairs'
+            tone='success'
+          />
+        </Grid>
+        <Grid item xs={6} sm={3}>
+          <OpsMetricTile
+            icon='mdi:alert-circle-outline'
+            label='Draft state'
+            value={dirty || hasUnpublished ? 'Pending' : 'Clean'}
+            hint={dirty ? 'Local edits' : hasUnpublished ? 'Unpublished' : 'In sync'}
+            tone={dirty || hasUnpublished ? 'warn' : 'success'}
+          />
+        </Grid>
+      </Grid>
+
+      {(dirty || hasUnpublished) && (
+        <OpsSurfaceCard sx={{ mb: 2, py: 1.5 }}>
+          <Typography sx={{ fontSize: 13, color: '#ab570a' }}>
+            Unpublished changes — apps still serve the last published version until you publish.
+          </Typography>
+        </OpsSurfaceCard>
+      )}
+
+      <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
+        <AdminPageSection>
+          <ContentPlacementGuide kind='faq' defaultExpanded={false} />
+          <Grid container spacing={3}>
+            <Grid item xs={12} lg={7}>
+              <FaqDndEditor
+                sections={sections}
+                setSections={setSections}
+                markDirty={markDirty}
+                onRemoveSection={removeSection}
+                onAddSection={addSection}
+                onAddItem={addItem}
+                onRemoveItem={removeItem}
+              />
+            </Grid>
+            <Grid item xs={12} lg={5}>
+              <Box sx={{ position: { lg: 'sticky' }, top: { lg: 16 } }}>
+                <MobileFramePreview label='Mobile preview' subtitle='Settings → FAQ accordion' showDeviceToggle>
+                  <FaqPreview sections={sections} />
+                </MobileFramePreview>
+              </Box>
+            </Grid>
+          </Grid>
+        </AdminPageSection>
+      </OpsSurfaceCard>
       {ConfirmDialog}
     </AdminPageShell>
   )

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Box, Button, Chip, Stack, TextField, Typography } from '@mui/material'
+import { Box, Button, Chip, Grid, Stack, TextField, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import moment from 'moment'
@@ -8,12 +8,14 @@ import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminGridContainer from 'src/components/admin/AdminGridContainer'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
 import LogDetailDrawer from 'src/components/admin/LogDetailDrawer'
+import OpsMetricTile from 'src/components/admin/OpsMetricTile'
 import AdminPageShell from 'src/layouts/components/AdminPageShell'
 import { getPlatformActivity } from 'src/services/user360Api'
 import { CATEGORY_META, categoryChipSx, actionTone, ops } from 'src/styles/opsSurface'
 import { formatOpsDateTime } from 'src/utils/opsDateTime'
 
 const CATEGORIES = Object.keys(CATEGORY_META)
+const fmtInt = v => new Intl.NumberFormat('en-US').format(Number(v) || 0)
 
 export default function PlatformActivityPage() {
   const router = useRouter()
@@ -392,6 +394,63 @@ export default function PlatformActivityPage() {
         </Stack>
       }
     >
+      <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
+        <Grid item xs={6} sm={3} md={2}>
+          <OpsMetricTile
+            icon='mdi:timeline-text-outline'
+            label='Events'
+            value={fmtInt(total)}
+            hint={category === 'all' ? 'All categories' : CATEGORY_META[category]?.label || category}
+            tone='accent'
+          />
+        </Grid>
+        <Grid item xs={6} sm={3} md={2}>
+          <OpsMetricTile
+            icon='mdi:login'
+            label='Logins'
+            value={fmtInt(counts.logins)}
+            hint='Facet'
+            onClick={() => applyCategory('logins')}
+          />
+        </Grid>
+        <Grid item xs={6} sm={3} md={2}>
+          <OpsMetricTile
+            icon='mdi:api'
+            label='API hits'
+            value={fmtInt(counts.api)}
+            hint='Facet'
+            onClick={() => applyCategory('api')}
+          />
+        </Grid>
+        <Grid item xs={6} sm={3} md={2}>
+          <OpsMetricTile
+            icon='mdi:calendar-check'
+            label='Bookings'
+            value={fmtInt(counts.booking)}
+            hint='Facet'
+            onClick={() => applyCategory('booking')}
+          />
+        </Grid>
+        <Grid item xs={6} sm={3} md={2}>
+          <OpsMetricTile
+            icon='mdi:cash'
+            label='Transactions'
+            value={fmtInt(counts.transactions)}
+            hint='Facet'
+            onClick={() => applyCategory('transactions')}
+          />
+        </Grid>
+        <Grid item xs={6} sm={3} md={2}>
+          <OpsMetricTile
+            icon='mdi:shield-account'
+            label='Admin'
+            value={fmtInt(counts.admin)}
+            hint='Facet'
+            onClick={() => applyCategory('admin')}
+          />
+        </Grid>
+      </Grid>
+
       <Box
         sx={{
           bgcolor: ops.canvas,
