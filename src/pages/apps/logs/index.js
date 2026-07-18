@@ -25,12 +25,14 @@ import { ops, categoryChipSx } from 'src/styles/opsSurface'
 import { formatOpsDateTime } from 'src/utils/opsDateTime'
 import {
   exportLogs,
+  getAdminNavPreferences,
   getApiLogs,
   getDashboardSummary,
   getFileLogs,
   getLoginHistory,
   getNotificationLogs,
-  getSecurityLogs
+  getSecurityLogs,
+  putAdminPreferences
 } from 'src/services/adminLogsApi'
 
 const TABS = [
@@ -94,6 +96,60 @@ export default function LogsHubPage() {
   const [filters, setFilters] = useState(emptyFilters)
   const [detail, setDetail] = useState(null)
   const [lastRefresh, setLastRefresh] = useState(null)
+  const [presets, setPresets] = useState([])
+  const [presetName, setPresetName] = useState('')
+
+  // Hydrate filter presets (synced like nav favorites)
+  useEffect(() => {
+    let cancelled = false
+    void getAdminNavPreferences()
+      .then(data => {
+        if (cancelled) return
+        const list = data?.log_filter_presets || data?.data?.log_filter_presets || []
+        if (Array.isArray(list)) setPresets(list)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const persistPresets = async next => {
+    setPresets(next)
+    try {
+      const saved = await putAdminPreferences({ log_filter_presets: next })
+      const list = saved?.log_filter_presets || saved?.data?.log_filter_presets
+      if (Array.isArray(list)) setPresets(list)
+    } catch (e) {
+      toast.error(e?.message || 'Could not sync preset')
+    }
+  }
+
+  const saveCurrentPreset = () => {
+    const name = String(presetName || '').trim()
+    if (!name) {
+      toast.error('Name this preset first')
+      return
+    }
+    const next = [
+      { id: `p-${Date.now()}`, name, tab, filters: { ...filters } },
+      ...presets.filter(p => p.name !== name)
+    ].slice(0, 12)
+    setPresetName('')
+    void persistPresets(next)
+    toast.success('Preset saved')
+  }
+
+  const applyPreset = p => {
+    const nextFilters = { ...emptyFilters(), ...(p.filters || {}) }
+    setFilters(nextFilters)
+    setPage(0)
+    syncUrl(p.tab || tab, nextFilters, 0)
+  }
+
+  const deletePreset = id => {
+    void persistPresets(presets.filter(p => p.id !== id))
+  }
 
   // Hydrate filters from URL once ready
   useEffect(() => {
@@ -699,9 +755,19 @@ export default function LogsHubPage() {
             resultCount={total}
             onRefresh={() => void loadTab(true)}
             refreshLoading={loading}
-            helperText='Filters sync into the URL. Click Apply after editing fields.'
+            helperText='Filters sync into the URL. Save presets to reuse across devices.'
             endAdornment={
-              <Stack direction='row' spacing={1}>
+              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                <TextField
+                  size='small'
+                  placeholder='Preset name'
+                  value={presetName}
+                  onChange={e => setPresetName(e.target.value)}
+                  sx={{ width: 140 }}
+                />
+                <Button size='small' variant='outlined' onClick={saveCurrentPreset} sx={{ textTransform: 'none' }}>
+                  Save preset
+                </Button>
                 <Button size='small' variant='contained' onClick={applyFilters} sx={{ textTransform: 'none', bgcolor: ops.indigo }}>
                   Apply
                 </Button>
@@ -842,6 +908,21 @@ export default function LogsHubPage() {
               />
             )}
           </AdminFilterBar>
+
+          {presets.length ? (
+            <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 1 }}>
+              {presets.map(p => (
+                <Chip
+                  key={p.id || p.name}
+                  size='small'
+                  label={`${p.name} · ${p.tab || 'api'}`}
+                  onClick={() => applyPreset(p)}
+                  onDelete={() => deletePreset(p.id)}
+                  sx={{ fontFamily: ops.mono, fontSize: 11 }}
+                />
+              ))}
+            </Stack>
+          ) : null}
 
           <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.mute }}>
             {total.toLocaleString()} rows

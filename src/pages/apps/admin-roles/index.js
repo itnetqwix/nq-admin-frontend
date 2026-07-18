@@ -35,6 +35,7 @@ import {
   updateAdminPermissions,
   updateCustomRole
 } from 'src/services/adminLogsApi'
+import { revokeUserSession } from 'src/services/user360Api'
 import { formatOpsDateTime } from 'src/utils/opsDateTime'
 import { ops } from 'src/styles/opsSurface'
 import { ALL_PERMISSION_KEYS, PERM_GROUPS, ROLE_MATRIX } from 'src/configs/adminRoleMatrix'
@@ -76,6 +77,7 @@ export default function AdminRolesPage() {
   const [savingRole, setSavingRole] = useState(false)
   const [editTemplateOpen, setEditTemplateOpen] = useState(false)
   const [devicesUser, setDevicesUser] = useState(null)
+  const [revokingSessionId, setRevokingSessionId] = useState(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -643,7 +645,7 @@ export default function AdminRolesPage() {
         </DialogTitle>
         <DialogContent dividers>
           <Typography sx={{ mb: 2, fontSize: 13, color: ops.mute }}>
-            Auth sessions for this admin — device, IP, location, last used. Revoked sessions stay for audit.
+            Auth sessions for this admin — device, IP, location, last used. Revoke kicks that device off immediately.
           </Typography>
           {(devicesUser?.sessions || []).length ? (
             <Stack spacing={1.5}>
@@ -655,30 +657,66 @@ export default function AdminRolesPage() {
                     pb: 1.25
                   }}
                 >
-                  <Stack direction='row' justifyContent='space-between' gap={1} flexWrap='wrap'>
-                    <Typography sx={{ fontSize: 13, fontWeight: 600 }}>
-                      {s.deviceLabel || 'Device'} · {s.platform || '—'}
-                      {s.revokedAt ? ' · revoked' : s.trusted ? ' · trusted' : ''}
-                    </Typography>
-                    <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.body }}>
-                      {s.lastUsedAt ? formatOpsDateTime(s.lastUsedAt, { withSeconds: false }) : '—'}
-                    </Typography>
+                  <Stack direction='row' justifyContent='space-between' gap={1} flexWrap='wrap' alignItems='flex-start'>
+                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                      <Typography sx={{ fontSize: 13, fontWeight: 600 }}>
+                        {s.deviceLabel || 'Device'} · {s.platform || '—'}
+                        {s.revokedAt ? ' · revoked' : s.trusted ? ' · trusted' : ''}
+                      </Typography>
+                      <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute }}>
+                        {[
+                          s.ipAddress || 'no ip',
+                          s.loginMethod,
+                          [s.city, s.region, s.country].filter(Boolean).join(', '),
+                          s.browser,
+                          s.os,
+                          s.appVersion
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </Typography>
+                      <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute }}>
+                        {[s.publicId, s.clientType, s.timezone].filter(Boolean).join(' · ')}
+                      </Typography>
+                    </Box>
+                    <Stack alignItems='flex-end' spacing={0.5}>
+                      <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.body }}>
+                        {s.lastUsedAt ? formatOpsDateTime(s.lastUsedAt, { withSeconds: false }) : '—'}
+                      </Typography>
+                      {!s.revokedAt && devicesUser?.id ? (
+                        <Button
+                          size='small'
+                          color='error'
+                          disabled={revokingSessionId === s.id}
+                          sx={{ textTransform: 'none', minWidth: 0 }}
+                          onClick={async () => {
+                            setRevokingSessionId(s.id)
+                            try {
+                              await revokeUserSession(devicesUser.id, s.id)
+                              toast.success('Session revoked')
+                              setDevicesUser(prev =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      sessions: (prev.sessions || []).map(row =>
+                                        row.id === s.id ? { ...row, revokedAt: new Date().toISOString() } : row
+                                      )
+                                    }
+                                  : prev
+                              )
+                              void load()
+                            } catch (e) {
+                              toast.error(e?.message || 'Revoke failed')
+                            } finally {
+                              setRevokingSessionId(null)
+                            }
+                          }}
+                        >
+                          {revokingSessionId === s.id ? '…' : 'Revoke'}
+                        </Button>
+                      ) : null}
+                    </Stack>
                   </Stack>
-                  <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute }}>
-                    {[
-                      s.ipAddress || 'no ip',
-                      s.loginMethod,
-                      [s.city, s.region, s.country].filter(Boolean).join(', '),
-                      s.browser,
-                      s.os,
-                      s.appVersion
-                    ]
-                      .filter(Boolean)
-                      .join(' · ')}
-                  </Typography>
-                  <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute }}>
-                    {[s.publicId, s.clientType, s.timezone].filter(Boolean).join(' · ')}
-                  </Typography>
                 </Box>
               ))}
             </Stack>

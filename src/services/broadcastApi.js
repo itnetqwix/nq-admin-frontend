@@ -31,6 +31,14 @@ export const listBroadcasts = async (query = {}) => {
   return handleRes(res)
 }
 
+export const getBroadcastDeliveryStats = async (days = 14) => {
+  const res = await fetch(apiUrl(`/admin/broadcasts/stats?days=${days}`), {
+    method: 'GET',
+    headers: getAuthHeaders()
+  })
+  return handleRes(res)
+}
+
 export const getBroadcastById = async id => {
   const res = await fetch(apiUrl(`/admin/broadcasts/${id}`), {
     method: 'GET',

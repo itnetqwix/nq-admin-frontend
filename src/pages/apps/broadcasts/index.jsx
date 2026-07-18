@@ -23,6 +23,7 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import { AbilityContext } from 'src/layouts/components/acl/Can'
 import { ops } from 'src/styles/opsSurface'
+import MiniSparkline, { fillDailySeries } from 'src/components/admin/MiniSparkline'
 import { EditorWrapper } from 'src/@core/styles/libs/react-draft-wysiwyg'
 import {
   listBroadcasts,
@@ -30,7 +31,8 @@ import {
   createBroadcast,
   resendBroadcast,
   deleteBroadcast,
-  getRecipientPreviewCount
+  getRecipientPreviewCount,
+  getBroadcastDeliveryStats
 } from 'src/services/broadcastApi'
 
 const Editor = dynamic(() => import('react-draft-wysiwyg').then(mod => mod.Editor), { ssr: false })
@@ -85,6 +87,7 @@ export default function BroadcastsPage() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
   const searchTimer = useRef(null)
+  const [deliveryStats, setDeliveryStats] = useState(null)
 
   // ─── Detail dialog state ───────────────────────────────────
   const [detailOpen, setDetailOpen] = useState(false)
@@ -196,10 +199,15 @@ export default function BroadcastsPage() {
   const fetchHistory = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await listBroadcasts({ search, page, limit: pageSize })
+      const [data, statsRes] = await Promise.all([
+        listBroadcasts({ search, page, limit: pageSize }),
+        getBroadcastDeliveryStats(14).catch(() => null)
+      ])
       const list = data?.result?.broadcasts || []
       setBroadcasts(list.map(b => ({ ...b, id: b._id })))
       setTotal(data?.result?.total || 0)
+      const stats = statsRes?.result || statsRes?.data || statsRes
+      if (stats?.dailyDeliveries) setDeliveryStats(stats)
     } catch (err) {
       toast.error(err.message || 'Failed to load broadcasts')
     } finally {
@@ -312,6 +320,22 @@ export default function BroadcastsPage() {
       headerName: 'Recipients',
       width: 110,
       renderCell: p => p.value?.total_recipients ?? '--',
+    },
+    {
+      field: 'delivery_spark',
+      headerName: '14d sent',
+      width: 100,
+      sortable: false,
+      renderCell: p => (
+        <MiniSparkline
+          values={
+            Array.isArray(p.row.delivery_daily) && p.row.delivery_daily.length
+              ? p.row.delivery_daily
+              : []
+          }
+          width={80}
+        />
+      ),
     },
     {
       field: 'sent_at',
@@ -530,6 +554,39 @@ export default function BroadcastsPage() {
         {/* ─── HISTORY TAB ─────────────────────────────────── */}
         {tab === 1 && (
           <AdminPageSection>
+            {deliveryStats?.dailyDeliveries?.length ? (
+              <Box
+                sx={{
+                  mb: 2,
+                  p: 1.5,
+                  borderRadius: ops.radiusMd,
+                  border: `1px solid ${ops.hairline}`,
+                  bgcolor: ops.canvasSoft,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  flexWrap: 'wrap'
+                }}
+              >
+                {(() => {
+                  const sentSeries = fillDailySeries(deliveryStats.dailyDeliveries, 14, 'sent')
+                  const failedSeries = fillDailySeries(deliveryStats.dailyDeliveries, 14, 'failed')
+                  return (
+                    <>
+                      <Box>
+                        <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute, mb: 0.5 }}>
+                          Platform deliveries · 14d
+                        </Typography>
+                        <MiniSparkline values={sentSeries} width={160} height={32} />
+                      </Box>
+                      <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.body }}>
+                        {sentSeries.reduce((a, b) => a + b, 0)} sent · {failedSeries.reduce((a, b) => a + b, 0)} failed
+                      </Typography>
+                    </>
+                  )
+                })()}
+              </Box>
+            ) : null}
             <AdminFilterBar
               searchPlaceholder='Search broadcasts…'
               onSearchChange={handleSearchChange}

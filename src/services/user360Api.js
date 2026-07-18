@@ -205,3 +205,27 @@ export const getUserReferrals = async userId => {
   if (isApiFailure(data, response)) throw new Error(readError(data))
   return unwrapData(data)
 }
+
+export const revokeUserSession = async (userId, sessionId) => {
+  if (!userId || !sessionId) throw new Error('userId and sessionId required')
+  const response = await fetch(apiUrl(`/admin/users/${userId}/sessions/${sessionId}/revoke`), {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({})
+  })
+  const data = await response.json()
+  if (isApiFailure(data, response)) throw new Error(readError(data))
+  return unwrapData(data) || data?.data || { revoked: true }
+}
+
+export const revokeAllUserSessions = async userId => {
+  if (!userId || userId === 'undefined') throw new Error('Invalid user id')
+  const response = await fetch(apiUrl(`/admin/users/${userId}/sessions/revoke-all`), {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({})
+  })
+  const data = await response.json()
+  if (isApiFailure(data, response)) throw new Error(readError(data))
+  return unwrapData(data) || data?.data || { revokedCount: 0 }
+}

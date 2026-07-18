@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -14,6 +14,7 @@ import { useAdminConfirm } from 'src/components/admin'
 import { AbilityContext } from 'src/layouts/components/acl/Can'
 import { usePricingConfig } from 'src/hooks/usePricingConfig'
 import { ops } from 'src/styles/opsSurface'
+import { formatDiffValue, pricingConfigDiff } from 'src/utils/pricingDiff'
 import PricingDashboardTab from './components/PricingDashboardTab'
 import PricingPromoSponsorTab from './components/PricingPromoSponsorTab'
 import PricingRatesTab from './components/PricingRatesTab'
@@ -50,6 +51,7 @@ const PricingPage = () => {
 
   const {
     config,
+    savedConfig,
     loading,
     saving,
     isDirty,
@@ -64,6 +66,11 @@ const PricingPage = () => {
     patchEscrowPolicy,
     patchGlobal
   } = usePricingConfig()
+
+  const dirtyDiff = useMemo(
+    () => (isDirty && savedConfig && config ? pricingConfigDiff(savedConfig, config) : []),
+    [isDirty, savedConfig, config]
+  )
 
   const confirmReset = async () => {
     const ok = await confirm({
@@ -91,6 +98,13 @@ const PricingPage = () => {
     const ok = await confirm({
       title: 'Save pricing changes?',
       message: 'New rates apply to future checkouts and sessions.',
+      detail:
+        dirtyDiff.length > 0
+          ? `${dirtyDiff.length} field(s) vs last publish:\n${dirtyDiff
+              .slice(0, 12)
+              .map(d => `${d.path}: ${formatDiffValue(d.from)} → ${formatDiffValue(d.to)}`)
+              .join('\n')}${dirtyDiff.length > 12 ? `\n…and ${dirtyDiff.length - 12} more` : ''}`
+          : '',
       confirmLabel: 'Save',
       variant: 'warning'
     })
@@ -143,7 +157,29 @@ const PricingPage = () => {
       >
         {isDirty ? (
           <Alert severity='warning' sx={{ mb: 2 }}>
-            You have unsaved changes. Save before leaving, or Discard to revert.
+            You have unsaved changes
+            {dirtyDiff.length ? ` (${dirtyDiff.length} field${dirtyDiff.length === 1 ? '' : 's'})` : ''}.
+            Save before leaving, or Discard to revert.
+            {dirtyDiff.length ? (
+              <Box
+                component='pre'
+                sx={{
+                  mt: 1,
+                  mb: 0,
+                  fontFamily: ops.mono,
+                  fontSize: 11,
+                  whiteSpace: 'pre-wrap',
+                  maxHeight: 120,
+                  overflow: 'auto'
+                }}
+              >
+                {dirtyDiff
+                  .slice(0, 8)
+                  .map(d => `${d.path}: ${formatDiffValue(d.from)} → ${formatDiffValue(d.to)}`)
+                  .join('\n')}
+                {dirtyDiff.length > 8 ? `\n…+${dirtyDiff.length - 8} more` : ''}
+              </Box>
+            ) : null}
           </Alert>
         ) : null}
 

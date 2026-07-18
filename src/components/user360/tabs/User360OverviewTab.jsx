@@ -12,15 +12,20 @@ import {
   Typography
 } from '@mui/material'
 import Link from 'next/link'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
 import { ops } from 'src/styles/opsSurface'
 import { formatOpsDateTime } from 'src/utils/opsDateTime'
+import { revokeAllUserSessions, revokeUserSession } from 'src/services/user360Api'
+import { useAdminConfirm } from 'src/components/admin/useAdminConfirm'
 
 import User360AccountReviewActions from '../User360AccountReviewActions'
 import { SectionShell, StatTile, OpsSurfaceCard } from '../user360Shared'
 import { KeyValueRow, NotificationPreferencesPanel, ExtraInfoTree, safeImg } from '../user360Parts'
 
 export default function User360OverviewTab({ userId, userData, onRefresh }) {
+  const { confirm, ConfirmDialog } = useAdminConfirm()
+  const [revoking, setRevoking] = useState(false)
   const summary = useMemo(() => userData?.summary || {}, [userData])
   const overview = userData?.overview || {}
   const profile = userData?.user || {}
@@ -30,6 +35,7 @@ export default function User360OverviewTab({ userId, userData, onRefresh }) {
   const preferences = overview.preferences || {}
   const sessions = overview.sessions || userData?.sessions || []
   const loginHistory = overview.login_history || userData?.login_history || []
+  const activeSessions = sessions.filter(s => !s.revokedAt)
 
   const lastOnlineLabel = summary.lastOnlineAt || overview.lastOnlineAt
     ? new Date(summary.lastOnlineAt || overview.lastOnlineAt).toLocaleString()
@@ -43,6 +49,7 @@ export default function User360OverviewTab({ userId, userData, onRefresh }) {
   }
 
   return (
+    <>
     <SectionShell
       title='Profile & account snapshot'
       subtitle='High-signal fields for identity, wallet, sessions, and engagement. Expand sections below for notification channels and extended profile metadata.'
@@ -154,18 +161,50 @@ export default function User360OverviewTab({ userId, userData, onRefresh }) {
 
           <Stack spacing={2} sx={{ mt: 3 }}>
             <OpsSurfaceCard>
-              <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mb: 1.5 }}>
+              <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mb: 1.5 }} flexWrap='wrap' gap={1}>
                 <Typography sx={{ fontWeight: 600 }}>Sessions &amp; login IP</Typography>
-                {userId ? (
-                  <Button
-                    size='small'
-                    component={Link}
-                    href={`/apps/logs?tab=login&userId=${userId}`}
-                    sx={{ textTransform: 'none' }}
-                  >
-                    Full login history →
-                  </Button>
-                ) : null}
+                <Stack direction='row' spacing={1} flexWrap='wrap'>
+                  {userId && activeSessions.length > 0 ? (
+                    <Button
+                      size='small'
+                      color='error'
+                      variant='outlined'
+                      disabled={revoking}
+                      sx={{ textTransform: 'none' }}
+                      onClick={async () => {
+                        const ok = await confirm({
+                          title: 'Revoke all devices?',
+                          message: `Signs this user out of ${activeSessions.length} active session(s). They must log in again.`,
+                          confirmLabel: 'Revoke all',
+                          variant: 'danger'
+                        })
+                        if (!ok) return
+                        setRevoking(true)
+                        try {
+                          const res = await revokeAllUserSessions(userId)
+                          toast.success(`Revoked ${res?.revokedCount ?? activeSessions.length} session(s)`)
+                          onRefresh?.()
+                        } catch (e) {
+                          toast.error(e?.message || 'Revoke failed')
+                        } finally {
+                          setRevoking(false)
+                        }
+                      }}
+                    >
+                      Revoke all devices
+                    </Button>
+                  ) : null}
+                  {userId ? (
+                    <Button
+                      size='small'
+                      component={Link}
+                      href={`/apps/logs?tab=login&userId=${userId}`}
+                      sx={{ textTransform: 'none' }}
+                    >
+                      Full login history →
+                    </Button>
+                  ) : null}
+                </Stack>
               </Stack>
               {sessions.length ? (
                 <Stack spacing={1} sx={{ mb: 2 }}>
@@ -178,7 +217,8 @@ export default function User360OverviewTab({ userId, userData, onRefresh }) {
                         display: 'flex',
                         justifyContent: 'space-between',
                         gap: 2,
-                        flexWrap: 'wrap'
+                        flexWrap: 'wrap',
+                        alignItems: 'flex-start'
                       }}
                     >
                       <Box>
@@ -204,9 +244,33 @@ export default function User360OverviewTab({ userId, userData, onRefresh }) {
                           {[s.publicId, s.deviceId, s.appVersion, s.screen].filter(Boolean).join(' · ')}
                         </Typography>
                       </Box>
-                      <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.body }}>
-                        {s.lastUsedAt ? formatOpsDateTime(s.lastUsedAt, { withSeconds: false }) : '—'}
-                      </Typography>
+                      <Stack alignItems='flex-end' spacing={0.5}>
+                        <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.body }}>
+                          {s.lastUsedAt ? formatOpsDateTime(s.lastUsedAt, { withSeconds: false }) : '—'}
+                        </Typography>
+                        {!s.revokedAt && userId ? (
+                          <Button
+                            size='small'
+                            color='error'
+                            disabled={revoking}
+                            sx={{ textTransform: 'none', minWidth: 0 }}
+                            onClick={async () => {
+                              setRevoking(true)
+                              try {
+                                await revokeUserSession(userId, s.id)
+                                toast.success('Session revoked')
+                                onRefresh?.()
+                              } catch (e) {
+                                toast.error(e?.message || 'Revoke failed')
+                              } finally {
+                                setRevoking(false)
+                              }
+                            }}
+                          >
+                            Revoke
+                          </Button>
+                        ) : null}
+                      </Stack>
                     </Box>
                   ))}
                 </Stack>
@@ -325,5 +389,7 @@ export default function User360OverviewTab({ userId, userData, onRefresh }) {
         </Box>
       </Stack>
     </SectionShell>
+    {ConfirmDialog}
+    </>
   )
 }

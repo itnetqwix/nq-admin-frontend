@@ -160,3 +160,13 @@ export async function putAdminNavPreferences(nav_favorites) {
   })
   return parse(res)
 }
+
+/** Partial preferences update — pass only keys you change. */
+export async function putAdminPreferences(partial) {
+  const res = await fetch(apiUrl('/admin/me/preferences'), {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(partial || {})
+  })
+  return parse(res)
+}

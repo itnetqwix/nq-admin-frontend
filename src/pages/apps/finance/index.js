@@ -14,6 +14,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
+import Box from '@mui/material/Box'
 import toast from 'react-hot-toast'
 import { AbilityContext } from 'src/layouts/components/acl/Can'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
@@ -47,7 +48,8 @@ import {
   disputeEscrowHold,
   resolveDisputeEscrow,
   getTopUpHistory,
-  getFinanceOpsDashboard
+  getFinanceOpsDashboard,
+  exportFinanceCsv
 } from 'src/services/financeApi'
 
 const TAB = {
@@ -763,6 +765,41 @@ const FinancePage = () => {
 
   const heldSummary = escrowSummary?.byStatus?.held
   const aging = escrowSummary?.aging
+  const moneyAtRisk = opsDashboard?.moneyAtRisk
+  const stuckStripVisible =
+    opsDashboard &&
+    ((opsDashboard.heldCount ?? 0) > 0 ||
+      (opsDashboard.releasingCount ?? 0) > 0 ||
+      (opsDashboard.disputedCount ?? 0) > 0 ||
+      (opsDashboard.openRefundCount ?? 0) > 0 ||
+      (opsDashboard.pendingPayoutCount ?? 0) > 0 ||
+      (opsDashboard.stuckTopUpsPending30m ?? 0) > 0)
+
+  const exportCurrentTab = async () => {
+    if (tab === TAB.OVERVIEW) {
+      toast.error('Switch to a data tab to export')
+      return
+    }
+    const kind = TAB_SLUG[tab]
+    if (!kind || kind === 'overview') {
+      toast.error('Nothing to export on this tab')
+      return
+    }
+    try {
+      toast.loading('Exporting…', { id: 'finance-csv' })
+      await exportFinanceCsv(kind, {
+        q: searchQ || undefined,
+        userId: searchQ || undefined,
+        sessionId: searchQ && searchQ.length === 24 ? searchQ : undefined,
+        status: tab === TAB.ESCROW ? escrowStatus || undefined : tab === TAB.REFUNDS ? refundStatus || undefined : undefined,
+        referenceType: tab === TAB.LEDGER ? ledgerReferenceType || undefined : undefined,
+        maxAgeMinutes: tab === TAB.STUCK_TOPUPS ? 30 : undefined
+      })
+      toast.success('CSV downloaded', { id: 'finance-csv' })
+    } catch (e) {
+      toast.error(e?.message || 'Export failed', { id: 'finance-csv' })
+    }
+  }
 
   return (
     <AdminPageShell
@@ -775,6 +812,11 @@ const FinancePage = () => {
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
           <Chip component={Link} href='/apps/finance/connect' label='Stripe Connect' clickable variant='outlined' size='small' />
           <Chip component={Link} href='/apps/pricing' label='Pricing' clickable variant='outlined' size='small' />
+          {tab !== TAB.OVERVIEW ? (
+            <Button size='small' variant='outlined' onClick={() => void exportCurrentTab()} sx={{ textTransform: 'none' }}>
+              Export CSV
+            </Button>
+          ) : null}
           {allowAdjust ? (
             <Button
               size='small'
@@ -852,6 +894,100 @@ const FinancePage = () => {
       }
     >
       <AdminPageSection>
+        {stuckStripVisible ? (
+          <Box
+            sx={{
+              mb: 2,
+              p: 1.5,
+              borderRadius: ops.radiusMd,
+              border: `1px solid ${ops.hairline}`,
+              bgcolor: ops.canvasSoft
+            }}
+          >
+            <Stack direction='row' justifyContent='space-between' alignItems='baseline' flexWrap='wrap' gap={1} sx={{ mb: 1 }}>
+              <Typography sx={{ fontSize: 13, fontWeight: 600 }}>Stuck money</Typography>
+              {moneyAtRisk?.totalMinor != null ? (
+                <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.mute }}>
+                  At risk · ${(Number(moneyAtRisk.totalMinor) / 100).toFixed(2)}
+                </Typography>
+              ) : null}
+            </Stack>
+            <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+              <Chip
+                component={Link}
+                href='/apps/finance?tab=escrow'
+                clickable
+                label={`Held: ${opsDashboard.heldCount ?? 0}${
+                  moneyAtRisk?.heldMinor != null ? ` · $${(moneyAtRisk.heldMinor / 100).toFixed(0)}` : ''
+                }`}
+                color={(opsDashboard.heldCount ?? 0) > 0 ? 'warning' : 'default'}
+                size='small'
+                variant='outlined'
+              />
+              <Chip
+                component={Link}
+                href='/apps/finance?tab=escrow'
+                clickable
+                label={`Releasing: ${opsDashboard.releasingCount ?? 0}`}
+                color={(opsDashboard.releasingCount ?? 0) > 0 ? 'warning' : 'default'}
+                size='small'
+                variant='outlined'
+                onClick={e => {
+                  e.preventDefault()
+                  handleGoTab('escrow', { status: 'releasing' })
+                }}
+              />
+              <Chip
+                component={Link}
+                href='/apps/finance?tab=escrow'
+                clickable
+                label={`Disputed: ${opsDashboard.disputedCount ?? 0}`}
+                color={(opsDashboard.disputedCount ?? 0) > 0 ? 'error' : 'default'}
+                size='small'
+                variant='outlined'
+                onClick={e => {
+                  e.preventDefault()
+                  handleGoTab('escrow', { status: 'disputed' })
+                }}
+              />
+              <Chip
+                component={Link}
+                href='/apps/finance?tab=refunds'
+                clickable
+                label={`Open refunds: ${opsDashboard.openRefundCount ?? 0}${
+                  moneyAtRisk?.openRefundMinor != null
+                    ? ` · $${(moneyAtRisk.openRefundMinor / 100).toFixed(0)}`
+                    : ''
+                }`}
+                color={(opsDashboard.openRefundCount ?? 0) > 0 ? 'error' : 'default'}
+                size='small'
+                variant='outlined'
+              />
+              <Chip
+                component={Link}
+                href='/apps/finance?tab=payouts'
+                clickable
+                label={`Pending payouts: ${opsDashboard.pendingPayoutCount ?? 0}${
+                  moneyAtRisk?.pendingPayoutMinor != null
+                    ? ` · $${(moneyAtRisk.pendingPayoutMinor / 100).toFixed(0)}`
+                    : ''
+                }`}
+                color={(opsDashboard.pendingPayoutCount ?? 0) > 0 ? 'warning' : 'default'}
+                size='small'
+                variant='outlined'
+              />
+              <Chip
+                component={Link}
+                href='/apps/finance?tab=stuck_topups'
+                clickable
+                label={`Stuck top-ups: ${opsDashboard.stuckTopUpsPending30m ?? 0}`}
+                size='small'
+                variant='outlined'
+              />
+            </Stack>
+          </Box>
+        ) : null}
+
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} sx={{ mb: 2 }}>
           {tab !== TAB.OVERVIEW ? (
             <>
@@ -931,30 +1067,7 @@ const FinancePage = () => {
         {tab !== TAB.OVERVIEW && opsDashboard ? (
           <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
             <Chip
-              label={`Held: ${opsDashboard.heldCount ?? 0}`}
-              color={(opsDashboard.heldCount ?? 0) > 0 ? 'warning' : 'default'}
-              size='small'
-              variant='outlined'
-            />
-            <Chip
-              label={`Releasing: ${opsDashboard.releasingCount ?? 0}`}
-              color={opsDashboard.releasingCount > 0 ? 'warning' : 'default'}
-              size='small'
-              variant='outlined'
-            />
-            <Chip
-              label={`Disputed: ${opsDashboard.disputedCount ?? 0}`}
-              color={opsDashboard.disputedCount > 0 ? 'error' : 'default'}
-              size='small'
-              variant='outlined'
-            />
-            <Chip
               label={`Transfer failures (7d): ${opsDashboard.transferFailuresLast7d ?? 0}`}
-              size='small'
-              variant='outlined'
-            />
-            <Chip
-              label={`Stuck top-ups: ${opsDashboard.stuckTopUpsPending30m ?? 0}`}
               size='small'
               variant='outlined'
             />

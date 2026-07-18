@@ -63,11 +63,16 @@ export default function AdminConfirmDialog({
         </Stack>
       </DialogTitle>
       <DialogContent sx={{ pt: 0 }}>
-        <Typography variant='body2' color='text.secondary' sx={{ lineHeight: 1.65 }}>
+        <Typography variant='body2' color='text.secondary' sx={{ lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>
           {message}
         </Typography>
         {detail ? (
-          <Typography variant='caption' color='text.secondary' display='block' sx={{ mt: 1.5, lineHeight: 1.5 }}>
+          <Typography
+            variant='caption'
+            color='text.secondary'
+            display='block'
+            sx={{ mt: 1.5, lineHeight: 1.5, whiteSpace: 'pre-wrap', fontFamily: 'ui-monospace, monospace' }}
+          >
             {detail}
           </Typography>
         ) : null}

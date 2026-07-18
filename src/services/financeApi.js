@@ -196,3 +196,33 @@ export async function getFinanceOpsDashboard() {
   if (!res.ok) throw new Error(data?.error || 'Failed to load ops dashboard')
   return data?.data ?? data
 }
+
+/** Download filtered finance CSV for a tab (server-side, up to 5k rows). */
+export async function exportFinanceCsv(kind, filters = {}) {
+  const params = new URLSearchParams(
+    Object.fromEntries(
+      Object.entries({ kind, limit: 2000, ...filters }).filter(([, v]) => v != null && v !== '')
+    )
+  ).toString()
+  const res = await fetch(apiUrl(`/admin/finance/export?${params}`), {
+    headers: getAuthHeaders()
+  })
+  const ct = res.headers.get('content-type') || ''
+  if (!res.ok) {
+    let msg = 'Export failed'
+    try {
+      const data = await res.json()
+      msg = data?.error || msg
+    } catch {
+      /* ignore */
+    }
+    throw new Error(msg)
+  }
+  const text = ct.includes('text/csv') || ct.includes('text/plain') ? await res.text() : await res.text()
+  const blob = new Blob([text], { type: 'text/csv;charset=utf-8;' })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = `finance-${kind}-${Date.now()}.csv`
+  a.click()
+  URL.revokeObjectURL(a.href)
+}

@@ -20,6 +20,7 @@ import Link from 'next/link'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import { AbilityContext } from 'src/layouts/components/acl/Can'
 import { ops } from 'src/styles/opsSurface'
+import MiniSparkline, { sparkFromUsedBy, fillDailySeries } from 'src/components/admin/MiniSparkline'
 import {
   listPromoCodes,
   getPromoAdminStats,
@@ -318,6 +319,13 @@ export default function PromoCodesPage() {
       renderCell: p => `${p.row.usage_count || 0} / ${p.row.usage_limit || '∞'}`
     },
     {
+      field: 'usage_spark',
+      headerName: '14d',
+      width: 90,
+      sortable: false,
+      renderCell: p => <MiniSparkline values={sparkFromUsedBy(p.row.used_by, 14)} />
+    },
+    {
       field: 'status',
       headerName: 'Status',
       width: 110,
@@ -444,6 +452,20 @@ export default function PromoCodesPage() {
               </Grid>
               <Grid item xs={6} md={3}>
                 <OpsMetricTile icon='mdi:ticket-confirmation' label='Redemptions' value={String(stats.totalRedemptions ?? 0)} />
+              </Grid>
+              <Grid item xs={6} md={3}>
+                <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', px: 1 }}>
+                  <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute, mb: 0.5 }}>14d trend</Typography>
+                  <MiniSparkline
+                    values={
+                      Array.isArray(stats.dailyRedemptions)
+                        ? fillDailySeries(stats.dailyRedemptions, 14, 'count')
+                        : []
+                    }
+                    width={96}
+                    height={28}
+                  />
+                </Box>
               </Grid>
               <Grid item xs={6} md={3}>
                 <OpsMetricTile

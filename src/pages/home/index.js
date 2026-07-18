@@ -24,6 +24,7 @@ import {
   selectDashboard
 } from 'src/store/slices/dashboardSlice'
 import { fetchGlobalCommission } from 'src/services/adminDashboardApi'
+import { getFinanceOpsDashboard } from 'src/services/financeApi'
 import { ops } from 'src/styles/opsSurface'
 import { formatOpsDateTime } from 'src/utils/opsDateTime'
 import { useRouter } from 'next/router'
@@ -167,6 +168,7 @@ const Home = () => {
   const [commissionModal, setCommissionModal] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
   const [focus, setFocus] = useState('all') // all | attention | business | security
+  const [moneyAtRisk, setMoneyAtRisk] = useState(null)
 
   const kpis = useMemo(() => logSummary?.kpis || {}, [logSummary])
   const topPaths = logSummary?.top_api_paths || []
@@ -183,14 +185,24 @@ const Home = () => {
     }
   }, [])
 
+  const loadMoneyAtRisk = useCallback(async () => {
+    try {
+      const data = await getFinanceOpsDashboard()
+      setMoneyAtRisk(data?.moneyAtRisk || null)
+    } catch {
+      setMoneyAtRisk(null)
+    }
+  }, [])
+
   useEffect(() => {
     void dispatch(fetchHomeDashboard())
     void loadCommission()
+    void loadMoneyAtRisk()
     const t = setInterval(() => {
       void dispatch(fetchLogSummaryOnly())
     }, 60_000)
     return () => clearInterval(t)
-  }, [dispatch, loadCommission])
+  }, [dispatch, loadCommission, loadMoneyAtRisk])
 
   const onRefresh = async () => {
     setRefreshing(true)
@@ -198,7 +210,8 @@ const Home = () => {
       await Promise.all([
         dispatch(fetchHomeDashboard()),
         refreshMetrics?.(),
-        loadCommission()
+        loadCommission(),
+        loadMoneyAtRisk()
       ])
     } finally {
       setRefreshing(false)
@@ -219,6 +232,19 @@ const Home = () => {
   const show = key => focus === 'all' || focus === key
 
   const attentionTiles = [
+    {
+      icon: 'mdi:cash-lock',
+      label: 'Money at risk',
+      value:
+        moneyAtRisk?.totalMinor != null
+          ? fmtMoney(Number(moneyAtRisk.totalMinor) / 100)
+          : '—',
+      hint: moneyAtRisk
+        ? `Escrow + refunds + payouts · ${fmtInt(moneyAtRisk.openRefundCount || 0)} open refunds`
+        : 'Held escrow + open refunds + pending payouts',
+      tone: (moneyAtRisk?.totalMinor || 0) > 0 ? 'danger' : 'default',
+      onClick: () => router.push('/apps/finance?tab=escrow')
+    },
     {
       icon: 'mdi:shield-alert-outline',
       label: 'Failed logins',
