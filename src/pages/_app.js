@@ -46,6 +46,7 @@ import ReactHotToast from 'src/@core/styles/libs/react-hot-toast'
 // ** Utils Imports
 import { createEmotionCache } from 'src/@core/utils/create-emotion-cache'
 import { initLogRocket } from 'src/lib/logrocket'
+import { initClarity, reidentifyClarityPage } from 'src/lib/clarity'
 
 // ** Prismjs Styles
 import 'prismjs'
@@ -71,8 +72,9 @@ if (themeConfig.routingLoader) {
   Router.events.on('routeChangeError', () => {
     NProgress.done()
   })
-  Router.events.on('routeChangeComplete', () => {
+  Router.events.on('routeChangeComplete', url => {
     NProgress.done()
+    reidentifyClarityPage(url)
   })
 }
 
@@ -102,6 +104,7 @@ const App = props => {
 
   useEffect(() => {
     initLogRocket()
+    initClarity()
   }, [])
 
   return (

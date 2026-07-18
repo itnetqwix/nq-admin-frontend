@@ -13,6 +13,7 @@ import {
   registerSessionExpiredCallback
 } from 'src/utils/sessionExpired'
 import { clearLogRocketUser, identifyLogRocketUser } from 'src/lib/logrocket'
+import { identifyClarityUser } from 'src/lib/clarity'
 import { installApiAuthHandler } from 'src/utils/installApiAuthHandler'
 
 // ** Defaults
@@ -129,6 +130,7 @@ const AuthProvider = ({ children }) => {
       window.localStorage.setItem('userData', JSON.stringify(response.userInfo))
       setUser({ ...response.userInfo })
       identifyLogRocketUser(response.userInfo)
+      identifyClarityUser(response.userInfo)
 
       const returnUrl = router.query.returnUrl
       const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/home'

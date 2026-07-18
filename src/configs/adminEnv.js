@@ -4,6 +4,11 @@
 export const LOGROCKET_APP_ID =
   String(process.env.NEXT_PUBLIC_LOGROCKET_APP_ID ?? 'kzg9vc/netqwix').trim()
 
+/** Microsoft Clarity project id (web admin). Empty = Clarity disabled. */
+export const CLARITY_PROJECT_ID = String(
+  process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID ?? ''
+).trim()
+
 /** Enabled unless explicitly set to "false" (avoids missing env after .env edits without restart). */
 export const isAdminRegisterEnabled = () => {
   const raw = String(process.env.NEXT_PUBLIC_ADMIN_REGISTER_ENABLED ?? 'true').trim().toLowerCase()

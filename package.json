@@ -34,6 +34,7 @@
     "@fullcalendar/timegrid": "6.1.4",
     "@hookform/resolvers": "^2.9.11",
     "@iconify/react": "4.1.0",
+    "@microsoft/clarity": "^1.0.2",
     "@mui/icons-material": "^5.15.12",
     "@mui/lab": "5.0.0-alpha.123",
     "@mui/material": "5.11.13",
