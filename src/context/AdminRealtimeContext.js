@@ -126,9 +126,11 @@ export const AdminRealtimeProvider = ({ children }) => {
     if (!token) return undefined
 
     const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '')
+    // Stay on HTTP long-polling — websocket upgrade returns 400 behind Cloudflare/LB.
     const socket = io(baseUrl, {
-      auth: { authorization: token },
-      transports: ['websocket', 'polling'],
+      auth: { authorization: token, token },
+      transports: ['polling'],
+      upgrade: false,
       reconnection: true,
       reconnectionAttempts: 10
     })
@@ -137,6 +139,13 @@ export const AdminRealtimeProvider = ({ children }) => {
       dispatch(setStoreSocketConnected(true))
       void refreshMetrics()
       void refreshOnlineUsers()
+    })
+    socket.on('connect_error', err => {
+      // Quiet in production — metrics still poll every 30s without the socket.
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.warn('[AdminRealtime] socket connect_error', err?.message || err)
+      }
     })
     socket.on('disconnect', () => dispatch(setStoreSocketConnected(false)))
     socket.on('ADMIN_ONLINE_USERS', payload => {

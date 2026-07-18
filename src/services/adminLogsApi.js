@@ -27,9 +27,19 @@ const parse = async res => {
     if (!res.ok) throw new Error('Export failed')
     return text
   }
-  const data = await res.json()
+  let data = null
+  try {
+    data = await res.json()
+  } catch {
+    data = null
+  }
+  if (res.status === 404) {
+    throw new Error(
+      'This admin API route is missing on the server. Redeploy nq-backend (logs / roles endpoints).'
+    )
+  }
   if (!res.ok || String(data?.status).toLowerCase() === 'fail') {
-    throw new Error(data?.error || data?.message || 'Request failed')
+    throw new Error(data?.error || data?.message || `Request failed (${res.status})`)
   }
   return data?.data ?? data?.result ?? data
 }

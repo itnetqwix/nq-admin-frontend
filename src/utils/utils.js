@@ -31,26 +31,19 @@ export const debouncedSearchMedicine = debounce(searchMedicine, 300)
 //     return updatedURL
 // }
 
-export const getImageUrl = (image) => {
-    console.log("image", image)
-    const backendUrl = "https://data.netqwix.com/";
+export const getImageUrl = image => {
+  const backendUrl = 'https://data.netqwix.com/'
 
-    // Check if the image URL is already a full URL (starts with http or https)
-    if (
-        image &&
-        (image.startsWith("http://") || image.startsWith("https://"))
-    ) {
-        return image;
-    }
+  if (image && (String(image).startsWith('http://') || String(image).startsWith('https://'))) {
+    return String(image)
+  }
 
-    // If the image is just a filename, append the backend URL
-    if (image) {
-        return `${backendUrl}${image}`
-    } else {
-        false
-    }
+  if (image) {
+    return `${backendUrl}${image}`
+  }
 
-};
+  return undefined
+}
 
 export const BookedSession = {
     confirm: "confirm",

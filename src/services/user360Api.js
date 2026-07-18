@@ -142,13 +142,34 @@ export const getAuditLogs = async (userId, query = {}) => {
 }
 
 export const getPlatformActivity = async (query = {}) => {
-  const response = await fetch(apiUrl(`/admin/platform-activity${toQueryString(query)}`), {
-    method: 'GET',
-    headers: getAuthHeaders()
-  })
-  const data = await response.json()
-  if (isApiFailure(data, response)) throw new Error(readError(data))
-  return unwrap(data) || { items: [], pagination: { page: 1, limit: 25, total: 0 }, counts: {} }
+  const qs = toQueryString(query)
+  // Prefer /logs/activity (logs hub); fall back to legacy /platform-activity.
+  const paths = [`/admin/logs/activity${qs}`, `/admin/platform-activity${qs}`]
+  let lastError = 'Failed to load platform activity'
+
+  for (const path of paths) {
+    const response = await fetch(apiUrl(path), {
+      method: 'GET',
+      headers: getAuthHeaders()
+    })
+    let data = null
+    try {
+      data = await response.json()
+    } catch {
+      data = null
+    }
+    if (response.status === 404) {
+      lastError =
+        'Platform activity API not found on this server. Redeploy nq-backend (route: GET /admin/platform-activity).'
+      continue
+    }
+    if (isApiFailure(data, response)) {
+      throw new Error(readError(data) || lastError)
+    }
+    return unwrap(data) || { items: [], pagination: { page: 1, limit: 25, total: 0 }, counts: {} }
+  }
+
+  throw new Error(lastError)
 }
 
 export const getCallDiagnostics = async (query = {}) => {

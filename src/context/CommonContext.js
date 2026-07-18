@@ -1,10 +1,6 @@
-import { createContext, useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import axios from 'axios'
+import { createContext, useState } from 'react'
 import authConfig from 'src/configs/auth'
-import { useAuth } from 'src/hooks/useAuth'
 import { getApiBaseUrl } from 'src/utils/apiBase'
-// import { useAuth } from 'src/hooks/useAuth'
 
 const defaultProvider = {
   trainerList: [],
@@ -17,216 +13,136 @@ const defaultProvider = {
 }
 const CommonContext = createContext(defaultProvider)
 
+const authHeaders = () => {
+  const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
 const CommonProvider = ({ children }) => {
-
-  // ** Hooks
-  const router = useRouter()
-  const auth = useAuth()
-
-  const {
-    user,
-    loading,
-    setUser,
-    setLoading,
-  } = auth;
-
-  // ** States
   const [trainerList, setTrainerList] = useState(defaultProvider.trainerList)
-  const [traineeList, setTraineeList] = useState(defaultProvider.traineeList);
-  const [bookingList, setBookingList] = useState(defaultProvider.bookingList);
-  const [moneyRequestList, setMoneyRequestList] = useState(defaultProvider.moneyRequestList);
-  const [writeByUsers, setWriteByUsers] = useState(defaultProvider.writeByUsers);
-  const [concernByUsers, setConcernByUsers] = useState(defaultProvider.concernByUsers);
-  const [activeUsers, setActiveUsers] = useState(defaultProvider.activeUsers);
-
-  useEffect(() => {
-    // getTrainersList()
-    // getTraineesList()
-    // getBookingList()
-    // getWriteByUsers()
-    // getConcernByUsers()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?._id])
+  const [traineeList, setTraineeList] = useState(defaultProvider.traineeList)
+  const [bookingList, setBookingList] = useState(defaultProvider.bookingList)
+  const [moneyRequestList, setMoneyRequestList] = useState(defaultProvider.moneyRequestList)
+  const [writeByUsers, setWriteByUsers] = useState(defaultProvider.writeByUsers)
+  const [concernByUsers, setConcernByUsers] = useState(defaultProvider.concernByUsers)
 
   const getTrainersList = async (search = '') => {
     const base = getApiBaseUrl()
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
     if (!base) {
       console.error('NEXT_PUBLIC_API_BASE_URL is missing; cannot load trainers.')
       setTrainerList([])
       return
     }
-    if (storedToken) {
-      // setLoading(true);
+    const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
+    if (!token) {
+      setTrainerList([])
+      return
+    }
+    try {
       const qs = search && String(search).trim() ? `?search=${encodeURIComponent(String(search).trim())}` : ''
-      await fetch(`${base}/user/get-all-trainer${qs}`, {
-        headers: {
-          'Authorization': `Bearer ${storedToken}`
-        }
-      })
-        .then(data => {
-          setLoading(false)
-          return data.json();
-        })
-        .then(async response => {
-          setLoading(false)
-          setTrainerList(response?.result?.map(e => ({ ...e, id: e._id })) ?? [])
-        })
-        .catch(() => {
-          setTrainerList([])
-          setLoading(false)
-        }).finally(() => {
-          setLoading(false)
-        })
-    } else {
-      setLoading(false)
+      const res = await fetch(`${base}/user/get-all-trainer${qs}`, { headers: authHeaders() })
+      const response = await res.json().catch(() => ({}))
+      setTrainerList(response?.result?.map(e => ({ ...e, id: e._id })) ?? [])
+    } catch {
+      setTrainerList([])
     }
   }
 
   const getTraineesList = async (search = '') => {
     const base = getApiBaseUrl()
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
     if (!base) {
       console.error('NEXT_PUBLIC_API_BASE_URL is missing; cannot load trainees.')
       setTraineeList([])
       return
     }
-    if (storedToken) {
-      // setLoading(true)
+    const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
+    if (!token) {
+      setTraineeList([])
+      return
+    }
+    try {
       const qs = search && String(search).trim() ? `?search=${encodeURIComponent(String(search).trim())}` : ''
-      await fetch(`${base}/user/get-all-trainee${qs}`, {
-        headers: {
-          'Authorization': `Bearer ${storedToken}`
-        }
-      })
-        .then(data => {
-          setLoading(false)
-          return data.json();
-        })
-        .then(async response => {
-          setLoading(false)
-          setTraineeList(response?.result?.map(e => ({ ...e, id: e._id })) ?? [])
-        })
-        .catch(() => {
-          setTraineeList([])
-          setLoading(false)
-        }).finally(() => {
-          setLoading(false)
-        })
-    } else {
-      setLoading(false)
+      const res = await fetch(`${base}/user/get-all-trainee${qs}`, { headers: authHeaders() })
+      const response = await res.json().catch(() => ({}))
+      setTraineeList(response?.result?.map(e => ({ ...e, id: e._id })) ?? [])
+    } catch {
+      setTraineeList([])
     }
   }
 
   const getBookingList = async () => {
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-    if (storedToken) {
-      // setLoading(true)
-      await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + '/user/booking-list', {
-        headers: {
-          'Authorization': `Bearer ${storedToken}`
-        }
-      })
-        .then(data => {
-          return data.json();
-        })
-        .then(async response => {
-          // setLoading(false)
-          setBookingList(response?.data?.result?.map(e => ({ ...e, id: e._id })) ?? [])
-        })
-        .catch(() => {
-          setBookingList([])
-          // setLoading(false)
-        })
-    } else {
-      // setLoading(false)
+    const base = getApiBaseUrl() || process.env.NEXT_PUBLIC_API_BASE_URL
+    const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
+    if (!token || !base) {
+      setBookingList([])
+      return
+    }
+    try {
+      const res = await fetch(`${base}/user/booking-list`, { headers: authHeaders() })
+      const response = await res.json().catch(() => ({}))
+      setBookingList(response?.data?.result?.map(e => ({ ...e, id: e._id })) ?? [])
+    } catch {
+      setBookingList([])
     }
   }
 
   const getWriteByUsers = async () => {
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-    if (storedToken) {
-      // setLoading(true)
-      await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + '/user/write-us', {
-        headers: {
-          'Authorization': `Bearer ${storedToken}`
-        }
-      })
-        .then(data => {
-          return data.json();
-        })
-        .then(async response => {
-          // setLoading(false)
-          setWriteByUsers(response?.result?.map(e => ({ ...e, id: e._id })) ?? [])
-        })
-        .catch(() => {
-          setWriteByUsers([])
-          // setLoading(false)
-        })
-    } else {
-      // setLoading(false)
+    const base = getApiBaseUrl() || process.env.NEXT_PUBLIC_API_BASE_URL
+    const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
+    if (!token || !base) {
+      setWriteByUsers([])
+      return
+    }
+    try {
+      const res = await fetch(`${base}/user/write-us`, { headers: authHeaders() })
+      const response = await res.json().catch(() => ({}))
+      setWriteByUsers(response?.result?.map(e => ({ ...e, id: e._id })) ?? [])
+    } catch {
+      setWriteByUsers([])
     }
   }
 
   const getConcernByUsers = async () => {
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-    if (storedToken) {
-      // setLoading(true)
-      await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + '/user/raise-concern', {
-        headers: {
-          'Authorization': `Bearer ${storedToken}`
-        }
-      })
-        .then(data => {
-          return data.json();
-        })
-        .then(async response => {
-          // setLoading(false)
-          setConcernByUsers(response?.result?.map(e => ({ ...e, id: e._id })) ?? [])
-        })
-        .catch(() => {
-          setConcernByUsers([])
-          // setLoading(false)
-        })
-    } else {
-      // setLoading(false)
+    const base = getApiBaseUrl() || process.env.NEXT_PUBLIC_API_BASE_URL
+    const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
+    if (!token || !base) {
+      setConcernByUsers([])
+      return
+    }
+    try {
+      const res = await fetch(`${base}/user/raise-concern`, { headers: authHeaders() })
+      const response = await res.json().catch(() => ({}))
+      setConcernByUsers(response?.result?.map(e => ({ ...e, id: e._id })) ?? [])
+    } catch {
+      setConcernByUsers([])
     }
   }
 
-  const updateCommission = (params) => {
-    setLoading(true)
+  const updateCommission = params => {
+    const base = getApiBaseUrl() || process.env.NEXT_PUBLIC_API_BASE_URL
     const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-    const options = {
+    if (!base || !storedToken) return
+    fetch(`${base}/user/update-trainer-commission`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${storedToken}`
+        Authorization: `Bearer ${storedToken}`
       },
-      body: JSON.stringify(params),
-    };
-    fetch(process.env.NEXT_PUBLIC_API_BASE_URL + '/user/update-trainer-commission', options)
-      .then(data => {
-        return data.json();
-      }).then(response => {
-        getTrainersList();
-      }).catch(e => {
-        setLoading(false)
-      });
-
+      body: JSON.stringify(params)
+    })
+      .then(data => data.json())
+      .then(() => {
+        void getTrainersList()
+      })
+      .catch(() => {})
   }
 
   const getActiveUsers = async () => {
-    console.log('get active users triggered');
+    const base = getApiBaseUrl() || process.env.NEXT_PUBLIC_API_BASE_URL
+    const response = await fetch(`${base}/connected-users`, { headers: authHeaders() })
+    return response.json()
+  }
 
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/connected-users`);
-      const data = await response.json();
-      return data;  // Return the data after successful fetch
-    } catch (error) {
-      console.error('Error fetching active users:', error);
-      throw error;  // Re-throw the error for external error handling if necessary
-    }
-  };
   const values = {
     trainerList,
     setTrainerList,
