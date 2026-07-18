@@ -120,6 +120,7 @@ export default function ConcernByUsers() {
   return (
     <form noValidate autoComplete='off'>
       <AdminPageShell
+        icon='mdi:lifebuoy'
         title='Support tickets'
         subtitle='Raise concern workflow: status, refunds, and links to User 360.'
         actions={

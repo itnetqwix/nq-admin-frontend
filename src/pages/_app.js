@@ -39,6 +39,8 @@ import { AuthProvider } from 'src/context/AuthContext'
 import { AdminRealtimeProvider } from 'src/context/AdminRealtimeContext'
 import { CommonProvider } from 'src/context/CommonContext'
 import { SettingsConsumer, SettingsProvider } from 'src/@core/context/settingsContext'
+import { Provider as ReduxProvider } from 'react-redux'
+import { store } from 'src/store'
 
 // ** Styled Components
 import ReactHotToast from 'src/@core/styles/libs/react-hot-toast'
@@ -114,13 +116,14 @@ const App = props => {
         <title>{`${themeConfig.templateName} - Admin`}</title>
         <meta
           name='description'
-          content={`${themeConfig.templateName} – Material Design React Admin Dashboard Template – is the most developer friendly & highly customizable Admin Dashboard Template based on MUI v5.`}
+          content={`${themeConfig.templateName} administrator console — people, ops, logs, and business.`}
         />
-        <meta name='keywords' content='Material Design, MUI, Admin Template, React Admin Template' />
+        <meta name='keywords' content='NetQwix, Admin, Operations' />
         <meta name='viewport' content='initial-scale=1, width=device-width' />
 
       </Head>
 
+      <ReduxProvider store={store}>
       <AuthProvider>
         <AdminRealtimeProvider>
         <CommonProvider>
@@ -145,6 +148,7 @@ const App = props => {
         </CommonProvider>
         </AdminRealtimeProvider>
       </AuthProvider>
+      </ReduxProvider>
     </CacheProvider>
 
   )

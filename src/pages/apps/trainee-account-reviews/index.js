@@ -102,6 +102,7 @@ export default function TraineeAccountReviewsPage() {
 
   return (
     <AdminPageShell
+      icon='mdi:account-clock-outline'
       title='Trainee account reviews'
       subtitle='Review trainees who resubmitted after rejection or were set to pending.'
       actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}

@@ -33,3 +33,7 @@ export const getAdminApiEnvLabel = () => {
 
 export const showAdminMfaNotice = () =>
   String(process.env.NEXT_PUBLIC_ADMIN_MFA_NOTICE || '').toLowerCase() === 'true'
+
+/** Google OAuth web client id for GIS on the admin login page. */
+export const getGoogleClientId = () =>
+  String(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '').trim()

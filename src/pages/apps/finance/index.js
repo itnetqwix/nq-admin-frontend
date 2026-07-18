@@ -725,6 +725,7 @@ const FinancePage = () => {
 
   return (
     <AdminPageShell
+      icon='mdi:wallet-outline'
       title='Finance'
       subtitle='Escrow holds, wallet ledger, payouts, and support tools — start on Overview, then drill into tabs.'
       actions={

@@ -95,6 +95,7 @@ export default function AuditLogsPage() {
 
   return (
     <AdminPageShell
+      icon='mdi:clipboard-text-clock-outline'
       title='Audit log'
       subtitle='Admin actions (deletes, refunds, and more). For logins, bookings, uploads, and referrals use Platform activity.'
       actions={

@@ -12,15 +12,15 @@ const GuestGuard = props => {
   const auth = useAuth()
   const router = useRouter()
   useEffect(() => {
-    if (!router.isReady) {
+    if (!router.isReady || !auth.bootstrapped || auth.loading) {
       return
     }
     if (auth.user) {
       router.replace('/home')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.route])
-  if (auth.loading || (!auth.loading && auth.user !== null)) {
+  }, [router.route, auth.user, auth.bootstrapped, auth.loading])
+  if (!auth.bootstrapped || auth.loading || auth.user !== null) {
     return fallback
   }
 

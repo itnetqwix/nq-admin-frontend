@@ -224,6 +224,7 @@ export default function OpsLogsPage() {
 
   return (
     <AdminPageShell
+      icon='mdi:alert-circle-outline'
       title='Operations log'
       subtitle='Unified issues: instant lessons, calls, wallet, support, and admin actions.'
       actions={

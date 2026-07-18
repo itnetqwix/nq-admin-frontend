@@ -4,17 +4,19 @@ import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Divider from '@mui/material/Divider'
 import { useRouter } from 'next/router'
+import Icon from 'src/@core/components/icon'
 import { AdminLoadingState } from 'src/components/admin/AdminLoadingState'
 import { ops } from 'src/styles/opsSurface'
 import { eyebrowForPath } from 'src/styles/opsPageEyebrows'
 
 /**
- * Ops Surface page chrome — mono eyebrow (explicit or auto from route), stacked-shadow card.
+ * Ops Surface page chrome — mono eyebrow, optional icon, soft accent.
  */
 export default function AdminPageShell({
   title,
   subtitle,
   eyebrow,
+  icon,
   actions,
   action,
   children,
@@ -35,40 +37,60 @@ export default function AdminPageShell({
       justifyContent='space-between'
       sx={{ mb: 3 }}
     >
-      <Box sx={{ minWidth: 0 }}>
-        {resolvedEyebrow ? (
-          <Typography
+      <Box sx={{ minWidth: 0, display: 'flex', gap: 1.75, alignItems: 'flex-start' }}>
+        {icon ? (
+          <Box
             sx={{
-              fontFamily: ops.mono,
-              fontSize: 11,
-              color: ops.mute,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              mb: 0.75
+              width: 44,
+              height: 44,
+              borderRadius: ops.radiusMd,
+              bgcolor: ops.softIndigo,
+              color: ops.indigo,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              boxShadow: ops.shadowCard
             }}
           >
-            {resolvedEyebrow}
-          </Typography>
+            <Icon icon={icon} fontSize={22} />
+          </Box>
         ) : null}
-        <Box
-          sx={{
-            fontWeight: 600,
-            letterSpacing: '-0.96px',
-            color: 'text.primary',
-            lineHeight: 1.25,
-            fontSize: { xs: 22, md: 24 }
-          }}
-        >
-          {title}
-        </Box>
-        {subtitle ? (
-          <Typography
-            variant='body2'
-            sx={{ mt: 0.75, maxWidth: 720, lineHeight: 1.65, color: 'text.secondary' }}
+        <Box sx={{ minWidth: 0 }}>
+          {resolvedEyebrow ? (
+            <Typography
+              sx={{
+                fontFamily: ops.mono,
+                fontSize: 11,
+                color: ops.mute,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                mb: 0.75
+              }}
+            >
+              {resolvedEyebrow}
+            </Typography>
+          ) : null}
+          <Box
+            sx={{
+              fontWeight: 600,
+              letterSpacing: '-0.96px',
+              color: 'text.primary',
+              lineHeight: 1.25,
+              fontSize: { xs: 22, md: 24 }
+            }}
           >
-            {subtitle}
-          </Typography>
-        ) : null}
+            {title}
+          </Box>
+          {subtitle ? (
+            <Typography
+              variant='body2'
+              sx={{ mt: 0.75, maxWidth: 720, lineHeight: 1.65, color: 'text.secondary' }}
+            >
+              {subtitle}
+            </Typography>
+          ) : null}
+        </Box>
       </Box>
       {headerActions ? (
         <Box
@@ -117,22 +139,42 @@ export default function AdminPageShell({
   )
 }
 
-export function AdminPageSection({ title, description, children, withDivider = false, action }) {
+export function AdminPageSection({ title, subtitle, description, children, withDivider = false, action, icon }) {
+  const desc = subtitle || description
   return (
     <>
       {withDivider ? <Divider /> : null}
       <Box sx={{ p: { xs: 2, sm: 3 } }}>
         {title ? (
-          <Stack direction='row' alignItems='flex-start' justifyContent='space-between' sx={{ mb: description ? 1 : 2 }}>
-            <Box>
-              <Typography variant='subtitle1' sx={{ fontWeight: 600, letterSpacing: '-0.28px' }}>
-                {title}
-              </Typography>
-              {description ? (
-                <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5, maxWidth: 720, lineHeight: 1.6 }}>
-                  {description}
-                </Typography>
+          <Stack direction='row' alignItems='flex-start' justifyContent='space-between' sx={{ mb: desc ? 1 : 2 }}>
+            <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'flex-start' }}>
+              {icon ? (
+                <Box
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: ops.radiusSm,
+                    bgcolor: ops.softIndigo,
+                    color: ops.indigo,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}
+                >
+                  <Icon icon={icon} fontSize={18} />
+                </Box>
               ) : null}
+              <Box>
+                <Typography variant='subtitle1' sx={{ fontWeight: 600, letterSpacing: '-0.28px' }}>
+                  {title}
+                </Typography>
+                {desc ? (
+                  <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5, maxWidth: 720, lineHeight: 1.6 }}>
+                    {desc}
+                  </Typography>
+                ) : null}
+              </Box>
             </Box>
             {action}
           </Stack>

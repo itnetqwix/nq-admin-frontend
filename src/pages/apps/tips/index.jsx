@@ -349,6 +349,7 @@ export default function TipsPage() {
   return (
     <>
       <AdminPageShell
+        icon='mdi:lightbulb-on-outline'
         title='Tips'
         subtitle='Coaching cards in the mobile home “Tips for you” carousel. Use audience + schedule to target trainee vs trainer homes (and guest browse for “Everyone”).'
         actions={

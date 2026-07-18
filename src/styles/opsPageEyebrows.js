@@ -16,6 +16,8 @@ export const OPS_PAGE_EYEBROWS = {
   '/apps/call-diagnostics': 'Operations · calls',
   '/apps/platform-health': 'Operations · health',
   '/apps/platform-activity': 'Logs · platform',
+  '/apps/logs': 'Logs · hub',
+  '/apps/admin-roles': 'Settings · RBAC',
   '/apps/audit-logs': 'Logs · audit',
   '/apps/ops-logs': 'Logs · operations',
   '/apps/finance': 'Business · finance',

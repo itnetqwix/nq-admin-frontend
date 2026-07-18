@@ -281,6 +281,7 @@ export default function CmsBlogPage() {
 
   return (
     <AdminPageShell
+      icon='mdi:post-outline'
       title='Blog & pages'
       subtitle='Articles and static pages in the mobile app'
       actions={

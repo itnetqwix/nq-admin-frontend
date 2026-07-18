@@ -77,6 +77,7 @@ export default function WriteByUsers() {
   return (
     <form noValidate autoComplete='off'>
       <AdminPageShell
+        icon='mdi:message-text-outline'
         title='User feedback'
         subtitle='Contact-us tickets and status. Open User 360 for full context.'
         actions={

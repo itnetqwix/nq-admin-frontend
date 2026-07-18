@@ -1,10 +1,11 @@
 import { AbilityBuilder, Ability } from '@casl/ability'
+import { effectiveAdminPermissions } from 'src/configs/adminRoleMatrix'
 
 export const AppAbility = Ability
 
 /**
- * Admin menu + action rules. If `user.extraInfo.admin_permissions` is missing or empty,
- * admin has full access (`manage all`). Otherwise any key set to `false` removes that ability.
+ * Admin menu + action rules. Effective permissions come from admin_permissions
+ * or admin_role matrix. Null/empty = full access (`manage all`).
  */
 const defineRulesFor = (role, user) => {
   const { can, rules } = new AbilityBuilder(AppAbility)
@@ -13,7 +14,7 @@ const defineRulesFor = (role, user) => {
     return rules
   }
 
-  const p = user?.extraInfo?.admin_permissions
+  const p = effectiveAdminPermissions(user)
   const restricted = p && typeof p === 'object' && Object.keys(p).length > 0
 
   const ok = key => !restricted || p[key] !== false
@@ -86,6 +87,14 @@ const defineRulesFor = (role, user) => {
     can('read', 'admin-nav-audit-logs')
     can('read', 'admin-nav-ops-logs')
   }
+  if (ok('can_assign_admin_roles')) {
+    can('read', 'admin-nav-admin-settings')
+    can('update', 'admin-nav-admin-settings')
+  }
+  if (ok('can_export_logs')) can('export', 'admin-action-export-logs')
+  if (ok('can_view_security_logs')) can('read', 'admin-action-security-logs')
+  if (ok('can_resolve_ops')) can('update', 'admin-action-resolve-ops')
+
   if (ok('nav_business') || ok('nav_finance')) {
     can('read', 'admin-nav-business')
     can('read', 'admin-nav-finance')

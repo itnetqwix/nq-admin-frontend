@@ -113,6 +113,7 @@ export default function PlatformHealthPage() {
 
   return (
     <AdminPageShell
+      icon='mdi:heart-pulse'
       title='Platform health'
       subtitle='Messaging providers, finance anomaly queues, and ops signals — live from the backend.'
       actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}

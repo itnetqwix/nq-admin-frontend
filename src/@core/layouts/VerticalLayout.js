@@ -99,6 +99,7 @@ const VerticalLayout = props => {
           <ContentWrapper
             className='layout-page-content'
             sx={{
+              backgroundColor: '#f6f7f9',
               ...(contentHeightFixed && {
                 overflow: 'hidden',
                 '& > :first-of-type': { height: '100%' }

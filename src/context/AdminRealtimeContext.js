@@ -5,6 +5,13 @@ import { io } from 'socket.io-client'
 // ** Config
 import authConfig from 'src/configs/auth'
 import { useAuth } from 'src/hooks/useAuth'
+import { useAppDispatch, useAppSelector } from 'src/store/hooks'
+import {
+  selectDashboard,
+  setLiveMetrics,
+  setOnlineUsers as setStoreOnlineUsers,
+  setSocketConnected as setStoreSocketConnected
+} from 'src/store/slices/dashboardSlice'
 import {
   fetchDashboardMetrics,
   fetchOnlineUsers,
@@ -47,12 +54,15 @@ const normalizeMetrics = payload => {
   return data
 }
 
+/**
+ * Socket + poll for live admin metrics.
+ * Mirrors into Redux `dashboard` so pages can use either context or selectors.
+ */
 export const AdminRealtimeProvider = ({ children }) => {
   const { user } = useAuth()
-  const [onlineUsers, setOnlineUsers] = useState([])
-  const [metrics, setMetrics] = useState(null)
+  const dispatch = useAppDispatch()
+  const dash = useAppSelector(selectDashboard)
   const [metricsLoading, setMetricsLoading] = useState(true)
-  const [socketConnected, setSocketConnected] = useState(false)
 
   const isAdmin = useMemo(() => {
     if (user && user.account_type != null) return isAdminRole(user.account_type)
@@ -62,36 +72,37 @@ export const AdminRealtimeProvider = ({ children }) => {
   const refreshMetrics = useCallback(async () => {
     const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
     if (!token || !isAdmin) {
-      setMetrics(null)
+      dispatch(setLiveMetrics(null))
       setMetricsLoading(false)
       return
     }
     try {
       const data = await fetchDashboardMetrics()
-      if (data) setMetrics(data)
+      if (data) dispatch(setLiveMetrics(data))
     } catch (e) {
       console.error('refreshMetrics', e)
     } finally {
       setMetricsLoading(false)
     }
-  }, [isAdmin])
+  }, [isAdmin, dispatch])
 
   const refreshOnlineUsers = useCallback(async () => {
     const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
     if (!token || !isAdmin) return
     try {
       const users = await fetchOnlineUsers()
-      setOnlineUsers(users)
+      dispatch(setStoreOnlineUsers(users))
     } catch (e) {
       console.error('refreshOnlineUsers', e)
     }
-  }, [isAdmin])
+  }, [isAdmin, dispatch])
 
   useEffect(() => {
     if (!isAdmin) {
-      setMetrics(null)
+      dispatch(setLiveMetrics(null))
+      dispatch(setStoreOnlineUsers([]))
+      dispatch(setStoreSocketConnected(false))
       setMetricsLoading(false)
-      setOnlineUsers([])
       return undefined
     }
     setMetricsLoading(true)
@@ -102,12 +113,12 @@ export const AdminRealtimeProvider = ({ children }) => {
       void refreshOnlineUsers()
     }, METRICS_POLL_MS)
     return () => clearInterval(timer)
-  }, [isAdmin, refreshMetrics, refreshOnlineUsers])
+  }, [isAdmin, refreshMetrics, refreshOnlineUsers, dispatch])
 
   useEffect(() => {
     if (!isAdmin) {
-      setOnlineUsers([])
-      setSocketConnected(false)
+      dispatch(setStoreOnlineUsers([]))
+      dispatch(setStoreSocketConnected(false))
       return undefined
     }
 
@@ -123,38 +134,38 @@ export const AdminRealtimeProvider = ({ children }) => {
     })
 
     socket.on('connect', () => {
-      setSocketConnected(true)
+      dispatch(setStoreSocketConnected(true))
       void refreshMetrics()
       void refreshOnlineUsers()
     })
-    socket.on('disconnect', () => setSocketConnected(false))
+    socket.on('disconnect', () => dispatch(setStoreSocketConnected(false)))
     socket.on('ADMIN_ONLINE_USERS', payload => {
-      setOnlineUsers(Array.isArray(payload?.users) ? payload.users : [])
+      dispatch(setStoreOnlineUsers(Array.isArray(payload?.users) ? payload.users : []))
     })
     socket.on('ADMIN_DASHBOARD_METRICS', payload => {
       const next = normalizeMetrics(payload?.metrics)
       if (next) {
-        setMetrics(next)
+        dispatch(setLiveMetrics(next))
         setMetricsLoading(false)
       }
     })
 
     return () => {
       socket.disconnect()
-      setSocketConnected(false)
+      dispatch(setStoreSocketConnected(false))
     }
-  }, [isAdmin, refreshMetrics, refreshOnlineUsers])
+  }, [isAdmin, refreshMetrics, refreshOnlineUsers, dispatch])
 
   const value = useMemo(
     () => ({
-      onlineUsers,
-      metrics,
+      onlineUsers: dash.onlineUsers,
+      metrics: dash.metrics,
       metricsLoading,
-      socketConnected,
+      socketConnected: dash.socketConnected,
       refreshMetrics,
       refreshOnlineUsers
     }),
-    [onlineUsers, metrics, metricsLoading, socketConnected, refreshMetrics, refreshOnlineUsers]
+    [dash.onlineUsers, dash.metrics, dash.socketConnected, metricsLoading, refreshMetrics, refreshOnlineUsers]
   )
 
   return <AdminRealtimeContext.Provider value={value}>{children}</AdminRealtimeContext.Provider>

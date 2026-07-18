@@ -20,28 +20,35 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 import ActiveUsersTable from '../components/tables/UsersTable'
 import AdminPageShell from 'src/layouts/components/AdminPageShell'
 import { useAdminRealtime } from 'src/context/AdminRealtimeContext'
-import { getPendingVerificationCount } from 'src/services/verificationApi'
-import { getPendingTraineeCount } from 'src/services/clipsAdminApi'
+import { useAppDispatch, useAppSelector } from 'src/store/hooks'
+import {
+  fetchHomeDashboard,
+  fetchLogSummaryOnly,
+  selectDashboard
+} from 'src/store/slices/dashboardSlice'
 
 const Home = () => {
   const router = useRouter()
   const ability = useContext(AbilityContext)
   const canEditCommission = ability?.can('update', 'admin-action-commission') ?? true
   const { metrics, socketConnected } = useAdminRealtime()
+  const dispatch = useAppDispatch()
+  const {
+    pendingVerifications,
+    pendingTraineeReviews,
+    logSummary
+  } = useAppSelector(selectDashboard)
 
-  const [comission, setComission] = useState([]);
-  const [commissionModal, setComissionModal] = useState(false);
-  const [pendingVerifications, setPendingVerifications] = useState(null);
-  const [pendingTraineeReviews, setPendingTraineeReviews] = useState(null);
+  const [comission, setComission] = useState([])
+  const [commissionModal, setComissionModal] = useState(false)
 
   useEffect(() => {
-    getPendingVerificationCount()
-      .then(setPendingVerifications)
-      .catch(() => setPendingVerifications(0))
-    getPendingTraineeCount()
-      .then(setPendingTraineeReviews)
-      .catch(() => setPendingTraineeReviews(0))
-  }, [])
+    void dispatch(fetchHomeDashboard())
+    const t = setInterval(() => {
+      void dispatch(fetchLogSummaryOnly())
+    }, 60_000)
+    return () => clearInterval(t)
+  }, [dispatch])
 
   const fmtMoney = v =>
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(
@@ -92,6 +99,7 @@ const Home = () => {
     <>
       <AdminPageShell
         bare
+        icon='mdi:view-dashboard-outline'
         eyebrow='Overview'
         title={
           <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
@@ -172,13 +180,14 @@ const Home = () => {
           </Grid>
 
           <Grid item xs={6} sm={3}>
-            <OpsMetricTile label='Active banners' value={metrics != null ? fmtInt(metrics.activeBanners ?? 0) : '—'} hint='CMS' onClick={() => router.push('/apps/banners')} />
+            <OpsMetricTile icon='mdi:image-multiple-outline' label='Active banners' value={metrics != null ? fmtInt(metrics.activeBanners ?? 0) : '—'} hint='CMS' onClick={() => router.push('/apps/banners')} />
           </Grid>
           <Grid item xs={6} sm={3}>
-            <OpsMetricTile label='Active tips' value={metrics != null ? fmtInt(metrics.activeTips ?? 0) : '—'} hint='CMS offers' onClick={() => router.push('/apps/tips')} />
+            <OpsMetricTile icon='mdi:lightbulb-on-outline' label='Active tips' value={metrics != null ? fmtInt(metrics.activeTips ?? 0) : '—'} hint='CMS offers' tone='success' onClick={() => router.push('/apps/tips')} />
           </Grid>
           <Grid item xs={6} sm={3}>
             <OpsMetricTile
+              icon='mdi:view-grid-outline'
               label='Banner placements'
               value={
                 metrics != null
@@ -190,42 +199,73 @@ const Home = () => {
             />
           </Grid>
           <Grid item xs={6} sm={3}>
-            <OpsMetricTile label='Support tickets' value={metrics != null ? fmtInt(metrics.openSupportTickets ?? 0) : '—'} hint='Open queue' tone='warn' onClick={() => router.push('/apps/concern-by-user')} />
+            <OpsMetricTile icon='mdi:lifebuoy' label='Support tickets' value={metrics != null ? fmtInt(metrics.openSupportTickets ?? 0) : '—'} hint='Open queue' tone='warn' onClick={() => router.push('/apps/concern-by-user')} />
           </Grid>
           <Grid item xs={6} sm={3}>
-            <OpsMetricTile label='User feedback' value={metrics != null ? fmtInt(metrics.openUserFeedback ?? 0) : '—'} hint='Open queue' onClick={() => router.push('/apps/write-by-user')} />
+            <OpsMetricTile icon='mdi:message-text-outline' label='User feedback' value={metrics != null ? fmtInt(metrics.openUserFeedback ?? 0) : '—'} hint='Open queue' onClick={() => router.push('/apps/write-by-user')} />
           </Grid>
           <Grid item xs={6} sm={3}>
-            <OpsMetricTile label='Pending refunds' value={metrics != null ? fmtInt(metrics.bookingsPendingRefund ?? 0) : '—'} hint='Canceled w/ payment' tone='danger' onClick={() => router.push('/apps/booking')} />
+            <OpsMetricTile icon='mdi:cash-refund' label='Pending refunds' value={metrics != null ? fmtInt(metrics.bookingsPendingRefund ?? 0) : '—'} hint='Canceled w/ payment' tone='danger' onClick={() => router.push('/apps/booking')} />
           </Grid>
           <Grid item xs={6} sm={3}>
-            <OpsMetricTile label='New users (7d)' value={metrics != null ? fmtInt(metrics.newUsersLast7Days ?? 0) : '—'} hint='Trainers + trainees' onClick={() => router.push('/apps/manage-trainer')} />
+            <OpsMetricTile icon='mdi:account-plus-outline' label='New users (7d)' value={metrics != null ? fmtInt(metrics.newUsersLast7Days ?? 0) : '—'} hint='Trainers + trainees' tone='accent' onClick={() => router.push('/apps/manage-trainer')} />
           </Grid>
           <Grid item xs={6} sm={3}>
-            <OpsMetricTile label='Call diagnostics' value='Open' hint='Quality & events' accent onClick={() => router.push('/apps/call-diagnostics')} tone='accent' />
+            <OpsMetricTile icon='mdi:phone-in-talk-outline' label='Call diagnostics' value='Open' hint='Quality & events' onClick={() => router.push('/apps/call-diagnostics')} tone='accent' />
           </Grid>
           <Grid item xs={6} sm={3}>
-            <OpsMetricTile label='Trainer verifications' value={pendingVerifications != null ? fmtInt(pendingVerifications) : '—'} hint='Pending review' onClick={() => router.push('/apps/trainer-verifications')} />
+            <OpsMetricTile icon='mdi:account-check-outline' label='Trainer verifications' value={pendingVerifications != null ? fmtInt(pendingVerifications) : '—'} hint='Pending review' onClick={() => router.push('/apps/trainer-verifications')} />
           </Grid>
           <Grid item xs={6} sm={3}>
-            <OpsMetricTile label='Trainee reviews' value={pendingTraineeReviews != null ? fmtInt(pendingTraineeReviews) : '—'} hint='Pending review' tone='warn' onClick={() => router.push('/apps/trainee-account-reviews')} />
+            <OpsMetricTile icon='mdi:account-clock-outline' label='Trainee reviews' value={pendingTraineeReviews != null ? fmtInt(pendingTraineeReviews) : '—'} hint='Pending review' tone='warn' onClick={() => router.push('/apps/trainee-account-reviews')} />
           </Grid>
           <Grid item xs={6} sm={3}>
-            <OpsMetricTile label='Critical ops (24h)' value={metrics != null ? fmtInt(metrics.opsCriticalOpen24h ?? 0) : '—'} hint='Open / investigating' tone='danger' onClick={() => router.push('/apps/ops-logs?severity=critical')} />
+            <OpsMetricTile icon='mdi:alert-octagon-outline' label='Critical ops (24h)' value={metrics != null ? fmtInt(metrics.opsCriticalOpen24h ?? 0) : '—'} hint='Open / investigating' tone='danger' onClick={() => router.push('/apps/ops-logs?severity=critical')} />
           </Grid>
           <Grid item xs={6} sm={3}>
-            <OpsMetricTile label='Instant failures (24h)' value={metrics != null ? fmtInt(metrics.opsInstantFailures24h ?? 0) : '—'} hint='Lesson errors' tone='warn' onClick={() => router.push('/apps/ops-logs?instant_only=true')} />
+            <OpsMetricTile icon='mdi:flash-alert-outline' label='Instant failures (24h)' value={metrics != null ? fmtInt(metrics.opsInstantFailures24h ?? 0) : '—'} hint='Lesson errors' tone='warn' onClick={() => router.push('/apps/ops-logs?instant_only=true')} />
           </Grid>
           <Grid item xs={6} sm={3}>
-            <OpsMetricTile label='Call preflight (24h)' value={metrics != null ? fmtInt(metrics.opsCallPreflightFailures24h ?? 0) : '—'} hint='Connection' onClick={() => router.push('/apps/ops-logs?category=connection')} />
+            <OpsMetricTile icon='mdi:wifi-strength-alert-outline' label='Call preflight (24h)' value={metrics != null ? fmtInt(metrics.opsCallPreflightFailures24h ?? 0) : '—'} hint='Connection' onClick={() => router.push('/apps/ops-logs?category=connection')} />
           </Grid>
           <Grid item xs={6} sm={3}>
-            <OpsMetricTile label='Platform activity' value='Open' hint='Who · when · what' tone='accent' onClick={() => router.push('/apps/platform-activity')} />
+            <OpsMetricTile icon='mdi:timeline-text-outline' label='Platform activity' value='Open' hint='Who · when · what' tone='accent' onClick={() => router.push('/apps/platform-activity')} />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:login'
+              label='Logins (24h)'
+              value={logSummary?.kpis?.logins != null ? fmtInt(logSummary.kpis.logins) : '—'}
+              hint='Platform logs'
+              tone='success'
+              onClick={() => router.push('/apps/logs?tab=overview')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:shield-alert-outline'
+              label='Failed logins (24h)'
+              value={logSummary?.kpis?.failed_logins != null ? fmtInt(logSummary.kpis.failed_logins) : '—'}
+              hint='Security'
+              tone='danger'
+              onClick={() => router.push('/apps/logs?tab=security')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:api'
+              label='API errors (24h)'
+              value={logSummary?.kpis?.api_errors != null ? fmtInt(logSummary.kpis.api_errors) : '—'}
+              hint='API logs'
+              tone='warn'
+              onClick={() => router.push('/apps/logs?tab=api')}
+            />
           </Grid>
 
           <Grid item xs={12} md={8} container spacing={2}>
             <Grid item xs={12} sm={6}>
               <OpsMetricTile
+                icon='mdi:currency-usd'
                 label='Total revenue'
                 value={metrics ? fmtMoney(metrics.totalRevenue) : '—'}
                 hint={`Paid bookings · ${liveHint}`}
@@ -235,6 +275,7 @@ const Home = () => {
             </Grid>
             <Grid item xs={6} sm={3}>
               <OpsMetricTile
+                icon='mdi:eye-outline'
                 label='Impressions'
                 value={metrics ? fmtInt(metrics.totalImpressions) : '—'}
                 hint='Published clips'
@@ -243,6 +284,7 @@ const Home = () => {
             </Grid>
             <Grid item xs={6} sm={3}>
               <OpsMetricTile
+                icon='mdi:account-group-outline'
                 label='Trainers / trainees'
                 value={
                   metrics
@@ -256,6 +298,7 @@ const Home = () => {
           </Grid>
           <Grid item xs={6} md={2}>
             <OpsMetricTile
+              icon='mdi:cart-outline'
               label='Total orders'
               value={metrics ? fmtInt(metrics.totalOrders) : '—'}
               hint='Paid bookings'
@@ -264,9 +307,11 @@ const Home = () => {
           </Grid>
           <Grid item xs={6} md={2}>
             <OpsMetricTile
+              icon='mdi:calendar-check-outline'
               label='Total sessions'
               value={metrics ? fmtInt(metrics.totalSessions) : '—'}
               hint={liveHint}
+              tone='success'
               onClick={() => router.push('/apps/booking')}
             />
           </Grid>

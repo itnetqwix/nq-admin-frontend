@@ -24,6 +24,7 @@ import toast from 'react-hot-toast'
 import UserQuickPreviewModal from 'src/components/user360/UserQuickPreviewModal'
 import { getUser360 } from 'src/services/user360Api'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import { formatOpsDateTime } from 'src/utils/opsDateTime'
 
 export default function ManageTrainer() {
   const router = useRouter()
@@ -185,8 +186,8 @@ export default function ManageTrainer() {
     {
       field: 'createdAt',
       headerName: 'Joined',
-      width: 150,
-      valueGetter: p => (p.row.createdAt ? new Date(p.row.createdAt).toLocaleDateString() : '—')
+      width: 170,
+      valueGetter: p => (p.row.createdAt ? formatOpsDateTime(p.row.createdAt, { withSeconds: false }) : '—')
     },
     {
       field: 'view',
@@ -249,6 +250,7 @@ export default function ManageTrainer() {
       />
       <form noValidate autoComplete='off'>
         <AdminPageShell
+          icon='mdi:human-male-board'
           title='Trainers'
           subtitle='Directory with KYC, Stripe, wallet, commission, and referral — click a row for User 360.'
           actions={

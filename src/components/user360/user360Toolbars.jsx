@@ -178,6 +178,16 @@ export const ActivityToolbar = ({ query, onQueryChange }) => {
             Open in Platform activity →
           </Button>
         ) : null}
+        {userId ? (
+          <Button
+            size='small'
+            component={Link}
+            href={`/apps/logs?tab=login&userId=${userId}`}
+            sx={{ textTransform: 'none' }}
+          >
+            Login history →
+          </Button>
+        ) : null}
       </Stack>
       <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems={{ md: 'center' }} flexWrap='wrap' useFlexGap>
         <TextField

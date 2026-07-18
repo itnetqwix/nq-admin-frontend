@@ -138,6 +138,7 @@ export default function CmsLegalPage() {
 
   return (
     <AdminPageShell
+      icon='mdi:file-document-outline'
       title='Legal documents'
       subtitle='Terms, privacy, cancellation & refund — live in the app without a store update. Terms and privacy can trigger user emails on publish.'
     >

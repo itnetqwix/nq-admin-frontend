@@ -1,17 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import {
-  Box,
-  Button,
-  Chip,
-  Collapse,
-  Drawer,
-  IconButton,
-  Stack,
-  TextField,
-  Typography
-} from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
-import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import { Box, Button, Chip, Stack, TextField, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import moment from 'moment'
@@ -19,8 +7,11 @@ import toast from 'react-hot-toast'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminGridContainer from 'src/components/admin/AdminGridContainer'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
+import LogDetailDrawer from 'src/components/admin/LogDetailDrawer'
+import AdminPageShell from 'src/layouts/components/AdminPageShell'
 import { getPlatformActivity } from 'src/services/user360Api'
 import { CATEGORY_META, categoryChipSx, actionTone, ops } from 'src/styles/opsSurface'
+import { formatOpsDateTime } from 'src/utils/opsDateTime'
 
 const CATEGORIES = Object.keys(CATEGORY_META)
 
@@ -41,7 +32,6 @@ export default function PlatformActivityPage() {
   const [pathFilter, setPathFilter] = useState('')
   const [deviceFilter, setDeviceFilter] = useState('')
   const [detail, setDetail] = useState(null)
-  const [metaOpen, setMetaOpen] = useState(true)
 
   useEffect(() => {
     if (!router.isReady) return
@@ -103,11 +93,18 @@ export default function PlatformActivityPage() {
       'category',
       'action',
       'title',
-      'actor',
+      'fullname',
+      'email',
+      'user_id',
       'target',
       'entity',
       'ip',
+      'country',
+      'region',
+      'city',
       'device',
+      'browser',
+      'os',
       'method',
       'path',
       'status',
@@ -121,11 +118,18 @@ export default function PlatformActivityPage() {
           r.category,
           r.action,
           `"${String(r.title || '').replace(/"/g, '""')}"`,
-          `"${String(r.actor?.label || '').replace(/"/g, '""')}"`,
+          `"${String(r.actor?.fullname || '').replace(/"/g, '""')}"`,
+          `"${String(r.actor?.email || '').replace(/"/g, '""')}"`,
+          r.actor?.id || '',
           `"${String(r.target?.label || '').replace(/"/g, '""')}"`,
           r.entity ? `${r.entity.type}:${r.entity.id}` : '',
           r.ip || '',
+          r.country || '',
+          r.region || '',
+          r.city || '',
           r.device || '',
+          r.browser || '',
+          r.os || '',
           r.method || '',
           r.path || '',
           r.status_code ?? '',
@@ -164,9 +168,14 @@ export default function PlatformActivityPage() {
         width: 168,
         renderHeader: () => monoHeader('When'),
         renderCell: p => (
-          <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.body, fontVariantNumeric: 'tabular-nums' }}>
-            {p.value ? moment(p.value).format('YYYY-MM-DD HH:mm') : '—'}
-          </Typography>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.body, fontVariantNumeric: 'tabular-nums' }}>
+              {p.value ? formatOpsDateTime(p.value, { withSeconds: false }) : '—'}
+            </Typography>
+            <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute }} noWrap>
+              {p.value ? moment(p.value).fromNow() : ''}
+            </Typography>
+          </Box>
         )
       },
       {
@@ -201,26 +210,42 @@ export default function PlatformActivityPage() {
       {
         field: 'actorLabel',
         headerName: 'Who',
-        width: 160,
-        valueGetter: params => params.row.actor?.label || '—',
+        width: 190,
+        valueGetter: params => params.row.actor?.fullname || params.row.actor?.label || '—',
         renderHeader: () => monoHeader('Who'),
         renderCell: p =>
           p.row.actor?.id ? (
-            <Typography
-              component={Link}
-              href={`/apps/users/${p.row.actor.id}`}
-              sx={{
-                fontSize: 13,
-                color: ops.indigo,
-                textDecoration: 'none',
-                fontWeight: 500,
-                '&:hover': { color: ops.indigoDeep }
-              }}
-            >
-              {p.value}
-            </Typography>
+            <Box sx={{ minWidth: 0 }}>
+              <Typography
+                component={Link}
+                href={`/apps/users/${p.row.actor.id}`}
+                sx={{
+                  fontSize: 13,
+                  color: ops.indigo,
+                  textDecoration: 'none',
+                  fontWeight: 500,
+                  display: 'block',
+                  '&:hover': { color: ops.indigoDeep }
+                }}
+                noWrap
+              >
+                {p.value}
+              </Typography>
+              <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute }} noWrap>
+                {p.row.actor?.email || p.row.actor?.id || ''}
+              </Typography>
+            </Box>
           ) : (
-            <Typography sx={{ fontSize: 13, color: ops.body }}>{p.value}</Typography>
+            <Box sx={{ minWidth: 0 }}>
+              <Typography sx={{ fontSize: 13, color: ops.body }} noWrap>
+                {p.value}
+              </Typography>
+              {p.row.actor?.email ? (
+                <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute }} noWrap>
+                  {p.row.actor.email}
+                </Typography>
+              ) : null}
+            </Box>
           )
       },
       {
@@ -249,7 +274,7 @@ export default function PlatformActivityPage() {
       {
         field: 'ip',
         headerName: 'IP',
-        width: 120,
+        width: 110,
         renderHeader: () => monoHeader('IP'),
         renderCell: p => (
           <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.body }} noWrap>
@@ -258,17 +283,30 @@ export default function PlatformActivityPage() {
         )
       },
       {
+        field: 'location',
+        headerName: 'Location',
+        width: 130,
+        valueGetter: params =>
+          [params.row.city, params.row.region, params.row.country].filter(Boolean).join(', ') || '—',
+        renderHeader: () => monoHeader('Location'),
+        renderCell: p => (
+          <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.body }} noWrap>
+            {p.value}
+          </Typography>
+        )
+      },
+      {
         field: 'device',
         headerName: 'Device',
-        width: 140,
+        width: 150,
         renderHeader: () => monoHeader('Device'),
         renderCell: p => (
           <Box sx={{ minWidth: 0 }}>
             <Typography sx={{ fontSize: 12, color: ops.ink }} noWrap>
-              {p.row.device || '—'}
+              {p.row.device || p.row.browser || '—'}
             </Typography>
             <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute }} noWrap>
-              {[p.row.platform, p.row.client_type].filter(Boolean).join(' · ') || ''}
+              {[p.row.browser, p.row.os, p.row.platform, p.row.client_type].filter(Boolean).join(' · ') || ''}
             </Typography>
           </Box>
         )
@@ -304,101 +342,64 @@ export default function PlatformActivityPage() {
   )
 
   return (
-    <Box
-      sx={{
-        fontFamily: ops.sans,
-        bgcolor: ops.canvasSoft,
-        mx: { xs: -2, sm: -3 },
-        px: { xs: 2, sm: 3 },
-        pt: 1,
-        pb: 2,
-        minHeight: '100%'
-      }}
-    >
-      <Box sx={{ width: '100%', maxWidth: 1680, mx: 'auto', pb: 4 }}>
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          spacing={2}
-          alignItems={{ sm: 'flex-start' }}
-          justifyContent='space-between'
-          sx={{ mb: 3 }}
-        >
-          <Box sx={{ minWidth: 0 }}>
-            <Stack direction='row' spacing={1} alignItems='center' sx={{ mb: 0.75 }}>
-              <Typography
-                sx={{
-                  fontFamily: ops.mono,
-                  fontSize: 11,
-                  color: ops.mute,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em'
-                }}
-              >
-                Logs · platform
-              </Typography>
-              <Box
-                sx={{
-                  px: 1,
-                  py: 0.15,
-                  bgcolor: ops.lime,
-                  color: ops.night,
-                  borderRadius: '4px',
-                  fontFamily: ops.mono,
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: '0.06em'
-                }}
-              >
-                LIVE
-              </Box>
-            </Stack>
-            <Typography
-              sx={{
-                fontSize: { xs: 24, md: 32 },
-                fontWeight: 600,
-                letterSpacing: '-1.28px',
-                lineHeight: 1.2,
-                color: ops.ink
-              }}
-            >
-              Platform activity.
-            </Typography>
-            <Typography sx={{ mt: 0.75, maxWidth: 720, fontSize: 14, color: ops.body, lineHeight: 1.65 }}>
-              Who did what, when — logins, uploads, bookings, invites, referrals, transactions, admin
-              actions, and authenticated API hits (IP · device · path). Filters sync to the URL.
-            </Typography>
+    <AdminPageShell
+      bare
+      eyebrow='Logs · platform'
+      icon='mdi:timeline-text-outline'
+      title={
+        <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
+          Platform activity.
+          <Box
+            component='span'
+            sx={{
+              px: 1,
+              py: 0.15,
+              bgcolor: ops.lime,
+              color: ops.night,
+              borderRadius: '4px',
+              fontFamily: ops.mono,
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: '0.06em'
+            }}
+          >
+            LIVE
           </Box>
-          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-            <AdminRefreshButton onClick={() => void load()} loading={loading} />
-            <Button
-              onClick={exportCsv}
-              disabled={!rows.length}
-              sx={{
-                bgcolor: ops.ink,
-                color: '#fff',
-                borderRadius: ops.radiusSm,
-                textTransform: 'none',
-                fontWeight: 500,
-                fontSize: 14,
-                px: 1.5,
-                height: 32,
-                '&:hover': { bgcolor: '#000' },
-                '&.Mui-disabled': { bgcolor: ops.hairline, color: ops.mute }
-              }}
-            >
-              Export CSV
-            </Button>
-          </Stack>
+        </Box>
+      }
+      subtitle='Who did what, when — logins, uploads, bookings, invites, referrals, transactions, admin actions, and authenticated API hits (IP · device · path). Filters sync to the URL.'
+      actions={
+        <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+          <AdminRefreshButton onClick={() => void load()} loading={loading} />
+          <Button
+            onClick={exportCsv}
+            disabled={!rows.length}
+            sx={{
+              bgcolor: ops.ink,
+              color: '#fff',
+              borderRadius: ops.radiusSm,
+              textTransform: 'none',
+              fontWeight: 500,
+              fontSize: 14,
+              px: 1.5,
+              height: 32,
+              '&:hover': { bgcolor: '#000' },
+              '&.Mui-disabled': { bgcolor: ops.hairline, color: ops.mute }
+            }}
+          >
+            Export CSV
+          </Button>
         </Stack>
-
-        <Box
-          sx={{
-            bgcolor: ops.canvas,
-            borderRadius: ops.radiusLg,
-            boxShadow: ops.shadowCard,
-            overflow: 'hidden'
-          }}
-        >
+      }
+    >
+      <Box
+        sx={{
+          bgcolor: ops.canvas,
+          borderRadius: ops.radiusLg,
+          boxShadow: ops.shadowCard,
+          overflow: 'hidden'
+        }}
+      >
           <Box sx={{ p: { xs: 2, sm: 3 }, borderBottom: `1px solid ${ops.hairline}` }}>
             <Stack
               direction='row'
@@ -666,186 +667,13 @@ export default function PlatformActivityPage() {
             />
           </AdminGridContainer>
         </Box>
-      </Box>
 
-      <Drawer
-        anchor='right'
+      <LogDetailDrawer
         open={Boolean(detail)}
+        row={detail}
         onClose={() => setDetail(null)}
-        PaperProps={{
-          sx: {
-            width: { xs: '100%', sm: 480 },
-            bgcolor: ops.night,
-            color: ops.onNight,
-            boxShadow: ops.shadowDrawer,
-            p: 0
-          }
-        }}
-      >
-        {detail ? (
-          <Stack sx={{ height: '100%' }}>
-            <Stack
-              direction='row'
-              alignItems='flex-start'
-              justifyContent='space-between'
-              sx={{ p: 2.5, borderBottom: `1px solid ${ops.nightLift}` }}
-            >
-              <Box sx={{ minWidth: 0, pr: 1 }}>
-                <Typography
-                  sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.onNightMuted, textTransform: 'uppercase' }}
-                >
-                  Event detail
-                </Typography>
-                <Typography sx={{ fontSize: 18, fontWeight: 600, letterSpacing: '-0.4px', mt: 0.5 }}>
-                  {detail.title}
-                </Typography>
-                <Stack direction='row' spacing={1} sx={{ mt: 1 }} alignItems='center'>
-                  <Chip
-                    size='small'
-                    label={CATEGORY_META[detail.category]?.label || detail.category}
-                    sx={categoryChipSx(detail.category)}
-                  />
-                  <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.onNightMuted }}>
-                    {detail.at ? moment(detail.at).format('YYYY-MM-DD HH:mm:ss') : '—'}
-                  </Typography>
-                </Stack>
-              </Box>
-              <IconButton onClick={() => setDetail(null)} sx={{ color: ops.onNightMuted }}>
-                <CloseIcon fontSize='small' />
-              </IconButton>
-            </Stack>
-
-            <Stack spacing={2} sx={{ p: 2.5, flex: 1, overflow: 'auto' }}>
-              {[
-                ['When', detail.at ? moment(detail.at).format('YYYY-MM-DD HH:mm:ss') : '—', null],
-                ['Who', detail.actor?.label, detail.actor?.id ? `/apps/users/${detail.actor.id}` : null],
-                ['Target', detail.target?.label, detail.target?.id ? `/apps/users/${detail.target.id}` : null],
-                ['Action', detail.action, null],
-                ['Source', detail.source, null],
-                ['IP address', detail.ip || '—', null],
-                ['Device', detail.device || '—', null],
-                [
-                  'Client',
-                  [detail.platform, detail.client_type, detail.device_id].filter(Boolean).join(' · ') || '—',
-                  null
-                ],
-                [
-                  'API',
-                  detail.method || detail.path
-                    ? `${detail.method || ''} ${detail.path || ''}`.trim()
-                    : '—',
-                  null
-                ],
-                [
-                  'Status / duration',
-                  detail.status_code != null || detail.duration_ms != null
-                    ? `${detail.status_code ?? '—'} · ${detail.duration_ms != null ? `${detail.duration_ms}ms` : '—'}`
-                    : '—',
-                  null
-                ],
-                ['Request id', detail.request_id || '—', null],
-                ['User-Agent', detail.user_agent || '—', null],
-                ['Entity', detail.entity ? `${detail.entity.type} · ${detail.entity.id}` : '—', null]
-              ].map(([label, value, href]) => (
-                <Box key={label}>
-                  <Typography
-                    sx={{
-                      fontFamily: ops.mono,
-                      fontSize: 10,
-                      color: ops.onNightMuted,
-                      textTransform: 'uppercase',
-                      mb: 0.5
-                    }}
-                  >
-                    {label}
-                  </Typography>
-                  {href ? (
-                    <Typography
-                      component={Link}
-                      href={href}
-                      sx={{
-                        color: ops.lime,
-                        textDecoration: 'none',
-                        fontSize: 14,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 0.5,
-                        '&:hover': { textDecoration: 'underline' }
-                      }}
-                    >
-                      {value} <OpenInNewIcon sx={{ fontSize: 14 }} />
-                    </Typography>
-                  ) : (
-                    <Typography
-                      sx={{
-                        fontSize: 14,
-                        color: ops.onNight,
-                        fontFamily: ops.mono,
-                        fontVariantNumeric: 'tabular-nums',
-                        wordBreak: 'break-all',
-                        lineHeight: 1.45
-                      }}
-                    >
-                      {value}
-                    </Typography>
-                  )}
-                </Box>
-              ))}
-
-              {detail.meta?.amount ? (
-                <Box>
-                  <Typography
-                    sx={{
-                      fontFamily: ops.mono,
-                      fontSize: 10,
-                      color: ops.onNightMuted,
-                      textTransform: 'uppercase',
-                      mb: 0.5
-                    }}
-                  >
-                    Amount
-                  </Typography>
-                  <Typography
-                    sx={{ fontFamily: ops.mono, fontSize: 20, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}
-                  >
-                    {detail.meta.amount}
-                  </Typography>
-                </Box>
-              ) : null}
-
-              <Box>
-                <Button
-                  size='small'
-                  onClick={() => setMetaOpen(v => !v)}
-                  sx={{ color: ops.lime, textTransform: 'none', fontFamily: ops.mono, fontSize: 12, px: 0 }}
-                >
-                  {metaOpen ? 'Hide payload' : 'Show payload'}
-                </Button>
-                <Collapse in={metaOpen}>
-                  <Box
-                    component='pre'
-                    sx={{
-                      mt: 1,
-                      p: 1.5,
-                      borderRadius: ops.radiusMd,
-                      bgcolor: ops.nightLift,
-                      fontFamily: ops.mono,
-                      fontSize: 12,
-                      lineHeight: 1.5,
-                      overflow: 'auto',
-                      maxHeight: 320,
-                      color: ops.onNightMuted,
-                      m: 0
-                    }}
-                  >
-                    {JSON.stringify(detail.meta || {}, null, 2)}
-                  </Box>
-                </Collapse>
-              </Box>
-            </Stack>
-          </Stack>
-        ) : null}
-      </Drawer>
-    </Box>
+        kind='activity'
+      />
+    </AdminPageShell>
   )
 }

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import Checkbox from '@mui/material/Checkbox'
+import Divider from '@mui/material/Divider'
 import TextField from '@mui/material/TextField'
 import InputLabel from '@mui/material/InputLabel'
 import IconButton from '@mui/material/IconButton'
@@ -21,6 +22,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useAuth } from 'src/hooks/useAuth'
 import BlankLayout from 'src/@core/layouts/BlankLayout'
 import { OpsAuthShell } from 'src/components/admin'
+import AdminGoogleSignIn from 'src/components/admin/AdminGoogleSignIn'
 import { ops } from 'src/styles/opsSurface'
 
 const schema = yup.object().shape({
@@ -33,6 +35,7 @@ const defaultValues = { password: '', email: '' }
 const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
+  const [googleError, setGoogleError] = useState('')
   const auth = useAuth()
 
   const {
@@ -56,12 +59,33 @@ const LoginPage = () => {
     })
   }
 
+  const onGoogle = async (payload, errMsg) => {
+    setGoogleError('')
+    if (errMsg) {
+      setGoogleError(errMsg)
+      return
+    }
+    if (!payload) return
+    await auth.loginWithGoogle(payload, err => setGoogleError(err || 'Google sign-in failed'))
+  }
+
   return (
     <OpsAuthShell
       eyebrow='Sign in'
       title='Administrator login'
-      subtitle='Use your NetQwix admin email and password.'
+      subtitle='Use your NetQwix admin email, or continue with Google if your account is already provisioned.'
     >
+      <AdminGoogleSignIn onCredential={onGoogle} disabled={auth.loading} />
+      {googleError ? (
+        <Alert severity='error' sx={{ mt: 1.5, borderRadius: ops.radiusSm, mb: 0 }}>
+          {googleError}
+        </Alert>
+      ) : null}
+
+      <Divider sx={{ my: 2.5 }}>
+        <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute }}>or email</Typography>
+      </Divider>
+
       <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
         <FormControl fullWidth sx={{ mb: 3 }}>
           <Controller
@@ -76,7 +100,7 @@ const LoginPage = () => {
                 onBlur={onBlur}
                 onChange={onChange}
                 error={Boolean(errors.email)}
-                placeholder='admin@company.com'
+                placeholder='admin@netqwix.com'
               />
             )}
           />
@@ -133,6 +157,7 @@ const LoginPage = () => {
           size='large'
           type='submit'
           variant='contained'
+          disabled={auth.loading}
           sx={{ mb: 1.5, bgcolor: ops.ink, '&:hover': { bgcolor: '#000' }, textTransform: 'none', fontWeight: 600 }}
         >
           Sign in
@@ -147,6 +172,9 @@ const LoginPage = () => {
         >
           Create administrator account
         </Button>
+        <Typography sx={{ fontSize: 12, color: ops.mute, lineHeight: 1.55, mb: 2 }}>
+          Only existing Admin accounts can sign in. Google works when that email is already an admin on NetQwix.
+        </Typography>
         {showAdminMfaNotice() ? (
           <Alert severity='info' sx={{ borderRadius: ops.radiusSm }}>
             Your organization may enable multi-factor authentication for admin accounts.

@@ -1,42 +1,29 @@
 /**
- * Admin sidebar — grouped by area. Section headers use `auth: false` (labels only).
- * Parent groups collapse children; keep child `subject` values aligned with `src/configs/acl.js`.
+ * Admin sidebar — main categories with nested sub-items.
+ * Keep child `subject` values aligned with `src/configs/acl.js`.
  */
 const navigation = () => [
   {
-    title: 'Home',
+    title: 'Dashboard',
     path: '/home',
-    icon: 'mdi:home-outline',
+    icon: 'mdi:view-dashboard-outline',
     action: 'read',
     subject: 'admin-nav-home'
   },
-  { sectionTitle: 'People', auth: false },
+
+  { sectionTitle: 'People', icon: 'mdi:account-group-outline', auth: false },
   {
-    title: 'Users',
-    icon: 'mdi:account-group-outline',
+    title: 'Users & accounts',
+    icon: 'mdi:account-multiple-outline',
     action: 'read',
     subject: 'admin-nav-people',
     children: [
       {
-        title: 'All users',
+        title: 'Directory',
         path: '/apps/users',
         icon: 'mdi:account-search-outline',
         action: 'read',
         subject: 'admin-nav-users-directory'
-      },
-      {
-        title: 'Trainer verifications',
-        path: '/apps/trainer-verifications',
-        icon: 'mdi:account-check-outline',
-        action: 'read',
-        subject: 'admin-nav-trainer-verifications'
-      },
-      {
-        title: 'Trainee reviews',
-        path: '/apps/trainee-account-reviews',
-        icon: 'mdi:account-clock-outline',
-        action: 'read',
-        subject: 'admin-nav-trainee-reviews'
       },
       {
         title: 'Trainers',
@@ -53,6 +40,20 @@ const navigation = () => [
         subject: 'admin-nav-trainees'
       },
       {
+        title: 'Trainer verifications',
+        path: '/apps/trainer-verifications',
+        icon: 'mdi:account-check-outline',
+        action: 'read',
+        subject: 'admin-nav-trainer-verifications'
+      },
+      {
+        title: 'Trainee reviews',
+        path: '/apps/trainee-account-reviews',
+        icon: 'mdi:account-clock-outline',
+        action: 'read',
+        subject: 'admin-nav-trainee-reviews'
+      },
+      {
         title: 'Account deletions',
         path: '/apps/account-deletions',
         icon: 'mdi:account-remove-outline',
@@ -61,17 +62,18 @@ const navigation = () => [
       }
     ]
   },
-  { sectionTitle: 'Mobile content', auth: false },
+
+  { sectionTitle: 'Content', icon: 'mdi:cellphone-cog', auth: false },
   {
     title: 'CMS & placements',
-    icon: 'mdi:cellphone-cog',
+    icon: 'mdi:newspaper-variant-outline',
     action: 'read',
     subject: 'admin-nav-content',
     children: [
       {
         title: 'Overview',
         path: '/apps/cms',
-        icon: 'mdi:view-dashboard-outline',
+        icon: 'mdi:view-grid-outline',
         action: 'read',
         subject: 'admin-nav-cms-overview'
       },
@@ -112,10 +114,11 @@ const navigation = () => [
       }
     ]
   },
-  { sectionTitle: 'Clips & video', auth: false },
+
+  { sectionTitle: 'Library', icon: 'mdi:video-box-outline', auth: false },
   {
     title: 'NetQwix Library',
-    icon: 'mdi:video-box-outline',
+    icon: 'mdi:play-box-multiple-outline',
     action: 'read',
     subject: 'admin-nav-clips-library',
     children: [
@@ -142,24 +145,25 @@ const navigation = () => [
       }
     ]
   },
-  { sectionTitle: 'Operations', auth: false },
-  {
-    title: 'Platform health',
-    path: '/apps/platform-health',
-    icon: 'mdi:heart-pulse',
-    action: 'read',
-    subject: 'admin-nav-operations'
-  },
+
+  { sectionTitle: 'Operations', icon: 'mdi:cog-outline', auth: false },
   {
     title: 'Platform ops',
-    icon: 'mdi:cog-outline',
+    icon: 'mdi:toolbox-outline',
     action: 'read',
     subject: 'admin-nav-operations',
     children: [
       {
+        title: 'Platform health',
+        path: '/apps/platform-health',
+        icon: 'mdi:heart-pulse',
+        action: 'read',
+        subject: 'admin-nav-operations'
+      },
+      {
         title: 'Bookings',
         path: '/apps/booking',
-        icon: 'mdi:briefcase-arrow-left-right-outline',
+        icon: 'mdi:calendar-check-outline',
         action: 'read',
         subject: 'admin-nav-bookings'
       },
@@ -186,13 +190,21 @@ const navigation = () => [
       }
     ]
   },
-  { sectionTitle: 'Logs & audit', auth: false },
+
+  { sectionTitle: 'Observability', icon: 'mdi:chart-timeline-variant', auth: false },
   {
-    title: 'Logs',
+    title: 'Logs & audit',
     icon: 'mdi:text-box-search-outline',
     action: 'read',
     subject: 'admin-nav-logs',
     children: [
+      {
+        title: 'Logs hub',
+        path: '/apps/logs',
+        icon: 'mdi:view-dashboard-outline',
+        action: 'read',
+        subject: 'admin-nav-logs'
+      },
       {
         title: 'Platform activity',
         path: '/apps/platform-activity',
@@ -201,22 +213,30 @@ const navigation = () => [
         subject: 'admin-nav-platform-activity'
       },
       {
-        title: 'Audit log',
+        title: 'Audit trail',
         path: '/apps/audit-logs',
         icon: 'mdi:clipboard-text-clock-outline',
         action: 'read',
         subject: 'admin-nav-audit-logs'
       },
       {
-        title: 'Operations log',
+        title: 'Ops / errors',
         path: '/apps/ops-logs',
         icon: 'mdi:alert-circle-outline',
         action: 'read',
         subject: 'admin-nav-ops-logs'
+      },
+      {
+        title: 'Admin roles',
+        path: '/apps/admin-roles',
+        icon: 'mdi:shield-account-outline',
+        action: 'read',
+        subject: 'admin-nav-admin-settings'
       }
     ]
   },
-  { sectionTitle: 'Business', auth: false },
+
+  { sectionTitle: 'Business', icon: 'mdi:cash-multiple', auth: false },
   {
     title: 'Revenue & growth',
     icon: 'mdi:chart-line',

@@ -5,13 +5,16 @@ import {
   AccordionSummary,
   Avatar,
   Box,
+  Button,
   Chip,
   Grid,
   Stack,
   Typography
 } from '@mui/material'
+import Link from 'next/link'
 import { useMemo } from 'react'
 import { ops } from 'src/styles/opsSurface'
+import { formatOpsDateTime } from 'src/utils/opsDateTime'
 
 import User360AccountReviewActions from '../User360AccountReviewActions'
 import { SectionShell, StatTile, OpsSurfaceCard } from '../user360Shared'
@@ -25,6 +28,8 @@ export default function User360OverviewTab({ userId, userData, onRefresh }) {
   const money = overview.money || {}
   const media = overview.media || {}
   const preferences = overview.preferences || {}
+  const sessions = overview.sessions || userData?.sessions || []
+  const loginHistory = overview.login_history || userData?.login_history || []
 
   const lastOnlineLabel = summary.lastOnlineAt || overview.lastOnlineAt
     ? new Date(summary.lastOnlineAt || overview.lastOnlineAt).toLocaleString()
@@ -40,7 +45,7 @@ export default function User360OverviewTab({ userId, userData, onRefresh }) {
   return (
     <SectionShell
       title='Profile & account snapshot'
-      subtitle='High-signal fields for identity, wallet, and engagement counts. Expand sections below for notification channels and extended profile metadata.'
+      subtitle='High-signal fields for identity, wallet, sessions, and engagement. Expand sections below for notification channels and extended profile metadata.'
     >
       <Stack direction={{ xs: 'column', lg: 'row' }} spacing={3} alignItems={{ lg: 'flex-start' }}>
         <Stack alignItems='center' spacing={1.5} sx={{ minWidth: { lg: 200 } }}>
@@ -88,6 +93,11 @@ export default function User360OverviewTab({ userId, userData, onRefresh }) {
               Last activity
             </Typography>
             <Typography sx={{ mt: 0.5, fontWeight: 600 }}>{lastOnlineLabel}</Typography>
+            {summary.activeSessionsCount != null ? (
+              <Typography sx={{ mt: 0.5, fontFamily: ops.mono, fontSize: 11, color: ops.mute }}>
+                {summary.activeSessionsCount} active auth session{summary.activeSessionsCount === 1 ? '' : 's'}
+              </Typography>
+            ) : null}
           </OpsSurfaceCard>
 
           <Typography sx={{ mb: 1.5, fontWeight: 600, letterSpacing: '-0.28px' }}>Engagement</Typography>
@@ -143,6 +153,113 @@ export default function User360OverviewTab({ userId, userData, onRefresh }) {
           </Grid>
 
           <Stack spacing={2} sx={{ mt: 3 }}>
+            <OpsSurfaceCard>
+              <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mb: 1.5 }}>
+                <Typography sx={{ fontWeight: 600 }}>Sessions &amp; login IP</Typography>
+                {userId ? (
+                  <Button
+                    size='small'
+                    component={Link}
+                    href={`/apps/logs?tab=login&userId=${userId}`}
+                    sx={{ textTransform: 'none' }}
+                  >
+                    Full login history →
+                  </Button>
+                ) : null}
+              </Stack>
+              {sessions.length ? (
+                <Stack spacing={1} sx={{ mb: 2 }}>
+                  {sessions.slice(0, 6).map(s => (
+                    <Box
+                      key={s.id}
+                      sx={{
+                        borderBottom: `1px solid ${ops.hairline}`,
+                        pb: 1,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        gap: 2,
+                        flexWrap: 'wrap'
+                      }}
+                    >
+                      <Box>
+                        <Typography sx={{ fontSize: 13, fontWeight: 600 }}>
+                          {s.deviceLabel || 'Device'} · {s.platform || '—'}
+                          {s.revokedAt ? ' · revoked' : ''}
+                        </Typography>
+                        <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute }}>
+                          {[
+                            s.ipAddress || 'no ip',
+                            s.loginMethod,
+                            [s.city, s.region, s.country].filter(Boolean).join(', '),
+                            s.timezone,
+                            s.browser,
+                            s.os,
+                            s.networkType || s.network_type,
+                            s.environmentLabel
+                          ]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </Typography>
+                        <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute }}>
+                          {[s.publicId, s.deviceId, s.appVersion, s.screen].filter(Boolean).join(' · ')}
+                        </Typography>
+                      </Box>
+                      <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.body }}>
+                        {s.lastUsedAt ? formatOpsDateTime(s.lastUsedAt, { withSeconds: false }) : '—'}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Stack>
+              ) : (
+                <Typography sx={{ fontSize: 13, color: ops.mute, mb: 2 }}>No auth sessions on record.</Typography>
+              )}
+              {loginHistory.length ? (
+                <>
+                  <Typography
+                    sx={{
+                      fontFamily: ops.mono,
+                      fontSize: 11,
+                      color: ops.mute,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                      mb: 1
+                    }}
+                  >
+                    Recent logins
+                  </Typography>
+                  <Stack spacing={0.75}>
+                    {loginHistory.slice(0, 5).map(row => (
+                      <Typography key={row.id} sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.body }}>
+                        {formatOpsDateTime(row.at, { withSeconds: false })} ·{' '}
+                        <Box
+                          component='span'
+                          sx={{
+                            color:
+                              String(row.action || '').includes('fail') || String(row.action || '').includes('lock')
+                                ? ops.error
+                                : ops.body
+                          }}
+                        >
+                          {String(row.action || '').replace(/_/g, ' ')}
+                        </Box>{' '}
+                        · {row.ip || 'no ip'} · {row.device || row.browser || '—'}
+                        {[row.city, row.region, row.country].filter(Boolean).length
+                          ? ` · ${[row.city, row.region, row.country].filter(Boolean).join(', ')}`
+                          : ''}
+                        {row.browser ? ` · ${row.browser}` : ''}
+                        {row.os ? ` · ${row.os}` : ''}
+                        {row.timezone ? ` · ${row.timezone}` : ''}
+                        {Array.isArray(row.risk_flags) && row.risk_flags.length
+                          ? ` · ${row.risk_flags.map(f => String(f).replace(/_/g, ' ')).join(', ')}`
+                          : ''}
+                        {row.session_public_id ? ` · ${row.session_public_id}` : ''}
+                      </Typography>
+                    ))}
+                  </Stack>
+                </>
+              ) : null}
+            </OpsSurfaceCard>
+
             <Accordion defaultExpanded sx={accordionSx} disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Stack direction='row' alignItems='center' spacing={1} flexWrap='wrap' sx={{ pr: 1 }}>

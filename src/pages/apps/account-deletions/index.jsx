@@ -260,6 +260,7 @@ export default function AccountDeletionsPage() {
   return (
     <>
       <AdminPageShell
+        icon='mdi:account-remove-outline'
         title='Account deletions'
         subtitle='15-day soft-delete queue. Restore accounts that asked support before the deadline. After 15 days the nightly job hard-deletes the row.'
         contentSx={{ p: 0 }}

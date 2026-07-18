@@ -9,6 +9,7 @@ export default function ClipTaxonomyPage() {
 
   return (
     <AdminPageShell
+      icon='mdi:folder-outline'
       title='Clip categories (master data)'
       subtitle='Create and organize categories and subcategories used when users upload clips and request library publishing.'
       actions={

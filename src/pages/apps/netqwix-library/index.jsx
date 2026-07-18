@@ -207,6 +207,7 @@ export default function NetqwixLibraryPage() {
 
   return (
     <AdminPageShell
+      icon='mdi:library-outline'
       title='NetQwix Library'
       subtitle={loading ? 'Loading published clips…' : `${clipCount} published clips`}
       actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}

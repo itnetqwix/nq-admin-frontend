@@ -6,6 +6,7 @@ import LibrarySubmissionsPanel from 'src/components/clips/LibrarySubmissionsPane
 export default function LibrarySubmissionsPage() {
   return (
     <AdminPageShell
+      icon='mdi:clipboard-check-outline'
       title='NetQwix Library requests'
       subtitle='Review videos submitted by trainers or trainees who want their clip added to the public NetQwix Library. Watch the clip, confirm category placement, then approve or reject with a reason.'
       actions={

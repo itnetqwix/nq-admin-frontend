@@ -78,7 +78,7 @@ const PricingPage = () => {
 
   if (loading || !config) {
     return (
-      <AdminPageShell title='Pricing & fees' subtitle='Loading pricing configuration…'>
+      <AdminPageShell icon='mdi:currency-usd' title='Pricing & fees' subtitle='Loading pricing configuration…'>
         <Typography color='text.secondary'>Loading…</Typography>
       </AdminPageShell>
     )
@@ -87,6 +87,7 @@ const PricingPage = () => {
   return (
     <>
       <AdminPageShell
+        icon='mdi:currency-usd'
         title='Pricing & fees'
         subtitle='Commission, platform fees, surge rules, and profit checks — saved config applies to all future checkouts.'
         actions={

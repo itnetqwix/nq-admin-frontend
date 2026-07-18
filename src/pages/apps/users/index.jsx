@@ -216,6 +216,7 @@ export default function UsersDirectoryPage() {
       />
 
       <AdminPageShell
+        icon='mdi:account-search-outline'
         title='All users'
         subtitle='Unified directory — click a row for User 360 (support, billing, moderation).'
         actions={

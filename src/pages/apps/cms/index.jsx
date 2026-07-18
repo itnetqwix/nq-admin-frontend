@@ -120,6 +120,7 @@ export default function CmsOverviewPage() {
 
   return (
     <AdminPageShell
+      icon='mdi:cellphone-cog'
       title='Mobile content'
       subtitle='CMS health dashboard — placements, drafts, and legal versions across the app.'
       actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}

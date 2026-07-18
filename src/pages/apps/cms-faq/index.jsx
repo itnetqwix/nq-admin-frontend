@@ -204,6 +204,7 @@ export default function CmsFaqPage() {
 
   return (
     <AdminPageShell
+      icon='mdi:help-circle-outline'
       title='FAQ'
       subtitle='Help content in Settings → FAQ — publish without an app store update'
       actions={

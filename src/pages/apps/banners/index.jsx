@@ -445,6 +445,7 @@ export default function BannersPage() {
   return (
     <>
       <AdminPageShell
+        icon='mdi:image-multiple-outline'
         title='Banners'
         subtitle='Hero carousel, announcement strip, and sticky promo on mobile + web dashboard home. Upload images or paste URL/S3 key. Use guest + all for sign-in promos.'
         actions={

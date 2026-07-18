@@ -369,6 +369,7 @@ export default function BroadcastsPage() {
   return (
     <>
       <AdminPageShell
+        icon='mdi:bullhorn-outline'
         title='Broadcasts'
         subtitle='Send messages to your users via Email, SMS, WhatsApp, In-App notifications, and Push notifications.'
         contentSx={{ p: 0 }}

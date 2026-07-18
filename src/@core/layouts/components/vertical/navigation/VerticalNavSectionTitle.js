@@ -1,12 +1,13 @@
-// ** MUI Imports
 import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
+import Box from '@mui/material/Box'
 import { styled, useTheme } from '@mui/material/styles'
 import MuiListSubheader from '@mui/material/ListSubheader'
 
 // ** Custom Components Imports
 import Translations from 'src/layouts/components/Translations'
 import CanViewNavSectionTitle from 'src/layouts/components/acl/CanViewNavSectionTitle'
+import Icon from 'src/@core/components/icon'
 
 // ** Styled Components
 const ListSubheader = styled(props => <MuiListSubheader component='li' {...props} />)(({ theme }) => ({
@@ -87,7 +88,23 @@ const VerticalNavSectionTitle = props => {
           }}
         >
           {navCollapsed && !navHover ? null : (
-            <Typography noWrap variant='caption' sx={{ ...conditionalColor() }}>
+            <Typography
+              noWrap
+              variant='caption'
+              sx={{
+                ...conditionalColor(),
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.75,
+                color: '#6b6b6b !important',
+                fontWeight: 600
+              }}
+            >
+              {item.icon ? (
+                <Box component='span' sx={{ display: 'inline-flex', color: '#533afd', opacity: 0.85 }}>
+                  <Icon icon={item.icon} fontSize={14} />
+                </Box>
+              ) : null}
               <Translations text={item.sectionTitle} />
             </Typography>
           )}

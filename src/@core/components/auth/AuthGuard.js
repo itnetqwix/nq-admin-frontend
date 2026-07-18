@@ -13,7 +13,7 @@ const AuthGuard = props => {
   const router = useRouter()
   useEffect(
     () => {
-      if (!router.isReady || auth.loading) {
+      if (!router.isReady || auth.loading || !auth.bootstrapped) {
         return
       }
       if (!auth.user && !router.pathname.includes('login')) {
@@ -30,7 +30,10 @@ const AuthGuard = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [router.isReady, router.route, auth.loading, auth.user]
   )
-  if (auth.loading || !auth.user) {
+  if (auth.loading || !auth.bootstrapped) {
+    return fallback
+  }
+  if (!auth.user) {
     return fallback
   }
 

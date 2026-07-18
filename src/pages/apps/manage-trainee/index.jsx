@@ -21,6 +21,7 @@ import UserQuickPreviewModal from 'src/components/user360/UserQuickPreviewModal'
 import { getUser360 } from 'src/services/user360Api'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import authConfig from 'src/configs/auth'
+import { formatOpsDateTime } from 'src/utils/opsDateTime'
 
 export default function ManageTrainee() {
   const router = useRouter()
@@ -161,8 +162,8 @@ export default function ManageTrainee() {
     {
       field: 'createdAt',
       headerName: 'Joined',
-      width: 150,
-      valueGetter: p => (p.row.createdAt ? new Date(p.row.createdAt).toLocaleDateString() : '—')
+      width: 170,
+      valueGetter: p => (p.row.createdAt ? formatOpsDateTime(p.row.createdAt, { withSeconds: false }) : '—')
     },
     {
       field: 'view',
@@ -211,6 +212,7 @@ export default function ManageTrainee() {
       />
       <form noValidate autoComplete='off'>
         <AdminPageShell
+          icon='mdi:account-school-outline'
           title='Trainees'
           subtitle='Directory with wallet, referral, join date, and status — click a row for User 360.'
           actions={

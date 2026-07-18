@@ -327,6 +327,7 @@ export default function Booking() {
     <>
       <form noValidate autoComplete='off'>
         <AdminPageShell
+          icon='mdi:calendar-check-outline'
           title='Bookings'
           subtitle='Sessions, confirmations, cancellations, and refunds. Search by booking id.'
           actions={

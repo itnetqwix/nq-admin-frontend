@@ -118,6 +118,7 @@ export default function TrainerVerificationsPage() {
 
   return (
     <AdminPageShell
+      icon='mdi:account-check-outline'
       title='Trainer verifications'
       subtitle='Review face liveness and profile before granting access.'
       actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}

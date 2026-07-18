@@ -83,6 +83,7 @@ const ConnectAccountsPage = () => {
 
   return (
     <AdminPageShell
+      icon='mdi:bank-transfer'
       title='Stripe Connect'
       subtitle='Trainer Connect accounts, KYC status, and payout preferences.'
       actions={

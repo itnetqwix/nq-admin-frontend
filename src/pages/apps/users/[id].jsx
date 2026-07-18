@@ -300,39 +300,57 @@ export default function User360Page() {
   return (
     <Box sx={{ bgcolor: ops.canvasSoft, minHeight: '100%', pb: 6 }}>
       <Container maxWidth='xl' sx={{ pt: 3 }}>
-        <Typography
-          sx={{
-            fontFamily: ops.mono,
-            fontSize: 11,
-            color: ops.mute,
-            textTransform: 'uppercase',
-            letterSpacing: '0.08em',
-            mb: 1
-          }}
-        >
-          People · user 360
-        </Typography>
-        <Breadcrumbs sx={{ mb: 2 }} separator='/'>
-          <MuiLink component={Link} href='/home' underline='hover' color='inherit' sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <HomeOutlinedIcon sx={{ fontSize: 18 }} /> Home
-          </MuiLink>
-          <MuiLink component={Link} href={listHref} underline='hover' color='inherit'>
-            {listLabel}
-          </MuiLink>
-          <MuiLink component={Link} href='/apps/users' underline='hover' color='inherit' sx={{ fontSize: 13 }}>
-            All users
-          </MuiLink>
-          <Typography color='text.primary' sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <PersonSearchOutlinedIcon sx={{ fontSize: 18 }} /> User console
-          </Typography>
-        </Breadcrumbs>
+        <Stack direction='row' spacing={1.5} alignItems='flex-start' sx={{ mb: 1 }}>
+          <Box
+            sx={{
+              width: 40,
+              height: 40,
+              borderRadius: ops.radiusMd,
+              bgcolor: ops.softIndigo,
+              color: ops.indigo,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              boxShadow: ops.shadowCard
+            }}
+          >
+            <PersonSearchOutlinedIcon sx={{ fontSize: 22 }} />
+          </Box>
+          <Box>
+            <Typography
+              sx={{
+                fontFamily: ops.mono,
+                fontSize: 11,
+                color: ops.mute,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                mb: 0.5
+              }}
+            >
+              People · user 360
+            </Typography>
+            <Breadcrumbs sx={{ mb: 0 }} separator='/'>
+              <MuiLink component={Link} href='/home' underline='hover' color='inherit' sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <HomeOutlinedIcon sx={{ fontSize: 18 }} /> Home
+              </MuiLink>
+              <MuiLink component={Link} href={listHref} underline='hover' color='inherit'>
+                {listLabel}
+              </MuiLink>
+              <MuiLink component={Link} href='/apps/users' underline='hover' color='inherit' sx={{ fontSize: 13 }}>
+                All users
+              </MuiLink>
+              <Typography color='text.primary'>User console</Typography>
+            </Breadcrumbs>
+          </Box>
+        </Stack>
 
         <Stack
           direction={{ xs: 'column', md: 'row' }}
           spacing={2}
           alignItems={{ xs: 'flex-start', md: 'center' }}
           justifyContent='space-between'
-          sx={{ mb: 2 }}
+          sx={{ mb: 2, mt: 2 }}
         >
           <Box>
             <Typography

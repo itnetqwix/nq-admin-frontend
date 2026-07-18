@@ -69,6 +69,7 @@ export default function ActiveUsersTable() {
   return (
     <Box sx={{ mt: 4, width: '100%' }}>
       <AdminPageShell
+        icon='mdi:account-multiple-check-outline'
         title='Who is online now'
         subtitle='Trainers and trainees currently connected. Data refreshes over the admin realtime channel.'
         actions={

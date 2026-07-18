@@ -380,6 +380,7 @@ export default function PromoCodesPage() {
   return (
     <>
       <AdminPageShell
+        icon='mdi:tag-multiple-outline'
         title='Promo codes'
         subtitle='Platform promos (NetQwix-funded) and coach-owned promos. Coach codes only apply to that coach’s bookings.'
         actions={

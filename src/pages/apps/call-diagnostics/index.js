@@ -73,6 +73,7 @@ export default function CallDiagnosticsPage() {
 
   return (
     <AdminPageShell
+      icon='mdi:phone-in-talk-outline'
       title='Call diagnostics'
       subtitle='Video and session quality events. Filter by session, user, event type, or date range.'
       contentSx={{ p: 0 }}
