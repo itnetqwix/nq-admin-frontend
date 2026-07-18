@@ -1,23 +1,14 @@
 import React, { useMemo, useState } from 'react'
 import NextLink from 'next/link'
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Chip,
-  Grid,
-  Stack,
-  Typography
-} from '@mui/material'
-import RefreshIcon from '@mui/icons-material/Refresh'
+import { Alert, Box, Button, Chip, Grid, Stack, Typography } from '@mui/material'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import toast from 'react-hot-toast'
 
+import { AdminRefreshButton, OpsSurfaceCard } from 'src/components/admin'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import ContentPlacementGuide from 'src/components/admin/content/ContentPlacementGuide'
 import { getCmsSummary, getCmsAssetHealth } from 'src/services/cmsApi'
+import { ops } from 'src/styles/opsSurface'
 
 const SECTIONS = [
   {
@@ -57,9 +48,7 @@ const SECTIONS = [
     description: 'Terms, privacy, cancellation & refund — versioned for OTA refresh.',
     metric: s => s?.legal?.active_documents ?? 0,
     detail: s =>
-      (s?.legal?.documents || [])
-        .map(d => `${d.slug} v${d.version}`)
-        .join(' · ') || '—'
+      (s?.legal?.documents || []).map(d => `${d.slug} v${d.version}`).join(' · ') || '—'
   }
 ]
 
@@ -87,7 +76,7 @@ function HealthAlerts({ summary, assetHealth }) {
   return (
     <Stack spacing={1} sx={{ mb: 3 }}>
       {alerts.map(a => (
-        <Alert key={a.text} severity={a.severity} icon={<WarningAmberIcon fontSize='inherit' />}>
+        <Alert key={a.text} severity={a.severity} icon={<WarningAmberIcon fontSize='inherit' />} sx={{ borderRadius: ops.radiusSm }}>
           {a.text}
         </Alert>
       ))}
@@ -98,7 +87,6 @@ function HealthAlerts({ summary, assetHealth }) {
 export default function CmsOverviewPage() {
   const [summary, setSummary] = useState(null)
   const [loading, setLoading] = useState(false)
-
   const [assetHealth, setAssetHealth] = useState(null)
 
   const load = async () => {
@@ -134,33 +122,51 @@ export default function CmsOverviewPage() {
     <AdminPageShell
       title='Mobile content'
       subtitle='CMS health dashboard — placements, drafts, and legal versions across the app.'
-      actions={
-        <Button variant='outlined' startIcon={<RefreshIcon />} onClick={() => void load()} disabled={loading}>
-          Refresh
-        </Button>
-      }
+      actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}
     >
       <AdminPageSection>
         <HealthAlerts summary={summary} assetHealth={assetHealth} />
 
-        <Typography variant='subtitle2' fontWeight={700} sx={{ mb: 1 }}>
-          Live counts
-        </Typography>
-        <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
-          <Chip label={`Banners ${summary?.live?.banners ?? '—'}`} color='primary' component={NextLink} href='/apps/banners' clickable />
+        <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', mb: 1.5 }}>Live counts.</Typography>
+        <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2.5 }}>
+          <Chip
+            label={`Banners ${summary?.live?.banners ?? '—'}`}
+            component={NextLink}
+            href='/apps/banners'
+            clickable
+            sx={{ fontFamily: ops.mono, fontSize: 11, bgcolor: ops.ink, color: '#fff' }}
+          />
           {placementChips.map(c => (
-            <Chip key={c.label} label={c.label} size='small' variant='outlined' component={NextLink} href={c.href} clickable />
+            <Chip
+              key={c.label}
+              label={c.label}
+              size='small'
+              variant='outlined'
+              component={NextLink}
+              href={c.href}
+              clickable
+              sx={{ fontFamily: ops.mono, fontSize: 11, borderColor: ops.hairline }}
+            />
           ))}
-          <Chip label={`Tips ${summary?.live?.tips ?? '—'}`} color='primary' component={NextLink} href='/apps/tips' clickable />
+          <Chip
+            label={`Tips ${summary?.live?.tips ?? '—'}`}
+            component={NextLink}
+            href='/apps/tips'
+            clickable
+            sx={{ fontFamily: ops.mono, fontSize: 11 }}
+          />
           <Chip
             label={`FAQ ${summary?.faq?.active ? `v${summary.faq.version}` : 'off'}`}
-            color={summary?.faq?.has_unpublished_changes ? 'warning' : 'default'}
             component={NextLink}
             href='/apps/cms-faq'
             clickable
+            sx={{
+              fontFamily: ops.mono,
+              fontSize: 11,
+              bgcolor: summary?.faq?.has_unpublished_changes ? ops.errorSoft : ops.canvasSoft2,
+              color: summary?.faq?.has_unpublished_changes ? ops.warning : ops.body
+            }}
           />
-          <Chip label={`Inactive banners ${summary?.inactive?.banners ?? '—'}`} size='small' />
-          <Chip label={`Inactive tips ${summary?.inactive?.tips ?? '—'}`} size='small' />
         </Stack>
 
         <Grid container spacing={2}>
@@ -169,45 +175,51 @@ export default function CmsOverviewPage() {
             const detail = section.detail?.(summary)
             return (
               <Grid key={section.href} item xs={12} sm={6} md={4}>
-                <Card variant='outlined' sx={{ height: '100%' }}>
-                  <CardContent>
-                    <Stack direction='row' justifyContent='space-between' alignItems='flex-start' spacing={1}>
-                      <Typography variant='h6'>{section.title}</Typography>
-                      {typeof metric === 'number' ? (
-                        <Chip size='small' color='success' label={`${metric} live`} />
-                      ) : null}
-                    </Stack>
-                    <Typography variant='body2' color='text.secondary' sx={{ mt: 1, mb: 0.5 }}>
-                      {section.description}
+                <OpsSurfaceCard>
+                  <Stack direction='row' justifyContent='space-between' alignItems='flex-start' spacing={1}>
+                    <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px' }}>{section.title}</Typography>
+                    {typeof metric === 'number' ? (
+                      <Chip
+                        size='small'
+                        label={`${metric} live`}
+                        sx={{ fontFamily: ops.mono, fontSize: 11, bgcolor: '#AAFFEC', color: '#1A8F76' }}
+                      />
+                    ) : null}
+                  </Stack>
+                  <Typography sx={{ fontSize: 13, color: ops.body, mt: 1, mb: 0.5, lineHeight: 1.5 }}>
+                    {section.description}
+                  </Typography>
+                  {detail ? (
+                    <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute, display: 'block', mb: 2 }}>
+                      {detail}
                     </Typography>
-                    {detail ? (
-                      <Typography variant='caption' color='text.secondary' display='block' sx={{ mb: 2 }}>
-                        {detail}
-                      </Typography>
-                    ) : (
-                      <Box sx={{ mb: 2 }} />
-                    )}
-                    <Button component={NextLink} href={section.href} variant='contained' size='small'>
-                      Open
-                    </Button>
-                  </CardContent>
-                </Card>
+                  ) : (
+                    <Box sx={{ mb: 2 }} />
+                  )}
+                  <Button
+                    component={NextLink}
+                    href={section.href}
+                    variant='contained'
+                    size='small'
+                    sx={{ textTransform: 'none', bgcolor: ops.ink, '&:hover': { bgcolor: '#000' } }}
+                  >
+                    Open →
+                  </Button>
+                </OpsSurfaceCard>
               </Grid>
             )
           })}
         </Grid>
 
         <Box sx={{ mt: 4 }}>
-          <Typography variant='subtitle1' fontWeight={700} gutterBottom>
-            Placement guides
-          </Typography>
+          <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', mb: 1.5 }}>Placement guides.</Typography>
           <ContentPlacementGuide kind='banners' />
           <ContentPlacementGuide kind='tips' />
           <ContentPlacementGuide kind='blog' />
           <ContentPlacementGuide kind='faq' />
           <ContentPlacementGuide kind='legal' />
         </Box>
-        <Typography variant='caption' color='text.secondary' display='block' sx={{ mt: 3 }}>
+        <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute, display: 'block', mt: 3 }}>
           Content version: {summary?.content_version ?? '—'} · Updated:{' '}
           {summary?.updated_at ? new Date(summary.updated_at).toLocaleString() : '—'}
         </Typography>

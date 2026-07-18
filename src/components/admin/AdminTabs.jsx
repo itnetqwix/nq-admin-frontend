@@ -1,16 +1,16 @@
 import Box from '@mui/material/Box'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
+import { ops } from 'src/styles/opsSurface'
 
 /**
- * Consistent tab strip for finance, pricing, CMS sub-views, etc.
+ * Ops Surface tab strip — hairline bottom, sentence-case labels.
  */
 export default function AdminTabs({ value, onChange, tabs, sx }) {
   return (
     <Box
       sx={{
-        borderBottom: 1,
-        borderColor: 'divider',
+        borderBottom: `1px solid ${ops.hairline}`,
         mb: 2,
         ...sx
       }}
@@ -23,11 +23,15 @@ export default function AdminTabs({ value, onChange, tabs, sx }) {
         allowScrollButtonsMobile
         sx={{
           minHeight: 44,
+          '& .MuiTabs-indicator': { bgcolor: ops.ink, height: 2 },
           '& .MuiTab-root': {
             minHeight: 44,
             textTransform: 'none',
-            fontWeight: 600,
-            fontSize: '0.875rem'
+            fontWeight: 500,
+            fontSize: 13,
+            color: ops.mute,
+            letterSpacing: '-0.01em',
+            '&.Mui-selected': { color: ops.ink, fontWeight: 600 }
           }
         }}
       >

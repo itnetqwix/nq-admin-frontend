@@ -20,6 +20,7 @@ import toast from 'react-hot-toast'
 import AdminUser360Tabs from 'src/components/user360/AdminUser360Tabs'
 import { getUser360, getUserAssets, getUserLessons, getUserReviews, getUserTimeline } from 'src/services/user360Api'
 import { getOpsEventsForUser } from 'src/services/opsApi'
+import { ops } from 'src/styles/opsSurface'
 
 export default function User360Page() {
   const router = useRouter()
@@ -274,8 +275,8 @@ export default function User360Page() {
 
   if (!router.isReady) {
     return (
-      <Box sx={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'grey.50' }}>
-        <CircularProgress />
+      <Box sx={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: ops.canvasSoft }}>
+        <CircularProgress size={28} sx={{ color: ops.ink }} />
       </Box>
     )
   }
@@ -283,9 +284,9 @@ export default function User360Page() {
   if (!userId) {
     return (
       <Container maxWidth='md' sx={{ py: 6 }}>
-        <Box sx={{ p: 4, borderRadius: 2, bgcolor: 'background.paper', boxShadow: 1 }}>
-          <Typography variant='h6' sx={{ mb: 1 }}>User not found</Typography>
-          <Typography variant='body2' color='text.secondary' sx={{ mb: 3 }}>
+        <Box sx={{ p: 4, borderRadius: ops.radiusLg, bgcolor: ops.canvas, boxShadow: ops.shadowCard }}>
+          <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', mb: 1 }}>User not found.</Typography>
+          <Typography sx={{ fontSize: 13, color: ops.body, mb: 3, lineHeight: 1.5 }}>
             The link may be invalid or the user id is missing.
           </Typography>
           <Button component={Link} href='/apps/users' variant='contained'>
@@ -297,8 +298,20 @@ export default function User360Page() {
   }
 
   return (
-    <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh', pb: 6 }}>
+    <Box sx={{ bgcolor: ops.canvasSoft, minHeight: '100%', pb: 6 }}>
       <Container maxWidth='xl' sx={{ pt: 3 }}>
+        <Typography
+          sx={{
+            fontFamily: ops.mono,
+            fontSize: 11,
+            color: ops.mute,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            mb: 1
+          }}
+        >
+          People · user 360
+        </Typography>
         <Breadcrumbs sx={{ mb: 2 }} separator='/'>
           <MuiLink component={Link} href='/home' underline='hover' color='inherit' sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <HomeOutlinedIcon sx={{ fontSize: 18 }} /> Home
@@ -322,10 +335,13 @@ export default function User360Page() {
           sx={{ mb: 2 }}
         >
           <Box>
-            <Typography variant='h4' component='h1' sx={{ fontWeight: 700, letterSpacing: '-0.02em', mb: 0.5 }}>
+            <Typography
+              component='h1'
+              sx={{ fontSize: { xs: 24, md: 32 }, fontWeight: 600, letterSpacing: '-0.96px', mb: 0.5 }}
+            >
               {overviewLoading && !userData ? 'Loading…' : displayName}
             </Typography>
-            <Typography variant='body2' color='text.secondary'>
+            <Typography sx={{ fontSize: 13, color: ops.body, lineHeight: 1.5 }}>
               Full access view for support, moderation, and billing context.
             </Typography>
           </Box>
@@ -353,17 +369,15 @@ export default function User360Page() {
 
         <Box
           sx={{
-            borderRadius: 2,
-            bgcolor: 'background.paper',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-            border: '1px solid',
-            borderColor: 'divider',
+            borderRadius: ops.radiusLg,
+            bgcolor: ops.canvas,
+            boxShadow: ops.shadowCard,
             overflow: 'hidden'
           }}
         >
           {overviewLoading && !userData ? (
             <Box sx={{ py: 12, display: 'flex', justifyContent: 'center' }}>
-              <CircularProgress />
+              <CircularProgress size={28} sx={{ color: ops.ink }} />
             </Box>
           ) : (
             <AdminUser360Tabs

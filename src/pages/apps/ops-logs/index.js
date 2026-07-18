@@ -16,6 +16,7 @@ import {
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminGridContainer from 'src/components/admin/AdminGridContainer'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
+import OpsMetricTile from 'src/components/admin/OpsMetricTile'
 import { useAdminConfirm } from 'src/components/admin/useAdminConfirm'
 import { useRouter } from 'next/router'
 import moment from 'moment'
@@ -244,10 +245,11 @@ export default function OpsLogsPage() {
         {stats ? (
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <Grid item xs={12} sm={4}>
-              <Chip
-                label={`Critical open (24h): ${stats.criticalOpen ?? 0}`}
-                color={(stats.criticalOpen ?? 0) > 0 ? 'error' : 'default'}
-                variant='outlined'
+              <OpsMetricTile
+                label='Critical open (24h)'
+                value={stats.criticalOpen ?? 0}
+                hint='Filter critical + open'
+                tone={(stats.criticalOpen ?? 0) > 0 ? 'danger' : 'default'}
                 onClick={() => {
                   setSeverity('critical')
                   setResolution('open')
@@ -256,9 +258,11 @@ export default function OpsLogsPage() {
               />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <Chip
-                label={`Instant failures (24h): ${stats.instantFailures ?? 0}`}
-                variant='outlined'
+              <OpsMetricTile
+                label='Instant failures (24h)'
+                value={stats.instantFailures ?? 0}
+                hint='Filter instant only'
+                tone={(stats.instantFailures ?? 0) > 0 ? 'warn' : 'default'}
                 onClick={() => {
                   setInstantOnly(true)
                   setPage(0)
@@ -266,9 +270,10 @@ export default function OpsLogsPage() {
               />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <Chip
-                label={`Call preflight failures (24h): ${stats.callPreflightFailures ?? 0}`}
-                variant='outlined'
+              <OpsMetricTile
+                label='Call preflight (24h)'
+                value={stats.callPreflightFailures ?? 0}
+                hint='Filter call category'
                 onClick={() => {
                   setCategory('call')
                   setPage(0)

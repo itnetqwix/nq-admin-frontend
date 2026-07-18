@@ -1,15 +1,9 @@
 import Link from 'next/link'
-import {
-  Box,
-  Button,
-  Chip,
-  CircularProgress,
-  Paper,
-  Stack,
-  Typography
-} from '@mui/material'
+import { Button, Chip, Stack, Typography } from '@mui/material'
+import { AdminLoadingState } from 'src/components/admin'
+import { ops } from 'src/styles/opsSurface'
 
-import { SectionShell, EmptyHint } from '../user360Shared'
+import { SectionShell, EmptyHint, OpsSurfaceCard } from '../user360Shared'
 
 export default function User360IssuesTab({ userId, opsItems = [], loadingOpsEvents = false }) {
   return (
@@ -22,40 +16,46 @@ export default function User360IssuesTab({ userId, opsItems = [], loadingOpsEven
         </Button>
       }
     >
-      {loadingOpsEvents ? (
-        <Box sx={{ py: 8, display: 'flex', justifyContent: 'center' }}>
-          <CircularProgress />
-        </Box>
-      ) : null}
+      {loadingOpsEvents ? <AdminLoadingState message='Loading issues…' minHeight={180} /> : null}
       {!loadingOpsEvents && opsItems.length ? (
         <Stack spacing={1.5}>
           {opsItems.slice(0, 30).map(row => (
-            <Paper key={row._id || row.event_id} variant='outlined' sx={{ p: 2 }}>
+            <OpsSurfaceCard key={row._id || row.event_id}>
               <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
                 <Chip
                   size='small'
                   label={row.severity}
-                  color={row.severity === 'error' || row.severity === 'critical' ? 'error' : 'default'}
+                  sx={{
+                    fontFamily: ops.mono,
+                    fontSize: 11,
+                    bgcolor:
+                      row.severity === 'error' || row.severity === 'critical' ? ops.errorSoft : ops.canvasSoft2,
+                    color: row.severity === 'error' || row.severity === 'critical' ? ops.error : ops.body
+                  }}
                 />
-                <Chip size='small' label={row.category} variant='outlined' />
-                <Typography variant='caption' color='text.secondary'>
+                <Chip
+                  size='small'
+                  label={row.category}
+                  sx={{ fontFamily: ops.mono, fontSize: 11, borderColor: ops.hairline }}
+                  variant='outlined'
+                />
+                <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute }}>
                   {row.createdAt ? new Date(row.createdAt).toLocaleString() : ''}
                 </Typography>
               </Stack>
-              <Typography variant='subtitle2' sx={{ mt: 1, fontWeight: 600 }}>
-                {row.title}
-              </Typography>
+              <Typography sx={{ mt: 1, fontWeight: 600, letterSpacing: '-0.28px' }}>{row.title}</Typography>
               {row.summary ? (
-                <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
-                  {row.summary}
-                </Typography>
+                <Typography sx={{ mt: 0.5, fontSize: 13, color: ops.body, lineHeight: 1.5 }}>{row.summary}</Typography>
               ) : null}
-            </Paper>
+            </OpsSurfaceCard>
           ))}
         </Stack>
       ) : null}
       {!loadingOpsEvents && !opsItems.length ? (
-        <EmptyHint title='No ops events' hint='Issues will appear here when logged from calls, wallet, or support.' />
+        <EmptyHint
+          title='No ops events'
+          hint='Issues will appear here when logged from calls, wallet, or support.'
+        />
       ) : null}
     </SectionShell>
   )

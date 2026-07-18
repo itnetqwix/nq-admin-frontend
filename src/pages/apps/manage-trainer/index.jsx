@@ -133,21 +133,65 @@ export default function ManageTrainer() {
         </Badge>
       )
     },
-    { field: 'fullname', headerName: 'Trainer Name', width: 180 },
-    { field: 'email', headerName: 'Trainer Email', width: 200 },
-    { field: 'mobile_no', headerName: 'Mobile Number', width: 150 },
+    { field: 'fullname', headerName: 'Trainer Name', width: 160 },
+    { field: 'email', headerName: 'Email', width: 190 },
+    { field: 'mobile_no', headerName: 'Mobile', width: 130 },
     {
       field: 'status',
       headerName: 'Status',
-      width: 200,
+      width: 180,
       renderCell: params => <TrainerStatus params={params} />
     },
     { field: 'category', headerName: 'Category', width: 100 },
-    { field: 'wallet_amount', headerName: 'Wallet Amount', width: 150 },
+    {
+      field: 'wallet_amount',
+      headerName: 'Wallet',
+      width: 110,
+      valueGetter: p =>
+        p.row.wallet_amount != null ? `$${Number(p.row.wallet_amount).toFixed(2)}` : '—'
+    },
+    {
+      field: 'commission',
+      headerName: 'Commission',
+      width: 130,
+      renderCell: params => (
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+          <span>{params.row.commission ?? 0}%</span>
+          <IconButton onClick={() => handleOpenCommisionModal(params.row.id)} aria-label='Edit commission' size='small'>
+            <SaveAsIcon fontSize='small' />
+          </IconButton>
+        </Box>
+      )
+    },
+    { field: 'login_type', headerName: 'Login', width: 100 },
+    {
+      field: 'is_kyc_completed',
+      headerName: 'KYC',
+      width: 80,
+      valueGetter: p => (p.row.is_kyc_completed ? 'Yes' : 'No')
+    },
+    {
+      field: 'is_registered_with_stript',
+      headerName: 'Stripe',
+      width: 90,
+      valueGetter: p => (p.row.is_registered_with_stript ? 'Onboarded' : '—')
+    },
+    {
+      field: 'referral_code',
+      headerName: 'Referral',
+      width: 110,
+      valueGetter: p => p.row.referral_code || '—'
+    },
+    {
+      field: 'createdAt',
+      headerName: 'Joined',
+      width: 150,
+      valueGetter: p => (p.row.createdAt ? new Date(p.row.createdAt).toLocaleDateString() : '—')
+    },
     {
       field: 'view',
       headerName: 'Preview',
-      width: 90,
+      width: 80,
       sortable: false,
       renderCell: params => (
         <IconButton onClick={() => handleCourseClick(params.row.id)} aria-label='Quick preview'>
@@ -156,23 +200,9 @@ export default function ManageTrainer() {
       )
     },
     {
-      field: 'commission',
-      headerName: 'Commission',
-      width: 150,
-      renderCell: params => (
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-          <span>{params.row.commission}%</span>
-          <IconButton onClick={() => handleOpenCommisionModal(params.row.id)} aria-label='Edit commission' size='small'>
-            <SaveAsIcon fontSize='small' />
-          </IconButton>
-        </Box>
-      )
-    },
-    { field: 'login_type', headerName: 'Login Type', width: 150 },
-    {
       field: 'actions',
       headerName: 'Actions',
-      width: 100,
+      width: 80,
       sortable: false,
       renderCell: params => (
         <IconButton
@@ -220,7 +250,7 @@ export default function ManageTrainer() {
       <form noValidate autoComplete='off'>
         <AdminPageShell
           title='Trainers'
-          subtitle='Search the directory and click a row to open User 360.'
+          subtitle='Directory with KYC, Stripe, wallet, commission, and referral — click a row for User 360.'
           actions={
             <>
               <CustomButton component={Link} variant='outlined' href='/apps/users'>

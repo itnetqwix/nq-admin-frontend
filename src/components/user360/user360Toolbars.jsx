@@ -1,4 +1,3 @@
-import RefreshIcon from '@mui/icons-material/Refresh'
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined'
 import SearchIcon from '@mui/icons-material/Search'
 import {
@@ -12,26 +11,21 @@ import {
   Typography
 } from '@mui/material'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+import Link from 'next/link'
+import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
+import { ops } from 'src/styles/opsSurface'
 
 export const ToolbarRefreshExport = ({ onRefresh, onExport, exportLabel = 'Export CSV', busy }) => (
   <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
-    <Button
-      size='small'
-      variant='outlined'
-      startIcon={<RefreshIcon />}
-      onClick={() => onRefresh?.()}
-      disabled={busy}
-      sx={{ textTransform: 'none' }}
-    >
-      Refresh
-    </Button>
+    <AdminRefreshButton onClick={() => onRefresh?.()} loading={busy} />
     <Button
       size='small'
       variant='contained'
       startIcon={<FileDownloadOutlinedIcon />}
       onClick={onExport}
       disabled={busy}
-      sx={{ textTransform: 'none' }}
+      sx={{ textTransform: 'none', bgcolor: ops.ink, '&:hover': { bgcolor: '#000' } }}
     >
       {exportLabel}
     </Button>
@@ -127,6 +121,7 @@ export const QueryToolbar = ({ section, sectionQuery, onQueryChange, lessonSortO
 }
 
 export const ActivityToolbar = ({ query, onQueryChange }) => {
+  const router = useRouter()
   const aq = query?.activity || {}
   const [typeDraft, setTypeDraft] = useState(aq.eventType ?? '')
   useEffect(() => {
@@ -151,6 +146,8 @@ export const ActivityToolbar = ({ query, onQueryChange }) => {
     { label: 'Reports', value: 'report' }
   ]
 
+  const userId = router.query?.id ? String(router.query.id) : ''
+
   return (
     <Stack spacing={2}>
       <Stack direction='row' flexWrap='wrap' useFlexGap spacing={1} alignItems='center'>
@@ -166,10 +163,21 @@ export const ActivityToolbar = ({ query, onQueryChange }) => {
               }}
               color={selected ? 'primary' : 'default'}
               variant={selected ? 'filled' : 'outlined'}
-              sx={{ fontWeight: 500 }}
+              size='small'
+              sx={{ fontWeight: selected ? 600 : 400 }}
             />
           )
         })}
+        {userId ? (
+          <Button
+            size='small'
+            component={Link}
+            href={`/apps/platform-activity?userId=${userId}`}
+            sx={{ textTransform: 'none', ml: 0.5 }}
+          >
+            Open in Platform activity →
+          </Button>
+        ) : null}
       </Stack>
       <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems={{ md: 'center' }} flexWrap='wrap' useFlexGap>
         <TextField

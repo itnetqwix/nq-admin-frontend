@@ -1,35 +1,42 @@
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
+import Chip from '@mui/material/Chip'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import Chip from '@mui/material/Chip'
 import { useRouter } from 'next/router'
+import { OpsMetricTile, OpsSurfaceCard } from 'src/components/admin'
 import { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import { fmtMoney, fmtPct } from 'src/constants/pricingAdmin'
+import { ops } from 'src/styles/opsSurface'
 
-function SummaryCard({ title, subtitle, children, action }) {
+function RegionCard({ title, subtitle, chip, feeTrainee, feeCoach, commission, currency, onEdit }) {
   return (
-    <Card variant='outlined' sx={{ height: '100%' }}>
-      <CardContent>
-        <Stack direction='row' justifyContent='space-between' alignItems='flex-start' spacing={1}>
-          <Box>
-            <Typography variant='subtitle2' color='text.secondary'>
-              {title}
-            </Typography>
-            {subtitle ? (
-              <Typography variant='caption' color='text.secondary' display='block' sx={{ mt: 0.5 }}>
-                {subtitle}
-              </Typography>
-            ) : null}
-          </Box>
-          {action}
-        </Stack>
-        <Box sx={{ mt: 2 }}>{children}</Box>
-      </CardContent>
-    </Card>
+    <OpsSurfaceCard>
+      <Stack direction='row' justifyContent='space-between' alignItems='flex-start' spacing={1}>
+        <Box>
+          <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            {title}
+          </Typography>
+          <Typography sx={{ fontSize: 12, color: ops.body, mt: 0.5 }}>{subtitle}</Typography>
+        </Box>
+        {chip}
+      </Stack>
+      <Stack spacing={0.5} sx={{ mt: 2 }}>
+        <Typography sx={{ fontSize: 13 }}>
+          Trainee fee: <strong>{fmtMoney(feeTrainee, currency)}</strong>
+        </Typography>
+        <Typography sx={{ fontSize: 13 }}>
+          Coach fee: <strong>{fmtMoney(feeCoach, currency)}</strong>
+        </Typography>
+        <Typography sx={{ fontSize: 13 }}>
+          Commission: <strong>{fmtPct(commission)}</strong>
+        </Typography>
+      </Stack>
+      <Button size='small' sx={{ mt: 1.5, textTransform: 'none', px: 0 }} onClick={onEdit}>
+        Edit settings →
+      </Button>
+    </OpsSurfaceCard>
   )
 }
 
@@ -41,62 +48,43 @@ export default function PricingOverviewTab({ config, onGoTab }) {
   return (
     <Stack spacing={3}>
       <AdminPageSection title='At a glance'>
-        <Grid container spacing={3}>
+        <Grid container spacing={2}>
           <Grid item xs={12} md={4}>
-            <SummaryCard title='Config version' subtitle='Active pricing snapshot'>
-              <Typography variant='h4' fontWeight={700}>
-                v{config?.version ?? 1}
-              </Typography>
-              <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-                Quote tolerance: {config?.quoteToleranceMinor ?? 5}¢
-              </Typography>
-            </SummaryCard>
+            <OpsMetricTile
+              label='Config version'
+              value={`v${config?.version ?? 1}`}
+              hint={`Quote tolerance: ${config?.quoteToleranceMinor ?? 5}¢`}
+            />
           </Grid>
           <Grid item xs={12} md={4}>
-            <SummaryCard
+            <RegionCard
               title='United States'
               subtitle='USD checkout'
-              action={<Chip size='small' label='US' color='primary' variant='outlined' />}
-            >
-              <Typography variant='body2'>
-                Trainee platform fee: <strong>{fmtMoney(us?.traineePlatformFeeMinor, 'USD')}</strong>
-              </Typography>
-              <Typography variant='body2'>
-                Coach platform fee: <strong>{fmtMoney(us?.trainerPlatformFeeMinor, 'USD')}</strong>
-              </Typography>
-              <Typography variant='body2'>
-                Default commission: <strong>{fmtPct(us?.defaultCommissionRate)}</strong>
-              </Typography>
-              <Button size='small' sx={{ mt: 1.5 }} onClick={() => onGoTab(1)}>
-                Edit US settings
-              </Button>
-            </SummaryCard>
+              chip={<Chip size='small' label='US' sx={{ fontFamily: ops.mono, fontSize: 11, bgcolor: ops.ink, color: '#fff' }} />}
+              feeTrainee={us?.traineePlatformFeeMinor}
+              feeCoach={us?.trainerPlatformFeeMinor}
+              commission={us?.defaultCommissionRate}
+              currency='USD'
+              onEdit={() => onGoTab(1)}
+            />
           </Grid>
           <Grid item xs={12} md={4}>
-            <SummaryCard
+            <RegionCard
               title='Canada'
               subtitle='CAD checkout'
-              action={<Chip size='small' label='CA' color='secondary' variant='outlined' />}
-            >
-              <Typography variant='body2'>
-                Trainee platform fee: <strong>{fmtMoney(ca?.traineePlatformFeeMinor, 'CAD')}</strong>
-              </Typography>
-              <Typography variant='body2'>
-                Coach platform fee: <strong>{fmtMoney(ca?.trainerPlatformFeeMinor, 'CAD')}</strong>
-              </Typography>
-              <Typography variant='body2'>
-                Default commission: <strong>{fmtPct(ca?.defaultCommissionRate)}</strong>
-              </Typography>
-              <Button size='small' sx={{ mt: 1.5 }} onClick={() => onGoTab(2)}>
-                Edit Canada settings
-              </Button>
-            </SummaryCard>
+              chip={<Chip size='small' label='CA' sx={{ fontFamily: ops.mono, fontSize: 11 }} variant='outlined' />}
+              feeTrainee={ca?.traineePlatformFeeMinor}
+              feeCoach={ca?.trainerPlatformFeeMinor}
+              commission={ca?.defaultCommissionRate}
+              currency='CAD'
+              onEdit={() => onGoTab(2)}
+            />
           </Grid>
         </Grid>
       </AdminPageSection>
 
       <AdminPageSection title='Quick actions'>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} flexWrap='wrap'>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} flexWrap='wrap' useFlexGap>
           <Button variant='outlined' onClick={() => onGoTab(4)}>
             Open quote simulator
           </Button>
@@ -119,7 +107,7 @@ export default function PricingOverviewTab({ config, onGoTab }) {
       </AdminPageSection>
 
       <AdminPageSection title='How fees flow'>
-        <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 900, lineHeight: 1.7 }}>
+        <Typography sx={{ fontSize: 13, color: ops.body, maxWidth: 900, lineHeight: 1.7 }}>
           Trainees pay session price + trainee platform fee + processing + tax. Coaches receive session
           price minus % commission minus coach platform fee. All amounts are editable below and apply to
           new bookings only — existing escrow holds keep their saved snapshot.

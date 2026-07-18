@@ -2,8 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Box,
   Button,
-  Card,
-  CardContent,
   Chip,
   FormControl,
   InputLabel,
@@ -15,10 +13,10 @@ import {
   Typography
 } from '@mui/material'
 import toast from 'react-hot-toast'
-import { AdminLoadingState } from 'src/components/admin/AdminLoadingState'
+import { AdminLoadingState, OpsSurfaceCard, useAdminConfirm } from 'src/components/admin'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
-import { useAdminConfirm } from 'src/components/admin'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import { ops } from 'src/styles/opsSurface'
 import {
   confirmLibraryClip,
   getClipTaxonomyAdmin,
@@ -42,7 +40,6 @@ async function putPresigned(url, body, contentType) {
   }
 }
 
-/** Capture a JPEG thumbnail from a local video file (admin browser upload). */
 function captureVideoThumbnail(file) {
   return new Promise((resolve, reject) => {
     const video = document.createElement('video')
@@ -120,11 +117,7 @@ export default function NetqwixLibraryPage() {
       })
   }, [load])
 
-  const activeCategories = useMemo(
-    () => taxonomy.filter(c => c.is_active !== false),
-    [taxonomy]
-  )
-
+  const activeCategories = useMemo(() => taxonomy.filter(c => c.is_active !== false), [taxonomy])
   const selectedCat = activeCategories.find(c => (c.id || c._id) === categoryId)
   const subs = (selectedCat?.subcategories || []).filter(s => s.is_active !== false)
 
@@ -162,17 +155,12 @@ export default function NetqwixLibraryPage() {
         contentType: file.type || 'video/mp4',
         fileSizeBytes: file.size
       })
-
       if (!presign?.videoUploadUrl || !presign?.videoKey) {
         throw new Error('Invalid presign response from server')
       }
 
       setUploadStep('Uploading video…')
-      await putPresigned(
-        presign.videoUploadUrl,
-        file,
-        file.type || 'video/mp4'
-      )
+      await putPresigned(presign.videoUploadUrl, file, file.type || 'video/mp4')
 
       setUploadStep('Uploading thumbnail…')
       let thumbBlob
@@ -224,152 +212,149 @@ export default function NetqwixLibraryPage() {
       actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}
     >
       <AdminPageSection title='Upload library clip'>
-        <Card variant='outlined' sx={{ maxWidth: 720 }}>
-          <CardContent>
-            <Stack spacing={2.5}>
-              <Typography variant='body2' color='text.secondary'>
-                Upload a coaching clip to the public NetQwix library. Max size 50 MB. Clips appear in
-                the mobile app under Locker → NetQwix Library.
-              </Typography>
+        <OpsSurfaceCard sx={{ maxWidth: 720 }}>
+          <Stack spacing={2.5}>
+            <Typography sx={{ fontSize: 13, color: ops.body, lineHeight: 1.5 }}>
+              Upload a coaching clip to the public NetQwix library. Max size 50 MB. Clips appear in the
+              mobile app under Locker → NetQwix Library.
+            </Typography>
 
-              <TextField
-                label='Clip title'
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-                fullWidth
-                size='small'
-                disabled={uploading}
-              />
+            <TextField
+              label='Clip title'
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              fullWidth
+              size='small'
+              disabled={uploading}
+            />
 
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <FormControl fullWidth size='small' disabled={uploading || !activeCategories.length}>
-                  <InputLabel>Category</InputLabel>
-                  <Select
-                    label='Category'
-                    value={categoryId}
-                    onChange={e => onCategoryChange(e.target.value)}
-                  >
-                    {activeCategories.map(c => (
-                      <MenuItem key={c.id || c._id} value={c.id || c._id}>
-                        {c.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                <FormControl fullWidth size='small' disabled={uploading || !categoryId}>
-                  <InputLabel>Subcategory</InputLabel>
-                  <Select
-                    label='Subcategory'
-                    value={subcategoryId}
-                    onChange={e => setSubcategoryId(e.target.value)}
-                  >
-                    {subs.map(s => (
-                      <MenuItem key={s.id || s._id} value={s.id || s._id}>
-                        {s.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Stack>
-
-              {!activeCategories.length ? (
-                <Typography variant='body2' color='warning.main'>
-                  No active clip categories. Add categories under Clip Taxonomy first.
-                </Typography>
-              ) : null}
-
-              <Box
-                sx={{
-                  border: '2px dashed',
-                  borderColor: file ? 'primary.main' : 'divider',
-                  borderRadius: 2,
-                  p: 3,
-                  textAlign: 'center',
-                  bgcolor: 'action.hover'
-                }}
-              >
-                <Button variant='outlined' component='label' disabled={uploading}>
-                  {file ? 'Replace video' : 'Choose video file'}
-                  <input
-                    type='file'
-                    hidden
-                    accept='video/*'
-                    onChange={e => setFile(e.target.files?.[0] || null)}
-                  />
-                </Button>
-                {file ? (
-                  <Stack spacing={0.5} sx={{ mt: 1.5 }} alignItems='center'>
-                    <Typography variant='body2' fontWeight={600}>
-                      {file.name}
-                    </Typography>
-                    <Chip size='small' label={`${fileSizeMb} MB`} />
-                  </Stack>
-                ) : (
-                  <Typography variant='caption' color='text.secondary' display='block' sx={{ mt: 1 }}>
-                    MP4, MOV, or other video formats
-                  </Typography>
-                )}
-              </Box>
-
-              {uploading ? (
-                <Box>
-                  <Typography variant='caption' color='text.secondary' gutterBottom display='block'>
-                    {uploadStep}
-                  </Typography>
-                  <LinearProgress />
-                </Box>
-              ) : null}
-
-              <Button
-                variant='contained'
-                size='large'
-                disabled={
-                  uploading ||
-                  !file ||
-                  !title.trim() ||
-                  !categoryId ||
-                  !subcategoryId ||
-                  !activeCategories.length
-                }
-                onClick={() => void upload()}
-              >
-                {uploading ? 'Uploading…' : 'Publish to library'}
-              </Button>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+              <FormControl fullWidth size='small' disabled={uploading || !activeCategories.length}>
+                <InputLabel>Category</InputLabel>
+                <Select label='Category' value={categoryId} onChange={e => onCategoryChange(e.target.value)}>
+                  {activeCategories.map(c => (
+                    <MenuItem key={c.id || c._id} value={c.id || c._id}>
+                      {c.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth size='small' disabled={uploading || !categoryId}>
+                <InputLabel>Subcategory</InputLabel>
+                <Select
+                  label='Subcategory'
+                  value={subcategoryId}
+                  onChange={e => setSubcategoryId(e.target.value)}
+                >
+                  {subs.map(s => (
+                    <MenuItem key={s.id || s._id} value={s.id || s._id}>
+                      {s.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Stack>
-          </CardContent>
-        </Card>
+
+            {!activeCategories.length ? (
+              <Typography sx={{ fontSize: 13, color: ops.warning }}>
+                No active clip categories. Add categories under Clip Taxonomy first.
+              </Typography>
+            ) : null}
+
+            <Box
+              sx={{
+                border: `1px dashed ${file ? ops.indigo : ops.hairline}`,
+                borderRadius: ops.radiusMd,
+                p: 3,
+                textAlign: 'center',
+                bgcolor: ops.canvasSoft
+              }}
+            >
+              <Button variant='outlined' component='label' disabled={uploading}>
+                {file ? 'Replace video' : 'Choose video file'}
+                <input
+                  type='file'
+                  hidden
+                  accept='video/*'
+                  onChange={e => setFile(e.target.files?.[0] || null)}
+                />
+              </Button>
+              {file ? (
+                <Stack spacing={0.5} sx={{ mt: 1.5 }} alignItems='center'>
+                  <Typography sx={{ fontSize: 13, fontWeight: 600 }}>{file.name}</Typography>
+                  <Chip size='small' label={`${fileSizeMb} MB`} sx={{ fontFamily: ops.mono, fontSize: 11 }} />
+                </Stack>
+              ) : (
+                <Typography sx={{ fontSize: 12, color: ops.mute, display: 'block', mt: 1 }}>
+                  MP4, MOV, or other video formats
+                </Typography>
+              )}
+            </Box>
+
+            {uploading ? (
+              <Box>
+                <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute, mb: 1 }}>
+                  {uploadStep}
+                </Typography>
+                <LinearProgress sx={{ borderRadius: 1, bgcolor: ops.canvasSoft2, '& .MuiLinearProgress-bar': { bgcolor: ops.ink } }} />
+              </Box>
+            ) : null}
+
+            <Button
+              variant='contained'
+              disabled={
+                uploading ||
+                !file ||
+                !title.trim() ||
+                !categoryId ||
+                !subcategoryId ||
+                !activeCategories.length
+              }
+              onClick={() => void upload()}
+              sx={{ bgcolor: ops.ink, '&:hover': { bgcolor: '#000' }, textTransform: 'none', fontWeight: 500 }}
+            >
+              {uploading ? 'Uploading…' : 'Publish to library'}
+            </Button>
+          </Stack>
+        </OpsSurfaceCard>
       </AdminPageSection>
 
       <AdminPageSection title='Published clips'>
         {loading ? (
           <AdminLoadingState message='Loading library…' minHeight={200} />
         ) : groups.length === 0 ? (
-          <Typography color='text.secondary'>No library clips yet.</Typography>
+          <Typography sx={{ color: ops.mute, fontSize: 13 }}>No library clips yet.</Typography>
         ) : (
-          groups.map(cat => (
-            <Card key={cat.categoryId || cat.categoryName} variant='outlined' sx={{ mb: 2 }}>
-              <CardContent>
-                <Typography variant='subtitle1' fontWeight={700} gutterBottom>
+          <Stack spacing={2}>
+            {groups.map(cat => (
+              <OpsSurfaceCard key={cat.categoryId || cat.categoryName}>
+                <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', mb: 1 }}>
                   {cat.categoryName}
                 </Typography>
                 {(cat.subcategories || []).map(sub => (
-                  <Box key={sub.subcategoryId || sub.subcategoryName} sx={{ pl: 1, mt: 1.5 }}>
-                    <Typography variant='body2' color='text.secondary' fontWeight={600}>
-                      {sub.subcategoryName}{' '}
-                      <Chip size='small' label={(sub.clips || []).length} sx={{ ml: 0.5 }} />
-                    </Typography>
+                  <Box key={sub.subcategoryId || sub.subcategoryName} sx={{ pl: 0.5, mt: 1.5 }}>
+                    <Stack direction='row' spacing={1} alignItems='center'>
+                      <Typography sx={{ fontSize: 13, color: ops.body, fontWeight: 600 }}>
+                        {sub.subcategoryName}
+                      </Typography>
+                      <Chip
+                        size='small'
+                        label={(sub.clips || []).length}
+                        sx={{ fontFamily: ops.mono, fontSize: 11, height: 20 }}
+                      />
+                    </Stack>
                     <Stack component='ul' sx={{ m: 0, pl: 2.5, mt: 0.5 }} spacing={0.25}>
                       {(sub.clips || []).map(c => (
-                        <Typography component='li' key={c._id} variant='body2'>
+                        <Typography component='li' key={c._id} sx={{ fontSize: 13, color: ops.ink }}>
                           {c.title}
                         </Typography>
                       ))}
                     </Stack>
                   </Box>
                 ))}
-              </CardContent>
-            </Card>
-          ))
+              </OpsSurfaceCard>
+            ))}
+          </Stack>
         )}
       </AdminPageSection>
       {ConfirmDialog}

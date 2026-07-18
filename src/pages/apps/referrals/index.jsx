@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Box from '@mui/material/Box'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
 import Grid from '@mui/material/Grid'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
@@ -12,9 +10,10 @@ import Alert from '@mui/material/Alert'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminGridContainer from 'src/components/admin/AdminGridContainer'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
+import OpsMetricTile from 'src/components/admin/OpsMetricTile'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
-import CardStatisticsVertical from 'src/@core/components/card-statistics/card-stats-vertical'
 import { getReferralDashboard } from 'src/services/referralAdminApi'
+import { ops } from 'src/styles/opsSurface'
 
 const fmtMoney = minor =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
@@ -138,93 +137,86 @@ const ReferralsAdminPage = () => {
         </Alert>
       ) : null}
 
-      <Grid container spacing={4} sx={{ mb: 4 }}>
+      <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <CardStatisticsVertical
-            stats={String(summary.invitesTotal ?? 0)}
-            title='Invites sent'
-            subtitle={`${summary.invitesRegistered ?? 0} joined`}
-            icon='mdi:email-send-outline'
+          <OpsMetricTile
+            label='Invites sent'
+            value={String(summary.invitesTotal ?? 0)}
+            hint={`${summary.invitesRegistered ?? 0} joined`}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <CardStatisticsVertical
-            stats={String(summary.attributionsTotal ?? 0)}
-            title='Attributions'
-            subtitle='Linked accounts'
-            icon='mdi:account-multiple-plus-outline'
+          <OpsMetricTile label='Attributions' value={String(summary.attributionsTotal ?? 0)} hint='Linked accounts' />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <OpsMetricTile
+            label='Referral points issued'
+            value={fmtPts(summary.referralPointsIssued)}
+            hint={`${summary.rewardsCreditedCount ?? 0} credited rewards`}
+            tone='accent'
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <CardStatisticsVertical
-            stats={fmtPts(summary.referralPointsIssued)}
-            title='Referral points issued'
-            subtitle={`${summary.rewardsCreditedCount ?? 0} credited rewards`}
-            icon='mdi:star-circle-outline'
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <CardStatisticsVertical
-            stats={fmtMoney(summary.pointsRedeemedWalletMinor)}
-            title='Points redeemed'
-            subtitle={`${summary.pointsRedemptionsCount ?? 0} redemptions · ${fmtPts(summary.pointsRedeemedTotal)} burned`}
-            icon='mdi:wallet-outline'
+          <OpsMetricTile
+            label='Points redeemed'
+            value={fmtMoney(summary.pointsRedeemedWalletMinor)}
+            hint={`${summary.pointsRedemptionsCount ?? 0} redemptions · ${fmtPts(summary.pointsRedeemedTotal)} burned`}
           />
         </Grid>
       </Grid>
 
-      <Card sx={{ mb: 4 }}>
-        <CardContent>
-          <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>
-            Referral earn matrix (points)
-          </Typography>
-          <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
-            Redeem in the app: 100 points = $5 wallet credit. Per-action cap: 5 points.
-          </Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-            {matrixChips.map(row => {
-              const p = row.preview ?? {}
-              const bits = [
-                p.referrerSignupPoints > 0 && `referrer signup ${p.referrerSignupPoints} pts`,
-                p.refereeSignupPoints > 0 && `referee signup ${p.refereeSignupPoints} pts`,
-                p.referrerFirstBookingPoints > 0 &&
-                  `referrer first booking ${p.referrerFirstBookingPoints} pts`
-              ].filter(Boolean)
-              return (
-                <Box
-                  key={row.label}
-                  sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}
-                >
-                  <Chip size='small' label={row.label} variant='outlined' />
-                  {bits.length ? (
-                    bits.map(b => <Chip key={b} size='small' label={b} />)
-                  ) : (
-                    <Typography variant='caption' color='text.secondary'>
-                      No points for this pair
-                    </Typography>
-                  )}
-                </Box>
-              )
-            })}
-          </Box>
-        </CardContent>
-      </Card>
+      <Box sx={{ p: 2.5, mb: 3, bgcolor: ops.canvas, borderRadius: ops.radiusLg, boxShadow: ops.shadowCard }}>
+        <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', mb: 0.5 }}>
+          Referral earn matrix (points).
+        </Typography>
+        <Typography sx={{ fontSize: 13, color: ops.body, mb: 2, lineHeight: 1.5 }}>
+          Redeem in the app: 100 points = $5 wallet credit. Per-action cap: 5 points.
+        </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+          {matrixChips.map(row => {
+            const p = row.preview ?? {}
+            const bits = [
+              p.referrerSignupPoints > 0 && `referrer signup ${p.referrerSignupPoints} pts`,
+              p.refereeSignupPoints > 0 && `referee signup ${p.refereeSignupPoints} pts`,
+              p.referrerFirstBookingPoints > 0 && `referrer first booking ${p.referrerFirstBookingPoints} pts`
+            ].filter(Boolean)
+            return (
+              <Box key={row.label} sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+                <Chip
+                  size='small'
+                  label={row.label}
+                  variant='outlined'
+                  sx={{ fontFamily: ops.mono, fontSize: 11, borderColor: ops.hairline }}
+                />
+                {bits.length ? (
+                  bits.map(b => <Chip key={b} size='small' label={b} sx={{ fontFamily: ops.mono, fontSize: 11 }} />)
+                ) : (
+                  <Typography sx={{ fontSize: 12, color: ops.mute }}>No points for this pair</Typography>
+                )}
+              </Box>
+            )
+          })}
+        </Box>
+      </Box>
 
-      <Card sx={{ mb: 4 }}>
-        <CardContent>
-          <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 1 }}>
-            First lesson checkout discount
-          </Typography>
-          <Alert severity='info' sx={{ mb: 1 }}>
-            Dollar checkout discounts for referred trainees are disabled; rewards are points-only.
-          </Alert>
-          <Chip
-            size='small'
-            label={cfg.enabled ? 'Enabled (legacy config)' : 'Disabled'}
-            color={cfg.enabled ? 'warning' : 'default'}
-          />
-        </CardContent>
-      </Card>
+      <Box sx={{ p: 2.5, mb: 3, bgcolor: ops.canvas, borderRadius: ops.radiusLg, boxShadow: ops.shadowCard }}>
+        <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', mb: 1 }}>
+          First lesson checkout discount.
+        </Typography>
+        <Alert severity='info' sx={{ mb: 1.5, borderRadius: ops.radiusSm }}>
+          Dollar checkout discounts for referred trainees are disabled; rewards are points-only.
+        </Alert>
+        <Chip
+          size='small'
+          label={cfg.enabled ? 'Enabled (legacy config)' : 'Disabled'}
+          sx={{
+            fontFamily: ops.mono,
+            fontSize: 11,
+            bgcolor: cfg.enabled ? ops.errorSoft : ops.canvasSoft2,
+            color: cfg.enabled ? ops.warning : ops.mute
+          }}
+        />
+      </Box>
 
       <AdminPageSection title='Attributions by pair'>
         <AdminGridContainer>

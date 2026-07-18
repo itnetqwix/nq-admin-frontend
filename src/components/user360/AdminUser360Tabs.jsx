@@ -1,7 +1,8 @@
-import { alpha, Box, Tab, Tabs, useTheme } from '@mui/material'
+import { Box, Tab, Tabs } from '@mui/material'
 import { useMemo, useState } from 'react'
 
 import LessonTimelineDialog from 'src/pages/components/booking/LessonTimelineDialog'
+import { ops } from 'src/styles/opsSurface'
 
 import { USER360_TAB_LABELS } from './constants'
 import User360WalletTab from './User360WalletTab'
@@ -41,7 +42,6 @@ export default function AdminUser360Tabs({
   onQueryChange,
   hardDeletePolicy
 }) {
-  const theme = useTheme()
   const overview = userData?.overview || {}
   const money = overview.money || {}
   const opsItems = opsEvents?.items || []
@@ -65,10 +65,8 @@ export default function AdminUser360Tabs({
           position: 'sticky',
           top: 0,
           zIndex: 10,
-          bgcolor: alpha(theme.palette.background.paper, 0.92),
-          backdropFilter: 'blur(8px)',
-          borderBottom: 1,
-          borderColor: 'divider'
+          bgcolor: ops.canvas,
+          borderBottom: `1px solid ${ops.hairline}`
         }}
       >
         <Tabs
@@ -78,8 +76,16 @@ export default function AdminUser360Tabs({
           scrollButtons='auto'
           sx={{
             px: { xs: 1, md: 2 },
-            minHeight: 48,
-            '& .MuiTab-root': { textTransform: 'none', fontWeight: 600, minHeight: 48 }
+            minHeight: 44,
+            '& .MuiTabs-indicator': { bgcolor: ops.ink, height: 2 },
+            '& .MuiTab-root': {
+              minHeight: 44,
+              textTransform: 'none',
+              fontWeight: 500,
+              fontSize: 13,
+              color: ops.mute,
+              '&.Mui-selected': { color: ops.ink, fontWeight: 600 }
+            }
           }}
         >
           {USER360_TAB_LABELS.map((label, i) => (

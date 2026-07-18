@@ -36,8 +36,10 @@ const DataGrid = () => {
           padding: 0
         },
         columnHeaderTitle: {
-          fontSize: '0.75rem',
-          letterSpacing: '0.17px',
+          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+          fontSize: '0.6875rem',
+          fontWeight: 500,
+          letterSpacing: '0.06em',
           textTransform: 'uppercase'
         },
         columnSeparator: ({ theme }) => ({

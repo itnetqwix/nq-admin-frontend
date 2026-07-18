@@ -22,28 +22,38 @@ import CanViewNavLink from 'src/layouts/components/acl/CanViewNavLink'
 // ** Util Import
 import { handleURLQueries } from 'src/@core/layouts/utils'
 
-// ** Styled Components — subtle active rail (minimal)
+// ** Styled Components — Ops Surface: ink rail + soft hover (no blue wash)
 const MenuNavLink = styled(ListItemButton)(({ theme }) => ({
   width: '100%',
-  borderRadius: 10,
-  transition: 'background-color 0.15s ease, color 0.15s ease',
+  borderRadius: 6,
+  position: 'relative',
+  transition: 'background-color 0.12s ease, color 0.12s ease',
   '&:hover': {
     backgroundColor: theme.palette.action.hover
   },
   '&.active': {
     '&, &:hover': {
-      backgroundColor:
-        theme.palette.mode === 'light' ? 'rgba(37, 99, 235, 0.1)' : 'rgba(59, 130, 246, 0.16)',
+      backgroundColor: theme.palette.mode === 'light' ? '#F5F5F5' : 'rgba(255,255,255,0.06)',
       '&.Mui-focusVisible': {
-        backgroundColor: theme.palette.mode === 'light' ? 'rgba(37, 99, 235, 0.14)' : 'rgba(59, 130, 246, 0.2)'
+        backgroundColor: theme.palette.mode === 'light' ? '#F0F0F0' : 'rgba(255,255,255,0.08)'
       }
     },
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      left: 0,
+      top: 8,
+      bottom: 8,
+      width: 2,
+      borderRadius: 1,
+      backgroundColor: theme.palette.mode === 'light' ? '#171717' : theme.palette.customColors.lime
+    },
     '& .MuiTypography-root': {
-      fontWeight: 600,
-      color: `${theme.palette.primary.main} !important`
+      fontWeight: 500,
+      color: `${theme.palette.text.primary} !important`
     },
     '& .MuiListItemIcon-root': {
-      color: `${theme.palette.primary.main} !important`
+      color: `${theme.palette.text.primary} !important`
     }
   }
 }))

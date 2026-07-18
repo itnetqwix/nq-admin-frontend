@@ -3,41 +3,69 @@ import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Divider from '@mui/material/Divider'
+import { useRouter } from 'next/router'
 import { AdminLoadingState } from 'src/components/admin/AdminLoadingState'
+import { ops } from 'src/styles/opsSurface'
+import { eyebrowForPath } from 'src/styles/opsPageEyebrows'
 
 /**
- * Consistent page chrome: title, optional subtitle, actions, content in a soft card.
+ * Ops Surface page chrome — mono eyebrow (explicit or auto from route), stacked-shadow card.
  */
 export default function AdminPageShell({
   title,
   subtitle,
+  eyebrow,
   actions,
   action,
   children,
   contentSx = {},
   loading = false,
   loadingMessage = 'Loading…',
-  /** Dashboard-style pages: no outer card wrapper */
   bare = false
 }) {
+  const router = useRouter()
+  const resolvedEyebrow = eyebrow ?? eyebrowForPath(router.pathname)
   const headerActions = actions ?? action
+
   const header = (
     <Stack
       direction={{ xs: 'column', sm: 'row' }}
       spacing={2}
       alignItems={{ sm: 'flex-start' }}
       justifyContent='space-between'
-      sx={{ mb: bare ? 3 : 3 }}
+      sx={{ mb: 3 }}
     >
       <Box sx={{ minWidth: 0 }}>
-        <Typography
-          variant='h5'
-          sx={{ fontWeight: 700, letterSpacing: '-0.02em', color: 'text.primary', lineHeight: 1.25 }}
+        {resolvedEyebrow ? (
+          <Typography
+            sx={{
+              fontFamily: ops.mono,
+              fontSize: 11,
+              color: ops.mute,
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              mb: 0.75
+            }}
+          >
+            {resolvedEyebrow}
+          </Typography>
+        ) : null}
+        <Box
+          sx={{
+            fontWeight: 600,
+            letterSpacing: '-0.96px',
+            color: 'text.primary',
+            lineHeight: 1.25,
+            fontSize: { xs: 22, md: 24 }
+          }}
         >
           {title}
-        </Typography>
+        </Box>
         {subtitle ? (
-          <Typography variant='body2' color='text.secondary' sx={{ mt: 0.75, maxWidth: 720, lineHeight: 1.65 }}>
+          <Typography
+            variant='body2'
+            sx={{ mt: 0.75, maxWidth: 720, lineHeight: 1.65, color: 'text.secondary' }}
+          >
             {subtitle}
           </Typography>
         ) : null}
@@ -75,12 +103,11 @@ export default function AdminPageShell({
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 2,
-          border: '1px solid',
-          borderColor: 'divider',
+          borderRadius: `${ops.radiusLg}`,
+          border: 'none',
           overflow: 'hidden',
           bgcolor: 'background.paper',
-          boxShadow: theme => theme.shadows[1],
+          boxShadow: ops.shadowCard,
           ...contentSx
         }}
       >
@@ -98,7 +125,7 @@ export function AdminPageSection({ title, description, children, withDivider = f
         {title ? (
           <Stack direction='row' alignItems='flex-start' justifyContent='space-between' sx={{ mb: description ? 1 : 2 }}>
             <Box>
-              <Typography variant='subtitle1' fontWeight={700}>
+              <Typography variant='subtitle1' sx={{ fontWeight: 600, letterSpacing: '-0.28px' }}>
                 {title}
               </Typography>
               {description ? (

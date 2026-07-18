@@ -1,108 +1,114 @@
+/**
+ * Ops Surface palette — Vercel canvas/ink + Stripe indigo primary + Sentry error.
+ * Applied admin-wide so every screen inherits the same system.
+ */
 const DefaultPalette = (mode, skin) => {
-  // ** Vars
-  const whiteColor = '#FFF'
-  const lightColor = '76, 78, 100'
-  const darkColor = '234, 234, 255'
-  const mainColor = mode === 'light' ? lightColor : darkColor
+  const whiteColor = '#FFFFFF'
+  const isLight = mode === 'light'
+
+  // Light: near-black ink. Dark: soft off-white on night canvas.
+  const ink = isLight ? '23, 23, 23' : '242, 242, 242' // #171717 / #f2f2f2
+  const mainColor = ink
 
   const defaultBgColor = () => {
-    if (skin === 'bordered' && mode === 'light') {
-      return whiteColor
-    } else if (skin === 'bordered' && mode === 'dark') {
-      return '#30334E'
-    } else if (mode === 'light') {
-      return '#F1F5F9'
-    } else return '#282A42'
+    if (skin === 'bordered' && isLight) return whiteColor
+    if (skin === 'bordered' && !isLight) return '#1f1633'
+    if (isLight) return '#FAFAFA'
+    return '#150f23'
   }
 
   return {
     customColors: {
-      dark: darkColor,
+      dark: ink,
       main: mainColor,
-      light: lightColor,
-      darkBg: '#282A42',
-      lightBg: '#F1F5F9',
-      bodyBg: mode === 'light' ? '#F1F5F9' : '#282A42',
-      trackBg: mode === 'light' ? '#E2E8F0' : '#41435C',
-      avatarBg: mode === 'light' ? '#E2E8F0' : '#3F425C',
-      tooltipBg: mode === 'light' ? '#0F172A' : '#464A65',
-      tableHeaderBg: mode === 'light' ? '#F8FAFC' : '#3A3E5B'
+      light: ink,
+      darkBg: '#150f23',
+      lightBg: '#FAFAFA',
+      bodyBg: isLight ? '#FAFAFA' : '#150f23',
+      trackBg: isLight ? '#F5F5F5' : '#2a2340',
+      avatarBg: isLight ? '#F5F5F5' : '#2a2340',
+      tooltipBg: isLight ? '#171717' : '#1f1633',
+      tableHeaderBg: isLight ? '#FAFAFA' : '#1f1633',
+      hairline: isLight ? '#EBEBEB' : '#362d59',
+      indigo: '#533AFD',
+      lime: '#C2EF4E',
+      mute: isLight ? '#888888' : '#bdb8c0'
     },
-    mode: mode,
+    mode,
     common: {
-      black: '#000',
+      black: '#000000',
       white: whiteColor
     },
     primary: {
-      light: '#3B82F6',
-      main: '#2563EB',
-      dark: '#1D4ED8',
+      light: '#333333',
+      main: '#171717',
+      dark: '#000000',
       contrastText: whiteColor
     },
     secondary: {
-      light: '#64748B',
-      main: '#475569',
-      dark: '#334155',
+      light: '#665EFD',
+      main: '#533AFD',
+      dark: '#4434D4',
       contrastText: whiteColor
     },
     error: {
-      light: '#FF625F',
-      main: '#FF4D49',
-      dark: '#E04440',
+      light: '#F7D4D6',
+      main: '#EE0000',
+      dark: '#C50000',
       contrastText: whiteColor
     },
     warning: {
-      light: '#FDBE42',
-      main: '#FDB528',
-      dark: '#DF9F23',
-      contrastText: whiteColor
+      light: '#FFEFCF',
+      main: '#F5A623',
+      dark: '#AB570A',
+      contrastText: '#171717'
     },
     info: {
-      light: '#40CDFA',
-      main: '#26C6F9',
-      dark: '#21AEDB',
+      light: '#D3E5FF',
+      main: '#0070F3',
+      dark: '#0761D1',
       contrastText: whiteColor
     },
     success: {
-      light: '#83E542',
-      main: '#72E128',
-      dark: '#64C623',
+      light: '#AAFFEC',
+      main: '#29BC9B',
+      dark: '#1A8F76',
       contrastText: whiteColor
     },
     grey: {
       50: '#FAFAFA',
       100: '#F5F5F5',
-      200: '#EEEEEE',
+      200: '#EBEBEB',
       300: '#E0E0E0',
-      400: '#BDBDBD',
-      500: '#9E9E9E',
-      600: '#757575',
-      700: '#616161',
-      800: '#424242',
-      900: '#212121',
+      400: '#A1A1A1',
+      500: '#888888',
+      600: '#666666',
+      700: '#4D4D4D',
+      800: '#333333',
+      900: '#171717',
       A100: '#F5F5F5',
-      A200: '#EEEEEE',
-      A400: '#BDBDBD',
-      A700: '#616161'
+      A200: '#EBEBEB',
+      A400: '#A1A1A1',
+      A700: '#4D4D4D'
     },
     text: {
-      primary: `rgba(${mainColor}, 0.87)`,
-      secondary: `rgba(${mainColor}, 0.6)`,
-      disabled: `rgba(${mainColor}, 0.38)`
+      primary: isLight ? '#171717' : '#F2F2F2',
+      secondary: isLight ? '#4D4D4D' : 'rgba(255,255,255,0.72)',
+      disabled: isLight ? '#888888' : 'rgba(255,255,255,0.38)'
     },
-    divider: `rgba(${mainColor}, 0.12)`,
+    divider: isLight ? '#EBEBEB' : '#362d59',
     background: {
-      paper: mode === 'light' ? whiteColor : '#30334E',
+      paper: isLight ? whiteColor : '#1f1633',
       default: defaultBgColor()
     },
     action: {
-      active: `rgba(${mainColor}, 0.54)`,
-      hover: `rgba(${mainColor}, 0.05)`,
-      hoverOpacity: 0.05,
-      selected: `rgba(${mainColor}, 0.08)`,
-      disabled: `rgba(${mainColor}, 0.26)`,
-      disabledBackground: `rgba(${mainColor}, 0.12)`,
-      focus: `rgba(${mainColor}, 0.12)`
+      active: isLight ? 'rgba(23, 23, 23, 0.54)' : 'rgba(242, 242, 242, 0.54)',
+      hover: isLight ? 'rgba(23, 23, 23, 0.04)' : 'rgba(255, 255, 255, 0.06)',
+      hoverOpacity: 0.04,
+      selected: isLight ? 'rgba(23, 23, 23, 0.06)' : 'rgba(83, 58, 253, 0.2)',
+      disabled: isLight ? 'rgba(23, 23, 23, 0.26)' : 'rgba(255, 255, 255, 0.3)',
+      disabledBackground: isLight ? 'rgba(23, 23, 23, 0.08)' : 'rgba(255, 255, 255, 0.12)',
+      focus: isLight ? 'rgba(23, 23, 23, 0.12)' : 'rgba(83, 58, 253, 0.28)'
     }
   }
 }

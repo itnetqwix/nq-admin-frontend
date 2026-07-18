@@ -5,6 +5,7 @@ import { AdminDataGrid, AdminFilterBar, AdminGridContainer } from 'src/component
 import { getImageUrl } from 'src/utils/utils'
 import { useAdminRealtime } from 'src/context/AdminRealtimeContext'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import { ops } from 'src/styles/opsSurface'
 
 export default function ActiveUsersTable() {
   const router = useRouter()
@@ -75,8 +76,13 @@ export default function ActiveUsersTable() {
             <Chip
               size='small'
               label={socketConnected ? 'Live · WebSocket' : 'Connecting…'}
-              color={socketConnected ? 'success' : 'default'}
-              variant={socketConnected ? 'filled' : 'outlined'}
+              sx={{
+                fontFamily: ops.mono,
+                fontSize: 11,
+                bgcolor: socketConnected ? ops.lime : ops.canvasSoft2,
+                color: ops.night,
+                fontWeight: 700
+              }}
             />
             <Button size='small' variant='outlined' onClick={() => void refreshOnlineUsers()}>
               Refresh from API

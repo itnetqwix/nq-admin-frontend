@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Button from '@mui/material/Button'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
@@ -13,7 +11,9 @@ import Select from '@mui/material/Select'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
+import { OpsSurfaceCard } from 'src/components/admin'
 import { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import { ops } from 'src/styles/opsSurface'
 import {
   CA_PAYMENT_METHODS,
   CA_PROVINCE_OPTIONS,
@@ -185,8 +185,7 @@ export default function PricingSimulatorTab({ config, isDirty, variant = 'full' 
         <Grid item xs={12}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={4}>
-              <Card variant='outlined' sx={{ height: '100%', bgcolor: 'primary.50' }}>
-                <CardContent>
+              <OpsSurfaceCard>
                   <Typography variant='overline' color='text.secondary'>
                     Trainee pays
                   </Typography>
@@ -196,42 +195,38 @@ export default function PricingSimulatorTab({ config, isDirty, variant = 'full' 
                       currency
                     )}
                   </Typography>
-                </CardContent>
-              </Card>
+                </OpsSurfaceCard>
             </Grid>
             <Grid item xs={12} sm={4}>
-              <Card variant='outlined' sx={{ height: '100%' }}>
-                <CardContent>
+              <OpsSurfaceCard>
                   <Typography variant='overline' color='text.secondary'>
                     Coach receives
                   </Typography>
                   <Typography variant='h4' fontWeight={800}>
                     {fmtMoney(quote.trainerNetCents, currency)}
                   </Typography>
-                </CardContent>
-              </Card>
+                </OpsSurfaceCard>
             </Grid>
             <Grid item xs={12} sm={4}>
-              <Card
-                variant='outlined'
+              <OpsSurfaceCard
                 sx={{
-                  height: '100%',
-                  borderColor: quote.platformNetMarginCents >= 0 ? 'success.light' : 'error.light'
+                  boxShadow:
+                    quote.platformNetMarginCents >= 0
+                      ? ops.shadowCard
+                      : `0 0 0 1px ${ops.errorSoft}, ${ops.shadowCard}`
                 }}
               >
-                <CardContent>
-                  <Typography variant='overline' color='text.secondary'>
-                    You keep (before infra)
-                  </Typography>
-                  <Typography
-                    variant='h4'
-                    fontWeight={800}
-                    color={quote.platformNetMarginCents >= 0 ? 'success.main' : 'error.main'}
-                  >
-                    {fmtMoney(quote.platformNetMarginCents, currency)}
-                  </Typography>
-                </CardContent>
-              </Card>
+                <Typography variant='overline' color='text.secondary'>
+                  You keep (before infra)
+                </Typography>
+                <Typography
+                  variant='h4'
+                  fontWeight={800}
+                  color={quote.platformNetMarginCents >= 0 ? 'success.main' : 'error.main'}
+                >
+                  {fmtMoney(quote.platformNetMarginCents, currency)}
+                </Typography>
+              </OpsSurfaceCard>
             </Grid>
           </Grid>
           <Typography variant='caption' color='text.secondary' display='block' sx={{ mt: 1 }}>
@@ -243,8 +238,7 @@ export default function PricingSimulatorTab({ config, isDirty, variant = 'full' 
       {!simple ? (
       <Grid item xs={12} md={7}>
         {!simple ? (
-        <Card variant='outlined' sx={{ height: '100%' }}>
-          <CardContent>
+        <OpsSurfaceCard>
             <Stack direction='row' alignItems='center' spacing={1} sx={{ mb: 2 }}>
               <Typography variant='h6' fontWeight={600}>
                 Checkout breakdown
@@ -309,8 +303,7 @@ export default function PricingSimulatorTab({ config, isDirty, variant = 'full' 
                 </Stack>
               </>
             ) : null}
-          </CardContent>
-        </Card>
+          </OpsSurfaceCard>
         ) : null}
       </Grid>
       ) : null}

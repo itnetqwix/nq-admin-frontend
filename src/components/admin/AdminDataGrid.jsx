@@ -2,40 +2,51 @@ import Box from '@mui/material/Box'
 import LinearProgress from '@mui/material/LinearProgress'
 import { DataGrid } from '@mui/x-data-grid'
 import AdminEmptyState from './AdminEmptyState'
+import { ops } from 'src/styles/opsSurface'
 
 function GridLoadingBar() {
   return (
     <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 2 }}>
-      <LinearProgress />
+      <LinearProgress color='secondary' />
     </Box>
   )
 }
 
 const defaultSx = {
   border: 'none',
+  fontFamily: ops.sans,
   '& .MuiDataGrid-columnHeaders': {
-    bgcolor: 'action.hover',
+    bgcolor: ops.canvasSoft,
     borderRadius: 0,
-    fontSize: '0.75rem',
-    fontWeight: 700,
-    letterSpacing: '0.04em',
-    textTransform: 'uppercase'
+    borderBottom: `1px solid ${ops.hairline}`
+  },
+  '& .MuiDataGrid-columnHeaderTitle': {
+    fontFamily: ops.mono,
+    fontSize: '0.6875rem',
+    fontWeight: 500,
+    letterSpacing: '0.06em',
+    textTransform: 'uppercase',
+    color: ops.mute
   },
   '& .MuiDataGrid-cell': {
-    borderColor: 'divider',
+    borderColor: ops.hairline,
     fontSize: '0.875rem',
-    lineHeight: 1.45
+    lineHeight: 1.45,
+    borderBottom: `1px solid ${ops.hairline}`
   },
   '& .MuiDataGrid-row:nth-of-type(even)': {
-    bgcolor: 'action.hover'
+    bgcolor: 'transparent'
   },
   '& .MuiDataGrid-row:hover': {
-    bgcolor: theme => `${theme.palette.primary.main}08`
+    bgcolor: `${ops.canvasSoft} !important`
   },
   '& .MuiDataGrid-footerContainer': {
-    borderTop: '1px solid',
-    borderColor: 'divider',
+    borderTop: `1px solid ${ops.hairline}`,
     minHeight: 52
+  },
+  '& .MuiTablePagination-root': {
+    fontFamily: ops.mono,
+    fontSize: 12
   }
 }
 
@@ -52,7 +63,7 @@ function NoRowsOverlay({ message, description, onAction, actionLabel }) {
 }
 
 /**
- * DataGrid with consistent admin styling and loading bar.
+ * Ops Surface data grid — mono headers, hairline rows, soft hover.
  */
 export default function AdminDataGrid({
   loading,

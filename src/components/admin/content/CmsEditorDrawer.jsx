@@ -1,17 +1,10 @@
 import React from 'react'
-import {
-  Box,
-  Button,
-  Divider,
-  Drawer,
-  IconButton,
-  Stack,
-  Typography
-} from '@mui/material'
+import { Box, Button, Divider, Drawer, IconButton, Stack, Typography } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
+import { ops } from 'src/styles/opsSurface'
 
 /**
- * Full-height editor shell — replaces cramped Dialog modals for CMS CRUD.
+ * Full-height Ops Surface editor shell — night-adjacent header, ink save CTA.
  */
 export default function CmsEditorDrawer({
   open,
@@ -36,7 +29,8 @@ export default function CmsEditorDrawer({
           width,
           maxWidth: '100vw',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          boxShadow: ops.shadowDrawer
         }
       }}
     >
@@ -44,39 +38,47 @@ export default function CmsEditorDrawer({
         direction='row'
         alignItems='flex-start'
         justifyContent='space-between'
-        sx={{ px: 2.5, py: 2, borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}
+        sx={{
+          px: 2.5,
+          py: 2,
+          borderBottom: `1px solid ${ops.hairline}`,
+          bgcolor: ops.canvas
+        }}
       >
         <Box sx={{ pr: 2, minWidth: 0 }}>
-          <Typography variant='h6' fontWeight={700} noWrap>
+          <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', fontSize: 18 }} noWrap>
             {title}
           </Typography>
           {subtitle ? (
-            <Typography variant='body2' color='text.secondary' sx={{ mt: 0.25 }}>
-              {subtitle}
-            </Typography>
+            <Typography sx={{ fontSize: 13, color: ops.body, mt: 0.25, lineHeight: 1.45 }}>{subtitle}</Typography>
           ) : null}
         </Box>
-        <IconButton onClick={onClose} aria-label='Close editor' edge='end'>
+        <IconButton onClick={onClose} aria-label='Close editor' edge='end' sx={{ color: ops.mute }}>
           <CloseIcon />
         </IconButton>
       </Stack>
 
-      <Box sx={{ flex: 1, overflow: 'auto', p: { xs: 2, md: 2.5 } }}>{children}</Box>
+      <Box sx={{ flex: 1, overflow: 'auto', p: { xs: 2, md: 2.5 }, bgcolor: ops.canvasSoft }}>{children}</Box>
 
-      <Divider />
+      <Divider sx={{ borderColor: ops.hairline }} />
       <Stack
         direction='row'
         spacing={1}
         justifyContent='flex-end'
         alignItems='center'
-        sx={{ px: 2.5, py: 2, bgcolor: 'grey.50' }}
+        sx={{ px: 2.5, py: 2, bgcolor: ops.canvas }}
       >
         {secondaryAction}
-        <Button onClick={onClose} disabled={saving}>
+        <Button onClick={onClose} disabled={saving} sx={{ textTransform: 'none' }}>
           Cancel
         </Button>
         {onSave ? (
-          <Button variant='contained' onClick={onSave} disabled={saving || saveDisabled}>
+          <Button
+            variant='contained'
+            onClick={onSave}
+            disabled={saving || saveDisabled}
+            sx={{ textTransform: 'none', bgcolor: ops.ink, '&:hover': { bgcolor: '#000' } }}
+          >
             {saving ? 'Saving…' : saveLabel}
           </Button>
         ) : null}

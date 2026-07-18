@@ -122,13 +122,13 @@ export default function ManageTrainee() {
         </Badge>
       )
     },
-    { field: 'fullname', headerName: 'Trainee Name', width: 180 },
-    { field: 'email', headerName: 'Email', width: 200 },
-    { field: 'mobile_no', headerName: 'Mobile Number', width: 150 },
+    { field: 'fullname', headerName: 'Trainee Name', width: 160 },
+    { field: 'email', headerName: 'Email', width: 190 },
+    { field: 'mobile_no', headerName: 'Mobile', width: 130 },
     {
       field: 'status',
       headerName: 'Status',
-      width: 200,
+      width: 180,
       renderCell: params => (
         <TraineeRejectActions
           userId={params.row.id || params.row._id}
@@ -138,15 +138,39 @@ export default function ManageTrainee() {
       )
     },
     { field: 'category', headerName: 'Category', width: 100 },
-    { field: 'wallet_amount', headerName: 'Wallet Amount', width: 150 },
-    { field: 'login_type', headerName: 'Login Type', width: 150 },
+    {
+      field: 'wallet_amount',
+      headerName: 'Wallet',
+      width: 110,
+      valueGetter: p =>
+        p.row.wallet_amount != null ? `$${Number(p.row.wallet_amount).toFixed(2)}` : '—'
+    },
+    { field: 'login_type', headerName: 'Login', width: 100 },
+    {
+      field: 'referral_code',
+      headerName: 'Referral',
+      width: 110,
+      valueGetter: p => p.row.referral_code || '—'
+    },
+    {
+      field: 'referred_by_user_id',
+      headerName: 'Referred by',
+      width: 120,
+      valueGetter: p => p.row.referred_by_user_id || '—'
+    },
+    {
+      field: 'createdAt',
+      headerName: 'Joined',
+      width: 150,
+      valueGetter: p => (p.row.createdAt ? new Date(p.row.createdAt).toLocaleDateString() : '—')
+    },
     {
       field: 'view',
-      headerName: 'Clips',
-      width: 100,
+      headerName: 'Preview',
+      width: 80,
       sortable: false,
       renderCell: params => (
-        <IconButton onClick={() => handleCourseClick(params.row.id)} aria-label='Preview clips' size='small'>
+        <IconButton onClick={() => handleCourseClick(params.row.id)} aria-label='Preview' size='small'>
           <VisibilityIcon fontSize='small' />
         </IconButton>
       )
@@ -188,7 +212,7 @@ export default function ManageTrainee() {
       <form noValidate autoComplete='off'>
         <AdminPageShell
           title='Trainees'
-          subtitle='Search and open any trainee in User 360 from a row click.'
+          subtitle='Directory with wallet, referral, join date, and status — click a row for User 360.'
           actions={
             <CustomButton component={Link} variant='contained' href='/apps/manage-trainer' startIcon={<MenuIcon />}>
               Trainers

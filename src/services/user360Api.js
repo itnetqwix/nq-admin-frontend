@@ -141,6 +141,16 @@ export const getAuditLogs = async (userId, query = {}) => {
   return unwrap(data) || { items: [], pagination: { page: 1, limit: 20, total: 0 } }
 }
 
+export const getPlatformActivity = async (query = {}) => {
+  const response = await fetch(apiUrl(`/admin/platform-activity${toQueryString(query)}`), {
+    method: 'GET',
+    headers: getAuthHeaders()
+  })
+  const data = await response.json()
+  if (isApiFailure(data, response)) throw new Error(readError(data))
+  return unwrap(data) || { items: [], pagination: { page: 1, limit: 25, total: 0 }, counts: {} }
+}
+
 export const getCallDiagnostics = async (query = {}) => {
   const response = await fetch(apiUrl(`/admin/call-diagnostics${toQueryString(query)}`), {
     method: 'GET',

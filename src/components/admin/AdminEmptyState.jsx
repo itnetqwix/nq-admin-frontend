@@ -3,9 +3,10 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { ops } from 'src/styles/opsSurface'
 
 /**
- * Friendly empty state for grids, drawers, and section panels.
+ * Ops Surface empty state — soft canvas frame, mono caption.
  */
 export default function AdminEmptyState({
   title = 'Nothing here yet',
@@ -24,33 +25,44 @@ export default function AdminEmptyState({
         py: compact ? 3 : 5,
         px: 3,
         textAlign: 'center',
-        minHeight: compact ? 160 : 220
+        minHeight: compact ? 160 : 220,
+        bgcolor: ops.canvasSoft,
+        borderRadius: ops.radiusLg,
+        m: compact ? 1 : 2
       }}
     >
       <Box
         sx={{
-          width: 52,
-          height: 52,
-          borderRadius: '50%',
+          width: 48,
+          height: 48,
+          borderRadius: ops.radiusMd,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          bgcolor: 'action.hover',
-          color: 'text.secondary'
+          bgcolor: ops.canvas,
+          color: ops.mute,
+          boxShadow: ops.shadowCard
         }}
       >
-        <Icon />
+        <Icon sx={{ fontSize: 22 }} />
       </Box>
-      <Typography variant='subtitle1' fontWeight={700}>
-        {title}
-      </Typography>
-      {description ? (
-        <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 360, lineHeight: 1.6 }}>
-          {description}
-        </Typography>
-      ) : null}
+      <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', color: ops.ink }}>{title}</Typography>
+      <Typography sx={{ fontSize: 13, color: ops.body, maxWidth: 360, lineHeight: 1.5 }}>{description}</Typography>
       {actionLabel && onAction ? (
-        <Button variant='outlined' size='small' onClick={onAction} sx={{ mt: 0.5 }}>
+        <Button
+          size='small'
+          onClick={onAction}
+          sx={{
+            mt: 0.5,
+            textTransform: 'none',
+            fontWeight: 500,
+            bgcolor: ops.ink,
+            color: '#fff',
+            borderRadius: ops.radiusSm,
+            px: 1.5,
+            '&:hover': { bgcolor: '#000' }
+          }}
+        >
           {actionLabel}
         </Button>
       ) : null}

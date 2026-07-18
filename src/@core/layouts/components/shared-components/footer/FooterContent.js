@@ -1,52 +1,34 @@
-// ** Next Import
-import Link from 'next/link'
-
-// ** MUI Imports
 import Box from '@mui/material/Box'
-import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
-import useMediaQuery from '@mui/material/useMediaQuery'
+import { ops } from 'src/styles/opsSurface'
 
-const LinkStyled = styled(Link)(({ theme }) => ({
-  textDecoration: 'none',
-  color: theme.palette.primary.main
-}))
-
+/**
+ * Ops Surface footer — mono caption, no Envato leftover links.
+ */
 const FooterContent = () => {
-  // ** Var
-  const hidden = useMediaQuery(theme => theme.breakpoints.down('md'))
-
   return (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
-      {/* <Typography sx={{ mr: 2 }}>
-        {`© ${new Date().getFullYear()}, Made with `}
-        <Box component='span' sx={{ color: 'error.main' }}>
-          ❤️
-        </Box>
-        {` by `}
-        <LinkStyled target='_blank' href='https://netqwix-frontend.vercel.app/'>
-          NetQwix
-        </LinkStyled>
-      </Typography> */}
-      {hidden ? null : (
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', '& :not(:last-child)': { mr: 4 } }}>
-          {/* <LinkStyled target='_blank' href='https://themeforest.net/licenses/standard'>
-            License
-          </LinkStyled>
-          <LinkStyled target='_blank' href='https://1.envato.market/pixinvent_portfolio'>
-            More Themes
-          </LinkStyled>
-          <LinkStyled
-            target='_blank'
-            href='https://demos.pixinvent.com/materialize-nextjs-admin-template/documentation'
-          >
-            Documentation
-          </LinkStyled>
-          <LinkStyled target='_blank' href='https://pixinvent.ticksy.com/'>
-            Support
-          </LinkStyled> */}
-        </Box>
-      )}
+    <Box
+      sx={{
+        width: '100%',
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 1,
+        py: 0.5
+      }}
+    >
+      <Typography
+        sx={{
+          fontFamily: ops.mono,
+          fontSize: 11,
+          color: ops.mute,
+          letterSpacing: '0.04em'
+        }}
+      >
+        NetQwix Admin · {new Date().getFullYear()}
+      </Typography>
+      <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute }}>Ops Surface</Typography>
     </Box>
   )
 }

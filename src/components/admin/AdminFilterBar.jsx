@@ -5,9 +5,10 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import SearchIcon from '@mui/icons-material/Search'
 import AdminRefreshButton from './AdminRefreshButton'
+import { ops } from 'src/styles/opsSurface'
 
 /**
- * Standard search + refresh row above admin tables.
+ * Ops Surface filter bar — hairline inputs, mono result count.
  */
 export default function AdminFilterBar({
   searchLabel,
@@ -44,25 +45,47 @@ export default function AdminFilterBar({
               InputProps={{
                 startAdornment: (
                   <InputAdornment position='start'>
-                    <SearchIcon fontSize='small' color='action' />
+                    <SearchIcon fontSize='small' sx={{ color: ops.mute }} />
                   </InputAdornment>
                 )
               }}
-              sx={{ minWidth: { xs: '100%', sm: 280 }, maxWidth: 420 }}
+              sx={{
+                minWidth: { xs: '100%', sm: 280 },
+                maxWidth: 420,
+                '& .MuiOutlinedInput-root': {
+                  height: 40,
+                  borderRadius: ops.radiusSm,
+                  bgcolor: ops.canvas
+                }
+              }}
             />
           ) : null}
           {children}
         </Stack>
         <Box sx={{ display: 'flex', gap: 1, flexShrink: 0, alignItems: 'center' }}>
           {typeof resultCount === 'number' ? (
-            <Chip size='small' variant='outlined' label={`${resultCount.toLocaleString()} results`} />
+            <Chip
+              size='small'
+              variant='outlined'
+              label={`${resultCount.toLocaleString()} results`}
+              sx={{
+                fontFamily: ops.mono,
+                fontSize: 11,
+                borderColor: ops.hairline,
+                color: ops.mute,
+                bgcolor: ops.canvasSoft
+              }}
+            />
           ) : null}
           {onRefresh ? <AdminRefreshButton onClick={onRefresh} loading={refreshLoading} /> : null}
           {endAdornment}
         </Box>
       </Stack>
       {helperText ? (
-        <Box component='span' sx={{ typography: 'caption', color: 'text.secondary', lineHeight: 1.5 }}>
+        <Box
+          component='span'
+          sx={{ typography: 'caption', color: ops.mute, lineHeight: 1.5, fontFamily: ops.mono, fontSize: 11 }}
+        >
           {helperText}
         </Box>
       ) : null}

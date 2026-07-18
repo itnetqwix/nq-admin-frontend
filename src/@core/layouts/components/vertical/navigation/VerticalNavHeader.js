@@ -25,7 +25,8 @@ const MenuHeaderWrapper = styled(Box)(({ theme }) => ({
 }))
 
 const HeaderTitle = styled(Typography)({
-  fontWeight: 700,
+  fontWeight: 600,
+  letterSpacing: '-0.48px',
   lineHeight: 1.2,
   transition: 'opacity .25s ease-in-out, margin .25s ease-in-out'
 })

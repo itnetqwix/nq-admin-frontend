@@ -35,11 +35,11 @@ const MainContentWrapper = styled(Box)({
 const ContentWrapper = styled('main')(({ theme }) => ({
   flexGrow: 1,
   width: '100%',
-  padding: theme.spacing(4, 5, 6),
+  padding: theme.spacing(3, 4, 4),
   transition: 'padding .25s ease-in-out',
-  backgroundColor: theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.grey[50],
+  backgroundColor: theme.palette.background.default,
   [theme.breakpoints.down('md')]: {
-    padding: theme.spacing(3)
+    padding: theme.spacing(2)
   }
 }))
 
@@ -51,7 +51,7 @@ const VerticalLayout = props => {
   const { skin, navHidden, contentWidth } = settings
   const { navigationSize, disableCustomizer, collapsedNavigationSize } = themeConfig
   const navWidth = navigationSize
-  const navigationBorderWidth = skin === 'bordered' ? 1 : 0
+  const navigationBorderWidth = 1
   const collapsedNavWidth = collapsedNavigationSize
 
   // ** States
@@ -126,7 +126,16 @@ const VerticalLayout = props => {
         scrollToTop(props)
       ) : (
         <ScrollToTop className='mui-fixed'>
-          <Fab color='primary' size='small' aria-label='scroll back to top'>
+          <Fab
+            size='small'
+            aria-label='scroll back to top'
+            sx={{
+              bgcolor: '#171717',
+              color: '#fff',
+              boxShadow: 'none',
+              '&:hover': { bgcolor: '#000' }
+            }}
+          >
             <Icon icon='mdi:arrow-up' />
           </Fab>
         </ScrollToTop>

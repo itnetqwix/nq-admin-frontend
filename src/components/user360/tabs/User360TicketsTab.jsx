@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Box, Button, Chip, CircularProgress, Paper, Stack, Typography } from '@mui/material'
+import { Box, Button, Chip, Stack, Typography } from '@mui/material'
 import toast from 'react-hot-toast'
+import { AdminLoadingState } from 'src/components/admin'
+import { ops } from 'src/styles/opsSurface'
 
-import { SectionShell, EmptyHint } from '../user360Shared'
+import { SectionShell, EmptyHint, OpsSurfaceCard } from '../user360Shared'
 import { getUserSupportTickets } from 'src/services/user360Api'
 
 export default function User360TicketsTab({ userId }) {
@@ -49,26 +51,26 @@ export default function User360TicketsTab({ userId }) {
         </Stack>
       }
     >
-      {loading ? (
-        <Box sx={{ py: 8, display: 'flex', justifyContent: 'center' }}>
-          <CircularProgress />
-        </Box>
-      ) : null}
+      {loading ? <AdminLoadingState message='Loading tickets…' minHeight={180} /> : null}
       {!loading && items.length ? (
         <Stack spacing={1.5}>
           {items.map(row => (
-            <Paper key={row._id} variant='outlined' sx={{ p: 2 }}>
+            <OpsSurfaceCard key={row._id}>
               <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
-                <Chip size='small' label={row.type === 'feedback' ? 'Feedback' : 'Support'} variant='outlined' />
-                {row.status ? <Chip size='small' label={row.status} /> : null}
-                <Typography variant='caption' color='text.secondary'>
+                <Chip
+                  size='small'
+                  label={row.type === 'feedback' ? 'Feedback' : 'Support'}
+                  sx={{ fontFamily: ops.mono, fontSize: 11 }}
+                />
+                {row.status ? (
+                  <Chip size='small' label={row.status} sx={{ fontFamily: ops.mono, fontSize: 11 }} />
+                ) : null}
+                <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute }}>
                   {row.createdAt ? new Date(row.createdAt).toLocaleString() : ''}
                 </Typography>
               </Stack>
-              <Typography variant='subtitle2' sx={{ mt: 1, fontWeight: 600 }}>
-                {row.subject}
-              </Typography>
-              <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5, whiteSpace: 'pre-wrap' }}>
+              <Typography sx={{ mt: 1, fontWeight: 600, letterSpacing: '-0.28px' }}>{row.subject}</Typography>
+              <Typography sx={{ mt: 0.5, fontSize: 13, color: ops.body, whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
                 {row.message}
               </Typography>
               {row.session_id ? (
@@ -76,12 +78,12 @@ export default function User360TicketsTab({ userId }) {
                   size='small'
                   component={Link}
                   href={`/apps/booking?bookingId=${row.session_id}`}
-                  sx={{ mt: 1 }}
+                  sx={{ mt: 1, textTransform: 'none' }}
                 >
                   View session
                 </Button>
               ) : null}
-            </Paper>
+            </OpsSurfaceCard>
           ))}
         </Stack>
       ) : null}

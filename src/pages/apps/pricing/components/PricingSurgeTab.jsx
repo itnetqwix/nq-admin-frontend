@@ -2,8 +2,6 @@ import { useState } from 'react'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
@@ -14,6 +12,8 @@ import Typography from '@mui/material/Typography'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
 import toast from 'react-hot-toast'
+import { OpsSurfaceCard } from 'src/components/admin'
+import { ops } from 'src/styles/opsSurface'
 import { previewPricingQuote } from 'src/services/pricingApi'
 
 const PRODUCT_TYPES = [
@@ -99,8 +99,7 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
         fees and taxes. Coaches can opt out or cap surge via Manage trainers.
       </Alert>
 
-      <Card variant='outlined'>
-        <CardContent>
+      <OpsSurfaceCard>
           <FormControlLabel
             control={
               <Switch
@@ -121,11 +120,9 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
             disabled={!canEdit}
             helperText='IANA timezone for time-window rules (e.g. America/New_York)'
           />
-        </CardContent>
-      </Card>
+        </OpsSurfaceCard>
 
-      <Card variant='outlined'>
-        <CardContent>
+      <OpsSurfaceCard>
           <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
             <Typography variant='h6' fontWeight={700}>
               Time windows
@@ -156,7 +153,7 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
             ) : null}
           </Stack>
           {(surge.timeWindows || []).map((win, idx) => (
-            <Box key={win.id || idx} sx={{ mb: 2, p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}>
+            <Box key={win.id || idx} sx={{ mb: 2, p: 2, borderRadius: ops.radiusMd, bgcolor: ops.canvasSoft, boxShadow: 'inset 0 0 0 1px ' + ops.hairline }}>
               <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
                 <TextField
                   label='Label'
@@ -231,11 +228,9 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
               </Stack>
             </Box>
           ))}
-        </CardContent>
-      </Card>
+        </OpsSurfaceCard>
 
-      <Card variant='outlined'>
-        <CardContent>
+      <OpsSurfaceCard>
           <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
             <Typography variant='h6' fontWeight={700}>
               Demand rules
@@ -265,7 +260,7 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
             ) : null}
           </Stack>
           {(surge.demandRules || []).map((rule, idx) => (
-            <Box key={rule.id || idx} sx={{ mb: 2, p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}>
+            <Box key={rule.id || idx} sx={{ mb: 2, p: 2, borderRadius: ops.radiusMd, bgcolor: ops.canvasSoft, boxShadow: 'inset 0 0 0 1px ' + ops.hairline }}>
               <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
                 <TextField
                   label='Label'
@@ -324,11 +319,9 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
               </Stack>
             </Box>
           ))}
-        </CardContent>
-      </Card>
+        </OpsSurfaceCard>
 
-      <Card variant='outlined'>
-        <CardContent>
+      <OpsSurfaceCard>
           <Typography variant='h6' fontWeight={700} gutterBottom>
             Quote simulator
           </Typography>
@@ -368,7 +361,7 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
             </Button>
           </Stack>
           {simResult ? (
-            <Box sx={{ bgcolor: 'action.hover', p: 2, borderRadius: 1 }}>
+            <Box sx={{ bgcolor: ops.canvasSoft, p: 2, borderRadius: 1 }}>
               <Typography variant='body2' fontWeight={600} gutterBottom>
                 Total charged: ${((simResult.chargeTotalCents || 0) / 100).toFixed(2)}
               </Typography>
@@ -379,8 +372,7 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
               ))}
             </Box>
           ) : null}
-        </CardContent>
-      </Card>
+        </OpsSurfaceCard>
     </Stack>
   )
 }

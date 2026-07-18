@@ -49,6 +49,13 @@ const navigation = () => [
     subject: 'admin-nav-support-tickets'
   },
   {
+    title: 'Platform activity',
+    path: '/apps/platform-activity',
+    icon: 'mdi:timeline-text-outline',
+    action: 'read',
+    subject: 'admin-nav-platform-activity'
+  },
+  {
     title: 'Audit log',
     path: '/apps/audit-logs',
     icon: 'mdi:clipboard-text-clock-outline',

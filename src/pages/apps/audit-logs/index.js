@@ -5,6 +5,7 @@ import AdminGridContainer from 'src/components/admin/AdminGridContainer'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { getAuditLogs } from 'src/services/user360Api'
 import moment from 'moment'
@@ -95,9 +96,12 @@ export default function AuditLogsPage() {
   return (
     <AdminPageShell
       title='Audit log'
-      subtitle='Admin actions (deletes, refunds, wallet adjustments, and more). Search, refresh, or export CSV.'
+      subtitle='Admin actions (deletes, refunds, and more). For logins, bookings, uploads, and referrals use Platform activity.'
       actions={
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+          <Button variant='outlined' component={Link} href='/apps/platform-activity'>
+            Platform activity
+          </Button>
           <AdminRefreshButton onClick={() => void load()} loading={loading} />
           <Button variant='contained' onClick={exportCsv} disabled={!rows.length}>
             Export CSV

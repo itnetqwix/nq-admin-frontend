@@ -74,7 +74,15 @@ const VerticalNavSectionTitle = props => {
               : {
                   width: '100%',
                   '&:before': { top: 7, transform: 'none', width: theme.spacing(4) },
-                  '& .MuiDivider-wrapper': { px: 4, fontSize: '0.75rem', letterSpacing: '0.21px' }
+                  '& .MuiDivider-wrapper': {
+                    px: 4,
+                    fontSize: '0.6875rem',
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    fontFamily:
+                      'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                    fontWeight: 500
+                  }
                 })
           }}
         >

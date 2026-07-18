@@ -5,8 +5,6 @@ import AccordionSummary from '@mui/material/AccordionSummary'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
 import CircularProgress from '@mui/material/CircularProgress'
 import Collapse from '@mui/material/Collapse'
@@ -29,6 +27,7 @@ import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { OpsSurfaceCard } from 'src/components/admin'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import toast from 'react-hot-toast'
@@ -349,7 +348,7 @@ export default function PricingUnitEconomicsTab({ config, isDirty }) {
                 if (!items?.length) return null
 
                 return (
-                  <Accordion key={cat.id} disableGutters variant='outlined' sx={{ mb: 1 }}>
+                  <Accordion key={cat.id} disableGutters sx={{ mb: 1 }}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <Stack direction='row' justifyContent='space-between' width='100%' pr={1}>
                         <Typography fontWeight={600}>{cat.label}</Typography>
@@ -474,8 +473,7 @@ export default function PricingUnitEconomicsTab({ config, isDirty }) {
         <Grid item xs={12} lg={7}>
           <Stack spacing={3}>
             {monthlyBurn ? (
-              <Card variant='outlined'>
-                <CardContent>
+              <OpsSurfaceCard>
                   <Typography variant='h6' fontWeight={600} gutterBottom>
                     Monthly infrastructure burn
                   </Typography>
@@ -516,12 +514,10 @@ export default function PricingUnitEconomicsTab({ config, isDirty }) {
                       </Stack>
                     </Grid>
                   </Grid>
-                </CardContent>
-              </Card>
+                </OpsSurfaceCard>
             ) : null}
 
-            <Card variant='outlined'>
-              <CardContent>
+            <OpsSurfaceCard>
                 <Stack direction='row' alignItems='center' justifyContent='space-between' sx={{ mb: 2 }}>
                   <Box>
                     <Typography variant='h6' fontWeight={600}>
@@ -582,50 +578,50 @@ export default function PricingUnitEconomicsTab({ config, isDirty }) {
                 ) : (
                   <Typography color='text.secondary'>Calculating…</Typography>
                 )}
-              </CardContent>
-            </Card>
+              </OpsSurfaceCard>
 
             {customRow ? (
-              <Card
-                variant='outlined'
-                sx={{ borderColor: customRow.economics.profitable ? 'success.light' : 'error.light' }}
-              >
-                <CardContent>
-                  <Stack direction='row' justifyContent='space-between' alignItems='flex-start'>
-                    <Box>
-                      <Typography variant='subtitle1' fontWeight={700}>
-                        Custom session
+              <OpsSurfaceCard>
+                <Stack direction='row' justifyContent='space-between' alignItems='flex-start'>
+                  <Box>
+                    <Typography variant='subtitle1' fontWeight={700}>
+                      Custom session
+                    </Typography>
+                    <Typography variant='body2' color='text.secondary'>
+                      {customRow.durationMinutes} min · {fmtMoney(customRow.economics.sessionSubtotalCents, currency)}{' '}
+                      · Breakeven {fmtPct(customRow.economics.breakevenCommissionRate)}
+                    </Typography>
+                  </Box>
+                  <ProfitChip profitable={customRow.economics.profitable} />
+                </Stack>
+                <Divider sx={{ my: 2 }} />
+                <Stack spacing={0.5}>
+                  {(customRow.economics.breakdown || []).map(line => (
+                    <Stack key={line.key} direction='row' justifyContent='space-between'>
+                      <Typography
+                        variant='body2'
+                        color={
+                          line.key === 'net_profit'
+                            ? customRow.economics.profitable
+                              ? 'success.main'
+                              : 'error.main'
+                            : 'text.secondary'
+                        }
+                        fontWeight={line.key === 'net_profit' ? 700 : 400}
+                      >
+                        {line.label}
                       </Typography>
-                      <Typography variant='body2' color='text.secondary'>
-                        {customRow.durationMinutes} min · {fmtMoney(customRow.economics.sessionSubtotalCents, currency)}{' '}
-                        · Breakeven {fmtPct(customRow.economics.breakevenCommissionRate)}
+                      <Typography variant='body2' fontWeight={line.key === 'net_profit' ? 700 : 400}>
+                        {fmtMoney(line.amountMinor, currency)}
                       </Typography>
-                    </Box>
-                    <ProfitChip profitable={customRow.economics.profitable} />
-                  </Stack>
-                  <Divider sx={{ my: 2 }} />
-                  <Stack spacing={0.5}>
-                    {(customRow.economics.breakdown || []).map(line => (
-                      <Stack key={line.key} direction='row' justifyContent='space-between'>
-                        <Typography
-                          variant='body2'
-                          color={line.key === 'net_profit' ? (customRow.economics.profitable ? 'success.main' : 'error.main') : 'text.secondary'}
-                          fontWeight={line.key === 'net_profit' ? 700 : 400}
-                        >
-                          {line.label}
-                        </Typography>
-                        <Typography variant='body2' fontWeight={line.key === 'net_profit' ? 700 : 400}>
-                          {fmtMoney(line.amountMinor, currency)}
-                        </Typography>
-                      </Stack>
-                    ))}
-                  </Stack>
-                </CardContent>
-              </Card>
+                    </Stack>
+                  ))}
+                </Stack>
+              </OpsSurfaceCard>
             ) : null}
 
             <AdminPageSection title='Preset scenarios' subtitle='Expand a row for per-vendor infra breakdown.'>
-              <Card variant='outlined'>
+              <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
                 <Table size='small'>
                   <TableHead>
                     <TableRow>
@@ -644,7 +640,7 @@ export default function PricingUnitEconomicsTab({ config, isDirty }) {
                     ))}
                   </TableBody>
                 </Table>
-              </Card>
+              </OpsSurfaceCard>
             </AdminPageSection>
           </Stack>
         </Grid>

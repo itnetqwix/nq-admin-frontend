@@ -1,6 +1,5 @@
 import CloseIcon from '@mui/icons-material/Close'
 import {
-  alpha,
   Box,
   Button,
   Chip,
@@ -10,7 +9,6 @@ import {
   DialogTitle,
   Grid,
   IconButton,
-  Paper,
   Stack,
   Typography,
   useTheme
@@ -20,6 +18,7 @@ import toast from 'react-hot-toast'
 import { deleteAdminEntity, getClipPlayUrl } from 'src/services/user360Api'
 import { getImageUrl } from 'src/utils/utils'
 import { AbilityContext } from 'src/layouts/components/acl/Can'
+import { ops } from 'src/styles/opsSurface'
 
 export const timelineDotColor = type => {
   const t = String(type || '').toLowerCase()
@@ -123,7 +122,6 @@ const RATING_FIELD_LABELS = {
 }
 
 const RatingSideCard = ({ label, data }) => {
-  const theme = useTheme()
   if (!data || typeof data !== 'object' || Array.isArray(data)) return null
 
   const numericKeys = ['sessionRating', 'audioVideoRating', 'recommendRating']
@@ -137,9 +135,7 @@ const RatingSideCard = ({ label, data }) => {
         key={key}
         size='small'
         label={`${lbl}: ${v}/5`}
-        color='primary'
-        variant='outlined'
-        sx={{ fontWeight: 600 }}
+        sx={{ fontFamily: ops.mono, fontSize: 11, bgcolor: ops.canvasSoft2, color: ops.ink }}
       />
     )
   })
@@ -155,8 +151,17 @@ const RatingSideCard = ({ label, data }) => {
   )
 
   return (
-    <Paper variant='outlined' sx={{ p: 1.25, borderRadius: 1.5, bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
-      <Typography variant='caption' sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'primary.main' }}>
+    <Box sx={{ p: 1.25, borderRadius: ops.radiusMd, bgcolor: ops.canvas, boxShadow: ops.shadowCard }}>
+      <Typography
+        sx={{
+          fontFamily: ops.mono,
+          fontSize: 11,
+          fontWeight: 500,
+          textTransform: 'uppercase',
+          letterSpacing: '0.06em',
+          color: ops.indigo
+        }}
+      >
         {label}
       </Typography>
       {chips.length ? (
@@ -168,22 +173,22 @@ const RatingSideCard = ({ label, data }) => {
         <Stack spacing={0.5} sx={{ mt: chips.length ? 1 : 0.5 }}>
           {textBits.map(({ k, v }) => (
             <Box key={k}>
-              <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 600 }}>{k}</Typography>
-              <Typography variant='body2' sx={{ wordBreak: 'break-word' }}>{v}</Typography>
+              <Typography sx={{ fontSize: 11, color: ops.mute, fontWeight: 600 }}>{k}</Typography>
+              <Typography sx={{ fontSize: 13, wordBreak: 'break-word' }}>{v}</Typography>
             </Box>
           ))}
         </Stack>
       ) : null}
       {restKeys.length ? (
-        <Stack spacing={0.25} sx={{ mt: 1, pt: 1, borderTop: 1, borderColor: 'divider' }}>
+        <Stack spacing={0.25} sx={{ mt: 1, pt: 1, borderTop: `1px solid ${ops.hairline}` }}>
           {restKeys.map(k => (
-            <Typography key={k} variant='caption' sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>
+            <Typography key={k} sx={{ fontFamily: ops.mono, fontSize: 11, wordBreak: 'break-all', color: ops.body }}>
               {k}: {formatPrimitive(data[k])}
             </Typography>
           ))}
         </Stack>
       ) : null}
-    </Paper>
+    </Box>
   )
 }
 
@@ -422,7 +427,7 @@ export function ClipPlayDialog({ clipId, open, onClose }) {
   }, [open, clipId])
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth PaperProps={{ sx: { borderRadius: 2 } }}>
+    <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth PaperProps={{ sx: { borderRadius: ops.radiusLg, boxShadow: ops.shadowDrawer } }}>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pr: 1 }}>
         Preview clip
         <IconButton aria-label='close' onClick={onClose} size='small'>
