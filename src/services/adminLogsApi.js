@@ -111,3 +111,52 @@ export async function assignAdminRole(userId, admin_role) {
   })
   return parse(res)
 }
+
+export async function updateAdminPermissions(userId, permissions) {
+  const res = await fetch(apiUrl(`/admin/roles/admins/${userId}/permissions`), {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ permissions })
+  })
+  return parse(res)
+}
+
+export async function createCustomRole({ name, label, permissions }) {
+  const res = await fetch(apiUrl('/admin/roles/custom'), {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ name, label, permissions })
+  })
+  return parse(res)
+}
+
+export async function updateCustomRole(name, { label, permissions, push_to_assigned = true }) {
+  const res = await fetch(apiUrl(`/admin/roles/custom/${encodeURIComponent(name)}`), {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ label, permissions, push_to_assigned })
+  })
+  return parse(res)
+}
+
+export async function deleteCustomRole(name) {
+  const res = await fetch(apiUrl(`/admin/roles/custom/${encodeURIComponent(name)}`), {
+    method: 'DELETE',
+    headers: getAuthHeaders()
+  })
+  return parse(res)
+}
+
+export async function getAdminNavPreferences() {
+  const res = await fetch(apiUrl('/admin/me/preferences'), { headers: getAuthHeaders() })
+  return parse(res)
+}
+
+export async function putAdminNavPreferences(nav_favorites) {
+  const res = await fetch(apiUrl('/admin/me/preferences'), {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ nav_favorites })
+  })
+  return parse(res)
+}

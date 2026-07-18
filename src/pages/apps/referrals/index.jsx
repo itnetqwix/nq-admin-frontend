@@ -121,9 +121,11 @@ const ReferralsAdminPage = () => {
 
   return (
     <AdminPageShell
+      bare
+      eyebrow='Revenue · referrals'
       icon='mdi:account-arrow-right-outline'
-      title='Referrals & points'
-      subtitle='Invites, attributions, referral points (1–5 per event), and wallet redemptions (100 pts = $5).'
+      title='Referrals & points.'
+      subtitle='Invites, attributions, referral points, and wallet redemptions (100 pts = $5).'
       actions={<AdminRefreshButton onClick={load} loading={loading} />}
     >
       {error ? (

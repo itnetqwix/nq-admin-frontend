@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Alert,
   Box, Button, Checkbox, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
@@ -21,6 +21,8 @@ import draftToHtml from 'draftjs-to-html'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import { AbilityContext } from 'src/layouts/components/acl/Can'
+import { ops } from 'src/styles/opsSurface'
 import { EditorWrapper } from 'src/@core/styles/libs/react-draft-wysiwyg'
 import {
   listBroadcasts,
@@ -55,6 +57,10 @@ function stripHtml(html) {
 }
 
 export default function BroadcastsPage() {
+  const ability = useContext(AbilityContext)
+  const fullAccess = ability?.can('manage', 'all') ?? false
+  const canSend = fullAccess || (ability?.can('create', 'admin-action-broadcast') ?? false)
+  const canDelete = fullAccess || (ability?.can('delete', 'admin-action-broadcast') ?? false)
   const { confirm, ConfirmDialog } = useAdminConfirm()
   const [tab, setTab] = useState(0)
 
@@ -178,6 +184,10 @@ export default function BroadcastsPage() {
   }
 
   const onSendClick = () => {
+    if (!canSend) {
+      toast.error('You cannot send broadcasts')
+      return
+    }
     if (!validateCompose()) return
     setConfirmOpen(true)
   }
@@ -244,6 +254,10 @@ export default function BroadcastsPage() {
   }
 
   const requestDelete = async row => {
+    if (!canDelete) {
+      toast.error('You cannot delete broadcasts')
+      return
+    }
     const ok = await confirm({
       title: 'Delete broadcast?',
       message: `"${row.title}" will be removed permanently.`,
@@ -369,10 +383,14 @@ export default function BroadcastsPage() {
   return (
     <>
       <AdminPageShell
+        bare
+        eyebrow='Revenue · broadcasts'
         icon='mdi:bullhorn-outline'
-        title='Broadcasts'
-        subtitle='Send messages to your users via Email, SMS, WhatsApp, In-App notifications, and Push notifications.'
-        contentSx={{ p: 0 }}
+        title='Broadcasts.'
+        subtitle='Compose and send across email, SMS, WhatsApp, in-app, and push. Send / delete respect RBAC.'
+        actions={
+          !canSend ? <Chip label='Send disabled for your role' size='small' sx={{ fontFamily: ops.mono }} /> : null
+        }
       >
         <AdminTabs
           value={tab}

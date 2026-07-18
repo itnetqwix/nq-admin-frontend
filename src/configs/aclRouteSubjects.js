@@ -19,7 +19,7 @@ export const ACL_ROUTE_SUBJECTS = {
   '/apps/ops-logs': 'admin-nav-ops-logs',
   '/apps/logs': 'admin-nav-logs',
   '/apps/finance': 'admin-nav-finance',
-  '/apps/finance/connect': 'admin-nav-finance',
+  '/apps/finance/connect': 'admin-nav-finance-connect',
   '/apps/pricing': 'admin-nav-pricing',
   '/apps/promo-codes': 'admin-nav-promo-codes',
   '/apps/referrals': 'admin-nav-referrals',
@@ -33,16 +33,14 @@ export const ACL_ROUTE_SUBJECTS = {
   '/apps/netqwix-library': 'admin-nav-netqwix-library',
   '/apps/clip-taxonomy': 'admin-nav-clip-taxonomy',
   '/apps/library-submissions': 'admin-nav-library-submissions',
-  '/apps/platform-health': 'admin-nav-ops-logs',
+  '/apps/platform-health': 'admin-nav-platform-health',
   '/apps/admin-roles': 'admin-nav-admin-settings'
 }
 
 export function subjectForPath(pathname) {
   if (!pathname) return null
   if (ACL_ROUTE_SUBJECTS[pathname]) return ACL_ROUTE_SUBJECTS[pathname]
-  // User 360 detail
   if (pathname.startsWith('/apps/users/')) return 'admin-nav-users-directory'
-  // Longest prefix match
   const keys = Object.keys(ACL_ROUTE_SUBJECTS).sort((a, b) => b.length - a.length)
   for (const key of keys) {
     if (pathname === key || pathname.startsWith(key + '/')) return ACL_ROUTE_SUBJECTS[key]

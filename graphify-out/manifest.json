@@ -315,8 +315,8 @@
     "semantic_hash": ""
   },
   "src/@core/layouts/components/vertical/navigation/VerticalNavLink.js": {
-    "mtime": 1784357696.1161683,
-    "ast_hash": "7a4ba314ec921b5a94dfb4fea21a6ab1",
+    "mtime": 1784392869.41814,
+    "ast_hash": "6aace772022c9b584b1385851254ad13",
     "semantic_hash": ""
   },
   "src/@core/layouts/components/vertical/navigation/VerticalNavSectionTitle.js": {
@@ -325,8 +325,8 @@
     "semantic_hash": ""
   },
   "src/@core/layouts/components/vertical/navigation/index.js": {
-    "mtime": 1777655847.279087,
-    "ast_hash": "cd44c6eec675e5ed7dd598a7583f00c1",
+    "mtime": 1784393677.7340572,
+    "ast_hash": "6f99faf1608a279cb865c3f0eb9d8846",
     "semantic_hash": ""
   },
   "src/@core/layouts/utils.js": {
@@ -745,8 +745,8 @@
     "semantic_hash": ""
   },
   "src/configs/acl.js": {
-    "mtime": 1784373442.2293406,
-    "ast_hash": "c330c72365526902304b987b700064c2",
+    "mtime": 1784391756.7743955,
+    "ast_hash": "67971d7d7ef9541d4e0c413ab7038bc1",
     "semantic_hash": ""
   },
   "src/configs/adminEnv.js": {
@@ -860,8 +860,8 @@
     "semantic_hash": ""
   },
   "src/layouts/components/acl/CanViewNavSectionTitle.js": {
-    "mtime": 1777655847.292773,
-    "ast_hash": "8c3d9d07bc209d5fd3aae8f0b90875f8",
+    "mtime": 1784391777.1098564,
+    "ast_hash": "deee76c3a807de56ea0d3b3613927bc7",
     "semantic_hash": ""
   },
   "src/layouts/components/acl/getHomeRoute.js": {
@@ -940,8 +940,8 @@
     "semantic_hash": ""
   },
   "src/navigation/vertical/index.js": {
-    "mtime": 1784373782.3632958,
-    "ast_hash": "bbd1384610376a617bfa612481be4c4c",
+    "mtime": 1784391777.1072862,
+    "ast_hash": "b9b939821e66d610023d7806098c2611",
     "semantic_hash": ""
   },
   "src/pages/401.js": {
@@ -995,8 +995,8 @@
     "semantic_hash": ""
   },
   "src/pages/apps/broadcasts/index.jsx": {
-    "mtime": 1784374409.7199805,
-    "ast_hash": "0a6f4f1799e437d17f28f807aad27855",
+    "mtime": 1784391919.142713,
+    "ast_hash": "13acd2d5bc0864941ffeafbf54769a12",
     "semantic_hash": ""
   },
   "src/pages/apps/call-diagnostics/index.js": {
@@ -1035,8 +1035,8 @@
     "semantic_hash": ""
   },
   "src/pages/apps/finance/index.js": {
-    "mtime": 1784374409.7229846,
-    "ast_hash": "9b7a7374a5f1c2e4c0fb3356293116f0",
+    "mtime": 1784391866.1140468,
+    "ast_hash": "4c424165b371bf9722b1f053493739c5",
     "semantic_hash": ""
   },
   "src/pages/apps/library-submissions/index.jsx": {
@@ -1090,18 +1090,18 @@
     "semantic_hash": ""
   },
   "src/pages/apps/pricing/index.jsx": {
-    "mtime": 1784374416.6854684,
-    "ast_hash": "b4e6fc3149cb45fa3750ca47bfb0977a",
+    "mtime": 1784391885.3718371,
+    "ast_hash": "98a5d258c0b460a4eac107d812adb8b2",
     "semantic_hash": ""
   },
   "src/pages/apps/promo-codes/index.jsx": {
-    "mtime": 1784374409.715825,
-    "ast_hash": "a235dfdedce05470480878b5e9630058",
+    "mtime": 1784391950.8800118,
+    "ast_hash": "c94fba5d5a114e527bf3d16284ed113e",
     "semantic_hash": ""
   },
   "src/pages/apps/referrals/index.jsx": {
-    "mtime": 1784374409.7169237,
-    "ast_hash": "af8977ba669f08b3ef3a9b844521ba2f",
+    "mtime": 1784391908.2486005,
+    "ast_hash": "8fd33d5014633c6f4186ce83c258aa9e",
     "semantic_hash": ""
   },
   "src/pages/apps/tips/index.jsx": {
@@ -1640,8 +1640,8 @@
     "semantic_hash": ""
   },
   "src/pages/apps/finance/connect/index.js": {
-    "mtime": 1784374409.7182035,
-    "ast_hash": "42837541435f65f7b983579b96522975",
+    "mtime": 1784391871.840127,
+    "ast_hash": "d829e8b41d003529dd1c47f7133eba1c",
     "semantic_hash": ""
   },
   "src/pages/apps/platform-health/index.js": {
@@ -4435,13 +4435,13 @@
     "semantic_hash": ""
   },
   "src/configs/aclRouteSubjects.js": {
-    "mtime": 1784372265.8663025,
-    "ast_hash": "ac17243baad18df8cb0b818fdd89e2fd",
+    "mtime": 1784391756.9898176,
+    "ast_hash": "3c94414d3bf3ff85d60a6e68d3eec0eb",
     "semantic_hash": ""
   },
   "src/configs/adminRoleMatrix.js": {
-    "mtime": 1784372374.2356129,
-    "ast_hash": "087b7f3c52d5a0dc87a77958db6c9306",
+    "mtime": 1784391753.24261,
+    "ast_hash": "223068f6dcfaaf8fc1336a623613ab3c",
     "semantic_hash": ""
   },
   "src/lib/clarity.js": {
@@ -4450,8 +4450,8 @@
     "semantic_hash": ""
   },
   "src/pages/apps/admin-roles/index.js": {
-    "mtime": 1784391059.6726446,
-    "ast_hash": "25ac52de72fef593f7cfff35287baf48",
+    "mtime": 1784393694.163048,
+    "ast_hash": "aecdf2bd2f779587547804e833e23634",
     "semantic_hash": ""
   },
   "src/pages/apps/logs/index.js": {
@@ -4470,8 +4470,8 @@
     "semantic_hash": ""
   },
   "src/services/adminLogsApi.js": {
-    "mtime": 1784389171.9257195,
-    "ast_hash": "b0185b2e12f4ca38773232d52cc02cbc",
+    "mtime": 1784393676.6046112,
+    "ast_hash": "f276a01e5e6bd8f505ec5be55c7eba29",
     "semantic_hash": ""
   },
   "src/store/hooks.js": {
@@ -7252,6 +7252,11 @@
   "netqwix_frontend_v2/public/assets/sounds/notification.wav": {
     "mtime": 1784121687.3018656,
     "ast_hash": "8646c43bb795c88a170eed5d7893fcc3",
+    "semantic_hash": ""
+  },
+  "src/utils/navFavorites.js": {
+    "mtime": 1784393676.257945,
+    "ast_hash": "ee1b4e50e070a8cf454a159e837d066f",
     "semantic_hash": ""
   }
 }

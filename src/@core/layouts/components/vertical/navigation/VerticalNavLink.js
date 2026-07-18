@@ -77,7 +77,9 @@ const VerticalNavLink = ({
   isSubToSub,
   collapsedNavWidth,
   toggleNavVisibility,
-  navigationBorderWidth
+  navigationBorderWidth,
+  favoritePaths,
+  onToggleFavorite
 }) => {
   // ** Hooks
   const router = useRouter()
@@ -85,6 +87,7 @@ const VerticalNavLink = ({
   // ** Vars
   const { navCollapsed } = settings
   const icon = parent && !item.icon ? themeConfig.navSubItemIcon : item.icon
+  const isFavorite = item.path && favoritePaths?.has?.(item.path)
 
   const isNavLinkActive = () => {
     if (router.pathname === item.path || handleURLQueries(router, item.path)) {
@@ -158,14 +161,37 @@ const VerticalNavLink = ({
             >
               <Translations text={item.title} />
             </Typography>
-            {item.badgeContent ? (
-              <Chip
-                size='small'
-                label={item.badgeContent}
-                color={item.badgeColor || 'primary'}
-                sx={{ '& .MuiChip-label': { px: 2.5, lineHeight: 1.385, textTransform: 'capitalize' } }}
-              />
-            ) : null}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+              {item.badgeContent ? (
+                <Chip
+                  size='small'
+                  label={item.badgeContent}
+                  color={item.badgeColor || 'primary'}
+                  sx={{ '& .MuiChip-label': { px: 2.5, lineHeight: 1.385, textTransform: 'capitalize' } }}
+                />
+              ) : null}
+              {item.path && onToggleFavorite && !(navCollapsed && !navHover) ? (
+                <Box
+                  component='span'
+                  role='button'
+                  aria-label={isFavorite ? 'Unpin' : 'Pin'}
+                  onClick={e => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    onToggleFavorite(item)
+                  }}
+                  sx={{
+                    display: 'inline-flex',
+                    p: 0.25,
+                    borderRadius: 1,
+                    color: isFavorite ? 'warning.main' : 'text.disabled',
+                    '&:hover': { color: 'warning.main', bgcolor: 'action.hover' }
+                  }}
+                >
+                  <UserIcon icon={isFavorite ? 'mdi:star' : 'mdi:star-outline'} fontSize='1rem' />
+                </Box>
+              ) : null}
+            </Box>
           </MenuItemTextMetaWrapper>
         </MenuNavLink>
       </ListItem>

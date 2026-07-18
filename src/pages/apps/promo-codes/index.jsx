@@ -1,12 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
   FormControl, FormControlLabel, Grid, IconButton, InputLabel, MenuItem,
-  Select, Switch, TextField, Tooltip, Typography
+  Select, Stack, Switch, TextField, Tooltip, Typography
 } from '@mui/material'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminFilterBar from 'src/components/admin/AdminFilterBar'
 import AdminTabs from 'src/components/admin/AdminTabs'
+import OpsMetricTile from 'src/components/admin/OpsMetricTile'
 import { useAdminConfirm } from 'src/components/admin'
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
@@ -14,8 +15,11 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import toast from 'react-hot-toast'
+import Link from 'next/link'
 
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import { AbilityContext } from 'src/layouts/components/acl/Can'
+import { ops } from 'src/styles/opsSurface'
 import {
   listPromoCodes,
   getPromoAdminStats,
@@ -76,6 +80,11 @@ function getStatusChip(row) {
 }
 
 export default function PromoCodesPage() {
+  const ability = useContext(AbilityContext)
+  const fullAccess = ability?.can('manage', 'all') ?? false
+  const canCreate = fullAccess || (ability?.can('create', 'admin-action-promo') ?? false)
+  const canUpdate = fullAccess || (ability?.can('update', 'admin-action-promo') ?? false)
+  const canDelete = fullAccess || (ability?.can('delete', 'admin-action-promo') ?? false)
   const { confirm, ConfirmDialog } = useAdminConfirm()
   const [promos, setPromos] = useState([])
   const [total, setTotal] = useState(0)
@@ -129,12 +138,20 @@ export default function PromoCodesPage() {
   }
 
   const openCreate = () => {
+    if (!canCreate) {
+      toast.error('You cannot create promo codes')
+      return
+    }
     setEditId(null)
     setForm({ ...EMPTY_FORM })
     setFormOpen(true)
   }
 
   const openEdit = row => {
+    if (!canUpdate) {
+      toast.error('You cannot edit promo codes')
+      return
+    }
     setEditId(row._id)
     setForm({
       code: row.code || '',
@@ -205,6 +222,10 @@ export default function PromoCodesPage() {
   }
 
   const requestDelete = async row => {
+    if (!canDelete) {
+      toast.error('You cannot delete promo codes')
+      return
+    }
     const ok = await confirm({
       title: 'Delete promo code?',
       message: `"${row.code}" will be deactivated and removed from the list.`,
@@ -351,19 +372,19 @@ export default function PromoCodesPage() {
             </IconButton>
           </Tooltip>
           <Tooltip title='Edit'>
-            <IconButton size='small' onClick={e => { e.stopPropagation(); openEdit(p.row) }}>
+            <IconButton size='small' disabled={!canUpdate} onClick={e => { e.stopPropagation(); openEdit(p.row) }}>
               <EditIcon fontSize='small' />
             </IconButton>
           </Tooltip>
           <Tooltip title='Delete'>
-            <IconButton size='small' color='error' onClick={e => { e.stopPropagation(); void requestDelete(p.row) }}>
+            <IconButton size='small' color='error' disabled={!canDelete} onClick={e => { e.stopPropagation(); void requestDelete(p.row) }}>
               <DeleteOutlineIcon fontSize='small' />
             </IconButton>
           </Tooltip>
         </Box>
       )
     }
-  ], [])
+  ], [canUpdate, canDelete])
 
   const usageColumns = useMemo(() => [
     { field: 'user', headerName: 'User', flex: 1, renderCell: p => p.row.user_id?.fullname || p.row.user_id?.email || String(p.row.user_id) },
@@ -380,34 +401,57 @@ export default function PromoCodesPage() {
   return (
     <>
       <AdminPageShell
+        bare
+        eyebrow='Revenue · promos'
         icon='mdi:tag-multiple-outline'
-        title='Promo codes'
-        subtitle='Platform promos (NetQwix-funded) and coach-owned promos. Coach codes only apply to that coach’s bookings.'
+        title='Promo codes.'
+        subtitle='Platform (NetQwix-funded) and coach-owned codes. Create / edit / delete respect RBAC.'
         actions={
-          <Button variant='contained' startIcon={<AddIcon />} onClick={openCreate} sx={{ bgcolor: '#000080', '&:hover': { bgcolor: '#0000a0' } }}>
-            Create Promo Code
-          </Button>
+          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+            <Chip component={Link} href='/apps/pricing' label='Pricing' clickable variant='outlined' size='small' />
+            {canCreate ? (
+              <Button
+                variant='contained'
+                startIcon={<AddIcon />}
+                onClick={openCreate}
+                sx={{ textTransform: 'none', bgcolor: ops.ink, '&:hover': { bgcolor: '#000' } }}
+              >
+                Create promo
+              </Button>
+            ) : (
+              <Chip label='View only' size='small' sx={{ fontFamily: ops.mono }} />
+            )}
+          </Stack>
         }
-        contentSx={{ p: 0 }}
       >
         <AdminPageSection>
           {stats ? (
-            <Grid container spacing={3} sx={{ mb: 3 }}>
+            <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
               <Grid item xs={6} md={3}>
-                <Typography variant='caption' color='text.secondary'>Platform active</Typography>
-                <Typography fontWeight={700}>{stats.platformActive ?? 0} / {stats.platformTotal ?? 0}</Typography>
+                <OpsMetricTile
+                  icon='mdi:tag'
+                  label='Platform active'
+                  value={`${stats.platformActive ?? 0}/${stats.platformTotal ?? 0}`}
+                  tone='accent'
+                />
               </Grid>
               <Grid item xs={6} md={3}>
-                <Typography variant='caption' color='text.secondary'>Coach promos active</Typography>
-                <Typography fontWeight={700}>{stats.trainerActive ?? 0} / {stats.trainerTotal ?? 0}</Typography>
+                <OpsMetricTile
+                  icon='mdi:account-tie'
+                  label='Coach active'
+                  value={`${stats.trainerActive ?? 0}/${stats.trainerTotal ?? 0}`}
+                />
               </Grid>
               <Grid item xs={6} md={3}>
-                <Typography variant='caption' color='text.secondary'>Total redemptions</Typography>
-                <Typography fontWeight={700}>{stats.totalRedemptions ?? 0}</Typography>
+                <OpsMetricTile icon='mdi:ticket-confirmation' label='Redemptions' value={String(stats.totalRedemptions ?? 0)} />
               </Grid>
               <Grid item xs={6} md={3}>
-                <Typography variant='caption' color='text.secondary'>Expiring (7 days)</Typography>
-                <Typography fontWeight={700}>{stats.expiringSoon ?? 0}</Typography>
+                <OpsMetricTile
+                  icon='mdi:clock-alert'
+                  label='Expiring (7d)'
+                  value={String(stats.expiringSoon ?? 0)}
+                  tone={(stats.expiringSoon ?? 0) > 0 ? 'warn' : 'default'}
+                />
               </Grid>
             </Grid>
           ) : null}

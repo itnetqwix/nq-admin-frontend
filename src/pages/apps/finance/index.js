@@ -24,6 +24,7 @@ import { useAdminConfirm } from 'src/components/admin/useAdminConfirm'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import FinanceOverviewPanel from 'src/components/admin/finance/FinanceOverviewPanel'
 import FinanceTabGuide, { FinanceTabLegend } from 'src/components/admin/finance/FinanceTabGuide'
+import { ops } from 'src/styles/opsSurface'
 import {
   getFinanceLedger,
   getEscrowHolds,
@@ -73,6 +74,26 @@ const tabLabels = [
   'Audit log'
 ]
 
+const TAB_SLUG = {
+  [TAB.OVERVIEW]: 'overview',
+  [TAB.LEDGER]: 'ledger',
+  [TAB.TRANSACTIONS]: 'transactions',
+  [TAB.ESCROW]: 'escrow',
+  [TAB.REFUNDS]: 'refunds',
+  [TAB.PAYOUTS]: 'payouts',
+  [TAB.STUCK_TOPUPS]: 'stuck_topups',
+  [TAB.TOPUPS]: 'topups',
+  [TAB.AUDIT]: 'audit'
+}
+
+const searchPlaceholder = tab => {
+  if (tab === TAB.LEDGER) return 'User ID or session ID'
+  if (tab === TAB.ESCROW) return 'Session ID'
+  if (tab === TAB.TOPUPS) return 'User ID'
+  if (tab === TAB.TRANSACTIONS) return 'PI (pi_…), user ID, or session ID'
+  return 'Search…'
+}
+
 function formatMinor(minor) {
   if (minor == null) return '—'
   return (Number(minor) / 100).toFixed(2)
@@ -100,7 +121,16 @@ const FinancePage = () => {
   const router = useRouter()
   const ability = useContext(AbilityContext)
   const { confirm, ConfirmDialog } = useAdminConfirm()
-  const canRefund = ability?.can('update', 'admin-action-refund') ?? true
+  const canRefund = ability?.can('update', 'admin-action-refund') ?? false
+  const canAdjust = ability?.can('update', 'admin-action-wallet-adjust') ?? false
+  const canPayout = ability?.can('update', 'admin-action-payout') ?? false
+  const canReconcile = ability?.can('update', 'admin-action-reconcile') ?? false
+  // SuperAdmin has manage all — treat unrestricted ability as full access
+  const fullAccess = ability?.can('manage', 'all') ?? false
+  const allowRefund = fullAccess || canRefund
+  const allowAdjust = fullAccess || canAdjust
+  const allowPayout = fullAccess || canPayout
+  const allowReconcile = fullAccess || canReconcile
   const [tab, setTab] = useState(TAB.OVERVIEW)
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
@@ -349,7 +379,7 @@ const FinancePage = () => {
       headerName: '',
       width: 300,
       renderCell: params => {
-        if (!canRefund) return null
+        if (!allowRefund) return null
         if (params.row.status === 'disputed') {
           return (
             <Stack direction='row' spacing={1} flexWrap='wrap'>
@@ -612,7 +642,7 @@ const FinancePage = () => {
       headerName: '',
       width: 140,
       renderCell: params =>
-        params.row.status === 'pending_approval' ? (
+        params.row.status === 'pending_approval' && allowPayout ? (
           <Button
             size='small'
             onClick={async () => {
@@ -691,6 +721,13 @@ const FinancePage = () => {
     return auditCols
   }, [tab])
 
+  const syncTab = nextTab => {
+    setTab(nextTab)
+    const slug = TAB_SLUG[nextTab] || 'overview'
+    const q = { ...router.query, tab: slug }
+    void router.replace({ pathname: '/apps/finance', query: q }, undefined, { shallow: true })
+  }
+
   const handleGoTab = (key, opts = {}) => {
     const map = {
       escrow: TAB.ESCROW,
@@ -702,11 +739,15 @@ const FinancePage = () => {
       topups: TAB.TOPUPS,
       audit: TAB.AUDIT
     }
-    if (map[key] != null) setTab(map[key])
+    if (map[key] != null) syncTab(map[key])
     if (opts.status) setEscrowStatus(opts.status)
   }
 
   const handleOverviewReconcile = kind => {
+    if (!allowReconcile) {
+      toast.error('Reconcile is disabled for your role')
+      return
+    }
     if (kind === 'topups') {
       void runReconcile('Reconcile top-ups', () => reconcileStuckTopUps(30), load)
     } else if (kind === 'refunds') {
@@ -725,19 +766,27 @@ const FinancePage = () => {
 
   return (
     <AdminPageShell
+      bare
+      eyebrow='Revenue · finance'
       icon='mdi:wallet-outline'
-      title='Finance'
-      subtitle='Escrow holds, wallet ledger, payouts, and support tools — start on Overview, then drill into tabs.'
+      title='Finance.'
+      subtitle='Escrow, ledger, payouts, refunds — tabs sync to the URL. Money actions respect your RBAC.'
       actions={
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
-          <Button size='small' variant='outlined' component={Link} href='/apps/finance/connect'>
-            Stripe Connect
-          </Button>
-          <Button size='small' variant='outlined' onClick={() => setAdjustOpen(true)}>
-            Adjust wallet
-          </Button>
-          {canRefund ? (
-            <Button size='small' variant='outlined' onClick={() => setWalletRefundOpen(true)}>
+          <Chip component={Link} href='/apps/finance/connect' label='Stripe Connect' clickable variant='outlined' size='small' />
+          <Chip component={Link} href='/apps/pricing' label='Pricing' clickable variant='outlined' size='small' />
+          {allowAdjust ? (
+            <Button
+              size='small'
+              variant='contained'
+              onClick={() => setAdjustOpen(true)}
+              sx={{ textTransform: 'none', bgcolor: ops?.ink || '#171717' }}
+            >
+              Adjust wallet
+            </Button>
+          ) : null}
+          {allowRefund ? (
+            <Button size='small' variant='outlined' onClick={() => setWalletRefundOpen(true)} sx={{ textTransform: 'none' }}>
               Wallet refund
             </Button>
           ) : null}
@@ -746,6 +795,7 @@ const FinancePage = () => {
             variant='outlined'
             endIcon={<ExpandMoreIcon />}
             onClick={e => setOpsMenuAnchor(e.currentTarget)}
+            sx={{ textTransform: 'none' }}
           >
             More
           </Button>
@@ -768,35 +818,38 @@ const FinancePage = () => {
             >
               <ListItemText primary='Migrate legacy balances' secondary='One-time wallet migration' />
             </MenuItem>
-            <MenuItem
-              onClick={() => {
-                setOpsMenuAnchor(null)
-                void runReconcile('Reconcile top-ups', () => reconcileStuckTopUps(30), load)
-              }}
-            >
-              <ListItemText primary='Reconcile top-ups' />
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                setOpsMenuAnchor(null)
-                void runReconcile('Reconcile refunds', () => reconcileFailedRefunds(), load)
-              }}
-            >
-              <ListItemText primary='Reconcile refunds' />
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                setOpsMenuAnchor(null)
-                void runReconcile('Reconcile releasing', () => reconcileStuckReleasingHolds(60), load)
-              }}
-            >
-              <ListItemText primary='Reconcile releasing holds' />
-            </MenuItem>
+            {allowReconcile ? (
+              <>
+                <MenuItem
+                  onClick={() => {
+                    setOpsMenuAnchor(null)
+                    void runReconcile('Reconcile top-ups', () => reconcileStuckTopUps(30), load)
+                  }}
+                >
+                  <ListItemText primary='Reconcile top-ups' />
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setOpsMenuAnchor(null)
+                    void runReconcile('Reconcile refunds', () => reconcileFailedRefunds(), load)
+                  }}
+                >
+                  <ListItemText primary='Reconcile refunds' />
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setOpsMenuAnchor(null)
+                    void runReconcile('Reconcile releasing', () => reconcileStuckReleasingHolds(60), load)
+                  }}
+                >
+                  <ListItemText primary='Reconcile releasing holds' />
+                </MenuItem>
+              </>
+            ) : null}
           </Menu>
           <AdminRefreshButton onClick={() => void load()} loading={loading} />
         </Stack>
       }
-      contentSx={{ p: 0 }}
     >
       <AdminPageSection>
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={1} sx={{ mb: 2 }}>
@@ -804,7 +857,8 @@ const FinancePage = () => {
             <>
           <TextField
             size='small'
-            label='Search PI, user ID, or session ID'
+            label={searchPlaceholder(tab)}
+            placeholder={searchPlaceholder(tab)}
             value={searchQ}
             onChange={e => setSearchQ(e.target.value)}
             sx={{ minWidth: 280, flex: 1 }}
@@ -945,7 +999,7 @@ const FinancePage = () => {
 
         <AdminTabs
           value={tab}
-          onChange={setTab}
+          onChange={syncTab}
           tabs={tabLabels.map((label, index) => ({ value: index, label }))}
         />
         <FinanceTabGuide tab={tab} />

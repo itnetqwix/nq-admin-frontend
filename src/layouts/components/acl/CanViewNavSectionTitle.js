@@ -1,20 +1,18 @@
-// ** React Imports
 import { useContext } from 'react'
-
-// ** Component Imports
 import { AbilityContext } from 'src/layouts/components/acl/Can'
 
+/**
+ * Section titles hide when the user cannot read the section subject
+ * (no more always-visible auth:false headers above empty groups).
+ */
 const CanViewNavSectionTitle = props => {
-  // ** Props
   const { children, navTitle } = props
-
-  // ** Hook
   const ability = useContext(AbilityContext)
-  if (navTitle && navTitle.auth === false) {
-    return <>{children}</>
-  } else {
-    return ability && ability.can(navTitle?.action, navTitle?.subject) ? <>{children}</> : null
-  }
+
+  if (!navTitle) return null
+  if (navTitle.auth === false) return <>{children}</>
+  if (!(navTitle.action && navTitle.subject)) return <>{children}</>
+  return ability && ability.can(navTitle.action, navTitle.subject) ? <>{children}</> : null
 }
 
 export default CanViewNavSectionTitle

@@ -1,6 +1,7 @@
 /**
  * Admin sidebar — main categories with nested sub-items.
  * Keep child `subject` values aligned with `src/configs/acl.js`.
+ * Business / Revenue sits high for money ops.
  */
 const navigation = () => [
   {
@@ -11,7 +12,69 @@ const navigation = () => [
     subject: 'admin-nav-home'
   },
 
-  { sectionTitle: 'People', icon: 'mdi:account-group-outline', auth: false },
+  {
+    sectionTitle: 'Business',
+    icon: 'mdi:cash-multiple',
+    action: 'read',
+    subject: 'admin-nav-business'
+  },
+  {
+    title: 'Revenue & growth',
+    icon: 'mdi:chart-line',
+    action: 'read',
+    subject: 'admin-nav-business',
+    children: [
+      {
+        title: 'Finance',
+        path: '/apps/finance',
+        icon: 'mdi:wallet-outline',
+        action: 'read',
+        subject: 'admin-nav-finance'
+      },
+      {
+        title: 'Stripe Connect',
+        path: '/apps/finance/connect',
+        icon: 'mdi:bank-transfer',
+        action: 'read',
+        subject: 'admin-nav-finance-connect'
+      },
+      {
+        title: 'Pricing & fees',
+        path: '/apps/pricing',
+        icon: 'mdi:currency-usd',
+        action: 'read',
+        subject: 'admin-nav-pricing'
+      },
+      {
+        title: 'Promo codes',
+        path: '/apps/promo-codes',
+        icon: 'mdi:tag-multiple-outline',
+        action: 'read',
+        subject: 'admin-nav-promo-codes'
+      },
+      {
+        title: 'Referrals',
+        path: '/apps/referrals',
+        icon: 'mdi:account-arrow-right-outline',
+        action: 'read',
+        subject: 'admin-nav-referrals'
+      },
+      {
+        title: 'Broadcasts',
+        path: '/apps/broadcasts',
+        icon: 'mdi:bullhorn-outline',
+        action: 'read',
+        subject: 'admin-nav-broadcasts'
+      }
+    ]
+  },
+
+  {
+    sectionTitle: 'People',
+    icon: 'mdi:account-group-outline',
+    action: 'read',
+    subject: 'admin-nav-people'
+  },
   {
     title: 'Users & accounts',
     icon: 'mdi:account-multiple-outline',
@@ -63,7 +126,12 @@ const navigation = () => [
     ]
   },
 
-  { sectionTitle: 'Content', icon: 'mdi:cellphone-cog', auth: false },
+  {
+    sectionTitle: 'Content',
+    icon: 'mdi:cellphone-cog',
+    action: 'read',
+    subject: 'admin-nav-content'
+  },
   {
     title: 'CMS & placements',
     icon: 'mdi:newspaper-variant-outline',
@@ -115,7 +183,12 @@ const navigation = () => [
     ]
   },
 
-  { sectionTitle: 'Library', icon: 'mdi:video-box-outline', auth: false },
+  {
+    sectionTitle: 'Library',
+    icon: 'mdi:video-box-outline',
+    action: 'read',
+    subject: 'admin-nav-clips-library'
+  },
   {
     title: 'NetQwix Library',
     icon: 'mdi:play-box-multiple-outline',
@@ -146,7 +219,12 @@ const navigation = () => [
     ]
   },
 
-  { sectionTitle: 'Operations', icon: 'mdi:cog-outline', auth: false },
+  {
+    sectionTitle: 'Operations',
+    icon: 'mdi:cog-outline',
+    action: 'read',
+    subject: 'admin-nav-operations'
+  },
   {
     title: 'Platform ops',
     icon: 'mdi:toolbox-outline',
@@ -158,7 +236,7 @@ const navigation = () => [
         path: '/apps/platform-health',
         icon: 'mdi:heart-pulse',
         action: 'read',
-        subject: 'admin-nav-operations'
+        subject: 'admin-nav-platform-health'
       },
       {
         title: 'Bookings',
@@ -191,7 +269,12 @@ const navigation = () => [
     ]
   },
 
-  { sectionTitle: 'Observability', icon: 'mdi:chart-timeline-variant', auth: false },
+  {
+    sectionTitle: 'Observability',
+    icon: 'mdi:chart-timeline-variant',
+    action: 'read',
+    subject: 'admin-nav-logs'
+  },
   {
     title: 'Logs & audit',
     icon: 'mdi:text-box-search-outline',
@@ -225,65 +308,21 @@ const navigation = () => [
         icon: 'mdi:alert-circle-outline',
         action: 'read',
         subject: 'admin-nav-ops-logs'
-      },
-      {
-        title: 'Admin roles',
-        path: '/apps/admin-roles',
-        icon: 'mdi:shield-account-outline',
-        action: 'read',
-        subject: 'admin-nav-admin-settings'
       }
     ]
   },
-
-  { sectionTitle: 'Business', icon: 'mdi:cash-multiple', auth: false },
   {
-    title: 'Revenue & growth',
-    icon: 'mdi:chart-line',
+    title: 'Admin access',
+    icon: 'mdi:shield-account-outline',
     action: 'read',
-    subject: 'admin-nav-business',
+    subject: 'admin-nav-admin-settings',
     children: [
       {
-        title: 'Finance',
-        path: '/apps/finance',
-        icon: 'mdi:wallet-outline',
+        title: 'Admin roles',
+        path: '/apps/admin-roles',
+        icon: 'mdi:shield-key-outline',
         action: 'read',
-        subject: 'admin-nav-finance'
-      },
-      {
-        title: 'Stripe Connect',
-        path: '/apps/finance/connect',
-        icon: 'mdi:bank-transfer',
-        action: 'read',
-        subject: 'admin-nav-finance'
-      },
-      {
-        title: 'Pricing & fees',
-        path: '/apps/pricing',
-        icon: 'mdi:currency-usd',
-        action: 'read',
-        subject: 'admin-nav-pricing'
-      },
-      {
-        title: 'Promo codes',
-        path: '/apps/promo-codes',
-        icon: 'mdi:tag-multiple-outline',
-        action: 'read',
-        subject: 'admin-nav-promo-codes'
-      },
-      {
-        title: 'Referrals',
-        path: '/apps/referrals',
-        icon: 'mdi:account-arrow-right-outline',
-        action: 'read',
-        subject: 'admin-nav-referrals'
-      },
-      {
-        title: 'Broadcasts',
-        path: '/apps/broadcasts',
-        icon: 'mdi:bullhorn-outline',
-        action: 'read',
-        subject: 'admin-nav-broadcasts'
+        subject: 'admin-nav-admin-settings'
       }
     ]
   }
