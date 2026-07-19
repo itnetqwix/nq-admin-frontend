@@ -97,21 +97,44 @@ export default function PlatformActivityPage() {
       'title',
       'fullname',
       'email',
+      'account_type',
       'user_id',
-      'target',
-      'entity',
+      'target_label',
+      'target_email',
+      'target_account_type',
+      'target_id',
+      'entity_type',
+      'entity_id',
       'ip',
       'country',
       'region',
       'city',
+      'timezone',
+      'locale',
       'device',
       'browser',
+      'browser_version',
       'os',
+      'os_version',
+      'platform',
+      'client_type',
+      'device_id',
+      'app_version',
+      'screen',
+      'network_type',
+      'user_agent',
+      'session_public_id',
+      'session_id',
       'method',
       'path',
       'status',
+      'duration_ms',
+      'request_id',
+      'environment_label',
+      'amount',
       'source'
     ]
+    const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`
     const lines = [
       cols.join(','),
       ...rows.map(r =>
@@ -119,22 +142,44 @@ export default function PlatformActivityPage() {
           r.at,
           r.category,
           r.action,
-          `"${String(r.title || '').replace(/"/g, '""')}"`,
-          `"${String(r.actor?.fullname || '').replace(/"/g, '""')}"`,
-          `"${String(r.actor?.email || '').replace(/"/g, '""')}"`,
+          esc(r.title),
+          esc(r.actor?.fullname),
+          esc(r.actor?.email),
+          r.actor?.account_type || '',
           r.actor?.id || '',
-          `"${String(r.target?.label || '').replace(/"/g, '""')}"`,
-          r.entity ? `${r.entity.type}:${r.entity.id}` : '',
+          esc(r.target?.label || r.target?.fullname),
+          esc(r.target?.email),
+          r.target?.account_type || '',
+          r.target?.id || '',
+          r.entity?.type || '',
+          r.entity?.id || '',
           r.ip || '',
           r.country || '',
           r.region || '',
           r.city || '',
-          r.device || '',
+          r.timezone || '',
+          r.locale || '',
+          esc(r.device),
           r.browser || '',
+          r.browser_version || '',
           r.os || '',
+          r.os_version || '',
+          r.platform || '',
+          r.client_type || '',
+          r.device_id || '',
+          r.app_version || '',
+          r.screen || '',
+          r.network_type || '',
+          esc(r.user_agent),
+          r.session_public_id || '',
+          r.session_id || '',
           r.method || '',
           r.path || '',
           r.status_code ?? '',
+          r.duration_ms ?? '',
+          r.request_id || '',
+          esc(r.environment_label),
+          r.meta?.amount || '',
           r.source || ''
         ].join(',')
       )
@@ -162,182 +207,235 @@ export default function PlatformActivityPage() {
     </Typography>
   )
 
+  const muteLine = (text, opts = {}) =>
+    text ? (
+      <Typography
+        sx={{
+          fontFamily: ops.mono,
+          fontSize: 10,
+          color: ops.mute,
+          lineHeight: 1.35,
+          whiteSpace: opts.wrap ? 'normal' : 'nowrap',
+          wordBreak: opts.wrap ? 'break-all' : 'normal'
+        }}
+        title={typeof text === 'string' ? text : undefined}
+      >
+        {text}
+      </Typography>
+    ) : null
+
   const columns = useMemo(
     () => [
       {
         field: 'at',
         headerName: 'When',
-        width: 168,
+        width: 178,
         renderHeader: () => monoHeader('When'),
         renderCell: p => (
-          <Box sx={{ minWidth: 0 }}>
+          <Box sx={{ minWidth: 0, py: 0.5 }}>
             <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.body, fontVariantNumeric: 'tabular-nums' }}>
-              {p.value ? formatOpsDateTime(p.value, { withSeconds: false }) : '—'}
+              {p.value ? formatOpsDateTime(p.value, { withSeconds: true }) : '—'}
             </Typography>
-            <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute }} noWrap>
-              {p.value ? moment(p.value).fromNow() : ''}
-            </Typography>
+            {muteLine(p.value ? moment(p.value).fromNow() : '')}
+            {muteLine(p.row.timezone || '')}
           </Box>
         )
       },
       {
         field: 'category',
         headerName: 'Category',
-        width: 128,
+        width: 132,
         renderHeader: () => monoHeader('Category'),
         renderCell: p => (
-          <Chip size='small' label={CATEGORY_META[p.value]?.label || p.value} sx={categoryChipSx(p.value)} />
+          <Box sx={{ minWidth: 0, py: 0.5 }}>
+            <Chip size='small' label={CATEGORY_META[p.value]?.label || p.value} sx={categoryChipSx(p.value)} />
+            {muteLine(p.row.source || '')}
+          </Box>
         )
       },
       {
         field: 'title',
         headerName: 'Action',
-        flex: 1,
-        minWidth: 180,
+        flex: 1.4,
+        minWidth: 240,
         renderHeader: () => monoHeader('Action'),
-        renderCell: p => (
-          <Box sx={{ minWidth: 0 }}>
-            <Typography
-              sx={{ fontSize: 14, fontWeight: 500, color: actionTone(p.row.action), letterSpacing: '-0.28px' }}
-              noWrap
-            >
-              {p.row.title}
-            </Typography>
-            <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute }} noWrap>
-              {p.row.action}
-            </Typography>
-          </Box>
-        )
+        renderCell: p => {
+          const r = p.row
+          const apiLine =
+            r.method || r.path
+              ? [r.method, r.path, r.status_code != null ? `HTTP ${r.status_code}` : null, r.duration_ms != null ? `${r.duration_ms}ms` : null]
+                  .filter(Boolean)
+                  .join(' ')
+              : ''
+          const entityLine = r.entity?.type || r.entity?.id ? `${r.entity.type || 'entity'}:${r.entity.id || '—'}` : ''
+          const amountLine = r.meta?.amount ? `Amount · ${r.meta.amount}` : r.meta?.reason ? `Reason · ${r.meta.reason}` : ''
+          return (
+            <Box sx={{ minWidth: 0, py: 0.5 }}>
+              <Typography
+                sx={{ fontSize: 14, fontWeight: 500, color: actionTone(r.action), letterSpacing: '-0.28px', whiteSpace: 'normal' }}
+              >
+                {r.title || '—'}
+              </Typography>
+              {muteLine(r.action)}
+              {muteLine(apiLine, { wrap: true })}
+              {muteLine(entityLine)}
+              {muteLine(amountLine)}
+              {muteLine(r.request_id ? `req · ${r.request_id}` : '')}
+            </Box>
+          )
+        }
       },
       {
         field: 'actorLabel',
         headerName: 'Who',
-        width: 190,
-        valueGetter: params => params.row.actor?.fullname || params.row.actor?.label || '—',
+        width: 210,
+        valueGetter: params =>
+          params.row.actor?.fullname || params.row.actor?.label || params.row.actor?.email || '—',
         renderHeader: () => monoHeader('Who'),
-        renderCell: p =>
-          p.row.actor?.id ? (
-            <Box sx={{ minWidth: 0 }}>
+        renderCell: p => {
+          const a = p.row.actor || {}
+          const name = a.fullname || a.label || '—'
+          const body = (
+            <Box sx={{ minWidth: 0, py: 0.5 }}>
               <Typography
-                component={Link}
-                href={`/apps/users/${p.row.actor.id}`}
                 sx={{
                   fontSize: 13,
-                  color: ops.indigo,
-                  textDecoration: 'none',
                   fontWeight: 500,
+                  color: a.id ? ops.indigo : ops.body,
                   display: 'block',
-                  '&:hover': { color: ops.indigoDeep }
+                  ...(a.id
+                    ? { textDecoration: 'none', '&:hover': { color: ops.indigoDeep } }
+                    : {})
                 }}
                 noWrap
               >
-                {p.value}
+                {name}
               </Typography>
-              <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute }} noWrap>
-                {p.row.actor?.email || p.row.actor?.id || ''}
-              </Typography>
-            </Box>
-          ) : (
-            <Box sx={{ minWidth: 0 }}>
-              <Typography sx={{ fontSize: 13, color: ops.body }} noWrap>
-                {p.value}
-              </Typography>
-              {p.row.actor?.email ? (
-                <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute }} noWrap>
-                  {p.row.actor.email}
-                </Typography>
-              ) : null}
+              {muteLine(a.email || '')}
+              {muteLine([a.account_type, a.id].filter(Boolean).join(' · '))}
             </Box>
           )
+          return a.id ? (
+            <Box
+              component={Link}
+              href={`/apps/users/${a.id}`}
+              sx={{ textDecoration: 'none', color: 'inherit', display: 'block', minWidth: 0 }}
+            >
+              {body}
+            </Box>
+          ) : (
+            body
+          )
+        }
       },
       {
         field: 'targetLabel',
         headerName: 'Target',
-        width: 160,
-        valueGetter: params => params.row.target?.label || '—',
+        width: 200,
+        valueGetter: params =>
+          params.row.target?.label || params.row.target?.fullname || params.row.target?.email || '—',
         renderHeader: () => monoHeader('Target'),
-        renderCell: p =>
-          p.row.target?.id ? (
-            <Typography
-              component={Link}
-              href={`/apps/users/${p.row.target.id}`}
-              sx={{ fontSize: 13, color: ops.link, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
-            >
-              {p.value}
-            </Typography>
-          ) : (
-            <Typography
-              sx={{ fontSize: 13, color: ops.body, fontFamily: p.value?.includes('@') ? ops.mono : 'inherit' }}
-            >
-              {p.value}
-            </Typography>
+        renderCell: p => {
+          const t = p.row.target || {}
+          const label = t.label || t.fullname || t.email || '—'
+          const body = (
+            <Box sx={{ minWidth: 0, py: 0.5 }}>
+              <Typography
+                sx={{
+                  fontSize: 13,
+                  color: t.id ? ops.link : ops.body,
+                  fontFamily: String(label).includes('@') ? ops.mono : 'inherit'
+                }}
+                noWrap
+              >
+                {label}
+              </Typography>
+              {muteLine(t.email && t.email !== label ? t.email : '')}
+              {muteLine([t.account_type, t.id].filter(Boolean).join(' · '))}
+              {muteLine(
+                p.row.entity?.type || p.row.entity?.id
+                  ? `${p.row.entity.type || 'entity'}:${p.row.entity.id || '—'}`
+                  : ''
+              )}
+            </Box>
           )
+          return t.id ? (
+            <Box
+              component={Link}
+              href={`/apps/users/${t.id}`}
+              sx={{ textDecoration: 'none', color: 'inherit', display: 'block', minWidth: 0 }}
+            >
+              {body}
+            </Box>
+          ) : (
+            body
+          )
+        }
       },
       {
         field: 'ip',
         headerName: 'IP',
-        width: 110,
+        width: 148,
         renderHeader: () => monoHeader('IP'),
         renderCell: p => (
-          <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.body }} noWrap>
-            {p.row.ip || '—'}
-          </Typography>
+          <Box sx={{ minWidth: 0, py: 0.5 }}>
+            <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.body }} noWrap>
+              {p.row.ip || '—'}
+            </Typography>
+            {muteLine(p.row.session_public_id ? `session · ${p.row.session_public_id}` : '')}
+            {muteLine(p.row.network_type || '')}
+          </Box>
         )
       },
       {
         field: 'location',
         headerName: 'Location',
-        width: 130,
+        width: 180,
         valueGetter: params =>
           [params.row.city, params.row.region, params.row.country].filter(Boolean).join(', ') || '—',
         renderHeader: () => monoHeader('Location'),
-        renderCell: p => (
-          <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.body }} noWrap>
-            {p.value}
-          </Typography>
-        )
+        renderCell: p => {
+          const r = p.row
+          const primary = [r.city, r.region, r.country].filter(Boolean).join(', ') || '—'
+          return (
+            <Box sx={{ minWidth: 0, py: 0.5 }}>
+              <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.body, whiteSpace: 'normal' }}>
+                {primary}
+              </Typography>
+              {muteLine([r.timezone, r.locale].filter(Boolean).join(' · '))}
+              {muteLine(r.entry_path ? `entry · ${r.entry_path}` : '')}
+              {muteLine(r.referrer ? `ref · ${r.referrer}` : '', { wrap: true })}
+            </Box>
+          )
+        }
       },
       {
         field: 'device',
         headerName: 'Device',
-        width: 150,
+        width: 220,
         renderHeader: () => monoHeader('Device'),
-        renderCell: p => (
-          <Box sx={{ minWidth: 0 }}>
-            <Typography sx={{ fontSize: 12, color: ops.ink }} noWrap>
-              {p.row.device || p.row.browser || '—'}
-            </Typography>
-            <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute }} noWrap>
-              {[p.row.browser, p.row.os, p.row.platform, p.row.client_type].filter(Boolean).join(' · ') || ''}
-            </Typography>
-          </Box>
-        )
-      },
-      {
-        field: 'api',
-        headerName: 'API',
-        width: 160,
-        renderHeader: () => monoHeader('API'),
-        renderCell: p =>
-          p.row.method || p.row.path ? (
-            <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.body }} noWrap>
-              {p.row.method || ''} {p.row.path || ''}
-            </Typography>
-          ) : (
-            <Typography sx={{ fontSize: 12, color: ops.mute }}>—</Typography>
+        renderCell: p => {
+          const r = p.row
+          const browser = [r.browser, r.browser_version].filter(Boolean).join(' ')
+          const os = [r.os, r.os_version].filter(Boolean).join(' ')
+          const primary = r.device || browser || os || r.platform || '—'
+          return (
+            <Box sx={{ minWidth: 0, py: 0.5 }}>
+              <Typography sx={{ fontSize: 12, color: ops.ink, fontWeight: 500, whiteSpace: 'normal' }}>
+                {primary}
+              </Typography>
+              {muteLine([browser && primary !== browser ? browser : null, os].filter(Boolean).join(' · '))}
+              {muteLine(
+                [r.platform, r.client_type, r.app_version ? `v${r.app_version}` : null, r.screen]
+                  .filter(Boolean)
+                  .join(' · ')
+              )}
+              {muteLine(r.device_id ? `device_id · ${r.device_id}` : '')}
+              {muteLine(r.environment_label || '', { wrap: true })}
+              {muteLine(r.user_agent || '', { wrap: true })}
+            </Box>
           )
-      },
-      {
-        field: 'amount',
-        headerName: 'Amount',
-        width: 110,
-        valueGetter: params => params.row.meta?.amount || '',
-        renderHeader: () => monoHeader('Amount'),
-        renderCell: p => (
-          <Typography sx={{ fontFamily: ops.mono, fontSize: 12, fontVariantNumeric: 'tabular-nums', color: ops.ink }}>
-            {p.value || '—'}
-          </Typography>
-        )
+        }
       }
     ],
     []
@@ -685,6 +783,7 @@ export default function PlatformActivityPage() {
           <AdminGridContainer>
             <AdminDataGrid
               autoHeight={false}
+              getRowHeight={() => 'auto'}
               rows={rows}
               columns={columns}
               loading={loading}
@@ -707,7 +806,13 @@ export default function PlatformActivityPage() {
                   borderBottom: `1px solid ${ops.hairline}`,
                   '&:hover': { bgcolor: ops.canvasSoft }
                 },
-                '& .MuiDataGrid-cell': { border: 'none', py: 1 }
+                '& .MuiDataGrid-cell': {
+                  border: 'none',
+                  py: 1.25,
+                  alignItems: 'flex-start',
+                  whiteSpace: 'normal',
+                  lineHeight: 1.35
+                }
               }}
               emptyMessage='No activity in this view'
               emptyDescription='Widen the date range, clear filters, or switch category.'
