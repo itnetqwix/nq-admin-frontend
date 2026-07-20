@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { Chip, Stack } from '@mui/material'
+import { Chip, Grid, Stack } from '@mui/material'
 import Link from 'next/link'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import OpsMetricTile from 'src/components/admin/OpsMetricTile'
 import OpsSurfaceCard from 'src/components/admin/OpsSurfaceCard'
 import ClipTaxonomyPanel from 'src/components/clips/ClipTaxonomyPanel'
-import { ops } from 'src/styles/opsSurface'
+
+const fmtInt = v => new Intl.NumberFormat('en-US').format(Number(v) || 0)
 
 export default function ClipTaxonomyPage() {
   const [taxonomy, setTaxonomy] = useState([])
@@ -40,23 +42,23 @@ export default function ClipTaxonomyPage() {
         </Stack>
       }
     >
-      <Stack direction='row' spacing={1} sx={{ mb: 2 }} flexWrap='wrap' useFlexGap>
-        <Chip
-          size='small'
-          label={`${cats.length} categories`}
-          sx={{ fontFamily: ops.mono, fontSize: 11, bgcolor: ops.softIndigo, color: ops.indigoDeep }}
-        />
-        <Chip
-          size='small'
-          label={`${active} active`}
-          sx={{ fontFamily: ops.mono, fontSize: 11, bgcolor: '#AAFFEC', color: '#1A8F76' }}
-        />
-        <Chip
-          size='small'
-          label={`${subs} subcategories`}
-          sx={{ fontFamily: ops.mono, fontSize: 11, bgcolor: ops.canvasSoft2 }}
-        />
-      </Stack>
+      <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
+        <Grid item xs={6} sm={4}>
+          <OpsMetricTile icon='mdi:folder-outline' label='Categories' value={fmtInt(cats.length)} hint='All rows' />
+        </Grid>
+        <Grid item xs={6} sm={4}>
+          <OpsMetricTile
+            icon='mdi:check-circle-outline'
+            label='Active'
+            value={fmtInt(active)}
+            hint='Shown in picker'
+            tone='success'
+          />
+        </Grid>
+        <Grid item xs={6} sm={4}>
+          <OpsMetricTile icon='mdi:subdirectory-arrow-right' label='Subcategories' value={fmtInt(subs)} hint='Active only' />
+        </Grid>
+      </Grid>
 
       <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
         <AdminPageSection>

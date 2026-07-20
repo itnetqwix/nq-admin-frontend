@@ -11,6 +11,7 @@ import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminGridContainer from 'src/components/admin/AdminGridContainer'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
 import OpsMetricTile from 'src/components/admin/OpsMetricTile'
+import OpsSurfaceCard from 'src/components/admin/OpsSurfaceCard'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import { getReferralDashboard } from 'src/services/referralAdminApi'
 import { ops } from 'src/styles/opsSurface'
@@ -168,7 +169,7 @@ const ReferralsAdminPage = () => {
         </Grid>
       </Grid>
 
-      <Box sx={{ p: 2.5, mb: 3, bgcolor: ops.canvas, borderRadius: ops.radiusLg, boxShadow: ops.shadowCard }}>
+      <OpsSurfaceCard sx={{ p: 2.5, mb: 3 }}>
         <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', mb: 0.5 }}>
           Referral earn matrix (points).
         </Typography>
@@ -200,9 +201,9 @@ const ReferralsAdminPage = () => {
             )
           })}
         </Box>
-      </Box>
+      </OpsSurfaceCard>
 
-      <Box sx={{ p: 2.5, mb: 3, bgcolor: ops.canvas, borderRadius: ops.radiusLg, boxShadow: ops.shadowCard }}>
+      <OpsSurfaceCard sx={{ p: 2.5, mb: 3 }}>
         <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', mb: 1 }}>
           First lesson checkout discount.
         </Typography>
@@ -219,22 +220,24 @@ const ReferralsAdminPage = () => {
             color: cfg.enabled ? ops.warning : ops.mute
           }}
         />
-      </Box>
+      </OpsSurfaceCard>
 
       <AdminPageSection title='Attributions by pair'>
-        <AdminGridContainer>
-          <AdminDataGrid
-            rows={pairRows}
-            columns={[
-              { field: 'referrerType', headerName: 'Referrer', width: 120 },
-              { field: 'refereeType', headerName: 'Referee', width: 120 },
-              { field: 'attributions', headerName: 'Count', width: 100 }
-            ]}
-            loading={loading}
-            autoHeight
-            hideFooter
-          />
-        </AdminGridContainer>
+        <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
+          <AdminGridContainer>
+            <AdminDataGrid
+              rows={pairRows}
+              columns={[
+                { field: 'referrerType', headerName: 'Referrer', width: 120 },
+                { field: 'refereeType', headerName: 'Referee', width: 120 },
+                { field: 'attributions', headerName: 'Count', width: 100 }
+              ]}
+              loading={loading}
+              autoHeight
+              hideFooter
+            />
+          </AdminGridContainer>
+        </OpsSurfaceCard>
       </AdminPageSection>
 
       <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 2 }}>
@@ -242,27 +245,29 @@ const ReferralsAdminPage = () => {
         <Tab label='Recent attributions' />
       </Tabs>
 
-      <AdminGridContainer>
-        {tab === 0 ? (
-          <AdminDataGrid
-            rows={(data?.recentRewards ?? []).map((r, i) => ({ id: r._id || i, ...r }))}
-            columns={rewardCols}
-            loading={loading}
-            autoHeight
-            pageSizeOptions={[25, 50]}
-            initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
-          />
-        ) : (
-          <AdminDataGrid
-            rows={(data?.recentAttributions ?? []).map((a, i) => ({ id: a._id || i, ...a }))}
-            columns={attrCols}
-            loading={loading}
-            autoHeight
-            pageSizeOptions={[25, 50]}
-            initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
-          />
-        )}
-      </AdminGridContainer>
+      <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
+        <AdminGridContainer>
+          {tab === 0 ? (
+            <AdminDataGrid
+              rows={(data?.recentRewards ?? []).map((r, i) => ({ id: r._id || i, ...r }))}
+              columns={rewardCols}
+              loading={loading}
+              autoHeight
+              pageSizeOptions={[25, 50]}
+              initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
+            />
+          ) : (
+            <AdminDataGrid
+              rows={(data?.recentAttributions ?? []).map((a, i) => ({ id: a._id || i, ...a }))}
+              columns={attrCols}
+              loading={loading}
+              autoHeight
+              pageSizeOptions={[25, 50]}
+              initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
+            />
+          )}
+        </AdminGridContainer>
+      </OpsSurfaceCard>
     </AdminPageShell>
   )
 }

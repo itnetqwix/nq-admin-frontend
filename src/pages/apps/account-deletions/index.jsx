@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  Grid,
   InputLabel,
   MenuItem,
   Select,
@@ -21,8 +22,12 @@ import toast from 'react-hot-toast'
 
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminFilterBar from 'src/components/admin/AdminFilterBar'
+import AdminGridContainer from 'src/components/admin/AdminGridContainer'
+import OpsMetricTile from 'src/components/admin/OpsMetricTile'
+import OpsSurfaceCard from 'src/components/admin/OpsSurfaceCard'
 import { useAdminConfirm } from 'src/components/admin'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import { ops } from 'src/styles/opsSurface'
 import {
   listAccountDeletions,
   restoreAccountDeletion,
@@ -260,53 +265,113 @@ export default function AccountDeletionsPage() {
   return (
     <>
       <AdminPageShell
+        bare
+        eyebrow='People · deletions'
         icon='mdi:account-remove-outline'
-        title='Account deletions'
+        title='Account deletions.'
         subtitle='15-day soft-delete queue. Restore accounts that asked support before the deadline. After 15 days the nightly job hard-deletes the row.'
-        contentSx={{ p: 0 }}
       >
+        <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:timer-sand'
+              label='In restore window'
+              value={statusFilter === 'confirmed' ? String(total) : '·'}
+              hint='Confirmed soft-deletes'
+              tone='warn'
+              onClick={() => {
+                setStatusFilter('confirmed')
+                setPage(1)
+              }}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:restore'
+              label='Restored'
+              value={statusFilter === 'restored' ? String(total) : '·'}
+              hint='Brought back'
+              tone='success'
+              onClick={() => {
+                setStatusFilter('restored')
+                setPage(1)
+              }}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:delete-forever'
+              label='Hard-deleted'
+              value={statusFilter === 'hard_deleted' ? String(total) : '·'}
+              hint='Past deadline'
+              tone='danger'
+              onClick={() => {
+                setStatusFilter('hard_deleted')
+                setPage(1)
+              }}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:filter-variant'
+              label='In this view'
+              value={String(total)}
+              hint='Matching filters'
+              tone='accent'
+            />
+          </Grid>
+        </Grid>
+
         <AdminPageSection>
-          <AdminFilterBar
-            searchPlaceholder='Search by name, email, reason…'
-            searchValue={searchInput}
-            onSearchChange={handleSearchChange}
-            resultCount={total}
-            onRefresh={() => void fetchData()}
-            refreshLoading={loading}
-          >
-            <FormControl size='small' sx={{ minWidth: 200 }}>
-              <InputLabel>Status</InputLabel>
-              <Select
-                label='Status'
-                value={statusFilter}
-                onChange={e => {
-                  setStatusFilter(e.target.value)
-                  setPage(1)
-                }}
+          <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
+            <Box sx={{ p: { xs: 2, sm: 2.5 }, borderBottom: `1px solid ${ops.hairline}` }}>
+              <AdminFilterBar
+                searchPlaceholder='Search by name, email, reason…'
+                searchValue={searchInput}
+                onSearchChange={handleSearchChange}
+                resultCount={total}
+                onRefresh={() => void fetchData()}
+                refreshLoading={loading}
               >
-                <MenuItem value=''>All</MenuItem>
-                <MenuItem value='pending'>Pending OTP</MenuItem>
-                <MenuItem value='confirmed'>In restore window</MenuItem>
-                <MenuItem value='restored'>Restored</MenuItem>
-                <MenuItem value='hard_deleted'>Hard-deleted</MenuItem>
-                <MenuItem value='cancelled'>Cancelled</MenuItem>
-              </Select>
-            </FormControl>
-          </AdminFilterBar>
-          <AdminDataGrid
-            rows={rows}
-            columns={columns}
-            loading={loading}
-            rowCount={total}
-            paginationMode='server'
-            paginationModel={{ page: page - 1, pageSize }}
-            onPaginationModelChange={m => {
-              setPage(m.page + 1)
-              setPageSize(m.pageSize)
-            }}
-            sx={{ '& .MuiDataGrid-cell': { py: 1 } }}
-            getRowHeight={() => 72}
-          />
+                <FormControl size='small' sx={{ minWidth: 200 }}>
+                  <InputLabel>Status</InputLabel>
+                  <Select
+                    label='Status'
+                    value={statusFilter}
+                    onChange={e => {
+                      setStatusFilter(e.target.value)
+                      setPage(1)
+                    }}
+                  >
+                    <MenuItem value=''>All</MenuItem>
+                    <MenuItem value='pending'>Pending OTP</MenuItem>
+                    <MenuItem value='confirmed'>In restore window</MenuItem>
+                    <MenuItem value='restored'>Restored</MenuItem>
+                    <MenuItem value='hard_deleted'>Hard-deleted</MenuItem>
+                    <MenuItem value='cancelled'>Cancelled</MenuItem>
+                  </Select>
+                </FormControl>
+              </AdminFilterBar>
+            </Box>
+            <AdminGridContainer>
+              <AdminDataGrid
+                autoHeight={false}
+                rows={rows}
+                columns={columns}
+                loading={loading}
+                rowCount={total}
+                paginationMode='server'
+                paginationModel={{ page: page - 1, pageSize }}
+                onPaginationModelChange={m => {
+                  setPage(m.page + 1)
+                  setPageSize(m.pageSize)
+                }}
+                sx={{ '& .MuiDataGrid-cell': { py: 1 } }}
+                getRowHeight={() => 72}
+                emptyMessage='No deletion requests in this view.'
+              />
+            </AdminGridContainer>
+          </OpsSurfaceCard>
         </AdminPageSection>
       </AdminPageShell>
 
@@ -336,7 +401,7 @@ export default function AccountDeletionsPage() {
             variant='contained'
             onClick={handleRestore}
             disabled={restoring}
-            sx={{ bgcolor: '#000080', '&:hover': { bgcolor: '#0000a0' } }}
+            sx={{ bgcolor: ops.ink, '&:hover': { bgcolor: '#000' } }}
           >
             {restoring ? 'Restoring…' : 'Restore'}
           </Button>
@@ -363,7 +428,7 @@ export default function AccountDeletionsPage() {
             variant='contained'
             onClick={handleSaveNote}
             disabled={savingNote}
-            sx={{ bgcolor: '#000080', '&:hover': { bgcolor: '#0000a0' } }}
+            sx={{ bgcolor: ops.ink, '&:hover': { bgcolor: '#000' } }}
           >
             {savingNote ? 'Saving…' : 'Save'}
           </Button>

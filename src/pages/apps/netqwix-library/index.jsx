@@ -17,6 +17,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
 import { AdminLoadingState, OpsSurfaceCard, useAdminConfirm } from 'src/components/admin'
+import AdminFilterBar from 'src/components/admin/AdminFilterBar'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
 import OpsMetricTile from 'src/components/admin/OpsMetricTile'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
@@ -399,14 +400,12 @@ export default function NetqwixLibraryPage() {
 
       <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden', mt: 2 }}>
         <AdminPageSection title='Browse published' subtitle='Search titles or filter by category.'>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 2 }}>
-            <TextField
-              size='small'
-              placeholder='Search clip titles…'
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              sx={{ minWidth: 240, flex: 1 }}
-            />
+          <AdminFilterBar
+            searchPlaceholder='Search clip titles…'
+            searchValue={search}
+            onSearchChange={e => setSearch(e.target.value)}
+            resultCount={showingCount}
+          >
             <FormControl size='small' sx={{ minWidth: 200 }}>
               <InputLabel>Category</InputLabel>
               <Select label='Category' value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
@@ -418,7 +417,7 @@ export default function NetqwixLibraryPage() {
                 ))}
               </Select>
             </FormControl>
-          </Stack>
+          </AdminFilterBar>
 
           {loading ? (
             <AdminLoadingState message='Loading library…' minHeight={200} />

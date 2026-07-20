@@ -1,17 +1,23 @@
-import { useCallback, useEffect, useState } from 'react'
-import { Box, Button, Chip, Drawer, Stack, TextField, Typography } from '@mui/material'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Box, Button, Chip, Drawer, Grid, Stack, TextField, Typography } from '@mui/material'
 import moment from 'moment'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminFilterBar from 'src/components/admin/AdminFilterBar'
 import AdminGridContainer from 'src/components/admin/AdminGridContainer'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
+import OpsMetricTile from 'src/components/admin/OpsMetricTile'
+import OpsSurfaceCard from 'src/components/admin/OpsSurfaceCard'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import { ops } from 'src/styles/opsSurface'
 import {
   approveTraineeAccount,
   getPendingTraineeAccounts,
   rejectTraineeAccount
 } from 'src/services/clipsAdminApi'
+
+const fmtInt = v => new Intl.NumberFormat('en-US').format(Number(v) || 0)
 
 export default function TraineeAccountReviewsPage() {
   const [rows, setRows] = useState([])
@@ -20,6 +26,9 @@ export default function TraineeAccountReviewsPage() {
   const [detail, setDetail] = useState(null)
   const [rejectReason, setRejectReason] = useState('')
   const [acting, setActing] = useState(false)
+  const [searchInput, setSearchInput] = useState('')
+  const [search, setSearch] = useState('')
+  const searchTimer = useRef(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -43,6 +52,24 @@ export default function TraineeAccountReviewsPage() {
   useEffect(() => {
     void load()
   }, [load])
+
+  const handleSearchChange = e => {
+    const val = e.target.value
+    setSearchInput(val)
+    if (searchTimer.current) clearTimeout(searchTimer.current)
+    searchTimer.current = setTimeout(() => setSearch(val.trim().toLowerCase()), 300)
+  }
+
+  const filtered = useMemo(() => {
+    if (!search) return rows
+    return rows.filter(r =>
+      [r.fullname, r.email, r.mobile_no, r.id]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+        .includes(search)
+    )
+  }, [rows, search])
 
   const openDetail = row => {
     setDetail(row)
@@ -102,26 +129,65 @@ export default function TraineeAccountReviewsPage() {
 
   return (
     <AdminPageShell
+      bare
+      eyebrow='People · trainee reviews'
       icon='mdi:account-clock-outline'
-      title='Trainee account reviews'
+      title='Trainee account reviews.'
       subtitle='Review trainees who resubmitted after rejection or were set to pending.'
       actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}
-      contentSx={{ p: 0 }}
     >
-      <AdminPageSection>
-        <AdminGridContainer>
-          <AdminDataGrid
-            autoHeight={false}
-            rows={rows}
-            columns={columns}
-            loading={loading}
-            onRowClick={p => openDetail(p.row)}
-            emptyMessage='No trainees awaiting review.'
+      <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
+        <Grid item xs={6} sm={4}>
+          <OpsMetricTile
+            icon='mdi:account-clock'
+            label='In queue'
+            value={fmtInt(rows.length)}
+            hint='Awaiting review'
+            tone={rows.length > 0 ? 'warn' : 'default'}
           />
-        </AdminGridContainer>
+        </Grid>
+        <Grid item xs={6} sm={4}>
+          <OpsMetricTile
+            icon='mdi:filter-outline'
+            label='Showing'
+            value={fmtInt(filtered.length)}
+            hint={search ? 'Filtered' : 'All pending'}
+          />
+        </Grid>
+      </Grid>
+
+      <AdminPageSection>
+        <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
+          <Box sx={{ p: { xs: 2, sm: 2.5 }, borderBottom: `1px solid ${ops.hairline}` }}>
+            <AdminFilterBar
+              searchPlaceholder='Search name, email, phone…'
+              searchValue={searchInput}
+              onSearchChange={handleSearchChange}
+              resultCount={filtered.length}
+              onRefresh={() => void load()}
+              refreshLoading={loading}
+            />
+          </Box>
+          <AdminGridContainer>
+            <AdminDataGrid
+              autoHeight={false}
+              rows={filtered}
+              columns={columns}
+              loading={loading}
+              onRowClick={p => openDetail(p.row)}
+              emptyMessage='No trainees awaiting review.'
+              emptyDescription='Clear search or refresh the queue.'
+            />
+          </AdminGridContainer>
+        </OpsSurfaceCard>
       </AdminPageSection>
 
-      <Drawer anchor='right' open={drawerOpen} onClose={() => setDrawerOpen(false)} PaperProps={{ sx: { width: 420, p: 3 } }}>
+      <Drawer
+        anchor='right'
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        PaperProps={{ sx: { width: 420, p: 3 } }}
+      >
         {detail ? (
           <Stack spacing={2}>
             <Typography variant='h6'>{detail.fullname}</Typography>
@@ -139,10 +205,21 @@ export default function TraineeAccountReviewsPage() {
               onChange={e => setRejectReason(e.target.value)}
             />
             <Stack direction='row' spacing={1}>
-              <Button variant='contained' disabled={acting} onClick={() => void handleApprove()}>
+              <Button
+                variant='contained'
+                disabled={acting}
+                onClick={() => void handleApprove()}
+                sx={{ textTransform: 'none', bgcolor: ops.ink }}
+              >
                 Approve
               </Button>
-              <Button variant='outlined' color='error' disabled={acting} onClick={() => void handleReject()}>
+              <Button
+                variant='outlined'
+                color='error'
+                disabled={acting}
+                onClick={() => void handleReject()}
+                sx={{ textTransform: 'none' }}
+              >
                 Reject
               </Button>
             </Stack>

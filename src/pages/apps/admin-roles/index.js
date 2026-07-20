@@ -21,6 +21,7 @@ import Link from 'next/link'
 import toast from 'react-hot-toast'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminFilterBar from 'src/components/admin/AdminFilterBar'
 import AdminGridContainer from 'src/components/admin/AdminGridContainer'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
 import OpsMetricTile from 'src/components/admin/OpsMetricTile'
@@ -78,6 +79,7 @@ export default function AdminRolesPage() {
   const [editTemplateOpen, setEditTemplateOpen] = useState(false)
   const [devicesUser, setDevicesUser] = useState(null)
   const [revokingSessionId, setRevokingSessionId] = useState(null)
+  const [adminSearch, setAdminSearch] = useState('')
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -218,6 +220,18 @@ export default function AdminRolesPage() {
     })
     return c
   }, [items, roleList])
+
+  const filteredAdmins = useMemo(() => {
+    const q = adminSearch.trim().toLowerCase()
+    if (!q) return items
+    return items.filter(a =>
+      [a.fullname, a.email, a.admin_role, a.id]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+        .includes(q)
+    )
+  }, [items, adminSearch])
 
   const columns = [
     { field: 'fullname', headerName: 'Name', flex: 1, minWidth: 140 },
@@ -400,15 +414,29 @@ export default function AdminRolesPage() {
       ) : null}
 
       <AdminPageSection title='Administrators' subtitle='Assign a role or edit per-user permission overrides.'>
-        <AdminGridContainer>
-          <AdminDataGrid
-            rows={items}
-            columns={columns}
-            loading={loading}
-            pageSizeOptions={[25, 50]}
-            initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
-          />
-        </AdminGridContainer>
+        <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
+          <Box sx={{ p: { xs: 2, sm: 2.5 }, borderBottom: `1px solid ${ops.hairline}` }}>
+            <AdminFilterBar
+              searchPlaceholder='Search name, email, role…'
+              searchValue={adminSearch}
+              onSearchChange={e => setAdminSearch(e.target.value)}
+              resultCount={filteredAdmins.length}
+              onRefresh={() => void load()}
+              refreshLoading={loading}
+            />
+          </Box>
+          <AdminGridContainer>
+            <AdminDataGrid
+              autoHeight={false}
+              rows={filteredAdmins}
+              columns={columns}
+              loading={loading}
+              pageSizeOptions={[25, 50]}
+              initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
+              emptyMessage='No administrators match.'
+            />
+          </AdminGridContainer>
+        </OpsSurfaceCard>
       </AdminPageSection>
 
       <AdminPageSection

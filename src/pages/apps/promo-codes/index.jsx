@@ -6,8 +6,10 @@ import {
 } from '@mui/material'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminFilterBar from 'src/components/admin/AdminFilterBar'
+import AdminGridContainer from 'src/components/admin/AdminGridContainer'
 import AdminTabs from 'src/components/admin/AdminTabs'
 import OpsMetricTile from 'src/components/admin/OpsMetricTile'
+import OpsSurfaceCard from 'src/components/admin/OpsSurfaceCard'
 import { useAdminConfirm } from 'src/components/admin'
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
@@ -482,23 +484,31 @@ export default function PromoCodesPage() {
             onChange={v => { setSponsorTab(v); setPage(1) }}
             tabs={SPONSOR_TABS.map(t => ({ value: t.value, label: t.label }))}
           />
-          <AdminFilterBar
-            searchPlaceholder='Search by code, label, or description…'
-            onSearchChange={handleSearchChange}
-            resultCount={total}
-            onRefresh={() => void fetchData()}
-            refreshLoading={loading}
-          />
-          <AdminDataGrid
-            rows={promos}
-            columns={columns}
-            loading={loading}
-            rowCount={total}
-            paginationMode='server'
-            paginationModel={{ page: page - 1, pageSize }}
-            onPaginationModelChange={m => { setPage(m.page + 1); setPageSize(m.pageSize) }}
-            sx={{ '& .MuiDataGrid-cell': { py: 1 } }}
-          />
+          <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
+            <Box sx={{ p: { xs: 2, sm: 2.5 }, borderBottom: `1px solid ${ops.hairline}` }}>
+              <AdminFilterBar
+                searchPlaceholder='Search by code, label, or description…'
+                onSearchChange={handleSearchChange}
+                resultCount={total}
+                onRefresh={() => void fetchData()}
+                refreshLoading={loading}
+              />
+            </Box>
+            <AdminGridContainer>
+              <AdminDataGrid
+                autoHeight={false}
+                rows={promos}
+                columns={columns}
+                loading={loading}
+                rowCount={total}
+                paginationMode='server'
+                paginationModel={{ page: page - 1, pageSize }}
+                onPaginationModelChange={m => { setPage(m.page + 1); setPageSize(m.pageSize) }}
+                sx={{ '& .MuiDataGrid-cell': { py: 1 } }}
+                emptyMessage='No promo codes in this view.'
+              />
+            </AdminGridContainer>
+          </OpsSurfaceCard>
         </AdminPageSection>
       </AdminPageShell>
 

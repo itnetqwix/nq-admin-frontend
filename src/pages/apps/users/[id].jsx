@@ -1,23 +1,12 @@
-import {
-  Box,
-  Breadcrumbs,
-  Button,
-  CircularProgress,
-  Container,
-  IconButton,
-  Link as MuiLink,
-  Stack,
-  Tooltip,
-  Typography
-} from '@mui/material'
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
-import PersonSearchOutlinedIcon from '@mui/icons-material/PersonSearchOutlined'
+import { Box, Button, CircularProgress, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import AdminUser360Tabs from 'src/components/user360/AdminUser360Tabs'
+import AdminPageShell from 'src/layouts/components/AdminPageShell'
+import OpsSurfaceCard from 'src/components/admin/OpsSurfaceCard'
 import { getUser360, getUserAssets, getUserLessons, getUserReviews, getUserTimeline } from 'src/services/user360Api'
 import { getOpsEventsForUser } from 'src/services/opsApi'
 import { ops } from 'src/styles/opsSurface'
@@ -260,167 +249,141 @@ export default function User360Page() {
   }
 
   const displayName =
-    userData?.overview?.identity?.fullname ||
-    userData?.user?.fullname ||
-    'User profile'
-
+    userData?.overview?.identity?.fullname || userData?.user?.fullname || 'User profile'
+  const email = userData?.overview?.identity?.email || userData?.user?.email || ''
   const accountType =
-    userData?.user?.account_type ||
-    userData?.overview?.identity?.account_type ||
-    'trainer'
+    userData?.user?.account_type || userData?.overview?.identity?.account_type || 'trainer'
   const listHref =
-    accountType === 'trainee' ? '/apps/manage-trainee' : accountType === 'trainer' ? '/apps/manage-trainer' : '/apps/users'
+    accountType === 'trainee'
+      ? '/apps/manage-trainee'
+      : accountType === 'trainer'
+        ? '/apps/manage-trainer'
+        : '/apps/users'
   const listLabel =
     accountType === 'trainee' ? 'Trainees' : accountType === 'trainer' ? 'Trainers' : 'Users'
 
   if (!router.isReady) {
     return (
-      <Box sx={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: ops.canvasSoft }}>
-        <CircularProgress size={28} sx={{ color: ops.ink }} />
-      </Box>
+      <AdminPageShell
+        bare
+        eyebrow='People · user 360'
+        icon='mdi:account-search-outline'
+        title='User 360.'
+        subtitle='Loading…'
+        loading
+      />
     )
   }
 
   if (!userId) {
     return (
-      <Container maxWidth='md' sx={{ py: 6 }}>
-        <Box sx={{ p: 4, borderRadius: ops.radiusLg, bgcolor: ops.canvas, boxShadow: ops.shadowCard }}>
-          <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', mb: 1 }}>User not found.</Typography>
-          <Typography sx={{ fontSize: 13, color: ops.body, mb: 3, lineHeight: 1.5 }}>
-            The link may be invalid or the user id is missing.
-          </Typography>
-          <Button component={Link} href='/apps/users' variant='contained'>
+      <AdminPageShell
+        bare
+        eyebrow='People · user 360'
+        icon='mdi:account-search-outline'
+        title='User not found.'
+        subtitle='The link may be invalid or the user id is missing.'
+        actions={
+          <Button component={Link} href='/apps/users' variant='contained' sx={{ textTransform: 'none' }}>
             Back to users
           </Button>
-        </Box>
-      </Container>
+        }
+      />
     )
   }
 
   return (
-    <Box sx={{ bgcolor: ops.canvasSoft, minHeight: '100%', pb: 6 }}>
-      <Container maxWidth='xl' sx={{ pt: 3 }}>
-        <Stack direction='row' spacing={1.5} alignItems='flex-start' sx={{ mb: 1 }}>
-          <Box
-            sx={{
-              width: 40,
-              height: 40,
-              borderRadius: ops.radiusMd,
-              bgcolor: ops.softIndigo,
-              color: ops.indigo,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-              boxShadow: ops.shadowCard
-            }}
+    <AdminPageShell
+      bare
+      eyebrow='People · user 360'
+      icon='mdi:account-search-outline'
+      title={overviewLoading && !userData ? 'Loading…' : `${displayName}.`}
+      subtitle={
+        email
+          ? `${email} · Full access view for support, moderation, and billing.`
+          : 'Full access view for support, moderation, and billing context.'
+      }
+      actions={
+        <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
+          <Button
+            component={Link}
+            href={listHref}
+            size='small'
+            variant='outlined'
+            sx={{ textTransform: 'none' }}
           >
-            <PersonSearchOutlinedIcon sx={{ fontSize: 22 }} />
-          </Box>
-          <Box>
-            <Typography
-              sx={{
-                fontFamily: ops.mono,
-                fontSize: 11,
-                color: ops.mute,
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                mb: 0.5
-              }}
+            ← {listLabel}
+          </Button>
+          <Button
+            component={Link}
+            href={`/apps/logs?tab=login&userId=${userId}`}
+            size='small'
+            variant='outlined'
+            sx={{ textTransform: 'none' }}
+          >
+            Login history
+          </Button>
+          <Tooltip title='Copy MongoDB user id'>
+            <Button
+              size='small'
+              variant='outlined'
+              startIcon={<ContentCopyOutlinedIcon />}
+              onClick={() => copyText('User ID', userId)}
+              sx={{ textTransform: 'none' }}
             >
-              People · user 360
-            </Typography>
-            <Breadcrumbs sx={{ mb: 0 }} separator='/'>
-              <MuiLink component={Link} href='/home' underline='hover' color='inherit' sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <HomeOutlinedIcon sx={{ fontSize: 18 }} /> Home
-              </MuiLink>
-              <MuiLink component={Link} href={listHref} underline='hover' color='inherit'>
-                {listLabel}
-              </MuiLink>
-              <MuiLink component={Link} href='/apps/users' underline='hover' color='inherit' sx={{ fontSize: 13 }}>
-                All users
-              </MuiLink>
-              <Typography color='text.primary'>User console</Typography>
-            </Breadcrumbs>
-          </Box>
-        </Stack>
-
-        <Stack
-          direction={{ xs: 'column', md: 'row' }}
-          spacing={2}
-          alignItems={{ xs: 'flex-start', md: 'center' }}
-          justifyContent='space-between'
-          sx={{ mb: 2, mt: 2 }}
-        >
-          <Box>
-            <Typography
-              component='h1'
-              sx={{ fontSize: { xs: 24, md: 32 }, fontWeight: 600, letterSpacing: '-0.96px', mb: 0.5 }}
-            >
-              {overviewLoading && !userData ? 'Loading…' : displayName}
-            </Typography>
-            <Typography sx={{ fontSize: 13, color: ops.body, lineHeight: 1.5 }}>
-              Full access view for support, moderation, and billing context.
-            </Typography>
-          </Box>
-          <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
-            <Tooltip title='Copy MongoDB user id'>
-              <Button
-                size='small'
-                variant='outlined'
-                startIcon={<ContentCopyOutlinedIcon />}
-                onClick={() => copyText('User ID', userId)}
-                sx={{ textTransform: 'none' }}
-              >
-                Copy ID
-              </Button>
+              Copy ID
+            </Button>
+          </Tooltip>
+          {email ? (
+            <Tooltip title='Copy email'>
+              <IconButton size='small' onClick={() => copyText('Email', email)} aria-label='copy email'>
+                <ContentCopyOutlinedIcon fontSize='small' />
+              </IconButton>
             </Tooltip>
-            {userData?.user?.email ? (
-              <Tooltip title='Copy email'>
-                <IconButton size='small' onClick={() => copyText('Email', userData.user.email)} aria-label='copy email'>
-                  <ContentCopyOutlinedIcon fontSize='small' />
-                </IconButton>
-              </Tooltip>
-            ) : null}
-          </Stack>
+          ) : null}
         </Stack>
-
-        <Box
-          sx={{
-            borderRadius: ops.radiusLg,
-            bgcolor: ops.canvas,
-            boxShadow: ops.shadowCard,
-            overflow: 'hidden'
-          }}
-        >
-          {overviewLoading && !userData ? (
-            <Box sx={{ py: 12, display: 'flex', justifyContent: 'center' }}>
-              <CircularProgress size={28} sx={{ color: ops.ink }} />
-            </Box>
-          ) : (
-            <AdminUser360Tabs
-              userId={userId}
-              tab={tab}
-              onTabChange={setTab}
-              userData={userData}
-              lessons={lessons}
-              reviews={reviews}
-              assets={assets}
-              timeline={timeline}
-              opsEvents={opsEvents}
-              loadingLessons={lessonsLoading}
-              loadingReviews={reviewsLoading}
-              loadingAssets={assetsLoading}
-              loadingTimeline={timelineLoading}
-              loadingOpsEvents={opsEventsLoading}
-              onRefresh={refreshActiveTab}
-              query={query}
-              onQueryChange={updateSectionQuery}
-              hardDeletePolicy={userData?.policy}
-            />
-          )}
+      }
+    >
+      <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute, mb: 2 }}>
+        <Box component={Link} href='/apps/users' sx={{ color: ops.indigo, textDecoration: 'none' }}>
+          All users
         </Box>
-      </Container>
-    </Box>
+        {' · '}
+        <Box component={Link} href={listHref} sx={{ color: ops.indigo, textDecoration: 'none' }}>
+          {listLabel}
+        </Box>
+        {' · '}
+        {userId}
+      </Typography>
+
+      <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
+        {overviewLoading && !userData ? (
+          <Box sx={{ py: 12, display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress size={28} sx={{ color: ops.ink }} />
+          </Box>
+        ) : (
+          <AdminUser360Tabs
+            userId={userId}
+            tab={tab}
+            onTabChange={setTab}
+            userData={userData}
+            lessons={lessons}
+            reviews={reviews}
+            assets={assets}
+            timeline={timeline}
+            opsEvents={opsEvents}
+            loadingLessons={lessonsLoading}
+            loadingReviews={reviewsLoading}
+            loadingAssets={assetsLoading}
+            loadingTimeline={timelineLoading}
+            loadingOpsEvents={opsEventsLoading}
+            onRefresh={refreshActiveTab}
+            query={query}
+            onQueryChange={updateSectionQuery}
+            hardDeletePolicy={userData?.policy}
+          />
+        )}
+      </OpsSurfaceCard>
+    </AdminPageShell>
   )
 }

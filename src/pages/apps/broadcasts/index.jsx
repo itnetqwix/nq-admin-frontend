@@ -7,9 +7,12 @@ import {
 } from '@mui/material'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminFilterBar from 'src/components/admin/AdminFilterBar'
+import AdminGridContainer from 'src/components/admin/AdminGridContainer'
 import AdminTabs from 'src/components/admin/AdminTabs'
 import { useAdminConfirm } from 'src/components/admin'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
+import OpsMetricTile from 'src/components/admin/OpsMetricTile'
+import OpsSurfaceCard from 'src/components/admin/OpsSurfaceCard'
 import SendIcon from '@mui/icons-material/Send'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import VisibilityIcon from '@mui/icons-material/Visibility'
@@ -554,56 +557,91 @@ export default function BroadcastsPage() {
         {/* ─── HISTORY TAB ─────────────────────────────────── */}
         {tab === 1 && (
           <AdminPageSection>
-            {deliveryStats?.dailyDeliveries?.length ? (
-              <Box
-                sx={{
-                  mb: 2,
-                  p: 1.5,
-                  borderRadius: ops.radiusMd,
-                  border: `1px solid ${ops.hairline}`,
-                  bgcolor: ops.canvasSoft,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 2,
-                  flexWrap: 'wrap'
-                }}
-              >
-                {(() => {
-                  const sentSeries = fillDailySeries(deliveryStats.dailyDeliveries, 14, 'sent')
-                  const failedSeries = fillDailySeries(deliveryStats.dailyDeliveries, 14, 'failed')
-                  return (
-                    <>
-                      <Box>
-                        <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute, mb: 0.5 }}>
-                          Platform deliveries · 14d
-                        </Typography>
-                        <MiniSparkline values={sentSeries} width={160} height={32} />
-                      </Box>
-                      <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.body }}>
-                        {sentSeries.reduce((a, b) => a + b, 0)} sent · {failedSeries.reduce((a, b) => a + b, 0)} failed
+            {(() => {
+              const sentSeries = deliveryStats?.dailyDeliveries?.length
+                ? fillDailySeries(deliveryStats.dailyDeliveries, 14, 'sent')
+                : []
+              const failedSeries = deliveryStats?.dailyDeliveries?.length
+                ? fillDailySeries(deliveryStats.dailyDeliveries, 14, 'failed')
+                : []
+              const sentTotal = sentSeries.reduce((a, b) => a + b, 0)
+              const failedTotal = failedSeries.reduce((a, b) => a + b, 0)
+              return (
+                <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
+                  <Grid item xs={6} sm={3}>
+                    <OpsMetricTile
+                      icon='mdi:send-check'
+                      label='Sent (14d)'
+                      value={String(sentTotal)}
+                      hint='Platform deliveries'
+                      tone='accent'
+                    />
+                  </Grid>
+                  <Grid item xs={6} sm={3}>
+                    <OpsMetricTile
+                      icon='mdi:alert-circle-outline'
+                      label='Failed (14d)'
+                      value={String(failedTotal)}
+                      hint='Delivery errors'
+                      tone={failedTotal > 0 ? 'danger' : 'default'}
+                    />
+                  </Grid>
+                  <Grid item xs={6} sm={3}>
+                    <OpsMetricTile
+                      icon='mdi:history'
+                      label='In this view'
+                      value={String(total)}
+                      hint='Matching search'
+                    />
+                  </Grid>
+                  <Grid item xs={6} sm={3}>
+                    <Box
+                      sx={{
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        px: 1,
+                        py: 1.5,
+                        borderRadius: ops.radiusMd,
+                        border: `1px solid ${ops.hairline}`,
+                        bgcolor: ops.canvasSoft
+                      }}
+                    >
+                      <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute, mb: 0.5 }}>
+                        14d trend
                       </Typography>
-                    </>
-                  )
-                })()}
+                      <MiniSparkline values={sentSeries} width={96} height={28} />
+                    </Box>
+                  </Grid>
+                </Grid>
+              )
+            })()}
+            <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
+              <Box sx={{ p: { xs: 2, sm: 2.5 }, borderBottom: `1px solid ${ops.hairline}` }}>
+                <AdminFilterBar
+                  searchPlaceholder='Search broadcasts…'
+                  onSearchChange={handleSearchChange}
+                  resultCount={total}
+                  onRefresh={() => void fetchHistory()}
+                  refreshLoading={loading}
+                />
               </Box>
-            ) : null}
-            <AdminFilterBar
-              searchPlaceholder='Search broadcasts…'
-              onSearchChange={handleSearchChange}
-              resultCount={total}
-              onRefresh={() => void fetchHistory()}
-              refreshLoading={loading}
-            />
-            <AdminDataGrid
-              rows={broadcasts}
-              columns={historyColumns}
-              loading={loading}
-              rowCount={total}
-              paginationMode='server'
-              paginationModel={{ page: page - 1, pageSize }}
-              onPaginationModelChange={m => { setPage(m.page + 1); setPageSize(m.pageSize) }}
-              sx={{ '& .MuiDataGrid-cell': { py: 1 } }}
-            />
+              <AdminGridContainer>
+                <AdminDataGrid
+                  autoHeight={false}
+                  rows={broadcasts}
+                  columns={historyColumns}
+                  loading={loading}
+                  rowCount={total}
+                  paginationMode='server'
+                  paginationModel={{ page: page - 1, pageSize }}
+                  onPaginationModelChange={m => { setPage(m.page + 1); setPageSize(m.pageSize) }}
+                  sx={{ '& .MuiDataGrid-cell': { py: 1 } }}
+                  emptyMessage='No broadcasts in this view.'
+                />
+              </AdminGridContainer>
+            </OpsSurfaceCard>
           </AdminPageSection>
         )}
       </AdminPageShell>
