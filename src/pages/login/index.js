@@ -51,7 +51,7 @@ const LoginPage = () => {
 
   const onSubmit = data => {
     const { email, password } = data
-    auth.login({ email, password }, err => {
+    auth.login({ email, password, rememberMe }, err => {
       setError('email', {
         type: 'manual',
         message: err ?? 'Email or Password is invalid'
@@ -66,7 +66,7 @@ const LoginPage = () => {
       return
     }
     if (!payload) return
-    await auth.loginWithGoogle(payload, err => setGoogleError(err || 'Google sign-in failed'))
+    await auth.loginWithGoogle({ ...payload, rememberMe }, err => setGoogleError(err || 'Google sign-in failed'))
   }
 
   return (
@@ -139,7 +139,7 @@ const LoginPage = () => {
         </FormControl>
         <Box sx={{ my: 2.5, display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
           <FormControlLabel
-            label='Remember me'
+            label='Remember me (2 weeks)'
             control={<Checkbox checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} size='small' />}
             sx={{ '& .MuiFormControlLabel-label': { fontSize: 13, color: ops.body } }}
           />

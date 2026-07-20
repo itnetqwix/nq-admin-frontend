@@ -3,5 +3,9 @@ export default {
   loginEndpoint: '/jwt/login',
   registerEndpoint: '/auth/signup',
   storageTokenKeyName: 'accessToken',
-  onTokenExpiration: 'logout' // logout | refreshToken (refresh not implemented in admin app)
+  storageRefreshKeyName: 'refreshToken',
+  storageRememberKeyName: 'rememberMe',
+  /** Refresh endpoint — POST { refresh_token } */
+  refreshEndpoint: '/auth/refresh',
+  onTokenExpiration: 'refreshToken'
 }

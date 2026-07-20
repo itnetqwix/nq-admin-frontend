@@ -1,6 +1,5 @@
-import authConfig from 'src/configs/auth'
-import toast from 'react-hot-toast'
 import { clearLogRocketUser } from 'src/lib/logrocket'
+import { clearAuthStorage as clearStores } from 'src/utils/authStorage'
 
 let sessionExpiredCallback = null
 let handlingSessionExpired = false
@@ -14,9 +13,7 @@ export function isUnauthorizedResponse(response) {
 }
 
 export function clearAuthStorage() {
-  if (typeof window === 'undefined') return
-  window.localStorage.removeItem('userData')
-  window.localStorage.removeItem(authConfig.storageTokenKeyName)
+  clearStores()
 }
 
 export function handleSessionExpired(message = 'Session expired. Please sign in again.') {
@@ -28,7 +25,8 @@ export function handleSessionExpired(message = 'Session expired. Please sign in 
   sessionExpiredCallback?.()
 
   if (!window.location.pathname.includes('/login')) {
-    toast.error(message)
+    // lazy require avoids circular import issues in some SSR paths
+    import('react-hot-toast').then(({ default: toast }) => toast.error(message)).catch(() => {})
     window.location.assign('/login')
   } else {
     handlingSessionExpired = false

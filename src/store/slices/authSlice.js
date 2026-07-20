@@ -4,6 +4,13 @@ import {
   clearAuthStorage,
   isUnauthorizedResponse
 } from 'src/utils/sessionExpired'
+import {
+  persistSession,
+  readStoredToken,
+  isRememberMeEnabled,
+  purgeIfEphemeralSessionEnded
+} from 'src/utils/authStorage'
+import { refreshAdminAccessToken } from 'src/utils/authRefresh'
 import { clearLogRocketUser, identifyLogRocketUser } from 'src/lib/logrocket'
 import { identifyClarityUser } from 'src/lib/clarity'
 
@@ -13,17 +20,6 @@ function isAdminAccount(accountType) {
   return String(accountType || '')
     .trim()
     .toLowerCase() === 'admin'
-}
-
-function persistSession(token, userInfo) {
-  if (typeof window === 'undefined') return
-  if (token) window.localStorage.setItem(authConfig.storageTokenKeyName, token)
-  if (userInfo) window.localStorage.setItem('userData', JSON.stringify(userInfo))
-}
-
-function readStoredToken() {
-  if (typeof window === 'undefined') return null
-  return window.localStorage.getItem(authConfig.storageTokenKeyName)
 }
 
 async function fetchMe(token) {
@@ -44,18 +40,38 @@ async function fetchMe(token) {
   return response.userInfo
 }
 
-/** Cold start: token in localStorage → /user/me */
+/** Cold start: token in storage → /user/me (refresh if access expired). */
 export const bootstrapSession = createAsyncThunk('auth/bootstrap', async (_, { rejectWithValue }) => {
-  const token = readStoredToken()
+  purgeIfEphemeralSessionEnded()
+  let token = readStoredToken()
+  if (!token) {
+    const refreshed = await refreshAdminAccessToken()
+    token = refreshed
+  }
   if (!token) return { user: null }
   try {
     const userInfo = await fetchMe(token)
     identifyLogRocketUser(userInfo)
     identifyClarityUser(userInfo)
-    persistSession(token, userInfo)
+    persistSession(token, userInfo, {
+      rememberMe: isRememberMeEnabled(),
+      refreshToken: undefined
+    })
     return { user: userInfo, token }
   } catch (e) {
     if (e?.code === 'UNAUTHORIZED') {
+      const refreshed = await refreshAdminAccessToken()
+      if (refreshed) {
+        try {
+          const userInfo = await fetchMe(refreshed)
+          identifyLogRocketUser(userInfo)
+          identifyClarityUser(userInfo)
+          persistSession(refreshed, userInfo, { rememberMe: isRememberMeEnabled() })
+          return { user: userInfo, token: refreshed }
+        } catch {
+          /* fall through */
+        }
+      }
       clearAuthStorage()
       clearLogRocketUser()
       return { user: null }
@@ -67,12 +83,12 @@ export const bootstrapSession = createAsyncThunk('auth/bootstrap', async (_, { r
 /** Email / password admin login */
 export const loginPassword = createAsyncThunk(
   'auth/loginPassword',
-  async ({ email, password }, { rejectWithValue }) => {
+  async ({ email, password, rememberMe = true }, { rejectWithValue }) => {
     try {
       const res = await fetch(`${apiBase()}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password, rememberMe: Boolean(rememberMe) })
       })
       const response = await res.json()
       if (response?.code === 400 || response?.status === 'fail' || !res.ok) {
@@ -80,11 +96,15 @@ export const loginPassword = createAsyncThunk(
       }
       const accountType = response?.result?.data?.account_type
       const accessToken = response?.result?.data?.access_token
+      const refreshToken = response?.result?.data?.refresh_token
       if (!accessToken) return rejectWithValue('Login failed: access token not found.')
       if (!isAdminAccount(accountType)) return rejectWithValue('Please login with admin account')
 
       const userInfo = await fetchMe(accessToken)
-      persistSession(accessToken, userInfo)
+      persistSession(accessToken, userInfo, {
+        rememberMe: Boolean(rememberMe),
+        refreshToken
+      })
       identifyLogRocketUser(userInfo)
       identifyClarityUser(userInfo)
       return { user: userInfo, token: accessToken, method: 'password' }
@@ -97,7 +117,7 @@ export const loginPassword = createAsyncThunk(
 /** Google GIS → verify-google-login (existing Admin only) */
 export const loginGoogle = createAsyncThunk(
   'auth/loginGoogle',
-  async ({ email, id_token }, { rejectWithValue }) => {
+  async ({ email, id_token, rememberMe = true }, { rejectWithValue }) => {
     try {
       const res = await fetch(`${apiBase()}/auth/verify-google-login`, {
         method: 'POST',
@@ -119,13 +139,17 @@ export const loginGoogle = createAsyncThunk(
       const tokens = payload?.data || payload
       const accountType = tokens?.account_type
       const accessToken = tokens?.access_token
+      const refreshToken = tokens?.refresh_token
       if (!accessToken) return rejectWithValue('Google sign-in failed: no access token.')
       if (!isAdminAccount(accountType)) {
         return rejectWithValue('This Google account is not an administrator.')
       }
 
       const userInfo = await fetchMe(accessToken)
-      persistSession(accessToken, userInfo)
+      persistSession(accessToken, userInfo, {
+        rememberMe: Boolean(rememberMe),
+        refreshToken
+      })
       identifyLogRocketUser(userInfo)
       identifyClarityUser(userInfo)
       return { user: userInfo, token: accessToken, method: 'google' }
