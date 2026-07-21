@@ -44,6 +44,17 @@ export async function rejectTrainerVerification(userId, reason) {
   return data?.data ?? data
 }
 
+export async function requestTrainerChanges(userId, message) {
+  const res = await fetch(api(`/admin/trainer-verifications/${userId}/request-changes`), {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({ message })
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data?.message || 'Request changes failed')
+  return data?.data ?? data
+}
+
 export async function getPendingVerificationCount() {
   const res = await fetch(api('/admin/trainer-verifications/pending-count'), { headers: headers() })
   const data = await res.json().catch(() => ({}))

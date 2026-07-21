@@ -25,7 +25,8 @@ import {
   approveTrainerVerification,
   getTrainerVerificationDetail,
   getTrainerVerifications,
-  rejectTrainerVerification
+  rejectTrainerVerification,
+  requestTrainerChanges
 } from 'src/services/verificationApi'
 
 const fmtInt = v => new Intl.NumberFormat('en-US').format(Number(v) || 0)
@@ -36,22 +37,26 @@ export default function TrainerVerificationsPage() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [detail, setDetail] = useState(null)
   const [rejectReason, setRejectReason] = useState('')
+  const [feedbackMessage, setFeedbackMessage] = useState('')
   const [acting, setActing] = useState(false)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
+  const [queueFilter, setQueueFilter] = useState('under_review') // under_review | feedback | all
   const [slaFilter, setSlaFilter] = useState('') // '' | pending | escalated
   const searchTimer = useRef(null)
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await getTrainerVerifications({ limit: 100 })
+      const data = await getTrainerVerifications({ limit: 100, queue: queueFilter })
       setRows(
         (data?.items || []).map((r, i) => ({
           id: r._id || i,
           ...r,
           submitted: r.trainer_verification?.submitted_for_review_at,
-          escalated: Boolean(r.trainer_verification?.review_escalated_at)
+          escalated: Boolean(r.trainer_verification?.review_escalated_at),
+          resubmitted: Boolean(r.trainer_verification?.trainer_resubmitted_at),
+          step: r.trainer_verification?.onboarding_step
         }))
       )
     } catch (e) {
@@ -60,7 +65,7 @@ export default function TrainerVerificationsPage() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [queueFilter])
 
   useEffect(() => {
     void load()
@@ -91,10 +96,12 @@ export default function TrainerVerificationsPage() {
 
   const metrics = useMemo(() => {
     const escalated = rows.filter(r => r.escalated).length
+    const resubmitted = rows.filter(r => r.resubmitted).length
     return {
       total: rows.length,
       escalated,
-      pending: rows.length - escalated
+      pending: rows.length - escalated,
+      resubmitted
     }
   }, [rows])
 
@@ -103,6 +110,7 @@ export default function TrainerVerificationsPage() {
       const d = await getTrainerVerificationDetail(row.id)
       setDetail(d)
       setRejectReason('')
+      setFeedbackMessage(d?.user?.trainer_verification?.feedback_message || '')
       setDrawerOpen(true)
     } catch (e) {
       toast.error(e?.message || 'Failed to load detail')
@@ -114,7 +122,7 @@ export default function TrainerVerificationsPage() {
     setActing(true)
     try {
       await approveTrainerVerification(detail.user._id)
-      toast.success('Trainer approved')
+      toast.success('Trainer confirmed')
       setDrawerOpen(false)
       void load()
     } catch (e) {
@@ -142,6 +150,24 @@ export default function TrainerVerificationsPage() {
     }
   }
 
+  const handleRequestChanges = async () => {
+    if (!detail?.user?._id || !feedbackMessage.trim()) {
+      toast.error('Feedback message required')
+      return
+    }
+    setActing(true)
+    try {
+      await requestTrainerChanges(detail.user._id, feedbackMessage.trim())
+      toast.success('Feedback sent to trainer')
+      setDrawerOpen(false)
+      void load()
+    } catch (e) {
+      toast.error(e?.message || 'Request changes failed')
+    } finally {
+      setActing(false)
+    }
+  }
+
   const columns = [
     {
       field: 'submitted',
@@ -152,6 +178,17 @@ export default function TrainerVerificationsPage() {
     { field: 'fullname', headerName: 'Name', flex: 1, minWidth: 160 },
     { field: 'email', headerName: 'Email', flex: 1, minWidth: 180 },
     {
+      field: 'step',
+      headerName: 'Status',
+      width: 130,
+      renderCell: p => {
+        const step = p.row.step
+        if (step === 'feedback') return <Chip size='small' color='warning' label='Feedback' />
+        if (p.row.resubmitted) return <Chip size='small' color='info' label='Updated' />
+        return <Chip size='small' label='Under review' />
+      }
+    },
+    {
       field: 'escalated',
       headerName: 'SLA',
       width: 110,
@@ -159,7 +196,7 @@ export default function TrainerVerificationsPage() {
         p.row.escalated ? (
           <Chip size='small' color='error' label='Overdue' />
         ) : (
-          <Chip size='small' label='Pending' />
+          <Chip size='small' label='On track' />
         )
     }
   ]
@@ -170,29 +207,29 @@ export default function TrainerVerificationsPage() {
       eyebrow='People · verifications'
       icon='mdi:account-check-outline'
       title='Trainer verifications.'
-      subtitle='Review face liveness and profile before granting access.'
+      subtitle='Confirm profiles, request changes, or reject. Soft-gate trainers wait on Locker until confirmed.'
       actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}
     >
       <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
-        <Grid item xs={6} sm={4}>
+        <Grid item xs={6} sm={3}>
           <OpsMetricTile
             icon='mdi:account-clock'
             label='In queue'
             value={fmtInt(metrics.total)}
-            hint='Awaiting review'
+            hint='Current filter'
             onClick={() => setSlaFilter('')}
           />
         </Grid>
-        <Grid item xs={6} sm={4}>
+        <Grid item xs={6} sm={3}>
           <OpsMetricTile
             icon='mdi:timer-sand'
-            label='Pending SLA'
+            label='On track'
             value={fmtInt(metrics.pending)}
-            hint='Within window'
+            hint='Within SLA'
             onClick={() => setSlaFilter('pending')}
           />
         </Grid>
-        <Grid item xs={6} sm={4}>
+        <Grid item xs={6} sm={3}>
           <OpsMetricTile
             icon='mdi:alert-octagon'
             label='Escalated'
@@ -200,6 +237,14 @@ export default function TrainerVerificationsPage() {
             hint='Overdue'
             tone={metrics.escalated > 0 ? 'danger' : 'default'}
             onClick={() => setSlaFilter('escalated')}
+          />
+        </Grid>
+        <Grid item xs={6} sm={3}>
+          <OpsMetricTile
+            icon='mdi:refresh'
+            label='Updated'
+            value={fmtInt(metrics.resubmitted)}
+            hint='Trainer resubmitted'
           />
         </Grid>
       </Grid>
@@ -218,13 +263,25 @@ export default function TrainerVerificationsPage() {
               <TextField
                 select
                 size='small'
+                label='Queue'
+                value={queueFilter}
+                onChange={e => setQueueFilter(e.target.value)}
+                sx={{ minWidth: 160 }}
+              >
+                <MenuItem value='under_review'>Under review</MenuItem>
+                <MenuItem value='feedback'>Awaiting trainer</MenuItem>
+                <MenuItem value='all'>All open</MenuItem>
+              </TextField>
+              <TextField
+                select
+                size='small'
                 label='SLA'
                 value={slaFilter}
                 onChange={e => setSlaFilter(e.target.value)}
                 sx={{ minWidth: 140 }}
               >
                 <MenuItem value=''>All</MenuItem>
-                <MenuItem value='pending'>Pending</MenuItem>
+                <MenuItem value='pending'>On track</MenuItem>
                 <MenuItem value='escalated'>Escalated</MenuItem>
               </TextField>
             </AdminFilterBar>
@@ -236,7 +293,7 @@ export default function TrainerVerificationsPage() {
               columns={columns}
               loading={loading}
               onRowClick={p => void openDetail(p.row)}
-              emptyMessage='No trainers awaiting verification.'
+              emptyMessage='No trainers in this queue.'
               emptyDescription='Clear filters or refresh the queue.'
             />
           </AdminGridContainer>
@@ -256,6 +313,12 @@ export default function TrainerVerificationsPage() {
               {detail.user.email} · {detail.user.mobile_no}
             </Typography>
             <Typography variant='body2'>Category: {detail.user.category || '—'}</Typography>
+            <Typography variant='body2'>
+              Step: {detail.user.trainer_verification?.onboarding_step || '—'}
+              {detail.user.trainer_verification?.trainer_resubmitted_at
+                ? ' · Updated since last review'
+                : ''}
+            </Typography>
             {detail.user.trainer_verification?.face ? (
               <Typography variant='body2'>
                 Liveness: {detail.user.trainer_verification.face.liveness_status} (
@@ -266,12 +329,30 @@ export default function TrainerVerificationsPage() {
               <Box component='img' src={detail.selfieUrl} alt='Selfie' sx={{ width: '100%', borderRadius: 1 }} />
             ) : (
               <Typography variant='caption' color='text.secondary'>
-                Selfie preview unavailable (mock mode or missing S3 key)
+                Selfie preview unavailable
               </Typography>
             )}
             <Button component={Link} href={`/apps/users/${detail.user._id}`} variant='outlined' size='small'>
               Open User 360
             </Button>
+
+            <TextField
+              label='Feedback for trainer'
+              multiline
+              minRows={3}
+              value={feedbackMessage}
+              onChange={e => setFeedbackMessage(e.target.value)}
+              placeholder='What should they update on their NetQwix profile?'
+            />
+            <Button
+              variant='outlined'
+              disabled={acting}
+              onClick={() => void handleRequestChanges()}
+              sx={{ textTransform: 'none' }}
+            >
+              Request changes
+            </Button>
+
             <TextField
               label='Rejection reason'
               multiline
@@ -286,7 +367,7 @@ export default function TrainerVerificationsPage() {
                 onClick={() => void handleApprove()}
                 sx={{ textTransform: 'none', bgcolor: ops.ink }}
               >
-                Approve
+                Confirm
               </Button>
               <Button
                 variant='outlined'
