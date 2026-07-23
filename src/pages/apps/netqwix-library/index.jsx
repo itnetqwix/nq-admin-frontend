@@ -104,6 +104,97 @@ function catIdOf(c) {
   return String(c?.id || c?._id || '')
 }
 
+function LibraryClipThumb({ clip, onPlay }) {
+  const [src, setSrc] = useState(() => clip?.thumbnailUrl || safeImg(clip?.thumbnail) || '')
+  const [triedSigned, setTriedSigned] = useState(Boolean(clip?.thumbnailUrl))
+
+  useEffect(() => {
+    setSrc(clip?.thumbnailUrl || safeImg(clip?.thumbnail) || '')
+    setTriedSigned(Boolean(clip?.thumbnailUrl))
+  }, [clip?._id, clip?.thumbnail, clip?.thumbnailUrl])
+
+  const onImgError = async () => {
+    if (triedSigned || !clip?._id) {
+      setSrc('')
+      return
+    }
+    setTriedSigned(true)
+    try {
+      const urls = await getClipPlayUrl(String(clip._id))
+      const next = urls?.thumbnailUrl || ''
+      if (next) setSrc(next)
+      else setSrc('')
+    } catch {
+      setSrc('')
+    }
+  }
+
+  return (
+    <Box
+      onClick={onPlay}
+      role='button'
+      tabIndex={0}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onPlay?.()
+        }
+      }}
+      sx={{
+        position: 'relative',
+        pt: '56.25%',
+        bgcolor: ops.canvasSoft2,
+        cursor: 'pointer',
+        overflow: 'hidden',
+        '&:hover .playOverlay': { opacity: 1 }
+      }}
+    >
+      {src ? (
+        <Box
+          component='img'
+          src={src}
+          alt=''
+          onError={() => void onImgError()}
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover'
+          }}
+        />
+      ) : null}
+      <Box
+        className='playOverlay'
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          bgcolor: 'rgba(0,0,0,0.35)',
+          opacity: 0.85,
+          transition: 'opacity 0.15s ease'
+        }}
+      >
+        <Box
+          sx={{
+            width: 48,
+            height: 48,
+            borderRadius: '50%',
+            bgcolor: 'rgba(255,255,255,0.92)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <PlayArrowRoundedIcon sx={{ fontSize: 32, color: ops.indigo }} />
+        </Box>
+      </Box>
+    </Box>
+  )
+}
+
 export default function NetqwixLibraryPage() {
   const router = useRouter()
   const { confirm, ConfirmDialog } = useAdminConfirm()
@@ -568,7 +659,6 @@ export default function NetqwixLibraryPage() {
                           {(sub.clips || []).map(c => {
                             const id = String(c._id)
                             const busy = busyId === id
-                            const thumb = safeImg(c.thumbnail)
                             return (
                               <Grid item xs={12} sm={6} md={4} lg={3} key={id}>
                                 <OpsSurfaceCard
@@ -581,55 +671,7 @@ export default function NetqwixLibraryPage() {
                                     bgcolor: ops.canvas
                                   }}
                                 >
-                                  <Box
-                                    onClick={() => setPlayClipId(id)}
-                                    role='button'
-                                    tabIndex={0}
-                                    onKeyDown={e => {
-                                      if (e.key === 'Enter' || e.key === ' ') {
-                                        e.preventDefault()
-                                        setPlayClipId(id)
-                                      }
-                                    }}
-                                    sx={{
-                                      position: 'relative',
-                                      pt: '56.25%',
-                                      bgcolor: ops.canvasSoft2,
-                                      backgroundImage: thumb ? `url(${thumb})` : undefined,
-                                      backgroundSize: 'cover',
-                                      backgroundPosition: 'center',
-                                      cursor: 'pointer',
-                                      '&:hover .playOverlay': { opacity: 1 }
-                                    }}
-                                  >
-                                    <Box
-                                      className='playOverlay'
-                                      sx={{
-                                        position: 'absolute',
-                                        inset: 0,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        bgcolor: 'rgba(0,0,0,0.35)',
-                                        opacity: 0.85,
-                                        transition: 'opacity 0.15s ease'
-                                      }}
-                                    >
-                                      <Box
-                                        sx={{
-                                          width: 48,
-                                          height: 48,
-                                          borderRadius: '50%',
-                                          bgcolor: 'rgba(255,255,255,0.92)',
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          justifyContent: 'center'
-                                        }}
-                                      >
-                                        <PlayArrowRoundedIcon sx={{ fontSize: 32, color: ops.indigo }} />
-                                      </Box>
-                                    </Box>
-                                  </Box>
+                                  <LibraryClipThumb clip={c} onPlay={() => setPlayClipId(id)} />
                                   <Box sx={{ p: 1.5, flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
                                     <Typography
                                       sx={{
