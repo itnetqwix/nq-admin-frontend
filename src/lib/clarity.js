@@ -8,13 +8,32 @@ const PROJECT_ID = String(process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID ?? '')
 let inited = false
 let lastCustomId = null
 
+/** Ad blockers block clarity.ms — treat as optional telemetry, not a hard dependency. */
+function clarityBlocked(): boolean {
+  if (typeof window === 'undefined') return true
+  try {
+    return window.localStorage.getItem('nq:clarity-blocked') === '1'
+  } catch {
+    return false
+  }
+}
+
+function markClarityBlocked() {
+  try {
+    window.localStorage.setItem('nq:clarity-blocked', '1')
+  } catch {
+    /* private mode */
+  }
+}
+
 export function initClarity() {
-  if (typeof window === 'undefined' || inited || !PROJECT_ID) return
+  if (typeof window === 'undefined' || inited || !PROJECT_ID || clarityBlocked()) return
   try {
     Clarity.init(PROJECT_ID)
     Clarity.setTag('app', 'admin')
     inited = true
   } catch (err) {
+    markClarityBlocked()
     if (process.env.NODE_ENV !== 'production') {
       // eslint-disable-next-line no-console
       console.warn('[Clarity] init failed:', err)
