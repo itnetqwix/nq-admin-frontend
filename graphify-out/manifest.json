@@ -755,8 +755,8 @@
     "semantic_hash": ""
   },
   "src/configs/auth.js": {
-    "mtime": 1780571283.5275612,
-    "ast_hash": "8bb982495e9570cc2f1d9a83bfcc5c06",
+    "mtime": 1784530466.4631698,
+    "ast_hash": "cbb4fe59b68ca08f28feb491f251375e",
     "semantic_hash": ""
   },
   "src/configs/themeConfig.js": {
@@ -935,8 +935,8 @@
     "semantic_hash": ""
   },
   "src/navigation/horizontal/index.js": {
-    "mtime": 1784357131.674951,
-    "ast_hash": "1441a277c3e164c1e8fbe05c063cd8a2",
+    "mtime": 1784544933.150773,
+    "ast_hash": "cd00ecfcdec376ac96836800c3407b6e",
     "semantic_hash": ""
   },
   "src/navigation/vertical/index.js": {
@@ -975,8 +975,8 @@
     "semantic_hash": ""
   },
   "src/pages/apps/account-deletions/index.jsx": {
-    "mtime": 1784374409.7189553,
-    "ast_hash": "1ee0259e600287eedbccd50dc98f65f5",
+    "mtime": 1784544851.221907,
+    "ast_hash": "962f167d3d3e45cbc3d35222ec2acd6e",
     "semantic_hash": ""
   },
   "src/pages/apps/audit-logs/index.js": {
@@ -995,8 +995,8 @@
     "semantic_hash": ""
   },
   "src/pages/apps/broadcasts/index.jsx": {
-    "mtime": 1784391919.142713,
-    "ast_hash": "13acd2d5bc0864941ffeafbf54769a12",
+    "mtime": 1784544877.479095,
+    "ast_hash": "12a06a0ca187e0523f31f64a408739b0",
     "semantic_hash": ""
   },
   "src/pages/apps/call-diagnostics/index.js": {
@@ -1005,8 +1005,8 @@
     "semantic_hash": ""
   },
   "src/pages/apps/clip-taxonomy/index.jsx": {
-    "mtime": 1784390781.6562002,
-    "ast_hash": "11c6fa793fc74baa7f426869e356890c",
+    "mtime": 1784544852.8317862,
+    "ast_hash": "58d87e698147c1776b38bb3606b17e89",
     "semantic_hash": ""
   },
   "src/pages/apps/cms-blog/index.jsx": {
@@ -1035,8 +1035,8 @@
     "semantic_hash": ""
   },
   "src/pages/apps/finance/index.js": {
-    "mtime": 1784391866.1140468,
-    "ast_hash": "4c424165b371bf9722b1f053493739c5",
+    "mtime": 1784394730.8129835,
+    "ast_hash": "0f7651d7a292c5b0b79381882f2701d1",
     "semantic_hash": ""
   },
   "src/pages/apps/library-submissions/index.jsx": {
@@ -1055,8 +1055,8 @@
     "semantic_hash": ""
   },
   "src/pages/apps/netqwix-library/index.jsx": {
-    "mtime": 1784390835.7609313,
-    "ast_hash": "dd95227ce290e0bae3fb697fe6934ef4",
+    "mtime": 1784788773.7610247,
+    "ast_hash": "cf69001358f7e7754a495ff93a63a9a0",
     "semantic_hash": ""
   },
   "src/pages/apps/ops-logs/index.js": {
@@ -1090,18 +1090,18 @@
     "semantic_hash": ""
   },
   "src/pages/apps/pricing/index.jsx": {
-    "mtime": 1784391885.3718371,
-    "ast_hash": "98a5d258c0b460a4eac107d812adb8b2",
+    "mtime": 1784394550.1971068,
+    "ast_hash": "11392f951fbbbbcc40972d420bd1348d",
     "semantic_hash": ""
   },
   "src/pages/apps/promo-codes/index.jsx": {
-    "mtime": 1784391950.8800118,
-    "ast_hash": "c94fba5d5a114e527bf3d16284ed113e",
+    "mtime": 1784544866.5830474,
+    "ast_hash": "c15c597e9066d361b068e31d5c0d8ffc",
     "semantic_hash": ""
   },
   "src/pages/apps/referrals/index.jsx": {
-    "mtime": 1784391908.2486005,
-    "ast_hash": "8fd33d5014633c6f4186ce83c258aa9e",
+    "mtime": 1784544893.2431455,
+    "ast_hash": "25ae34372f615c5069f4849fdf3678c3",
     "semantic_hash": ""
   },
   "src/pages/apps/tips/index.jsx": {
@@ -1110,13 +1110,13 @@
     "semantic_hash": ""
   },
   "src/pages/apps/trainer-verifications/index.js": {
-    "mtime": 1784374409.7152212,
-    "ast_hash": "b7eb6f06d88f69dec38d6c34e8d1cce5",
+    "mtime": 1784653084.204189,
+    "ast_hash": "a3fb8eadf539c64b4c78a78d1a803d34",
     "semantic_hash": ""
   },
   "src/pages/apps/users/[id].jsx": {
-    "mtime": 1784374455.0720017,
-    "ast_hash": "944d0f6e5e5a1b961f8531f2c6092cc4",
+    "mtime": 1784544646.2823668,
+    "ast_hash": "76bb4fe0ecd59c2bf56c2349558d5104",
     "semantic_hash": ""
   },
   "src/pages/apps/write-by-user/index.js": {
@@ -1200,8 +1200,8 @@
     "semantic_hash": ""
   },
   "src/pages/home/index.js": {
-    "mtime": 1784389927.395386,
-    "ast_hash": "6d0dfc84d57792c7a4d33009291bb57c",
+    "mtime": 1784394721.9856155,
+    "ast_hash": "ac215e4773608a50f2112bdcb17a29ab",
     "semantic_hash": ""
   },
   "src/pages/index.js": {
@@ -1210,8 +1210,8 @@
     "semantic_hash": ""
   },
   "src/pages/login/index.js": {
-    "mtime": 1784373829.4770062,
-    "ast_hash": "718ad2d43df481c30e64d308f0451149",
+    "mtime": 1784530472.1355946,
+    "ast_hash": "b6060f03835f6f9504846f857822f84c",
     "semantic_hash": ""
   },
   "src/pages/register/index.js": {
@@ -1250,13 +1250,13 @@
     "semantic_hash": ""
   },
   "src/services/broadcastApi.js": {
-    "mtime": 1780571283.5411777,
-    "ast_hash": "a7224c55ccd81ddf5b703dbcf2927210",
+    "mtime": 1784394732.54813,
+    "ast_hash": "46a1f546f269898aebfe563e2cfe3d5d",
     "semantic_hash": ""
   },
   "src/services/clipsAdminApi.js": {
-    "mtime": 1781333699.3628936,
-    "ast_hash": "d1b2eb6dc79f5484fd2e2c6c94517e15",
+    "mtime": 1784788708.1117961,
+    "ast_hash": "293fe95cbb461a47d893211aaa996bb7",
     "semantic_hash": ""
   },
   "src/services/cmsApi.js": {
@@ -1270,8 +1270,8 @@
     "semantic_hash": ""
   },
   "src/services/financeApi.js": {
-    "mtime": 1782368093.238324,
-    "ast_hash": "e65e537e4a901acc38c7c2db2b45a42a",
+    "mtime": 1784394713.8772266,
+    "ast_hash": "aed55e0183cd5ab88c383052d2ca5ccb",
     "semantic_hash": ""
   },
   "src/services/opsApi.js": {
@@ -1300,13 +1300,13 @@
     "semantic_hash": ""
   },
   "src/services/user360Api.js": {
-    "mtime": 1784388832.0887496,
-    "ast_hash": "b0759d58415d3668de4215b8d2cab6a8",
+    "mtime": 1784394466.5235977,
+    "ast_hash": "0d05a861ef5407e0b6e89efd1964fbfc",
     "semantic_hash": ""
   },
   "src/services/verificationApi.js": {
-    "mtime": 1780571283.542464,
-    "ast_hash": "84c31ef5c14d1d728c1fb65cd96482a7",
+    "mtime": 1784653047.5694585,
+    "ast_hash": "24f6a376e05cbedc831eb91c8361b1f3",
     "semantic_hash": ""
   },
   "src/utils/apiBase.js": {
@@ -1335,8 +1335,8 @@
     "semantic_hash": ""
   },
   "src/utils/sessionExpired.js": {
-    "mtime": 1783492741.1459892,
-    "ast_hash": "e2ba13290f43561b9b6390de76b01c2b",
+    "mtime": 1784530469.9365277,
+    "ast_hash": "782bf5fa0f871b33f4e421724fe48712",
     "semantic_hash": ""
   },
   "src/utils/utils.js": {
@@ -1560,8 +1560,8 @@
     "semantic_hash": ""
   },
   "src/components/admin/AdminConfirmDialog.jsx": {
-    "mtime": 1781767184.2073553,
-    "ast_hash": "705074ce483773824bf11fbc5e0f4681",
+    "mtime": 1784394547.7332616,
+    "ast_hash": "b9ec0f8a4b756b777b5ff0b3b409281a",
     "semantic_hash": ""
   },
   "src/components/admin/AdminEmptyState.jsx": {
@@ -1670,8 +1670,8 @@
     "semantic_hash": ""
   },
   "src/pages/apps/trainee-account-reviews/index.js": {
-    "mtime": 1784374409.7148435,
-    "ast_hash": "2c4cc00d0c0f5f2fe1c007528f117159",
+    "mtime": 1784544712.7450614,
+    "ast_hash": "06c041590ad3d18d723e21ea5cf551ec",
     "semantic_hash": ""
   },
   "src/services/platformHealthApi.js": {
@@ -1765,8 +1765,8 @@
     "semantic_hash": ""
   },
   "src/components/user360/tabs/User360OverviewTab.jsx": {
-    "mtime": 1784377562.5998635,
-    "ast_hash": "600708a9319c61bd80f7a8205851672d",
+    "mtime": 1784394501.1125107,
+    "ast_hash": "7efb0df26bc925277284838ed15d6ef0",
     "semantic_hash": ""
   },
   "src/components/user360/tabs/User360PlansTab.jsx": {
@@ -1860,82 +1860,82 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/.husky/_/applypatch-msg": {
-    "mtime": 1784389939.610343,
+    "mtime": 1784394266.836962,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/.husky/_/commit-msg": {
-    "mtime": 1784389939.6101103,
+    "mtime": 1784394266.836673,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/.husky/_/h": {
-    "mtime": 1784389939.6097975,
+    "mtime": 1784394266.836199,
     "ast_hash": "15239a01c5554e56ff745570fb583a91",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/.husky/_/husky.sh": {
-    "mtime": 1784389939.6108654,
+    "mtime": 1784394266.838207,
     "ast_hash": "13871d2ab13e8423790ecb2c01c78c18",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/.husky/_/post-applypatch": {
-    "mtime": 1784389939.6104438,
+    "mtime": 1784394266.837121,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/.husky/_/post-checkout": {
-    "mtime": 1784389939.6106,
+    "mtime": 1784394266.83798,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/.husky/_/post-commit": {
-    "mtime": 1784389939.610159,
+    "mtime": 1784394266.8367305,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/.husky/_/post-merge": {
-    "mtime": 1784389939.6106405,
+    "mtime": 1784394266.8380344,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/.husky/_/post-rewrite": {
-    "mtime": 1784389939.6105523,
+    "mtime": 1784394266.837921,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/.husky/_/pre-applypatch": {
-    "mtime": 1784389939.6103914,
+    "mtime": 1784394266.8370488,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/.husky/_/pre-auto-gc": {
-    "mtime": 1784389939.6108072,
+    "mtime": 1784394266.8381455,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/.husky/_/pre-commit": {
-    "mtime": 1784389939.6099284,
+    "mtime": 1784394266.83632,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/.husky/_/pre-merge-commit": {
-    "mtime": 1784389939.6099977,
+    "mtime": 1784394266.836461,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/.husky/_/pre-push": {
-    "mtime": 1784389939.6107683,
+    "mtime": 1784394266.83809,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/.husky/_/pre-rebase": {
-    "mtime": 1784389939.610505,
+    "mtime": 1784394266.837842,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/.husky/_/prepare-commit-msg": {
-    "mtime": 1784389939.6100626,
+    "mtime": 1784394266.8366196,
     "ast_hash": "0b71c2e7d39daa010985d529f1320b37",
     "semantic_hash": ""
   },
@@ -1970,13 +1970,13 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/app/(protected)/meeting/[lessonId]/page.tsx": {
-    "mtime": 1784296253.9440506,
+    "mtime": 1784395839.9211295,
     "ast_hash": "300a70822b6ccc1d116baa68d3eaf355",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/app/(public)/contact/page.tsx": {
-    "mtime": 1784121687.0856016,
-    "ast_hash": "ebb078ddf591ea1a6cdab8c1557dcdb8",
+    "mtime": 1784648168.990262,
+    "ast_hash": "04be91c65d82c0f628bbc821d7025054",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/app/(public)/layout.tsx": {
@@ -1995,8 +1995,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/app/api/media/route.ts": {
-    "mtime": 1784290474.8427465,
-    "ast_hash": "fb3cd54d02df44d4f185ea51c373b8d9",
+    "mtime": 1784737979.2215474,
+    "ast_hash": "765f6f70f4e91ee5d1f17367553e9cdc",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/app/api/s3-upload/route.ts": {
@@ -2010,8 +2010,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/app/layout.tsx": {
-    "mtime": 1784371079.2832937,
-    "ast_hash": "636a484afb81b2dbf2866d36bffe2827",
+    "mtime": 1784705059.1368144,
+    "ast_hash": "c2ec891f5e842aaa53ed0924a81ee0fd",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/app/not-found.tsx": {
@@ -2045,7 +2045,7 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/common/public-header/index.tsx": {
-    "mtime": 1784290474.9393415,
+    "mtime": 1784395839.921747,
     "ast_hash": "fd6eafbd6d5e7d6b792f8bc52e420a18",
     "semantic_hash": ""
   },
@@ -2060,8 +2060,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/common/trainer-card/index.tsx": {
-    "mtime": 1784290474.8446531,
-    "ast_hash": "534328995612c50e5ce230a487361dcc",
+    "mtime": 1784705059.1371338,
+    "ast_hash": "e2fb3459d81caa276af3ed1a65e902e5",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/landing/CategoryChip.tsx": {
@@ -2110,8 +2110,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/page-index/landing-page/components/LandingHeader.tsx": {
-    "mtime": 1784121687.0890303,
-    "ast_hash": "a53f1418693579aa6a389363786fee60",
+    "mtime": 1784705059.1373053,
+    "ast_hash": "efebd22f039bb0958e88b5b6255ea77d",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/page-index/landing-page/components/TopTrainers.tsx": {
@@ -2135,13 +2135,13 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/page-index/sign-in/index.tsx": {
-    "mtime": 1784121687.0895467,
-    "ast_hash": "050448b47346f68df029c85b8792204d",
+    "mtime": 1784705059.137461,
+    "ast_hash": "020cf49d2c5ab86785518a1ca0707fea",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/page-index/sign-up/index.tsx": {
-    "mtime": 1784121687.0896897,
-    "ast_hash": "61a404df9654bae11a61a0728c6bee06",
+    "mtime": 1784655148.5385857,
+    "ast_hash": "451fdce790ae1c211601dc7ae4b8fd6f",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/page-not-found/NotFoundView.tsx": {
@@ -2150,7 +2150,7 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/providers/ClarityAuthBridge.tsx": {
-    "mtime": 1784355540.7106292,
+    "mtime": 1784395839.921962,
     "ast_hash": "1ca94fa64bafd692252fb1f9ccb062a9",
     "semantic_hash": ""
   },
@@ -2160,8 +2160,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/providers/SocketProvider.tsx": {
-    "mtime": 1784203893.7527173,
-    "ast_hash": "5fe5c309f66a28d2d5fbae6efbdc62b4",
+    "mtime": 1784737740.8149862,
+    "ast_hash": "32d9af19993e77ea599dc3aab54a1370",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/providers/StoreProvider.tsx": {
@@ -2170,23 +2170,23 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/providers/ToastProvider.tsx": {
-    "mtime": 1784121687.090131,
-    "ast_hash": "ebd791651a6328b875e3d3666cf2ebcf",
+    "mtime": 1784705059.1377065,
+    "ast_hash": "af1156e9ecc02d17c542610d73cee412",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/providers/index.tsx": {
-    "mtime": 1784351242.119031,
-    "ast_hash": "14761c978e48b76b33eb9d6a408e84c9",
+    "mtime": 1784705059.1378522,
+    "ast_hash": "e7a7f4d96d3bfe73e9ace555cb6e1ab0",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/ui/ResponsiveTabSelector.tsx": {
-    "mtime": 1784290889.2997057,
+    "mtime": 1784395839.9224398,
     "ast_hash": "1b60b609690d3f80880d231df2ccfc7d",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/ui/badge.tsx": {
-    "mtime": 1784121687.0903761,
-    "ast_hash": "d92301202a9c12017429841a625652b6",
+    "mtime": 1784630888.8011832,
+    "ast_hash": "488df007f1a93cedb7fdde06b62b4c83",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/ui/button.tsx": {
@@ -2205,7 +2205,7 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/ui/drawer.tsx": {
-    "mtime": 1784290474.845431,
+    "mtime": 1784394976.1275227,
     "ast_hash": "c369d3123c260e5e8be703d74baf9a6f",
     "semantic_hash": ""
   },
@@ -2215,8 +2215,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/ui/index.ts": {
-    "mtime": 1784121687.0908139,
-    "ast_hash": "310bcc33c3f6753a771406579d332d79",
+    "mtime": 1784648168.9904842,
+    "ast_hash": "3a5d6ba00d7668d9753c56a72f076052",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/ui/input.tsx": {
@@ -2230,8 +2230,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/ui/modal.tsx": {
-    "mtime": 1784290474.8458636,
-    "ast_hash": "15dd00e887b7cf145b587b9b7d0689c6",
+    "mtime": 1784485741.4466472,
+    "ast_hash": "ea263f751fef43b5c2f200186873f5db",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/ui/netqwix-loader.tsx": {
@@ -2245,8 +2245,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/ui/select.tsx": {
-    "mtime": 1784121687.091229,
-    "ast_hash": "1dd727fff8996298ecf3c36af202dc49",
+    "mtime": 1784648168.9907947,
+    "ast_hash": "2c47379cdc8aea0768e36312dc785f46",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/components/ui/skeleton.tsx": {
@@ -2270,8 +2270,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/config/apiRoutes.ts": {
-    "mtime": 1784230214.8167567,
-    "ast_hash": "b784c1ecca7ef817f2b3897c4d97c6f5",
+    "mtime": 1784655148.5392551,
+    "ast_hash": "a78379a86db89afbd37b4f46fa62ef97",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/constants/accountTypes.ts": {
@@ -2280,7 +2280,7 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/constants/assets.ts": {
-    "mtime": 1784371079.283366,
+    "mtime": 1784647786.2769022,
     "ast_hash": "1bca3b6090c4977394d294a65153563c",
     "semantic_hash": ""
   },
@@ -2320,13 +2320,13 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/auth/AuthProvider.tsx": {
-    "mtime": 1784125377.2467012,
-    "ast_hash": "8a8d8bc915d2a013941dd196202fdb3c",
+    "mtime": 1784783458.0026128,
+    "ast_hash": "c81691fddafa3e7ea467514282aec7a3",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/auth/components/AuthGate.tsx": {
-    "mtime": 1784121687.0925689,
-    "ast_hash": "7dc150abea3343fea79402011b5e3c90",
+    "mtime": 1784783451.1730688,
+    "ast_hash": "78641cb6dce75905441a8cf521a1127a",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/auth/components/AuthPageShell.tsx": {
@@ -2355,8 +2355,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/auth/components/GoogleSignInButton.tsx": {
-    "mtime": 1784121687.0930085,
-    "ast_hash": "468898dd99ba6273a4c4b729f07b2a5f",
+    "mtime": 1784705059.1380022,
+    "ast_hash": "65be188c0cedf9593415f85637d4971a",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/auth/components/GuestAuthGate.tsx": {
@@ -2370,8 +2370,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/auth/components/sign-up/AccountTypeStep.tsx": {
-    "mtime": 1784121687.0934684,
-    "ast_hash": "47cc51a0193bc04743cfb9430b6d3693",
+    "mtime": 1784705059.13831,
+    "ast_hash": "fb5ba86f6d4a46895daf6da4f3657b96",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/auth/components/sign-up/BasicInfoStep.tsx": {
@@ -2380,13 +2380,13 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/auth/components/sign-up/CategoryStep.tsx": {
-    "mtime": 1784121687.0936134,
-    "ast_hash": "e714e1f02644a423b81aa9184adc77b4",
+    "mtime": 1784648168.9910626,
+    "ast_hash": "6ef2a8e3e09fb93c2dfaef6968994f87",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/auth/components/sign-up/DetailsStep.tsx": {
-    "mtime": 1784121687.0936885,
-    "ast_hash": "1a472db1a84e682adb347734bde4c185",
+    "mtime": 1784648168.9911876,
+    "ast_hash": "d9f1d95b520d8e2f7f52d9423c4f773a",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/auth/components/sign-up/KycStep.tsx": {
@@ -2420,28 +2420,28 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/auth/useGoogleSignIn.ts": {
-    "mtime": 1784121687.0942242,
-    "ast_hash": "d3603ce5949b08d13e4155ff5d5c577d",
+    "mtime": 1784705059.1386213,
+    "ast_hash": "44b87e92639c53b0a8d97eab50eff11d",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/booking/components/BookingSuccessView.tsx": {
-    "mtime": 1784230214.816988,
-    "ast_hash": "8f40d9c8b0e0bbde3db607785bbe3f02",
+    "mtime": 1784705059.1389673,
+    "ast_hash": "00156414c105dd7aa82b793bcdd8ceb6",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/booking/components/CoachesOnlineSection.tsx": {
-    "mtime": 1784297808.5096858,
-    "ast_hash": "e6165e20978048131e2fe3a0977db67f",
+    "mtime": 1784485741.4606442,
+    "ast_hash": "1a44cd695881e5267d29ca854ffb89f7",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/booking/components/InstantLessonFormModal.tsx": {
-    "mtime": 1784305573.259967,
-    "ast_hash": "82743bc2b1f11c78867d1a0bfdcbf863",
+    "mtime": 1784647786.2731113,
+    "ast_hash": "250185f518aa5dfa612191a386bde868",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/booking/components/OnlineCoachCard.tsx": {
-    "mtime": 1784203893.7558453,
-    "ast_hash": "c4c39fc412a4760c308405f902994ae9",
+    "mtime": 1784485741.4676127,
+    "ast_hash": "6e21ddaefd2e0ba0f261dc42dddb884c",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/booking/components/PromoCodeField.tsx": {
@@ -2455,28 +2455,28 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/booking/components/ScheduledSlotSelector.tsx": {
-    "mtime": 1784290474.846378,
-    "ast_hash": "368abc6ae6fe2ecc946738fae665d9b6",
+    "mtime": 1784630922.6476467,
+    "ast_hash": "e6984567467ff6a5728fbbd54aba32b6",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/booking/components/TrainerBookingModal.tsx": {
-    "mtime": 1784230214.8239343,
-    "ast_hash": "12e1697b6c2bbca3d2d7d4d459c7b962",
+    "mtime": 1784705059.1391113,
+    "ast_hash": "47fd9262b858a55aec6ae3a35b21c2d8",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/booking/components/TrainerCheckoutModal.tsx": {
-    "mtime": 1784221345.8449667,
-    "ast_hash": "437a4508ea4ae0d0b78a954a239cae5a",
+    "mtime": 1784630922.6480618,
+    "ast_hash": "b2ecc87f4a2a97dff4c1015f9fc5d0fa",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/booking/components/TrainerProfileDetails.tsx": {
-    "mtime": 1784371079.2833462,
-    "ast_hash": "3e8d7e776da6bc5728e355b1b50916c4",
+    "mtime": 1784705059.1393056,
+    "ast_hash": "39fd48e174f1ad184eea543b40f64793",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/booking/components/TrainerProfileDetailsModal.tsx": {
-    "mtime": 1784203884.8227887,
-    "ast_hash": "88df8399b7a2c44142e22839bbda73a9",
+    "mtime": 1784485741.4740288,
+    "ast_hash": "84b8feb24ead0d61021a2dbae1505a02",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/booking/hooks/useInstantEligibility.ts": {
@@ -2510,18 +2510,18 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/booking/utils/trainer.ts": {
-    "mtime": 1784290474.8493903,
+    "mtime": 1784394976.1277366,
     "ast_hash": "3bb92e21443acf8208e5a7be9382c0b5",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/capture/CaptureSection.tsx": {
-    "mtime": 1784296255.3446803,
+    "mtime": 1784395839.9236367,
     "ast_hash": "98c9303ff92c5febf20c1a740a348757",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/Dashboard.tsx": {
-    "mtime": 1784121687.0954173,
-    "ast_hash": "4d14c949343d85e4272af60d609fd2c6",
+    "mtime": 1784655148.541131,
+    "ast_hash": "c8c3a24b8959e020c97edbeae86e03ee",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/components/DashboardBottomNav.tsx": {
@@ -2550,8 +2550,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/components/DashboardHeader.tsx": {
-    "mtime": 1784371079.2833827,
-    "ast_hash": "08956349e6c5fe2afc6638c02064624f",
+    "mtime": 1784705059.1394727,
+    "ast_hash": "ae61afac05e4c952e92b4c2ee5519c00",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/components/DashboardInCardTitle.tsx": {
@@ -2560,7 +2560,7 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/components/DashboardMobileDrawer.tsx": {
-    "mtime": 1784290474.8499005,
+    "mtime": 1784394976.1279168,
     "ast_hash": "1a9efd6ae8fa4cc2b56f909021824694",
     "semantic_hash": ""
   },
@@ -2580,13 +2580,13 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/components/DashboardSectionTitle.tsx": {
-    "mtime": 1784121687.0963917,
-    "ast_hash": "9cc2c7c90740d1dfaa208a3fc8babf9c",
+    "mtime": 1784485741.486517,
+    "ast_hash": "e3fe2351e094e4a5eecef768fc838da7",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/components/DashboardSegmentTabs.tsx": {
-    "mtime": 1784121687.0964632,
-    "ast_hash": "8594d2365aca83c11ae294d9db1183e2",
+    "mtime": 1784395761.0601187,
+    "ast_hash": "f87c9105a465468437a671baf4246c67",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/components/DashboardShell.tsx": {
@@ -2610,7 +2610,7 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/components/DashboardSkeletons.tsx": {
-    "mtime": 1784297603.7555428,
+    "mtime": 1784395839.924201,
     "ast_hash": "895c4001200e93716fc145d32595b8d1",
     "semantic_hash": ""
   },
@@ -2620,8 +2620,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/config/deriveNav.ts": {
-    "mtime": 1784121687.0970573,
-    "ast_hash": "576c2832e14bf4908fdfa5ea4b7e32b5",
+    "mtime": 1784655148.5413895,
+    "ast_hash": "6b7512196a52a334c4f4b4c1a3c9b46c",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/config/nav.types.ts": {
@@ -2635,8 +2635,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/hooks/useDashboardNav.ts": {
-    "mtime": 1784121687.0973458,
-    "ast_hash": "592ebc3f264966adacb0cc1178760035",
+    "mtime": 1784655148.541617,
+    "ast_hash": "ba910eed0c6b604f873cea31bfe9d948",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/hooks/useMediaQuery.ts": {
@@ -2650,8 +2650,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/community/MyCommunitySection.tsx": {
-    "mtime": 1784290474.850837,
-    "ast_hash": "adf0b12add678a326d8acd5b0d74d33f",
+    "mtime": 1784485741.5020237,
+    "ast_hash": "82f3d9b5e494516225ade0fe5d61ed36",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/community/components/CommunityGridCard.tsx": {
@@ -2700,13 +2700,13 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/contact-us/components/ReportIssuePanel.tsx": {
-    "mtime": 1784296801.4704995,
+    "mtime": 1784395839.9246233,
     "ast_hash": "bc3581f34f8807ce6666af684a25fcc1",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/friends/FriendsSection.tsx": {
-    "mtime": 1784296801.4871569,
-    "ast_hash": "bebd4cdc0c392f3733a79e58f0dbbaec",
+    "mtime": 1784485741.5162725,
+    "ast_hash": "04d96f6a6b073d949f804c4840993a88",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/friends/components/FriendGridCard.tsx": {
@@ -2745,8 +2745,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/game-plans/GamePlansSection.tsx": {
-    "mtime": 1784296116.957171,
-    "ast_hash": "810f548496f2799e375ff3e8e610b760",
+    "mtime": 1784781546.1271052,
+    "ast_hash": "6599c6e2f5b4b5aac4f3cb3ea1c19ca1",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/locker/MyLockerSection.tsx": {
@@ -2755,18 +2755,18 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/locker/PendingSessionRequestsPanel.tsx": {
-    "mtime": 1784371079.2831194,
+    "mtime": 1784647786.2671747,
     "ast_hash": "b4ccd3d919721ae8a69b5cbe2de6c5e5",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/notifications/NotificationsSection.tsx": {
-    "mtime": 1784297806.5568135,
+    "mtime": 1784395839.9258013,
     "ast_hash": "213efe519b504877aedb953f43e31752",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/sessions/SessionsSection.tsx": {
-    "mtime": 1784298044.254885,
-    "ast_hash": "05b06c274fa85b7563edd1a9d97290d0",
+    "mtime": 1784781546.127654,
+    "ast_hash": "3aeeb38b8de8911727f8620d6b002e40",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/sessions/components/DeadlineChip.tsx": {
@@ -2775,18 +2775,18 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/sessions/components/SessionActionModal.tsx": {
-    "mtime": 1784290474.852621,
-    "ast_hash": "d7bb20b77973c0eb112c152ae6d80556",
+    "mtime": 1784485741.5237567,
+    "ast_hash": "0f43e372f7132dfd8e09674c84897ce0",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/sessions/components/SessionCard.tsx": {
-    "mtime": 1784290474.8527389,
-    "ast_hash": "c017d9066803c44aba3776f1f235a461",
+    "mtime": 1784485741.525197,
+    "ast_hash": "c8948cd856a23197f748f2a8f78e2ef4",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/sessions/components/SessionRateModal.tsx": {
-    "mtime": 1784290474.853189,
-    "ast_hash": "044268abcbfd3734fefcc97f48c40a47",
+    "mtime": 1784527359.8389835,
+    "ast_hash": "8d17c8af293d8698f5ddf57f355d390b",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/sessions/components/SessionStatusBadge.tsx": {
@@ -2795,23 +2795,23 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/sessions/components/SessionsCalendar.tsx": {
-    "mtime": 1784290474.8534117,
-    "ast_hash": "7bc91b135f5a6d1b9e22dfe3427f2229",
+    "mtime": 1784705059.1396618,
+    "ast_hash": "f3d562e732b542da58422b507c5e8d80",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/sessions/components/TrainerAvailabilityPanel.tsx": {
-    "mtime": 1784296289.7596266,
+    "mtime": 1784395839.9260743,
     "ast_hash": "c457f404d1c3674588163a188db0e0af",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/sessions/hooks/useSessions.ts": {
-    "mtime": 1784297902.7604096,
-    "ast_hash": "3767ba6646aed311d6138fb1ad32ea42",
+    "mtime": 1784647786.2730734,
+    "ast_hash": "51a6a45705f0dfc0c6126ac5710de48f",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/settings/SettingsSection.tsx": {
-    "mtime": 1784230214.8404374,
-    "ast_hash": "57ece65ea82cd5de9c52fd81d88cfda0",
+    "mtime": 1784705059.1398978,
+    "ast_hash": "1dfb0acb294cd9a736c952de3adb1ffd",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/settings/components/CropImageModal.tsx": {
@@ -2840,8 +2840,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/student/BookExpertSection.tsx": {
-    "mtime": 1784296116.718864,
-    "ast_hash": "db14fdc4e76563fafc51fefaf6864b88",
+    "mtime": 1784705059.1401093,
+    "ast_hash": "7de337197d03033ac3d5eef17709f9b3",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/student/ExpertsSection.tsx": {
@@ -2855,18 +2855,18 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/student/components/PeopleSection.tsx": {
-    "mtime": 1784296346.77831,
+    "mtime": 1784395839.9267921,
     "ast_hash": "4eead277b4665b0ca0916aa8e3e77915",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/student/components/PersonCard.tsx": {
-    "mtime": 1784121687.102118,
-    "ast_hash": "a70f5b5a9f303dc1f9b16c2cbfa4ff9b",
+    "mtime": 1784630888.8013508,
+    "ast_hash": "399e0f74d938d99d708827f23c7dd032",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/student/components/StudentDetailModal.tsx": {
-    "mtime": 1784121687.1022267,
-    "ast_hash": "ab6c3c7eed0723dbe5972dea0c887006",
+    "mtime": 1784630888.8015757,
+    "ast_hash": "c225d95872c2f98b5a953591d9d9ec29",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/student/components/StudentDetailTabs.tsx": {
@@ -2890,13 +2890,13 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/trainee/TraineesSection.tsx": {
-    "mtime": 1784290474.8543782,
-    "ast_hash": "38c3861713e4824e41159f20d1c403d0",
+    "mtime": 1784630888.8019168,
+    "ast_hash": "d79a39a180fbbc1a6f5dd7953905d89e",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/trainee/components/TraineeDetailModal.tsx": {
-    "mtime": 1784121687.1030526,
-    "ast_hash": "61550ee4e120559186f5a2bb073f4756",
+    "mtime": 1784630888.8021293,
+    "ast_hash": "c108454eccca95c7da7c3efa3dbd69ad",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/trainee/components/TraineeDetailTabs.tsx": {
@@ -2905,8 +2905,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/trainee/components/TraineeGridCard.tsx": {
-    "mtime": 1784230214.8476796,
-    "ast_hash": "0405e8ff6211ac116c6df2a8381dd09d",
+    "mtime": 1784623352.1816394,
+    "ast_hash": "1ab89ef2ec89550090cc2fd522e98399",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/trainee/components/TraineeListCard.tsx": {
@@ -2940,8 +2940,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/trainer-home/TrainerDashboardHome.tsx": {
-    "mtime": 1784290474.9402122,
-    "ast_hash": "899ae0cc5123d031c129e8f0b9399438",
+    "mtime": 1784737740.8153143,
+    "ast_hash": "01d5a6e9e2ace34b427955f36f4d303d",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/trainer-home/components/DashboardPromoImageCard.tsx": {
@@ -2950,8 +2950,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/trainer-home/components/DashboardUploadClipCard.tsx": {
-    "mtime": 1784121687.1039379,
-    "ast_hash": "da6a7aacb28bfa0688db9f0c4d7626b5",
+    "mtime": 1784630888.8024154,
+    "ast_hash": "bbb8d65d0033517917bd78b8f20a6ba9",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/trainer-home/components/InviteFriendsCard.tsx": {
@@ -2960,38 +2960,38 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/trainer-home/components/LockerCenterTabBar.tsx": {
-    "mtime": 1784290474.8552608,
+    "mtime": 1784394976.150609,
     "ast_hash": "2b248741f4987d686b3c5c21971fecc0",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/trainer-home/components/OnlineExpertsSection.tsx": {
-    "mtime": 1784203884.8248007,
-    "ast_hash": "fadb1d0071ef8a51a8a7d3dd25b5b02c",
+    "mtime": 1784647786.27688,
+    "ast_hash": "5bd79819ab844d302925793f62456ce0",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/trainer-home/components/RecentStudentsSection.tsx": {
-    "mtime": 1784203884.825198,
-    "ast_hash": "d5ee97962d22792c7497b6845a0c82a0",
+    "mtime": 1784630888.8025815,
+    "ast_hash": "6e09f95d3c6eb49c048ac281582542f5",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/trainer-home/components/TrainerDashboardRightColumn.tsx": {
-    "mtime": 1784121687.1042395,
-    "ast_hash": "746b714ccf9378f7b1137e3cfa932747",
+    "mtime": 1784630888.8027096,
+    "ast_hash": "ebeba4c54dd496a5f34d833d7eec386b",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/trainer-home/components/TrainerMyClipsSection.tsx": {
-    "mtime": 1784290474.8554947,
-    "ast_hash": "e64816303bbc78d996823be4eed7db72",
+    "mtime": 1784655148.5423567,
+    "ast_hash": "d920e1cb99f4250a41cd77c14c312240",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/trainer-home/components/TrainerOnlineToggle.tsx": {
-    "mtime": 1784279551.7203488,
-    "ast_hash": "f9dacecbdd5e705e9f2e6cb06e0db89f",
+    "mtime": 1784395761.0606985,
+    "ast_hash": "9ca18d0ef30ffbe8b75600e3aa4b0577",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/trainer-home/components/TrainerProfileCard.tsx": {
-    "mtime": 1784126940.9632044,
-    "ast_hash": "4f6d8bf745d64df402b249d24874256c",
+    "mtime": 1784705059.1404889,
+    "ast_hash": "32c20f22fc2f1dba3958e5ff92e7900f",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/trainer-home/hooks/useTrainerProfileRatings.ts": {
@@ -3000,7 +3000,7 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/transactions/TransactionDetailView.tsx": {
-    "mtime": 1784296255.2541006,
+    "mtime": 1784395839.9271252,
     "ast_hash": "418d226c2a02d7eec6b33ae371a2bf8b",
     "semantic_hash": ""
   },
@@ -3010,7 +3010,7 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/dashboard/sections/transactions/TransactionsSection.tsx": {
-    "mtime": 1784296118.3429341,
+    "mtime": 1784395839.9274058,
     "ast_hash": "d9a9b3b8cbdb807f9efb455dbd0a4456",
     "semantic_hash": ""
   },
@@ -3035,13 +3035,13 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/instant-lesson/InstantLessonTraineeModal.tsx": {
-    "mtime": 1784230214.8486824,
-    "ast_hash": "ee7952550056eaab5ed3c0ceab0e7634",
+    "mtime": 1784781546.1279056,
+    "ast_hash": "c5cc406f25eb983611aa517f09863c77",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/instant-lesson/InstantLessonTrainerModal.tsx": {
-    "mtime": 1784297904.9523203,
-    "ast_hash": "69d8592c2e51cc2be8cddf7a885c3a11",
+    "mtime": 1784781546.1283755,
+    "ast_hash": "aabdde4435633f0a823afd792df288cf",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/instant-lesson/initiateTraineeFlow.ts": {
@@ -3055,8 +3055,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/instant-lesson/useInstantLessonSocket.ts": {
-    "mtime": 1784203884.8291197,
-    "ast_hash": "419d3795f51f95db5d4289035d40e5e1",
+    "mtime": 1784781546.1285622,
+    "ast_hash": "834480751836db5a3b114955ed5efb4c",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/instant-lesson/utils.ts": {
@@ -3065,18 +3065,18 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/MeetingPage.tsx": {
-    "mtime": 1784296255.344315,
-    "ast_hash": "66a8d7b6c99ae4b6db990696d775f9b5",
+    "mtime": 1784781546.1287637,
+    "ast_hash": "ad548c63bbbe1ce39ebd8fc0b05bb608",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/__tests__/meetingConnectionHint.selfcheck.ts": {
-    "mtime": 1784368549.3512616,
+    "mtime": 1784395839.927952,
     "ast_hash": "8bb131d607292e6f40770924e49dd6e3",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/callEngine.ts": {
-    "mtime": 1784368534.1112504,
-    "ast_hash": "2d73b6855f02d38887d1ca9f0900dafe",
+    "mtime": 1784705059.141029,
+    "ast_hash": "284a15bcef2d78ef8e1252909eebbf82",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/components/ConnectionQualityPill.tsx": {
@@ -3085,33 +3085,33 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/components/DraggableVideoPip.tsx": {
-    "mtime": 1784290474.9407318,
-    "ast_hash": "58cedc93ed305ad89495d8c07afeb849",
+    "mtime": 1784648168.9916222,
+    "ast_hash": "b00842c19d5485d8587c2380917717f5",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/components/LiveLessonDashboardBanners.tsx": {
-    "mtime": 1784230214.849579,
-    "ast_hash": "ec533d2b84f513604c68d3bcb61c04b2",
+    "mtime": 1784395761.061897,
+    "ast_hash": "3c4bfa6927d09bbbb98f30180a1d22e0",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/components/LiveMeetingExperience.tsx": {
-    "mtime": 1784371079.2833185,
-    "ast_hash": "f6138086fc5721ce9ec6d845cf89cc18",
+    "mtime": 1784781546.1291487,
+    "ast_hash": "e9842dd68934f2ecadcb552f1d81df92",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/components/MeetingAnnotationToolbar.tsx": {
-    "mtime": 1784371079.2833927,
-    "ast_hash": "9344591b0e55a1c43a92865a6d746a47",
+    "mtime": 1784737979.2228863,
+    "ast_hash": "770aaf932debb56666b13dc960f71a68",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/components/MeetingClipPicker.tsx": {
-    "mtime": 1784290474.8584893,
-    "ast_hash": "e7d26436081929c0509148d7378dc6d4",
+    "mtime": 1784648168.992024,
+    "ast_hash": "4d1f31cfe5845771d1956df1681c974c",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/components/MeetingDepartureModals.tsx": {
-    "mtime": 1784230214.852007,
-    "ast_hash": "fa6738ab91e2657e90824b238776b3e8",
+    "mtime": 1784485741.5403876,
+    "ast_hash": "8393e8e4e0681d3a3352f070fc112c38",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/components/MeetingDepartureOverlays.tsx": {
@@ -3120,13 +3120,13 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/components/MeetingExtensionModals.tsx": {
-    "mtime": 1784230214.8533,
-    "ast_hash": "708fd1cef1bcccdb95d3b4fb75bb57fd",
+    "mtime": 1784485741.5408282,
+    "ast_hash": "15ce4cdd068dce7db418c7314c451c62",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/components/MeetingLiveNotesPanels.tsx": {
-    "mtime": 1784230214.8535085,
-    "ast_hash": "ee7135b34191dd245df676242fe38106",
+    "mtime": 1784485741.541613,
+    "ast_hash": "046da99be766ac1363b008a6a90c0f8b",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/components/MeetingRecordingBar.tsx": {
@@ -3135,18 +3135,18 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/components/MeetingReliabilityOverlays.tsx": {
-    "mtime": 1784305988.961952,
+    "mtime": 1784395839.929314,
     "ast_hash": "c15d233602a30c74d9d58f0283720cda",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/components/MeetingScreenshotDetailsModal.tsx": {
-    "mtime": 1784230214.8547702,
-    "ast_hash": "c9bfa960557cabdb85b0f3f5166e20ee",
+    "mtime": 1784781546.1293604,
+    "ast_hash": "5942598e2f8e49b31e45243abfef4e06",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/components/MeetingScreenshotGallery.tsx": {
-    "mtime": 1784230214.8550205,
-    "ast_hash": "513f30338454bc9fa5c64f0d7817bbef",
+    "mtime": 1784737979.2233293,
+    "ast_hash": "07922e57b2132b9e29598446e6faddbd",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/components/MeetingSessionHandoff.tsx": {
@@ -3155,18 +3155,18 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/components/MeetingStage.tsx": {
-    "mtime": 1784369027.5142424,
-    "ast_hash": "c9e97562eab7c82eb35754a2a0fdc612",
+    "mtime": 1784737979.224691,
+    "ast_hash": "f7106b1f7702eb02c71e8d0eb9e67798",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/components/MeetingTimeRemaining.tsx": {
-    "mtime": 1784306145.1069741,
-    "ast_hash": "504a0ef28ea1e4eaec52b9e7c69e4ad6",
+    "mtime": 1784737740.8176212,
+    "ast_hash": "406e5ad7e6c2dcdc5d84fc0f4dd07f5b",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/components/MeetingTrainerWrapUp.tsx": {
-    "mtime": 1784230214.8559368,
-    "ast_hash": "cd09111079a1b1e9ec28ad40848a51ff",
+    "mtime": 1784485741.545207,
+    "ast_hash": "e0933b6626048a4fefa2dc3a4544484c",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/earlyEndReasons.selfcheck.ts": {
@@ -3185,7 +3185,7 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/hooks/useInstantLessonRecording.ts": {
-    "mtime": 1784292063.9214988,
+    "mtime": 1784395839.9337566,
     "ast_hash": "ced0a3bbb63076c0f419dc3f85470bdb",
     "semantic_hash": ""
   },
@@ -3200,28 +3200,28 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/hooks/useLessonTimer.ts": {
-    "mtime": 1784230214.8594,
-    "ast_hash": "6edaef51be1806c613834f2aba3d327d",
+    "mtime": 1784737740.8178108,
+    "ast_hash": "c28fcad6dedb6055c26ce6a7be7e9459",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/hooks/useMeetingAnnotationSync.ts": {
-    "mtime": 1784292062.5988712,
+    "mtime": 1784395839.9339912,
     "ast_hash": "74cf7593256cac67612dd9fafb543820",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/hooks/useMeetingCall.ts": {
-    "mtime": 1784371079.2834694,
-    "ast_hash": "ad5c969068dc140b502cde26b7dfa929",
+    "mtime": 1784705059.1431975,
+    "ast_hash": "34b08092665a2745cffd4d4ad55a7a6a",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/hooks/useMeetingCapture.ts": {
-    "mtime": 1784371079.2830026,
-    "ast_hash": "b6acb215202f6426e0d95448f9b0e17e",
+    "mtime": 1784737979.227626,
+    "ast_hash": "e5e6d0124304892187cdfc487af2933f",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/hooks/useMeetingClipSync.ts": {
-    "mtime": 1784368570.3048413,
-    "ast_hash": "cae7f8db19ba2cdd907a4599e10b21e9",
+    "mtime": 1784781546.1356635,
+    "ast_hash": "d1fea75daf5d98db7bd273585596ce9a",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/hooks/useMeetingDeparture.ts": {
@@ -3230,12 +3230,12 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/hooks/useMeetingLayoutSync.ts": {
-    "mtime": 1784305255.0530055,
-    "ast_hash": "66467366c0178a7a5035e45d079b841d",
+    "mtime": 1784647786.2654083,
+    "ast_hash": "f4753ce023807d7580ec173063f2c1cb",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/hooks/useMeetingTimeWarnings.ts": {
-    "mtime": 1784306145.2793868,
+    "mtime": 1784395839.9353642,
     "ast_hash": "293a715413d52249956f441f558cc8d4",
     "semantic_hash": ""
   },
@@ -3245,12 +3245,12 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/hooks/useSessionPresence.ts": {
-    "mtime": 1784279551.720471,
-    "ast_hash": "1dd3910b7408690da2900882ed5f39ed",
+    "mtime": 1784705059.1435213,
+    "ast_hash": "f6df51e6f28ca38258f7fae3aba8cb42",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/hooks/useVideoPipLayout.ts": {
-    "mtime": 1784291488.6089685,
+    "mtime": 1784395839.9354758,
     "ast_hash": "d378a9560b68ceee7db37a63a8091266",
     "semantic_hash": ""
   },
@@ -3275,27 +3275,27 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/lib/clipParity.selfcheck.ts": {
-    "mtime": 1784126941.1374245,
-    "ast_hash": "64b3bf86899aae54c27e0100fc4b2125",
+    "mtime": 1784705059.143672,
+    "ast_hash": "d6795097eca4e594737017b417bd26e3",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/lib/clipParity.ts": {
-    "mtime": 1784126941.1396978,
-    "ast_hash": "9152b8feca084ab61e7e1e72afdb2b06",
+    "mtime": 1784705059.1438184,
+    "ast_hash": "2e1baf2574005a987d0806113a50fa08",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/lib/clipUtils.ts": {
-    "mtime": 1784371079.2834878,
-    "ast_hash": "72b695f222a7bb078df4bdab5adbcffd",
+    "mtime": 1784737979.2282765,
+    "ast_hash": "698645b1963d933fe5f818f67afa2273",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/lib/clipZoomPanUtils.ts": {
-    "mtime": 1784230214.865881,
-    "ast_hash": "56f761e09b0d3b6e5d9cb0c925a16ff3",
+    "mtime": 1784737979.228425,
+    "ast_hash": "cc239d76a078699779af929df3f246b5",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/lib/crossPlatformParity.check.ts": {
-    "mtime": 1784292127.6530628,
+    "mtime": 1784395839.9360352,
     "ast_hash": "11e8448cb90ebefb7a95fe1b2af6a0b3",
     "semantic_hash": ""
   },
@@ -3310,17 +3310,17 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/lib/pipLayout.ts": {
-    "mtime": 1784290474.9496906,
-    "ast_hash": "db7c2cec88d737acc980baca7d02e7e0",
+    "mtime": 1784485741.5502996,
+    "ast_hash": "953181947debe78a3ad590c2146d59d5",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/lib/videoFitUtils.ts": {
-    "mtime": 1784290474.950134,
+    "mtime": 1784395839.9364746,
     "ast_hash": "41c07e08afaf0883d926d724e9e305b8",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/meetingConnectionHint.ts": {
-    "mtime": 1784368539.450435,
+    "mtime": 1784395839.936845,
     "ast_hash": "449e4674b969cbd1bb617c02ce718946",
     "semantic_hash": ""
   },
@@ -3335,12 +3335,12 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/meeting/utils.ts": {
-    "mtime": 1784121687.106314,
-    "ast_hash": "4e2a378c3c1765d9c3ec6617995a2f31",
+    "mtime": 1784527359.7525187,
+    "ast_hash": "de4722f583c929fcbf9d7659a1ce91f1",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/notifications/components/DashboardNotificationButton.tsx": {
-    "mtime": 1784297808.3171916,
+    "mtime": 1784395839.9372191,
     "ast_hash": "100082e65a4e6da7cfd339c4c7076086",
     "semantic_hash": ""
   },
@@ -3455,8 +3455,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/practice-session/lib/pdfExport.ts": {
-    "mtime": 1784279551.7176943,
-    "ast_hash": "2cf4acd9ae7e20c02fffa64976e9606f",
+    "mtime": 1784737979.2295337,
+    "ast_hash": "835c22ca948aa7687bb24b59d77cb9d3",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/practice-session/lib/practiceHistoryStorage.ts": {
@@ -3495,7 +3495,7 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/referral/components/InviteProgramPanel.tsx": {
-    "mtime": 1784296362.5992377,
+    "mtime": 1784395839.937549,
     "ast_hash": "bacd861ac7a3f81782fd4700f4f16149",
     "semantic_hash": ""
   },
@@ -3515,18 +3515,18 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/schedule/components/ScheduleSettingsCard.tsx": {
-    "mtime": 1784121687.1087232,
-    "ast_hash": "9717392ba5548be628942674766a4250",
+    "mtime": 1784648168.993031,
+    "ast_hash": "84a4d536cd75fb4505b7ef3faaf179c2",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/schedule/components/ScheduleSkeleton.tsx": {
-    "mtime": 1784296227.847566,
+    "mtime": 1784395839.9377372,
     "ast_hash": "1ba42628bdaa6cece087002eb09b41d1",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/schedule/components/TimeSlotRow.tsx": {
-    "mtime": 1784121687.1088474,
-    "ast_hash": "4386734d23f0d169670d3d39f0b978bb",
+    "mtime": 1784648168.9931583,
+    "ast_hash": "7a209afa1aa4389906c78f2053fa531f",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/schedule/constants.ts": {
@@ -3595,18 +3595,18 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/uploads/components/ClipPlayerModal.tsx": {
-    "mtime": 1784230214.8738933,
-    "ast_hash": "043798aa08b1c52eb2cb2632c5af3856",
+    "mtime": 1784647786.2672088,
+    "ast_hash": "41b60f194575a62c977fda82f4973523",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/uploads/components/ClipThumbnailCard.tsx": {
-    "mtime": 1784121687.110113,
-    "ast_hash": "7a42d3959f60bb12a60140640bcc6ced",
+    "mtime": 1784647786.2670481,
+    "ast_hash": "57acfd5998f4fdb398178d5395672404",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/uploads/components/ClipsGrid.tsx": {
-    "mtime": 1784121687.110176,
-    "ast_hash": "f2142e395814c07194e9a9c997412f14",
+    "mtime": 1784485741.553127,
+    "ast_hash": "40a11246aea2e0801d9df8a4a33589a3",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/uploads/components/CollapsibleClipSection.tsx": {
@@ -3620,8 +3620,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/uploads/components/LockerClipsPreview.tsx": {
-    "mtime": 1784230214.8748403,
-    "ast_hash": "91b2cd993b3598252eea12dbcce951f3",
+    "mtime": 1784485741.5537314,
+    "ast_hash": "a98482d0a73c5a519d771b7ae2c6a472",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/uploads/components/LockerViewerModal.tsx": {
@@ -3630,13 +3630,13 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/uploads/components/MyClipsTab.tsx": {
-    "mtime": 1784230214.8754826,
-    "ast_hash": "adb053f8c19ff8a6318ceef542590e66",
+    "mtime": 1784485741.5544875,
+    "ast_hash": "ba89c7d777daab4e9dc19f911eaab686",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/uploads/components/MyUploadsPage.tsx": {
-    "mtime": 1784290474.865145,
-    "ast_hash": "d4d97678f1183382a4ac7185ffb61ec0",
+    "mtime": 1784647786.277101,
+    "ast_hash": "a4cda81694ccca18a518718565f4bfa2",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/uploads/components/NetQwixTab.tsx": {
@@ -3650,18 +3650,18 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/uploads/components/ReportsTab.tsx": {
-    "mtime": 1784290474.8664324,
-    "ast_hash": "4e02f5eeb7612b111d5bbecd3599791c",
+    "mtime": 1784781546.1362114,
+    "ast_hash": "574a457b8eef38e2603f81837c3ad884",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/uploads/components/SessionGamePlanModal.tsx": {
-    "mtime": 1784371079.2832265,
-    "ast_hash": "09e09b6c4255184b8be70e1a2c8f89dc",
+    "mtime": 1784781546.1364582,
+    "ast_hash": "819cb55230a343ef5f2bdb8a77724977",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/uploads/components/UploadClipForm.tsx": {
-    "mtime": 1784290474.86716,
-    "ast_hash": "ad6f78d51bb2319ce3450fdc9318566e",
+    "mtime": 1784648168.9933677,
+    "ast_hash": "8c006ce74674fe23b1b266f85218956c",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/uploads/components/UploadShareEmailPicker.tsx": {
@@ -3715,8 +3715,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/uploads/hooks/useMyUploadsData.ts": {
-    "mtime": 1784290474.8684096,
-    "ast_hash": "d793c35f3cf458a12c22aa4614e7f6c3",
+    "mtime": 1784647786.2768633,
+    "ast_hash": "a04ab191a7067141c8d254739e6ec651",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/uploads/types.ts": {
@@ -3765,17 +3765,17 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/wallet/lib/cardExpiry.check.ts": {
-    "mtime": 1784290889.3000298,
+    "mtime": 1784395839.9388387,
     "ast_hash": "260b152da38aa826733d6fe3394a3381",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/wallet/lib/cardExpiry.ts": {
-    "mtime": 1784290889.3003192,
+    "mtime": 1784395839.9390345,
     "ast_hash": "6bb40f7627e254c8d8e897fb309b44c4",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/wallet/lib/pinSessionStore.ts": {
-    "mtime": 1784290889.3006432,
+    "mtime": 1784395839.9395475,
     "ast_hash": "5088e7f512151fe8d062ce14e2d38938",
     "semantic_hash": ""
   },
@@ -3795,7 +3795,7 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/wallet/sections/TrainerEarningsTrends.tsx": {
-    "mtime": 1784290889.3011284,
+    "mtime": 1784395839.939799,
     "ast_hash": "20de8dc556fad3811d4e2ca195a563ab",
     "semantic_hash": ""
   },
@@ -3810,7 +3810,7 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/wallet/sections/WalletPayoutSetup.tsx": {
-    "mtime": 1784297901.9362948,
+    "mtime": 1784394976.1896856,
     "ast_hash": "8d8ae7d0bc95222d7deea8fafff32f66",
     "semantic_hash": ""
   },
@@ -3820,22 +3820,22 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/wallet/sections/WalletSavedCards.tsx": {
-    "mtime": 1784296270.0567663,
+    "mtime": 1784395839.940093,
     "ast_hash": "434ece9b20b5a4ea16780f68d0369efd",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/wallet/sections/WalletSection.tsx": {
-    "mtime": 1784297835.1729221,
+    "mtime": 1784395839.9404175,
     "ast_hash": "a22036c9cd92a6ab8f55528496d11ae7",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/wallet/sections/WalletSecurityPin.tsx": {
-    "mtime": 1784290889.3023388,
+    "mtime": 1784395839.9406505,
     "ast_hash": "1e32340974cee0b5d6686f3abdbe577e",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/features/wallet/sections/WalletTopUpModal.tsx": {
-    "mtime": 1784290889.3026872,
+    "mtime": 1784395839.940923,
     "ast_hash": "0bb41da1d729e9c70095c44741c42be7",
     "semantic_hash": ""
   },
@@ -3895,23 +3895,23 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/lib/auth/pendingGoogleSignup.ts": {
-    "mtime": 1784121687.113033,
-    "ast_hash": "73a872c9572f8f7edee297ff452916dd",
+    "mtime": 1784655148.5426445,
+    "ast_hash": "0da517c510bb4f1ef79f8640f20aef71",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/lib/auth/routeAccess.ts": {
-    "mtime": 1784121687.113091,
-    "ast_hash": "5c0e0c285d2a0715cc3876af87bc29f4",
+    "mtime": 1784783451.0362403,
+    "ast_hash": "16bbc7e33877ef59f83b5d5ce2e23eaf",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/lib/auth/session.ts": {
-    "mtime": 1784121687.1131477,
-    "ast_hash": "56b26c7d92f2bb9d2b12b4e247980776",
+    "mtime": 1784783502.299788,
+    "ast_hash": "69a707a254b65cae837e1a0b3d2e808c",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/lib/auth/sessionEvents.ts": {
-    "mtime": 1784121687.113205,
-    "ast_hash": "c747c03f160dbfbb1f018c87515d6a7e",
+    "mtime": 1784783474.9469497,
+    "ast_hash": "0edb28cbc71eb7d7ae510ede13c4f465",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/lib/auth/signOutNavigation.ts": {
@@ -3925,8 +3925,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/lib/clarity.ts": {
-    "mtime": 1784356543.9393568,
-    "ast_hash": "83a967863be25fcceaf7d1c01b61f4eb",
+    "mtime": 1784737740.8460793,
+    "ast_hash": "5939c9f21a5245cc251cf839503e7e31",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/lib/config/api.ts": {
@@ -3940,8 +3940,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/lib/config/socket.ts": {
-    "mtime": 1784203893.7651227,
-    "ast_hash": "d0ef3453a616e0da11fcb66f8e40c871",
+    "mtime": 1784737740.8462148,
+    "ast_hash": "f935eceaa5fd645ee9292f0b101f9e64",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/lib/design-tokens/breakpoints.ts": {
@@ -3965,7 +3965,7 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/lib/firebase.ts": {
-    "mtime": 1784355532.4859538,
+    "mtime": 1784395839.9413955,
     "ast_hash": "54969289142b361bb67e9c9521a52c8d",
     "semantic_hash": ""
   },
@@ -4050,12 +4050,12 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/lib/sessions/sessionUtils.ts": {
-    "mtime": 1784387825.1797347,
-    "ast_hash": "04c210d08bdaca66cb6b10b4cb7ed2fc",
+    "mtime": 1784647786.2671583,
+    "ast_hash": "f33590526fd00d174c343efd95fd8f5f",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/lib/socket/annotationEvents.ts": {
-    "mtime": 1784291457.5478842,
+    "mtime": 1784395839.9418385,
     "ast_hash": "bbed2af19e0488560368e9c63d0c3b29",
     "semantic_hash": ""
   },
@@ -4065,8 +4065,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/lib/socket/clipEvents.ts": {
-    "mtime": 1784291413.2113264,
-    "ast_hash": "a801bf7e9522fbc89c271ddcda5217bb",
+    "mtime": 1784647786.273052,
+    "ast_hash": "23f759db5b2472ee7bfd3b7fcbd3438b",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/lib/socket/events.ts": {
@@ -4080,8 +4080,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/lib/user/resolveShowAsOnline.ts": {
-    "mtime": 1784126941.1797884,
-    "ast_hash": "5ddf686196fb3d47a3812e631d8b7a11",
+    "mtime": 1784705059.1501203,
+    "ast_hash": "b0121dc7b9d58ba8969450fc7c8c0660",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/lib/utils/cn.ts": {
@@ -4100,7 +4100,7 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/package.json": {
-    "mtime": 1784355536.4466896,
+    "mtime": 1784395839.9437287,
     "ast_hash": "a43bd5621118eeb86d7489b4e9ce8fab",
     "semantic_hash": ""
   },
@@ -4115,13 +4115,13 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/services/api/api.endpoints.ts": {
-    "mtime": 1784290474.8725562,
-    "ast_hash": "585eb50d29dca11f7ace5c65e647942a",
+    "mtime": 1784485741.55554,
+    "ast_hash": "24074c27639b70d826a8506a9489e9ca",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/services/api/auth/auth.api.ts": {
-    "mtime": 1784121687.3038633,
-    "ast_hash": "fb95b125f63a6af587203adc2b4eb65f",
+    "mtime": 1784737740.8463793,
+    "ast_hash": "fd6d471db2d8b09693043997708299f6",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/services/api/auth/auth.service.ts": {
@@ -4130,8 +4130,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/services/api/auth/auth.types.ts": {
-    "mtime": 1784121687.3040218,
-    "ast_hash": "8e87d6b157d407342f36fce700aafc97",
+    "mtime": 1784655148.5434806,
+    "ast_hash": "b0fbc421276ebd7734db7600381a3026",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/services/api/auth/authSessions.service.ts": {
@@ -4140,7 +4140,7 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/services/api/axios.instance.ts": {
-    "mtime": 1784125377.2455525,
+    "mtime": 1784783498.4723356,
     "ast_hash": "085fc5f341eb30ee7991d357e3c441ab",
     "semantic_hash": ""
   },
@@ -4240,8 +4240,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/services/api/trainee/trainee.service.ts": {
-    "mtime": 1784290474.8738923,
-    "ast_hash": "4898e773d1bc94e807e68ab0a7d3fed3",
+    "mtime": 1784485741.5564554,
+    "ast_hash": "cf78d3b95cbcf3ab1602fbab5f40405f",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/services/api/trainer/trainer.service.ts": {
@@ -4265,8 +4265,8 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/services/api/uploads/uploads.service.ts": {
-    "mtime": 1784290474.8740776,
-    "ast_hash": "a43c7422f3e99b1a48917128cf64ebd4",
+    "mtime": 1784647786.2670372,
+    "ast_hash": "16e3ac0fd85eb1975a017a1b9d32d869",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/services/api/user/privacy.service.ts": {
@@ -4285,12 +4285,12 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/services/api/user/userSettings.service.ts": {
-    "mtime": 1784125377.161148,
-    "ast_hash": "223c94d840bb337d9bc884f8ae76e4bb",
+    "mtime": 1784485741.5568254,
+    "ast_hash": "a9b8e91e580079cc7ad62b59654ce6b4",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/services/api/wallet/wallet.service.ts": {
-    "mtime": 1784290889.3030405,
+    "mtime": 1784395839.959963,
     "ast_hash": "0279d1865820f439d500d1c101a0d88d",
     "semantic_hash": ""
   },
@@ -4360,7 +4360,7 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/store/features/trainer-search/index.ts": {
-    "mtime": 1784290474.8765996,
+    "mtime": 1784394976.1913528,
     "ast_hash": "324866bb62e0e31ecba0d773926ac7dd",
     "semantic_hash": ""
   },
@@ -4395,18 +4395,18 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/utils/gamePlanPdf.ts": {
-    "mtime": 1784371079.283087,
-    "ast_hash": "7f5290477bd1f5ddd9f95b9cac1c6fad",
+    "mtime": 1784781546.1366758,
+    "ast_hash": "504fdcc3a9f174350342fff059a428f7",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/utils/image.ts": {
-    "mtime": 1784121687.309158,
-    "ast_hash": "1cacc72399660e693747cb6ea673969a",
+    "mtime": 1784527359.759446,
+    "ast_hash": "284820ef1f50f6071ad220dc72029b8d",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/utils/media.ts": {
-    "mtime": 1784230214.8957028,
-    "ast_hash": "13515efc9752769920b444c30b1788eb",
+    "mtime": 1784737979.2728088,
+    "ast_hash": "6bbfcd172fe624e8115059acb93e0282",
     "semantic_hash": ""
   },
   "src/components/admin/AdminGoogleSignIn.jsx": {
@@ -4450,18 +4450,18 @@
     "semantic_hash": ""
   },
   "src/pages/apps/admin-roles/index.js": {
-    "mtime": 1784393694.163048,
-    "ast_hash": "aecdf2bd2f779587547804e833e23634",
+    "mtime": 1784544928.6234508,
+    "ast_hash": "a81c8f35e6e7c61f1ce79baae0447614",
     "semantic_hash": ""
   },
   "src/pages/apps/logs/index.js": {
-    "mtime": 1784391010.1768994,
-    "ast_hash": "6210f0eb772be069b0516def0aeef8cb",
+    "mtime": 1784394571.3723986,
+    "ast_hash": "327fd96611ea4e9cc87a7fe59a4f747b",
     "semantic_hash": ""
   },
   "src/pages/apps/platform-activity/index.js": {
-    "mtime": 1784391063.0975666,
-    "ast_hash": "eccadff29e73631ca88c7d0e6bb0db3b",
+    "mtime": 1784395956.961896,
+    "ast_hash": "aac30d6b380818d1f36344d4be93d0b9",
     "semantic_hash": ""
   },
   "src/services/adminAlertsApi.js": {
@@ -4470,8 +4470,8 @@
     "semantic_hash": ""
   },
   "src/services/adminLogsApi.js": {
-    "mtime": 1784393676.6046112,
-    "ast_hash": "f276a01e5e6bd8f505ec5be55c7eba29",
+    "mtime": 1784394471.2500205,
+    "ast_hash": "927a7953e8010d967ec8fe29c3d289a3",
     "semantic_hash": ""
   },
   "src/store/hooks.js": {
@@ -4485,8 +4485,8 @@
     "semantic_hash": ""
   },
   "src/store/slices/authSlice.js": {
-    "mtime": 1784374808.6497707,
-    "ast_hash": "cafed128ac4a9ea893f66ea2b40c97e7",
+    "mtime": 1784530558.7888353,
+    "ast_hash": "cf1f8430c72d46e226e916f8cae1b53e",
     "semantic_hash": ""
   },
   "src/store/slices/dashboardSlice.js": {
@@ -4500,8 +4500,8 @@
     "semantic_hash": ""
   },
   "src/styles/opsPageEyebrows.js": {
-    "mtime": 1784372435.5278795,
-    "ast_hash": "d849ba02291c9173b317ffa1cdbc8e75",
+    "mtime": 1784544933.5735798,
+    "ast_hash": "a8df1af2cc91736c7bb78915432e9f75",
     "semantic_hash": ""
   },
   "src/styles/opsSurface.js": {
@@ -6230,12 +6230,12 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/public/assets/images/favicon/favicon.png": {
-    "mtime": 1784290474.9523842,
+    "mtime": 1784395839.947981,
     "ast_hash": "e3000b880bdf9fe3c9633dd3da8f8897",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/public/assets/images/favicon/icon.png": {
-    "mtime": 1784290474.9550092,
+    "mtime": 1784395839.9493484,
     "ast_hash": "e3000b880bdf9fe3c9633dd3da8f8897",
     "semantic_hash": ""
   },
@@ -6729,26 +6729,6 @@
     "ast_hash": "df83136d9d8fe78d1f1cab772f06d780",
     "semantic_hash": ""
   },
-  "netqwix_frontend_v2/public/assets/images/logo/landing-logo.png": {
-    "mtime": 1784121687.2321942,
-    "ast_hash": "0909e3f052c1d2853353821b23ded27c",
-    "semantic_hash": ""
-  },
-  "netqwix_frontend_v2/public/assets/images/logo/logo-white.png": {
-    "mtime": 1784121687.2322512,
-    "ast_hash": "6def229bfab264f6e775567133aa04b7",
-    "semantic_hash": ""
-  },
-  "netqwix_frontend_v2/public/assets/images/logo/logo.png": {
-    "mtime": 1784121687.232313,
-    "ast_hash": "a5af194a4c62c53750dde79336f4b311",
-    "semantic_hash": ""
-  },
-  "netqwix_frontend_v2/public/assets/images/logo/logo_big.png": {
-    "mtime": 1784121687.2324257,
-    "ast_hash": "916398926f710590dc39d0861e0b4518",
-    "semantic_hash": ""
-  },
   "netqwix_frontend_v2/public/assets/images/logo/maximize.svg": {
     "mtime": 1784121687.2324944,
     "ast_hash": "c94f579ce742a5705f2179b9896fc3c3",
@@ -6770,7 +6750,7 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/public/assets/images/logo/netqwix_logo-fulll.png": {
-    "mtime": 1784290474.9645934,
+    "mtime": 1784395839.954223,
     "ast_hash": "86dfa90901e9f417d03eb506e9cccf99",
     "semantic_hash": ""
   },
@@ -6780,12 +6760,12 @@
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/public/assets/images/logo/netqwix_logo_pdf.png": {
-    "mtime": 1784290474.9691052,
+    "mtime": 1784395839.95696,
     "ast_hash": "dc903ac6e03824229133379d163cc5c6",
     "semantic_hash": ""
   },
   "netqwix_frontend_v2/public/assets/images/logo/netqwix_mark.png": {
-    "mtime": 1784290474.9738176,
+    "mtime": 1784395839.9590251,
     "ast_hash": "e3000b880bdf9fe3c9633dd3da8f8897",
     "semantic_hash": ""
   },
@@ -7257,6 +7237,136 @@
   "src/utils/navFavorites.js": {
     "mtime": 1784393676.257945,
     "ast_hash": "ee1b4e50e070a8cf454a159e837d066f",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/app/(auth)/forgot-password/page.tsx": {
+    "mtime": 1784737740.814531,
+    "ast_hash": "876b0208769b456b3ec79d2fe7793177",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/components/common/ThemeToggle.tsx": {
+    "mtime": 1784705059.1369545,
+    "ast_hash": "b12cf857428af0e26c1615d9a9fcf4eb",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/components/page-index/forgot-password/index.tsx": {
+    "mtime": 1784737740.814763,
+    "ast_hash": "16665caf2319174c1a4a7c8d39a49725",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/components/providers/ThemeProvider.tsx": {
+    "mtime": 1784705059.1375737,
+    "ast_hash": "ca3e5eb134f98476a16376fed2261f78",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/components/ui/simple-select.tsx": {
+    "mtime": 1784648168.9909163,
+    "ast_hash": "f421f514a8690f5adc58d87ec521203d",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/features/auth/components/AppleSignInButton.tsx": {
+    "mtime": 1784655148.5395288,
+    "ast_hash": "7a450d688796557d719309130766a71a",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/features/auth/components/SocialAuthButtons.tsx": {
+    "mtime": 1784705059.1381521,
+    "ast_hash": "9676bb8cabfebb5d59db9b01cb57a7c3",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/features/auth/useAppleSignIn.ts": {
+    "mtime": 1784705059.1384661,
+    "ast_hash": "d3f9782318dbeba870eb39be2a49bcf4",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/features/booking/components/BookingMonthCalendar.tsx": {
+    "mtime": 1784705059.1388168,
+    "ast_hash": "8091077e3443bac2ecf685b2c3276bf1",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/features/booking/hooks/useFavoriteTrainers.ts": {
+    "mtime": 1784485741.4766314,
+    "ast_hash": "4faa976665216f523f46c84f86a867ca",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/features/booking/utils/trainerCredentials.ts": {
+    "mtime": 1784485741.4831407,
+    "ast_hash": "2822d81b45f000fb08a0ef73e2f07cfb",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/features/dashboard/sections/locker/LockerUpcomingSessionsPanel.tsx": {
+    "mtime": 1784781546.127401,
+    "ast_hash": "cfbaa20ee8ed079639a72266a4877522",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/features/dashboard/sections/locker/TrainerReviewHubCard.tsx": {
+    "mtime": 1784655148.5418494,
+    "ast_hash": "2ec59d509a056573f93039b5b0b0f14c",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/features/dashboard/sections/settings/__tests__/profileCompletion.check.ts": {
+    "mtime": 1784485741.530262,
+    "ast_hash": "6e77db6a9273cae82a4792d1a2ecc6df",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/features/dashboard/sections/settings/components/ProfessionalProfileEditor.tsx": {
+    "mtime": 1784485741.5306082,
+    "ast_hash": "3f1ed26079fadcfce452cf2a29e10319",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/features/dashboard/sections/settings/components/ProfileCompletionCard.tsx": {
+    "mtime": 1784485741.531126,
+    "ast_hash": "9e4382277b15c31b0435f31c11340268",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/features/dashboard/sections/settings/profileCompletion.ts": {
+    "mtime": 1784485741.5324707,
+    "ast_hash": "154d2c8c623573000f093c05dd6f53ac",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/features/meeting/lib/videoSeek.ts": {
+    "mtime": 1784567093.2255578,
+    "ast_hash": "2a72fe31cbb983bcad112fec6e8acf62",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/lib/auth/ssoDevice.ts": {
+    "mtime": 1784655148.542812,
+    "ast_hash": "380c77889029949fd25b965777881313",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/lib/auth/trainerSoftGate.ts": {
+    "mtime": 1784655148.5429778,
+    "ast_hash": "e4fdea75403d0f85460f6c8055106d9f",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/services/api/verification/verification.api.ts": {
+    "mtime": 1784655148.543705,
+    "ast_hash": "60f81773c2ab0b6de0fc037303eac6ad",
+    "semantic_hash": ""
+  },
+  "netqwix_frontend_v2/utils/gamePlanSessionMeta.ts": {
+    "mtime": 1784781546.1368375,
+    "ast_hash": "cc631a54c6f3e676c04dc561af0aab7f",
+    "semantic_hash": ""
+  },
+  "src/components/admin/MiniSparkline.jsx": {
+    "mtime": 1784394732.4592965,
+    "ast_hash": "74b74540e067e0c67139be94d083fbcc",
+    "semantic_hash": ""
+  },
+  "src/utils/authRefresh.js": {
+    "mtime": 1784530710.840697,
+    "ast_hash": "ba3b7a929459d34cbf41a6a33251173e",
+    "semantic_hash": ""
+  },
+  "src/utils/authStorage.js": {
+    "mtime": 1784530556.5567486,
+    "ast_hash": "2baae2df959aa74812221a0a538d5335",
+    "semantic_hash": ""
+  },
+  "src/utils/pricingDiff.js": {
+    "mtime": 1784394460.4192736,
+    "ast_hash": "ec114c243d9d221e21f27e45dd8e2729",
     "semantic_hash": ""
   }
 }

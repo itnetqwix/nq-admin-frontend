@@ -3,16 +3,25 @@ import {
   Box,
   Button,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   Grid,
+  IconButton,
   InputLabel,
   LinearProgress,
   MenuItem,
   Select,
   Stack,
   TextField,
+  Tooltip,
   Typography
 } from '@mui/material'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined'
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
@@ -24,10 +33,13 @@ import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPa
 import { ops } from 'src/styles/opsSurface'
 import {
   confirmLibraryClip,
+  deleteLibraryClip,
+  getClipPlayUrl,
   getClipTaxonomyAdmin,
   getLibraryClipsGrouped,
   getLibrarySubmissions,
-  presignLibraryClip
+  presignLibraryClip,
+  updateLibraryClip
 } from 'src/services/clipsAdminApi'
 
 const MAX_BYTES = 50 * 1024 * 1024
@@ -86,6 +98,10 @@ function captureVideoThumbnail(file) {
   })
 }
 
+function catIdOf(c) {
+  return String(c?.id || c?._id || '')
+}
+
 export default function NetqwixLibraryPage() {
   const router = useRouter()
   const { confirm, ConfirmDialog } = useAdminConfirm()
@@ -101,6 +117,12 @@ export default function NetqwixLibraryPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
+  const [busyId, setBusyId] = useState('')
+  const [editClip, setEditClip] = useState(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editCategoryId, setEditCategoryId] = useState('')
+  const [editSubcategoryId, setEditSubcategoryId] = useState('')
+  const [savingEdit, setSavingEdit] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -133,8 +155,10 @@ export default function NetqwixLibraryPage() {
   }, [load])
 
   const activeCategories = useMemo(() => taxonomy.filter(c => c.is_active !== false), [taxonomy])
-  const selectedCat = activeCategories.find(c => (c.id || c._id) === categoryId)
+  const selectedCat = activeCategories.find(c => catIdOf(c) === categoryId)
   const subs = (selectedCat?.subcategories || []).filter(s => s.is_active !== false)
+  const editCat = activeCategories.find(c => catIdOf(c) === editCategoryId)
+  const editSubs = (editCat?.subcategories || []).filter(s => s.is_active !== false)
 
   const onCategoryChange = id => {
     setCategoryId(id)
@@ -168,9 +192,16 @@ export default function NetqwixLibraryPage() {
       .filter(Boolean)
   }, [groups, search, categoryFilter])
 
+  const showingCount = filteredGroups.reduce(
+    (n, g) => n + (g.subcategories || []).reduce((m, s) => m + (s.clips || []).length, 0),
+    0
+  )
+  const fileSizeMb = file ? (file.size / (1024 * 1024)).toFixed(1) : null
+  const uploadNeedsSub = subs.length > 0
+
   const upload = async () => {
-    if (!file || !title.trim() || !categoryId || !subcategoryId) {
-      toast.error('Fill all fields and choose a video file')
+    if (!file || !title.trim() || !categoryId || (uploadNeedsSub && !subcategoryId)) {
+      toast.error('Fill title, category' + (uploadNeedsSub ? ', subcategory' : '') + ', and choose a video')
       return
     }
     if (file.size > MAX_BYTES) {
@@ -178,12 +209,12 @@ export default function NetqwixLibraryPage() {
       return
     }
 
-    const catName = activeCategories.find(c => (c.id || c._id) === categoryId)?.name
-    const subName = subs.find(s => (s.id || s._id) === subcategoryId)?.name
+    const catName = activeCategories.find(c => catIdOf(c) === categoryId)?.name
+    const subName = subs.find(s => catIdOf(s) === subcategoryId)?.name
     const ok = await confirm({
       title: 'Publish clip to library?',
       message: 'This uploads and publishes the video to the public NetQwix library.',
-      detail: `"${title.trim()}" → ${catName} › ${subName}`,
+      detail: `"${title.trim()}" → ${catName}${subName ? ` › ${subName}` : ''}`,
       confirmLabel: 'Publish',
       variant: 'warning'
     })
@@ -223,7 +254,7 @@ export default function NetqwixLibraryPage() {
         fileType: file.type || 'video/mp4',
         fileSizeBytes: file.size,
         category_id: categoryId,
-        subcategory_id: subcategoryId
+        subcategory_id: subcategoryId || null
       })
 
       toast.success('Library clip published')
@@ -240,11 +271,85 @@ export default function NetqwixLibraryPage() {
     }
   }
 
-  const fileSizeMb = file ? (file.size / (1024 * 1024)).toFixed(1) : null
-  const showingCount = filteredGroups.reduce(
-    (n, g) => n + (g.subcategories || []).reduce((m, s) => m + (s.clips || []).length, 0),
-    0
-  )
+  const openEdit = (clip, catGroup, subGroup) => {
+    setEditClip(clip)
+    setEditTitle(String(clip?.title || ''))
+    setEditCategoryId(String(clip?.category_id || catGroup?.categoryId || ''))
+    setEditSubcategoryId(String(clip?.subcategory_id || subGroup?.subcategoryId || '') || '')
+  }
+
+  const saveEdit = async () => {
+    if (!editClip?._id) return
+    if (!editTitle.trim() || !editCategoryId) {
+      toast.error('Title and category are required')
+      return
+    }
+    if (editSubs.length > 0 && !editSubcategoryId) {
+      toast.error('Pick a subcategory')
+      return
+    }
+    setSavingEdit(true)
+    try {
+      await updateLibraryClip(String(editClip._id), {
+        title: editTitle.trim(),
+        category_id: editCategoryId,
+        subcategory_id: editSubcategoryId || null
+      })
+      toast.success('Clip updated')
+      setEditClip(null)
+      void load()
+    } catch (e) {
+      toast.error(e?.message || 'Update failed')
+    } finally {
+      setSavingEdit(false)
+    }
+  }
+
+  const onDownload = async clip => {
+    const id = String(clip?._id || '')
+    if (!id) return
+    setBusyId(id)
+    try {
+      const urls = await getClipPlayUrl(id)
+      const videoUrl = urls?.videoUrl || urls?.cdnFallbackVideo
+      if (!videoUrl) throw new Error('No download URL')
+      const a = document.createElement('a')
+      a.href = videoUrl
+      a.download = `${String(clip.title || 'clip').replace(/[^\w.-]+/g, '_')}.mp4`
+      a.target = '_blank'
+      a.rel = 'noopener noreferrer'
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+    } catch (e) {
+      toast.error(e?.message || 'Download failed')
+    } finally {
+      setBusyId('')
+    }
+  }
+
+  const onDelete = async clip => {
+    const id = String(clip?._id || '')
+    if (!id) return
+    const ok = await confirm({
+      title: 'Delete library clip?',
+      message: 'This permanently removes the clip from the NetQwix library.',
+      detail: clip?.title || id,
+      confirmLabel: 'Delete',
+      variant: 'danger'
+    })
+    if (!ok) return
+    setBusyId(id)
+    try {
+      await deleteLibraryClip(id)
+      toast.success('Clip deleted')
+      void load()
+    } catch (e) {
+      toast.error(e?.message || 'Delete failed')
+    } finally {
+      setBusyId('')
+    }
+  }
 
   return (
     <AdminPageShell
@@ -252,7 +357,7 @@ export default function NetqwixLibraryPage() {
       icon='mdi:library-outline'
       eyebrow='Library'
       title='Published clips'
-      subtitle='Public NetQwix Library — upload admin clips or browse by category.'
+      subtitle='Public NetQwix Library — upload, edit category, download, or delete clips.'
       actions={
         <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
           <Chip
@@ -317,17 +422,22 @@ export default function NetqwixLibraryPage() {
                 <InputLabel>Category</InputLabel>
                 <Select label='Category' value={categoryId} onChange={e => onCategoryChange(e.target.value)}>
                   {activeCategories.map(c => (
-                    <MenuItem key={c.id || c._id} value={c.id || c._id}>
+                    <MenuItem key={catIdOf(c)} value={catIdOf(c)}>
                       {c.name}
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
-              <FormControl fullWidth size='small' disabled={uploading || !categoryId}>
+              <FormControl fullWidth size='small' disabled={uploading || !categoryId || !subs.length}>
                 <InputLabel>Subcategory</InputLabel>
-                <Select label='Subcategory' value={subcategoryId} onChange={e => setSubcategoryId(e.target.value)}>
+                <Select
+                  label='Subcategory'
+                  value={subcategoryId}
+                  onChange={e => setSubcategoryId(e.target.value)}
+                >
+                  {!subs.length ? <MenuItem value=''>General (none)</MenuItem> : null}
                   {subs.map(s => (
-                    <MenuItem key={s.id || s._id} value={s.id || s._id}>
+                    <MenuItem key={catIdOf(s)} value={catIdOf(s)}>
                       {s.name}
                     </MenuItem>
                   ))}
@@ -387,7 +497,12 @@ export default function NetqwixLibraryPage() {
             <Button
               variant='contained'
               disabled={
-                uploading || !file || !title.trim() || !categoryId || !subcategoryId || !activeCategories.length
+                uploading ||
+                !file ||
+                !title.trim() ||
+                !categoryId ||
+                (uploadNeedsSub && !subcategoryId) ||
+                !activeCategories.length
               }
               onClick={() => void upload()}
               sx={{ bgcolor: ops.indigo, boxShadow: 'none', textTransform: 'none', fontWeight: 500 }}
@@ -399,7 +514,7 @@ export default function NetqwixLibraryPage() {
       </AdminPageSection>
 
       <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden', mt: 2 }}>
-        <AdminPageSection title='Browse published' subtitle='Search titles or filter by category.'>
+        <AdminPageSection title='Browse published' subtitle='Edit category, download, or permanently delete.'>
           <AdminFilterBar
             searchPlaceholder='Search clip titles…'
             searchValue={search}
@@ -442,12 +557,67 @@ export default function NetqwixLibraryPage() {
                           sx={{ fontFamily: ops.mono, fontSize: 11, height: 20 }}
                         />
                       </Stack>
-                      <Stack component='ul' sx={{ m: 0, pl: 2.5, mt: 0.5 }} spacing={0.25}>
-                        {(sub.clips || []).map(c => (
-                          <Typography component='li' key={c._id} sx={{ fontSize: 13, color: ops.ink }}>
-                            {c.title}
-                          </Typography>
-                        ))}
+                      <Stack spacing={0.5} sx={{ mt: 0.75 }}>
+                        {(sub.clips || []).map(c => {
+                          const id = String(c._id)
+                          const busy = busyId === id
+                          return (
+                            <Stack
+                              key={id}
+                              direction='row'
+                              alignItems='center'
+                              spacing={1}
+                              sx={{
+                                py: 0.75,
+                                px: 1,
+                                borderRadius: ops.radiusSm,
+                                bgcolor: ops.canvasSoft,
+                                border: `1px solid ${ops.hairline}`
+                              }}
+                            >
+                              <Typography sx={{ flex: 1, fontSize: 13, color: ops.ink, minWidth: 0 }} noWrap>
+                                {c.title}
+                              </Typography>
+                              <Tooltip title='Edit category'>
+                                <span>
+                                  <IconButton
+                                    size='small'
+                                    disabled={busy}
+                                    onClick={() => openEdit(c, cat, sub)}
+                                    aria-label='Edit clip'
+                                  >
+                                    <EditOutlinedIcon fontSize='small' />
+                                  </IconButton>
+                                </span>
+                              </Tooltip>
+                              <Tooltip title='Download'>
+                                <span>
+                                  <IconButton
+                                    size='small'
+                                    disabled={busy}
+                                    onClick={() => void onDownload(c)}
+                                    aria-label='Download clip'
+                                  >
+                                    <DownloadOutlinedIcon fontSize='small' />
+                                  </IconButton>
+                                </span>
+                              </Tooltip>
+                              <Tooltip title='Delete permanently'>
+                                <span>
+                                  <IconButton
+                                    size='small'
+                                    color='error'
+                                    disabled={busy}
+                                    onClick={() => void onDelete(c)}
+                                    aria-label='Delete clip'
+                                  >
+                                    <DeleteOutlineIcon fontSize='small' />
+                                  </IconButton>
+                                </span>
+                              </Tooltip>
+                            </Stack>
+                          )
+                        })}
                       </Stack>
                     </Box>
                   ))}
@@ -457,6 +627,68 @@ export default function NetqwixLibraryPage() {
           )}
         </AdminPageSection>
       </OpsSurfaceCard>
+
+      <Dialog open={Boolean(editClip)} onClose={() => !savingEdit && setEditClip(null)} fullWidth maxWidth='sm'>
+        <DialogTitle>Edit library clip</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ pt: 1 }}>
+            <TextField
+              label='Title'
+              value={editTitle}
+              onChange={e => setEditTitle(e.target.value)}
+              fullWidth
+              size='small'
+              disabled={savingEdit}
+            />
+            <FormControl fullWidth size='small' disabled={savingEdit}>
+              <InputLabel>Category</InputLabel>
+              <Select
+                label='Category'
+                value={editCategoryId}
+                onChange={e => {
+                  setEditCategoryId(e.target.value)
+                  setEditSubcategoryId('')
+                }}
+              >
+                {activeCategories.map(c => (
+                  <MenuItem key={catIdOf(c)} value={catIdOf(c)}>
+                    {c.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth size='small' disabled={savingEdit || !editCategoryId}>
+              <InputLabel>Subcategory</InputLabel>
+              <Select
+                label='Subcategory'
+                value={editSubcategoryId}
+                onChange={e => setEditSubcategoryId(e.target.value)}
+              >
+                <MenuItem value=''>General (none)</MenuItem>
+                {editSubs.map(s => (
+                  <MenuItem key={catIdOf(s)} value={catIdOf(s)}>
+                    {s.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setEditClip(null)} disabled={savingEdit} sx={{ textTransform: 'none' }}>
+            Cancel
+          </Button>
+          <Button
+            variant='contained'
+            onClick={() => void saveEdit()}
+            disabled={savingEdit}
+            sx={{ textTransform: 'none', bgcolor: ops.indigo, boxShadow: 'none' }}
+          >
+            {savingEdit ? 'Saving…' : 'Save'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {ConfirmDialog}
     </AdminPageShell>
   )

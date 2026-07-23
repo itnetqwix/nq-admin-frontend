@@ -112,6 +112,17 @@ export async function deleteLibraryClip(clipId) {
   return parseJson(res)
 }
 
+export async function updateLibraryClip(clipId, body) {
+  const res = await fetch(api(`/admin/library/clips/${clipId}`), {
+    method: 'PUT',
+    headers: headers(),
+    body: JSON.stringify(body)
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data?.message || data?.error || 'Update failed')
+  return data?.clip ?? data?.data ?? data
+}
+
 export async function getLibrarySubmissions(query = {}) {
   const params = new URLSearchParams(query).toString()
   const res = await fetch(api(`/admin/library-submissions?${params}`), { headers: headers() })
