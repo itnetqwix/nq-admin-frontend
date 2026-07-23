@@ -22,6 +22,7 @@ import {
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
+import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
@@ -29,6 +30,7 @@ import { AdminLoadingState, OpsSurfaceCard, useAdminConfirm } from 'src/componen
 import AdminFilterBar from 'src/components/admin/AdminFilterBar'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
 import OpsMetricTile from 'src/components/admin/OpsMetricTile'
+import { ClipPlayDialog, safeImg } from 'src/components/user360/user360Parts'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import { ops } from 'src/styles/opsSurface'
 import {
@@ -118,6 +120,7 @@ export default function NetqwixLibraryPage() {
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
   const [busyId, setBusyId] = useState('')
+  const [playClipId, setPlayClipId] = useState('')
   const [editClip, setEditClip] = useState(null)
   const [editTitle, setEditTitle] = useState('')
   const [editCategoryId, setEditCategoryId] = useState('')
@@ -514,7 +517,10 @@ export default function NetqwixLibraryPage() {
       </AdminPageSection>
 
       <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden', mt: 2 }}>
-        <AdminPageSection title='Browse published' subtitle='Edit category, download, or permanently delete.'>
+        <AdminPageSection
+          title='Browse published'
+          subtitle='Cards by category › subcategory — play, edit, download, or delete.'
+        >
           <AdminFilterBar
             searchPlaceholder='Search clip titles…'
             searchValue={search}
@@ -539,94 +545,178 @@ export default function NetqwixLibraryPage() {
           ) : filteredGroups.length === 0 ? (
             <Typography sx={{ color: ops.mute, fontSize: 13 }}>No clips match.</Typography>
           ) : (
-            <Stack spacing={2}>
+            <Stack spacing={3}>
               {filteredGroups.map(cat => (
-                <OpsSurfaceCard key={cat.categoryId || cat.categoryName} sx={{ bgcolor: ops.canvas }}>
-                  <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', mb: 1 }}>
+                <Box key={cat.categoryId || cat.categoryName}>
+                  <Typography sx={{ fontWeight: 700, letterSpacing: '-0.32px', mb: 1.5, fontSize: 18 }}>
                     {cat.categoryName}
                   </Typography>
-                  {(cat.subcategories || []).map(sub => (
-                    <Box key={sub.subcategoryId || sub.subcategoryName} sx={{ pl: 0.5, mt: 1.5 }}>
-                      <Stack direction='row' spacing={1} alignItems='center'>
-                        <Typography sx={{ fontSize: 13, color: ops.body, fontWeight: 600 }}>
-                          {sub.subcategoryName}
-                        </Typography>
-                        <Chip
-                          size='small'
-                          label={(sub.clips || []).length}
-                          sx={{ fontFamily: ops.mono, fontSize: 11, height: 20 }}
-                        />
-                      </Stack>
-                      <Stack spacing={0.5} sx={{ mt: 0.75 }}>
-                        {(sub.clips || []).map(c => {
-                          const id = String(c._id)
-                          const busy = busyId === id
-                          return (
-                            <Stack
-                              key={id}
-                              direction='row'
-                              alignItems='center'
-                              spacing={1}
-                              sx={{
-                                py: 0.75,
-                                px: 1,
-                                borderRadius: ops.radiusSm,
-                                bgcolor: ops.canvasSoft,
-                                border: `1px solid ${ops.hairline}`
-                              }}
-                            >
-                              <Typography sx={{ flex: 1, fontSize: 13, color: ops.ink, minWidth: 0 }} noWrap>
-                                {c.title}
-                              </Typography>
-                              <Tooltip title='Edit category'>
-                                <span>
-                                  <IconButton
-                                    size='small'
-                                    disabled={busy}
-                                    onClick={() => openEdit(c, cat, sub)}
-                                    aria-label='Edit clip'
+                  <Stack spacing={2.5}>
+                    {(cat.subcategories || []).map(sub => (
+                      <Box key={sub.subcategoryId || sub.subcategoryName}>
+                        <Stack direction='row' spacing={1} alignItems='center' sx={{ mb: 1.25 }}>
+                          <Typography sx={{ fontSize: 14, color: ops.body, fontWeight: 600 }}>
+                            {sub.subcategoryName}
+                          </Typography>
+                          <Chip
+                            size='small'
+                            label={(sub.clips || []).length}
+                            sx={{ fontFamily: ops.mono, fontSize: 11, height: 20 }}
+                          />
+                        </Stack>
+                        <Grid container spacing={2}>
+                          {(sub.clips || []).map(c => {
+                            const id = String(c._id)
+                            const busy = busyId === id
+                            const thumb = safeImg(c.thumbnail)
+                            return (
+                              <Grid item xs={12} sm={6} md={4} lg={3} key={id}>
+                                <OpsSurfaceCard
+                                  sx={{
+                                    p: 0,
+                                    overflow: 'hidden',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    height: '100%',
+                                    bgcolor: ops.canvas
+                                  }}
+                                >
+                                  <Box
+                                    onClick={() => setPlayClipId(id)}
+                                    role='button'
+                                    tabIndex={0}
+                                    onKeyDown={e => {
+                                      if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault()
+                                        setPlayClipId(id)
+                                      }
+                                    }}
+                                    sx={{
+                                      position: 'relative',
+                                      pt: '56.25%',
+                                      bgcolor: ops.canvasSoft2,
+                                      backgroundImage: thumb ? `url(${thumb})` : undefined,
+                                      backgroundSize: 'cover',
+                                      backgroundPosition: 'center',
+                                      cursor: 'pointer',
+                                      '&:hover .playOverlay': { opacity: 1 }
+                                    }}
                                   >
-                                    <EditOutlinedIcon fontSize='small' />
-                                  </IconButton>
-                                </span>
-                              </Tooltip>
-                              <Tooltip title='Download'>
-                                <span>
-                                  <IconButton
-                                    size='small'
-                                    disabled={busy}
-                                    onClick={() => void onDownload(c)}
-                                    aria-label='Download clip'
-                                  >
-                                    <DownloadOutlinedIcon fontSize='small' />
-                                  </IconButton>
-                                </span>
-                              </Tooltip>
-                              <Tooltip title='Delete permanently'>
-                                <span>
-                                  <IconButton
-                                    size='small'
-                                    color='error'
-                                    disabled={busy}
-                                    onClick={() => void onDelete(c)}
-                                    aria-label='Delete clip'
-                                  >
-                                    <DeleteOutlineIcon fontSize='small' />
-                                  </IconButton>
-                                </span>
-                              </Tooltip>
-                            </Stack>
-                          )
-                        })}
-                      </Stack>
-                    </Box>
-                  ))}
-                </OpsSurfaceCard>
+                                    <Box
+                                      className='playOverlay'
+                                      sx={{
+                                        position: 'absolute',
+                                        inset: 0,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        bgcolor: 'rgba(0,0,0,0.35)',
+                                        opacity: 0.85,
+                                        transition: 'opacity 0.15s ease'
+                                      }}
+                                    >
+                                      <Box
+                                        sx={{
+                                          width: 48,
+                                          height: 48,
+                                          borderRadius: '50%',
+                                          bgcolor: 'rgba(255,255,255,0.92)',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center'
+                                        }}
+                                      >
+                                        <PlayArrowRoundedIcon sx={{ fontSize: 32, color: ops.indigo }} />
+                                      </Box>
+                                    </Box>
+                                  </Box>
+                                  <Box sx={{ p: 1.5, flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                    <Typography
+                                      sx={{
+                                        fontWeight: 600,
+                                        letterSpacing: '-0.28px',
+                                        lineHeight: 1.3,
+                                        fontSize: 14
+                                      }}
+                                      noWrap
+                                      title={c.title}
+                                    >
+                                      {c.title || 'Untitled'}
+                                    </Typography>
+                                    <Typography sx={{ fontSize: 12, color: ops.mute }}>
+                                      {cat.categoryName}
+                                      {sub.subcategoryName ? ` · ${sub.subcategoryName}` : ''}
+                                    </Typography>
+                                    <Stack direction='row' spacing={0.5} sx={{ mt: 'auto', pt: 0.5 }} flexWrap='wrap' useFlexGap>
+                                      <Button
+                                        size='small'
+                                        variant='contained'
+                                        startIcon={<PlayArrowRoundedIcon />}
+                                        disabled={busy}
+                                        onClick={() => setPlayClipId(id)}
+                                        sx={{ textTransform: 'none', bgcolor: ops.indigo, boxShadow: 'none' }}
+                                      >
+                                        Play
+                                      </Button>
+                                      <Tooltip title='Edit'>
+                                        <span>
+                                          <IconButton
+                                            size='small'
+                                            disabled={busy}
+                                            onClick={() => openEdit(c, cat, sub)}
+                                            aria-label='Edit clip'
+                                          >
+                                            <EditOutlinedIcon fontSize='small' />
+                                          </IconButton>
+                                        </span>
+                                      </Tooltip>
+                                      <Tooltip title='Download'>
+                                        <span>
+                                          <IconButton
+                                            size='small'
+                                            disabled={busy}
+                                            onClick={() => void onDownload(c)}
+                                            aria-label='Download clip'
+                                          >
+                                            <DownloadOutlinedIcon fontSize='small' />
+                                          </IconButton>
+                                        </span>
+                                      </Tooltip>
+                                      <Tooltip title='Delete permanently'>
+                                        <span>
+                                          <IconButton
+                                            size='small'
+                                            color='error'
+                                            disabled={busy}
+                                            onClick={() => void onDelete(c)}
+                                            aria-label='Delete clip'
+                                          >
+                                            <DeleteOutlineIcon fontSize='small' />
+                                          </IconButton>
+                                        </span>
+                                      </Tooltip>
+                                    </Stack>
+                                  </Box>
+                                </OpsSurfaceCard>
+                              </Grid>
+                            )
+                          })}
+                        </Grid>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Box>
               ))}
             </Stack>
           )}
         </AdminPageSection>
       </OpsSurfaceCard>
+
+      <ClipPlayDialog
+        clipId={playClipId}
+        open={Boolean(playClipId)}
+        onClose={() => setPlayClipId('')}
+      />
 
       <Dialog open={Boolean(editClip)} onClose={() => !savingEdit && setEditClip(null)} fullWidth maxWidth='sm'>
         <DialogTitle>Edit library clip</DialogTitle>
