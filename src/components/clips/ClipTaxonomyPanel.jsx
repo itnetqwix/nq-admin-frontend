@@ -25,7 +25,8 @@ import {
   deleteClipCategory,
   deleteClipSubcategory,
   getClipTaxonomyAdmin,
-  updateClipCategory
+  updateClipCategory,
+  updateClipSubcategory
 } from 'src/services/clipsAdminApi'
 
 function catId(cat) {
@@ -40,6 +41,8 @@ export default function ClipTaxonomyPanel({ onTaxonomyChange }) {
   const [newSubName, setNewSubName] = useState('')
   const [editCatName, setEditCatName] = useState('')
   const [editingCat, setEditingCat] = useState(false)
+  const [editingSubId, setEditingSubId] = useState('')
+  const [editSubName, setEditSubName] = useState('')
   const { confirm, ConfirmDialog } = useAdminConfirm()
 
   const load = useCallback(async () => {
@@ -104,6 +107,20 @@ export default function ClipTaxonomyPanel({ onTaxonomyChange }) {
       await createClipSubcategory(selectedId, name)
       setNewSubName('')
       toast.success('Subcategory created')
+      void load()
+    } catch (e) {
+      toast.error(e?.message)
+    }
+  }
+
+  const saveSubcategoryName = async () => {
+    const name = editSubName.trim()
+    if (!editingSubId || !name) return
+    try {
+      await updateClipSubcategory(editingSubId, { name })
+      setEditingSubId('')
+      setEditSubName('')
+      toast.success('Subcategory updated')
       void load()
     } catch (e) {
       toast.error(e?.message)
@@ -292,12 +309,14 @@ export default function ClipTaxonomyPanel({ onTaxonomyChange }) {
                 <Stack spacing={1}>
                   {subs.map(sub => {
                     const subId = sub.id || sub._id
+                    const isEditing = editingSubId === subId
                     return (
                       <Stack
                         key={subId}
                         direction='row'
                         alignItems='center'
                         justifyContent='space-between'
+                        spacing={1}
                         sx={{
                           px: 1.5,
                           py: 1,
@@ -305,22 +324,62 @@ export default function ClipTaxonomyPanel({ onTaxonomyChange }) {
                           bgcolor: 'action.hover'
                         }}
                       >
-                        <Typography variant='body2' fontWeight={500}>
-                          {sub.name}
-                        </Typography>
-                        <IconButton
-                          size='small'
-                          color='error'
-                          onClick={() =>
-                            void requestDelete({
-                              type: 'subcategory',
-                              id: subId,
-                              label: sub.name
-                            })
-                          }
-                        >
-                          <DeleteOutlineIcon fontSize='small' />
-                        </IconButton>
+                        {isEditing ? (
+                          <Stack direction='row' spacing={1} sx={{ flex: 1 }}>
+                            <TextField
+                              size='small'
+                              fullWidth
+                              value={editSubName}
+                              onChange={e => setEditSubName(e.target.value)}
+                              onKeyDown={e => e.key === 'Enter' && void saveSubcategoryName()}
+                              autoFocus
+                            />
+                            <Button size='small' variant='contained' onClick={() => void saveSubcategoryName()}>
+                              Save
+                            </Button>
+                            <Button
+                              size='small'
+                              onClick={() => {
+                                setEditingSubId('')
+                                setEditSubName('')
+                              }}
+                            >
+                              Cancel
+                            </Button>
+                          </Stack>
+                        ) : (
+                          <>
+                            <Typography variant='body2' fontWeight={500}>
+                              {sub.name}
+                            </Typography>
+                            <Stack direction='row'>
+                              <IconButton
+                                size='small'
+                                aria-label={`Edit ${sub.name}`}
+                                onClick={() => {
+                                  setEditingSubId(subId)
+                                  setEditSubName(sub.name || '')
+                                }}
+                              >
+                                <EditOutlinedIcon fontSize='small' />
+                              </IconButton>
+                              <IconButton
+                                size='small'
+                                color='error'
+                                aria-label={`Delete ${sub.name}`}
+                                onClick={() =>
+                                  void requestDelete({
+                                    type: 'subcategory',
+                                    id: subId,
+                                    label: sub.name
+                                  })
+                                }
+                              >
+                                <DeleteOutlineIcon fontSize='small' />
+                              </IconButton>
+                            </Stack>
+                          </>
+                        )}
                       </Stack>
                     )
                   })}
