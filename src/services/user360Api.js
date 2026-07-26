@@ -148,5 +148,5 @@ export const getCallDiagnostics = async (query = {}) => {
   })
   const data = await response.json()
   if (isApiFailure(data, response)) throw new Error(readError(data))
-  return data?.data || { diagnostics: [], total: 0, limit: 100, skip: 0 }
+  return data?.data || { diagnostics: [], total: 0, limit: 25, skip: 0 }
 }

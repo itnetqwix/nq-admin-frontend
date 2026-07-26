@@ -103,6 +103,26 @@ const downloadCsv = (rows, filename) => {
   URL.revokeObjectURL(url)
 }
 
+/** Slim meta for UI/CSV — drop nested blobs and truncate long strings. */
+const leanMetaForDisplay = (meta, maxStr = 120) => {
+  const out = {}
+  if (!meta || typeof meta !== 'object') return out
+  for (const [k, v] of Object.entries(meta)) {
+    if (v == null) continue
+    if (typeof v === 'string') {
+      out[k] = v.length > maxStr ? `${v.slice(0, maxStr)}…` : v
+    } else if (typeof v === 'object') {
+      out[k] = '[object]'
+    } else {
+      out[k] = v
+    }
+  }
+  return out
+}
+
+const fmtWhen = v => (v ? new Date(v).toLocaleString() : '—')
+const dash = v => (v == null || v === '' ? '—' : String(v))
+
 const lessonStatusColor = status => {
   const s = String(status || '').toLowerCase()
   if (s.includes('complete')) return 'success'
@@ -529,6 +549,8 @@ export default function AdminUser360Tabs({
   const money = overview.money || {}
   const media = overview.media || {}
   const preferences = overview.preferences || {}
+  const deviceSessions = overview.sessions || []
+  const loginHistory = overview.login_history || []
 
   const lessonsItems = lessons?.items || []
   const reviewsItems = reviews?.items || []
@@ -910,6 +932,91 @@ export default function AdminUser360Tabs({
                     </AccordionDetails>
                   </Accordion>
 
+                  <Accordion
+                    defaultExpanded
+                    sx={{ borderRadius: '8px !important', '&:before': { display: 'none' }, boxShadow: 'none', border: 1, borderColor: 'divider' }}
+                    disableGutters
+                  >
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Stack direction='row' alignItems='center' spacing={1} flexWrap='wrap' sx={{ pr: 1 }}>
+                        <Typography fontWeight={600}>Devices &amp; logins</Typography>
+                        <Typography variant='caption' color='text.secondary'>
+                          Lean fields only (no UA / city / screen)
+                        </Typography>
+                      </Stack>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Typography variant='subtitle2' sx={{ mb: 1, fontWeight: 700 }}>
+                        Active sessions ({deviceSessions.filter(s => !s.revokedAt).length}/{deviceSessions.length})
+                      </Typography>
+                      {deviceSessions.length ? (
+                        <Table size='small' sx={{ mb: 2.5 }}>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Device</TableCell>
+                              <TableCell>Client</TableCell>
+                              <TableCell>Browser / OS</TableCell>
+                              <TableCell>Country</TableCell>
+                              <TableCell>IP</TableCell>
+                              <TableCell>Last used</TableCell>
+                              <TableCell>Status</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {deviceSessions.map(s => (
+                              <TableRow key={s.id || s.publicId}>
+                                <TableCell>{dash(s.deviceLabel)}</TableCell>
+                                <TableCell>{dash(s.clientType || s.platform)}</TableCell>
+                                <TableCell>{[s.browser, s.os].filter(Boolean).join(' / ') || '—'}</TableCell>
+                                <TableCell>{dash(s.country)}</TableCell>
+                                <TableCell sx={{ fontFamily: 'monospace', fontSize: 12 }}>{dash(s.ipAddress)}</TableCell>
+                                <TableCell>{fmtWhen(s.lastUsedAt)}</TableCell>
+                                <TableCell>{s.revokedAt ? 'Revoked' : 'Active'}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      ) : (
+                        <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+                          No auth sessions recorded.
+                        </Typography>
+                      )}
+                      <Typography variant='subtitle2' sx={{ mb: 1, fontWeight: 700 }}>
+                        Recent login events
+                      </Typography>
+                      {loginHistory.length ? (
+                        <Table size='small'>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>When</TableCell>
+                              <TableCell>Action</TableCell>
+                              <TableCell>Device</TableCell>
+                              <TableCell>Browser / OS</TableCell>
+                              <TableCell>Country</TableCell>
+                              <TableCell>IP</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {loginHistory.map(r => (
+                              <TableRow key={r.id}>
+                                <TableCell>{fmtWhen(r.at)}</TableCell>
+                                <TableCell>{dash(r.action)}</TableCell>
+                                <TableCell>{dash(r.device)}</TableCell>
+                                <TableCell>{[r.browser, r.os].filter(Boolean).join(' / ') || '—'}</TableCell>
+                                <TableCell>{dash(r.country)}</TableCell>
+                                <TableCell sx={{ fontFamily: 'monospace', fontSize: 12 }}>{dash(r.ip)}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      ) : (
+                        <Typography variant='body2' color='text.secondary'>
+                          No recent login events.
+                        </Typography>
+                      )}
+                    </AccordionDetails>
+                  </Accordion>
+
                   <Accordion sx={{ borderRadius: '8px !important', '&:before': { display: 'none' }, boxShadow: 'none', border: 1, borderColor: 'divider' }} disableGutters>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <Typography fontWeight={600} color='text.secondary'>Technical: raw JSON</Typography>
@@ -1194,7 +1301,7 @@ export default function AdminUser360Tabs({
                       type: row.type,
                       at: row.at,
                       title: row.title,
-                      meta: JSON.stringify(row.meta || {})
+                      meta: JSON.stringify(leanMetaForDisplay(row.meta))
                     })),
                     'admin-user-timeline.csv'
                   )
@@ -1257,7 +1364,7 @@ export default function AdminUser360Tabs({
                                   fontFamily: 'ui-monospace, Menlo, monospace'
                                 }}
                               >
-                                {JSON.stringify(item.meta, null, 2)}
+                                {JSON.stringify(leanMetaForDisplay(item.meta), null, 2)}
                               </Box>
                             </Collapse>
                           </>
