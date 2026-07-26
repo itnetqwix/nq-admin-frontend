@@ -45,6 +45,20 @@ const refundReasonLabel = (reason) => {
   return map[key] || String(reason)
 }
 
+/** Auto-refunds set `completed`; legacy/manual may set `refunded`. */
+const isRefundTerminal = (status) => {
+  const s = String(status || '').trim().toLowerCase()
+  return s === 'refunded' || s === 'completed' || s === 'processing'
+}
+
+const refundStatusLabel = (status) => {
+  const s = String(status || '').trim().toLowerCase()
+  if (s === 'completed' || s === 'refunded') return 'refunded'
+  if (s === 'processing') return 'processing'
+  if (s === 'failed') return 'failed'
+  return status || '—'
+}
+
 export default function Booking() {
   const ability = useContext(AbilityContext)
   const canRefund = ability?.can('update', 'admin-action-refund') ?? true
@@ -70,6 +84,10 @@ export default function Booking() {
 
   const showRefundPopup = (row) => {
     if (!row?.payment_intent_id || !canRefund) return
+    if (isRefundTerminal(row.refund_status)) {
+      toast.error('Refund already completed or in progress for this booking')
+      return
+    }
     setRefundRow(row)
     setOpenRefundPopup(true);
     setBookingId(row._id)
@@ -77,13 +95,31 @@ export default function Booking() {
   }
 
   const columns = [
-    { field: '_id', headerName: 'Booking Id', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 250 },
+    { field: '_id', headerName: 'Booking Id', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 220 },
+    {
+      field: 'is_instant',
+      headerName: 'Type',
+      headerClassName: styles['header-class'],
+      cellClassName: styles['cell-class'],
+      width: 130,
+      renderCell: params => {
+        const instant = !!params.row.is_instant
+        const phase = params.row.instant_phase
+          ? String(params.row.instant_phase)
+          : ''
+        return (
+          <div style={{ fontSize: 13, lineHeight: 1.3 }} title={phase || undefined}>
+            {instant ? (phase ? `Instant · ${phase}` : 'Instant') : 'Scheduled'}
+          </div>
+        )
+      }
+    },
     {
       field: 'booked_date',
       headerName: 'Booking Date',
       headerClassName: styles['header-class'],
       cellClassName: styles['cell-class'],
-      width: 150,
+      width: 130,
       renderCell: params => (
         <div>
           {moment(params.row.booked_date).format('MM-DD-YY')}
@@ -91,14 +127,14 @@ export default function Booking() {
       )
 
     },
-    { field: 'session_start_time', headerName: 'Start Time', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
-    { field: 'session_end_time', headerName: 'End Time', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
+    { field: 'session_start_time', headerName: 'Start Time', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 120 },
+    { field: 'session_end_time', headerName: 'End Time', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 120 },
     {
       field: 'trainer_info',
       headerName: 'Trainer Name',
       headerClassName: styles['header-class'],
       cellClassName: styles['cell-class'],
-      width: 200,
+      width: 180,
       renderCell: params => (
         <div >
           {params?.row?.trainer_info?.fullName}
@@ -110,10 +146,22 @@ export default function Booking() {
       headerName: 'Trainee Name',
       headerClassName: styles['header-class'],
       cellClassName: styles['cell-class'],
-      width: 200,
+      width: 180,
       renderCell: params => (
         <div >
           {params?.row?.trainee_info?.fullName}
+        </div>
+      )
+    },
+    {
+      field: 'refund_status',
+      headerName: 'Refund',
+      headerClassName: styles['header-class'],
+      cellClassName: styles['cell-class'],
+      width: 110,
+      renderCell: params => (
+        <div style={{ fontSize: 13 }}>
+          {refundStatusLabel(params.row.refund_status)}
         </div>
       )
     },
@@ -122,7 +170,7 @@ export default function Booking() {
       headerName: 'Reason',
       headerClassName: styles['header-class'],
       cellClassName: styles['cell-class'],
-      width: 220,
+      width: 200,
       renderCell: params => {
         const label = refundReasonLabel(params.row.refund_reason)
         return (
@@ -138,17 +186,27 @@ export default function Booking() {
       headerClassName: styles['header-class-last'],
       cellClassName: styles['cell-class-last'],
       width: 350,
-      renderCell: params => (
+      renderCell: params => {
+        const refundDone = isRefundTerminal(params.row.refund_status)
+        const refundFailed =
+          String(params.row.refund_status || '').toLowerCase() === 'failed'
+
+        return (
         <>
           <div className={styles["status-booking"]} style={{ backgroundColor: booking_status[params.row.status], cursor: "not-allowed" }}>
             {params.row.status}
           </div>
           {
-            params.row.status === "canceled" ? params?.row?.refund_status === "refunded" ?
+            params.row.status === "canceled" ? (
+              refundDone ? (
               <div className={styles["status-booking"]} style={{ backgroundColor: "gray", marginLeft: "10px", cursor: "not-allowed" }}>
-                {params?.row?.refund_status}
-              </div> :
-              canRefund ? (
+                {refundStatusLabel(params.row.refund_status)}
+              </div>
+              ) : refundFailed && canRefund ? (
+              <div onClick={() => showRefundPopup(params.row)} className={styles["status-booking"]} style={{ backgroundColor: "#8b4513", marginLeft: "10px", cursor: "pointer" }} title="Previous refund failed — retry">
+                Retry Refund
+              </div>
+              ) : canRefund ? (
               <div onClick={() => showRefundPopup(params.row)} className={styles["status-booking"]} style={{ backgroundColor: "#2d2d3f", marginLeft: "10px", cursor: "pointer", }}>
                 Start Refund
               </div>
@@ -156,7 +214,8 @@ export default function Booking() {
               <div className={styles["status-booking"]} style={{ backgroundColor: "#555", marginLeft: "10px", cursor: "not-allowed" }} title="No refund permission">
                 Refund (restricted)
               </div>
-              ) : null
+              )
+            ) : null
           }
 
           {
@@ -184,13 +243,10 @@ export default function Booking() {
                       backgroundColor: "#ff4e2b",
                       marginLeft: "10px"
                     }}
-                    // disabled={params.row.status !== BookedSession.booked}
                     onClick={() => {
-                      // onCancelBooking(params.row._id)
                       setOpenClosePopup(true);
                       setCancelId(params.row._id)
                     }}
-                  // onClick={() => onCancelBooking(params.row._id)}
                   >
                     Cancel
                   </button>
@@ -201,11 +257,15 @@ export default function Booking() {
                   </div>
 
                   {
-                    params?.row?.refund_status === "refunded" ?
+                    refundDone ?
                       <div className={styles["status-booking"]} style={{ backgroundColor: "gray", marginLeft: "10px" }}>
-                        {params?.row?.refund_status}
+                        {refundStatusLabel(params.row.refund_status)}
                       </div> :
-                      canRefund ? (
+                      refundFailed && canRefund ? (
+                      <div onClick={() => showRefundPopup(params.row)} className={styles["status-booking"]} style={{ backgroundColor: "#8b4513", marginLeft: "10px", cursor: "pointer" }}>
+                        Retry Refund
+                      </div>
+                      ) : canRefund ? (
                       <div onClick={() => showRefundPopup(params.row)} className={styles["status-booking"]} style={{ backgroundColor: "#2d2d3f", marginLeft: "10px", cursor: "pointer", }}>
                         Start Refund
                       </div>
@@ -221,7 +281,6 @@ export default function Booking() {
 
           {
             params.row.status === BookedSession.confirmed &&
-            // isCurrentDateBefore(params.row.start_time) &&
             <React.Fragment>
               <button
                 className={styles["status-booking"]}
@@ -231,8 +290,6 @@ export default function Booking() {
                   backgroundColor: "#ff4e2b",
                   marginLeft: "10px"
                 }}
-                // disabled={params.row.status !== BookedSession.booked}
-                // onClick={() => onCancelBooking(params.row._id)}
                 onClick={() => {
                   setOpenClosePopup(true);
                   setCancelId(params.row._id)
@@ -244,7 +301,8 @@ export default function Booking() {
           }
 
         </>
-      )
+        )
+      }
     }
 
   ];
