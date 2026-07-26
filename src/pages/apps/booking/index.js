@@ -51,6 +51,26 @@ function FilterChip({ active, label, onClick, count }) {
   )
 }
 
+/** Human labels for booking.refund_reason (support triage). */
+const refundReasonLabel = (reason) => {
+  if (!reason) return '—'
+  const key = String(reason).trim().toLowerCase()
+  const map = {
+    accept_expired: 'Accept window expired',
+    join_expired: 'Join window missed',
+    declined: 'Declined by coach',
+    no_show: 'No-show',
+    scheduled_trainer_no_show: 'No-show',
+    trainer_cancelled: 'Coach cancelled',
+    trainer_cancelled_scheduled: 'Coach cancelled',
+    trainee_cancelled: 'Enthusiast cancelled',
+    trainee_cancelled_scheduled: 'Cancelled before confirmation',
+    scheduled_unconfirmed_expired: 'Unconfirmed — expired at start',
+    scheduled_overlap_superseded: 'Overlap — another session confirmed first'
+  }
+  return map[key] || String(reason)
+}
+
 export default function Booking() {
   const ability = useContext(AbilityContext)
   const canRefund = ability?.can('update', 'admin-action-refund') ?? true
@@ -177,6 +197,21 @@ export default function Booking() {
       headerName: 'Trainee Name',
       width: 200,
       renderCell: params => params?.row?.trainee_info?.fullName
+    },
+    {
+      field: 'refund_reason',
+      headerName: 'Reason',
+      headerClassName: styles['header-class'],
+      cellClassName: styles['cell-class'],
+      width: 220,
+      renderCell: params => {
+        const label = refundReasonLabel(params.row.refund_reason)
+        return (
+          <div title={params.row.refund_reason || ''} style={{ fontSize: 13, lineHeight: 1.3 }}>
+            {label}
+          </div>
+        )
+      }
     },
     {
       field: 'status',
