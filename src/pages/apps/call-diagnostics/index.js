@@ -1,18 +1,37 @@
-import { Box, Button, Grid, TextField } from '@mui/material'
+import { Box, Button, Grid, MenuItem, TextField, Typography } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
+import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import styles from 'styles/common.module.css'
 import { getCallDiagnostics } from 'src/services/user360Api'
 import moment from 'moment'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import ObservabilityLinks from 'src/layouts/components/ObservabilityLinks'
+
+const EVENT_TYPES = [
+  { value: '', label: 'All events' },
+  { value: 'CLIENT_PRECALL_CHECK', label: 'Preflight check' },
+  { value: 'CLIENT_CALL_DIAGNOSTICS', label: 'Client env' },
+  { value: 'CALL_QUALITY_STATS', label: 'In-call quality' }
+]
 
 export default function CallDiagnosticsPage() {
+  const router = useRouter()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
   const [sessionId, setSessionId] = useState('')
   const [userId, setUserId] = useState('')
+  const [eventType, setEventType] = useState('')
   const [pageSize, setPageSize] = useState(25)
+
+  useEffect(() => {
+    if (!router.isReady) return
+    const q = router.query
+    if (q.sessionId) setSessionId(String(Array.isArray(q.sessionId) ? q.sessionId[0] : q.sessionId))
+    if (q.userId) setUserId(String(Array.isArray(q.userId) ? q.userId[0] : q.userId))
+    if (q.eventType) setEventType(String(Array.isArray(q.eventType) ? q.eventType[0] : q.eventType))
+  }, [router.isReady, router.query])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -20,6 +39,7 @@ export default function CallDiagnosticsPage() {
       const q = { limit: pageSize, skip: 0 }
       if (sessionId.trim()) q.sessionId = sessionId.trim()
       if (userId.trim()) q.userId = userId.trim()
+      if (eventType.trim()) q.eventType = eventType.trim()
       const data = await getCallDiagnostics(q)
       const list = data?.diagnostics || []
       setRows(
@@ -45,13 +65,13 @@ export default function CallDiagnosticsPage() {
     } finally {
       setLoading(false)
     }
-  }, [sessionId, userId, pageSize])
+  }, [sessionId, userId, eventType, pageSize])
 
   useEffect(() => {
+    if (!router.isReady) return
     void load()
-    // Reload when page size changes; filters apply via the button.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize])
+  }, [pageSize, router.isReady])
 
   const columns = [
     {
@@ -74,7 +94,7 @@ export default function CallDiagnosticsPage() {
   return (
     <AdminPageShell
       title='Call diagnostics'
-      subtitle='Video and session quality events (summary). Filter by session id or user Mongo id, then apply.'
+      subtitle='Preflight → env → in-call quality. Playbook: docs/REALTIME_CALL_DIAGNOSTICS.md (backend + admin).'
       actions={
         <Button variant='contained' onClick={() => void load()}>
           Apply filters
@@ -83,12 +103,33 @@ export default function CallDiagnosticsPage() {
       contentSx={{ p: 0 }}
     >
       <AdminPageSection>
-        <Grid container spacing={2} sx={{ mb: 2 }}>
-          <Grid item xs={12} md={5}>
+        <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
+          Bad call: filter by session id → check preflight fail reasons first, then quality score / RTT / relay. If admin
+          realtime chip is disconnected under multi-PM2, Redis adapter may be off — see playbook.
+        </Typography>
+        <ObservabilityLinks sessionId={sessionId.trim() || undefined} userId={userId.trim() || undefined} />
+        <Grid container spacing={2} sx={{ mb: 2, mt: 1 }}>
+          <Grid item xs={12} md={4}>
             <TextField size='small' fullWidth label='Session id' value={sessionId} onChange={e => setSessionId(e.target.value)} />
           </Grid>
-          <Grid item xs={12} md={5}>
+          <Grid item xs={12} md={4}>
             <TextField size='small' fullWidth label='User id' value={userId} onChange={e => setUserId(e.target.value)} />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              select
+              size='small'
+              fullWidth
+              label='Event type'
+              value={eventType}
+              onChange={e => setEventType(e.target.value)}
+            >
+              {EVENT_TYPES.map(o => (
+                <MenuItem key={o.value || 'all'} value={o.value}>
+                  {o.label}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
         </Grid>
         <Box className='admin-data-grid' sx={{ height: 560, width: '100%' }}>

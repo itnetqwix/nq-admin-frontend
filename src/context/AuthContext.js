@@ -146,13 +146,19 @@ const AuthProvider = ({ children }) => {
           setUser({ ...response.userInfo })
 
           const enrollFlag =
-            forceEnroll || window.localStorage.getItem('nq:admin_mfa_enroll') === '1'
+            forceEnroll ||
+            !!response.mfa_enrollment_required ||
+            window.localStorage.getItem('nq:admin_mfa_enroll') === '1'
           if (enrollFlag) {
             setMfaEnrollmentRequired(true)
+            window.localStorage.setItem('nq:admin_mfa_enroll', '1')
             router.replace('/pages/mfa-enroll')
             setLoading(false)
             return
           }
+
+          setMfaEnrollmentRequired(false)
+          window.localStorage.removeItem('nq:admin_mfa_enroll')
 
           const returnUrl = router.query.returnUrl
           const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'

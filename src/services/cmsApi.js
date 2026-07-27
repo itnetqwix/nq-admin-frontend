@@ -1,208 +1,112 @@
 import authConfig from 'src/configs/auth'
 import { requireApiBaseUrl } from 'src/utils/apiBase'
 
-const getAuthHeaders = () => {
-  const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
-  return {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`
-  }
-}
+const headers = () => ({
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${window.localStorage.getItem(authConfig.storageTokenKeyName)}`
+})
 
-const apiUrl = path => `${requireApiBaseUrl()}${path.startsWith('/') ? path : `/${path}`}`
+const api = path => `${requireApiBaseUrl()}${path.startsWith('/') ? path : `/${path}`}`
 
-const handleRes = async response => {
-  const data = await response.json()
-  if (!response.ok || String(data?.status ?? '').toLowerCase() === 'fail') {
+const handle = async res => {
+  const data = await res.json()
+  if (!res.ok || String(data?.status ?? '').toLowerCase() === 'fail') {
     const msg = typeof data?.error === 'string' ? data.error : data?.error?.message || 'Request failed'
-    throw new Error(msg)
+    const err = new Error(msg)
+    err.status = res.status
+    err.retryAfter = res.headers.get('Retry-After')
+    throw err
   }
-  return data
+  return data?.data ?? data?.result ?? data
 }
 
-export const listLegalDocuments = async () => {
-  const res = await fetch(apiUrl('/admin/cms/legal'), { headers: getAuthHeaders() })
-  return handleRes(res)
-}
-
-export const upsertLegalDocument = async (slug, body) => {
-  const res = await fetch(apiUrl(`/admin/cms/legal/${slug}`), {
-    method: 'PUT',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(body)
+const qs = query => {
+  const p = new URLSearchParams()
+  Object.entries(query || {}).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && v !== '') p.set(k, String(v))
   })
-  return handleRes(res)
+  const s = p.toString()
+  return s ? `?${s}` : ''
 }
 
-export const listCmsPages = async (type) => {
-  const qs = type ? `?type=${encodeURIComponent(type)}` : ''
-  const res = await fetch(apiUrl(`/admin/cms/pages${qs}`), {
-    headers: getAuthHeaders()
-  })
-  return handleRes(res)
-}
+export const getCmsSummary = () => fetch(api('/admin/cms/summary'), { headers: headers() }).then(handle)
 
-export const createCmsPage = async body => {
-  const res = await fetch(apiUrl('/admin/cms/pages'), {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(body)
-  })
-  return handleRes(res)
-}
+export const getCmsAssetHealth = () =>
+  fetch(api('/admin/cms/asset-health'), { headers: headers() }).then(handle)
 
-export const updateCmsPage = async (id, body) => {
-  const res = await fetch(apiUrl(`/admin/cms/pages/${id}`), {
-    method: 'PATCH',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(body)
-  })
-  return handleRes(res)
-}
+export const listBanners = (query = {}) =>
+  fetch(api(`/admin/banners${qs(query)}`), { headers: headers() }).then(handle)
 
-export const toggleCmsPage = async id => {
-  const res = await fetch(apiUrl(`/admin/cms/pages/${id}/toggle`), {
-    method: 'PATCH',
-    headers: getAuthHeaders()
-  })
-  return handleRes(res)
-}
+export const createBanner = body =>
+  fetch(api('/admin/banners'), { method: 'POST', headers: headers(), body: JSON.stringify(body) }).then(handle)
 
-export const deleteCmsPage = async id => {
-  const res = await fetch(apiUrl(`/admin/cms/pages/${id}`), {
-    method: 'DELETE',
-    headers: getAuthHeaders()
-  })
-  return handleRes(res)
-}
+export const updateBanner = (id, body) =>
+  fetch(api(`/admin/banners/${id}`), { method: 'PATCH', headers: headers(), body: JSON.stringify(body) }).then(
+    handle
+  )
 
-export const getAdminFaq = async () => {
-  const res = await fetch(apiUrl('/admin/cms/faq'), { headers: getAuthHeaders() })
-  return handleRes(res)
-}
+export const toggleBanner = id =>
+  fetch(api(`/admin/banners/${id}/toggle`), { method: 'PATCH', headers: headers() }).then(handle)
 
-export const publishAdminFaq = async body => {
-  const res = await fetch(apiUrl('/admin/cms/faq'), {
-    method: 'PUT',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(body)
-  })
-  return handleRes(res)
-}
+export const deleteBanner = id =>
+  fetch(api(`/admin/banners/${id}`), { method: 'DELETE', headers: headers() }).then(handle)
 
-/** Save FAQ editor state without going live. */
-export const saveFaqDraft = async body => {
-  const res = await fetch(apiUrl('/admin/cms/faq/draft'), {
-    method: 'PATCH',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(body)
-  })
-  return handleRes(res)
-}
+export const listTips = (query = {}) =>
+  fetch(api(`/admin/tips${qs(query)}`), { headers: headers() }).then(handle)
 
-/** Publish draft (or optional body) to all apps. */
-export const publishFaq = async (body = {}) => {
-  const res = await fetch(apiUrl('/admin/cms/faq/publish'), {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(body)
-  })
-  return handleRes(res)
-}
+export const createTip = body =>
+  fetch(api('/admin/tips'), { method: 'POST', headers: headers(), body: JSON.stringify(body) }).then(handle)
 
-export const saveLegalDraft = async (slug, body) => {
-  const res = await fetch(apiUrl(`/admin/cms/legal/${slug}/draft`), {
-    method: 'PATCH',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(body)
-  })
-  return handleRes(res)
-}
+export const updateTip = (id, body) =>
+  fetch(api(`/admin/tips/${id}`), { method: 'PATCH', headers: headers(), body: JSON.stringify(body) }).then(handle)
 
-export const getCmsAssetHealth = async () => {
-  const res = await fetch(apiUrl('/admin/cms/asset-health'), { headers: getAuthHeaders() })
-  return handleRes(res)
-}
+export const toggleTip = id =>
+  fetch(api(`/admin/tips/${id}/toggle`), { method: 'PATCH', headers: headers() }).then(handle)
 
-export const getLegalNotifyCount = async () => {
-  const res = await fetch(apiUrl('/admin/cms/legal/notify-count'), { headers: getAuthHeaders() })
-  return handleRes(res)
-}
+export const deleteTip = id =>
+  fetch(api(`/admin/tips/${id}`), { method: 'DELETE', headers: headers() }).then(handle)
 
-export const publishLegal = async (slug, body = {}) => {
-  const res = await fetch(apiUrl(`/admin/cms/legal/${slug}/publish`), {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(body)
-  })
-  return handleRes(res)
-}
-
-export const seedAdminFaq = async (body = {}) => {
-  const res = await fetch(apiUrl('/admin/cms/faq/seed'), {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(body)
-  })
-  return handleRes(res)
-}
-
-export const seedLegalDocuments = async (body = {}) => {
-  const res = await fetch(apiUrl('/admin/cms/legal/seed'), {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(body)
-  })
-  return handleRes(res)
-}
-
-export const getCmsSummary = async () => {
-  const res = await fetch(apiUrl('/admin/cms/summary'), { headers: getAuthHeaders() })
-  return handleRes(res)
-}
-
-/**
- * Request a presigned PUT URL for a CMS asset (banner/tip/page cover).
- * `kind` must be one of: banners | tips | pages.
- */
-export const presignCmsAsset = async ({ kind, contentType, fileSizeBytes, fileName }) => {
-  const res = await fetch(apiUrl('/admin/cms/asset-presign'), {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ kind, contentType, fileSizeBytes, fileName })
-  })
-  return handleRes(res)
-}
-
-/**
- * Two-step upload: presign with the backend, then PUT the file directly to S3.
- * Returns the permanent mediaUrl ready to persist on the CMS entity.
- */
-export const uploadCmsAsset = async (file, kind) => {
-  if (!file) throw new Error('No file selected.')
-  const allowed = new Set(['image/jpeg', 'image/png', 'image/webp'])
-  if (!allowed.has(file.type)) {
-    throw new Error('Unsupported image type. Use JPEG, PNG, or WebP.')
+/** Presign → PUT with progress. Returns public mediaUrl. */
+export function uploadCmsAsset(file, kind = 'banners', onProgress) {
+  const max = 5 * 1024 * 1024
+  const allowed = ['image/jpeg', 'image/png', 'image/webp']
+  if (!file) return Promise.reject(new Error('No file'))
+  if (!allowed.includes(file.type)) {
+    return Promise.reject(new Error('Use JPEG, PNG, or WebP'))
   }
-  const MAX = 5 * 1024 * 1024
-  if (file.size > MAX) {
-    throw new Error(`Image is too large (max ${Math.round(MAX / 1024 / 1024)} MB).`)
+  if (file.size > max) {
+    return Promise.reject(new Error('Image must be ≤ 5 MB'))
   }
-  const presign = await presignCmsAsset({
-    kind,
-    contentType: file.type,
-    fileSizeBytes: file.size,
-    fileName: file.name
+
+  return fetch(api('/admin/cms/asset-presign'), {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({
+      kind,
+      contentType: file.type,
+      fileSizeBytes: file.size,
+      fileName: file.name
+    })
   })
-  const { uploadUrl, mediaUrl } = presign.data || {}
-  if (!uploadUrl || !mediaUrl) throw new Error('Presign response missing upload URL.')
-  const put = await fetch(uploadUrl, {
-    method: 'PUT',
-    headers: { 'Content-Type': file.type },
-    body: file
-  })
-  if (!put.ok) {
-    throw new Error(`S3 upload failed (${put.status}).`)
-  }
-  return { mediaUrl, key: presign.data?.key }
+    .then(handle)
+    .then(
+      ({ uploadUrl, mediaUrl, expiresIn }) =>
+        new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest()
+          xhr.open('PUT', uploadUrl)
+          xhr.setRequestHeader('Content-Type', file.type)
+          xhr.upload.onprogress = e => {
+            if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100))
+          }
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve({ mediaUrl, expiresIn })
+            } else {
+              reject(new Error(`S3 upload failed (${xhr.status})`))
+            }
+          }
+          xhr.onerror = () => reject(new Error('S3 upload network error — retry'))
+          xhr.send(file)
+        })
+    )
 }

@@ -3,15 +3,11 @@ const path = require('path')
 
 /** @type {import('next').NextConfig} */
 
-// Remove this if you're not using Fullcalendar features
-
 module.exports = {
   trailingSlash: true,
   reactStrictMode: false,
   eslint: {
-    ignoreDuringBuilds: true
-  },
-  typescript: {
+    // Materialize template has many lint warnings; don't block security dep trains.
     ignoreDuringBuilds: true
   },
   webpack: config => {

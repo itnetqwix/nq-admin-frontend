@@ -12,10 +12,13 @@ const getAuthHeaders = () => {
 const apiUrl = path => `${requireApiBaseUrl()}${path.startsWith('/') ? path : `/${path}`}`
 
 const handleRes = async response => {
-  const data = await response.json()
+  const data = await response.json().catch(() => ({}))
   if (!response.ok || String(data?.status ?? '').toLowerCase() === 'fail') {
     const msg = typeof data?.error === 'string' ? data.error : data?.error?.message || 'Request failed'
-    throw new Error(msg)
+    const err = new Error(msg)
+    err.status = response.status
+    err.retryAfter = response.headers.get('Retry-After') || data?.retry_after
+    throw err
   }
   return data
 }

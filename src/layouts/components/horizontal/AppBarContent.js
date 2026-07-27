@@ -1,7 +1,7 @@
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Icon from 'src/@core/components/icon'
 
 // ** Components
@@ -15,9 +15,20 @@ const AppBarContent = props => {
   const { settings, saveSettings } = props
   const [paletteOpen, setPaletteOpen] = useState(false)
 
+  useEffect(() => {
+    const onKey = e => {
+      if ((e.metaKey || e.ctrlKey) && String(e.key).toLowerCase() === 'k') {
+        e.preventDefault()
+        setPaletteOpen(true)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      <IconButton color='inherit' onClick={() => setPaletteOpen(true)} title='Go to user or page'>
+      <IconButton color='inherit' onClick={() => setPaletteOpen(true)} title='Jump to (⌘/Ctrl+K)'>
         <Icon icon='mdi:magnify' />
       </IconButton>
       <AdminCommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />

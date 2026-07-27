@@ -1,15 +1,25 @@
-import { Box, Button, CircularProgress, IconButton, Stack, Tooltip, Typography } from '@mui/material'
+import {
+  Box,
+  Breadcrumbs,
+  Button,
+  CircularProgress,
+  Container,
+  IconButton,
+  Link as MuiLink,
+  Stack,
+  Tooltip,
+  Typography
+} from '@mui/material'
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
+import PersonSearchOutlinedIcon from '@mui/icons-material/PersonSearchOutlined'
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
-import AdminUser360Tabs from 'src/components/user360/AdminUser360Tabs'
-import AdminPageShell from 'src/layouts/components/AdminPageShell'
-import OpsSurfaceCard from 'src/components/admin/OpsSurfaceCard'
+import AdminUser360Tabs from 'src/pages/components/user360/AdminUser360Tabs'
+import ObservabilityLinks from 'src/layouts/components/ObservabilityLinks'
 import { getUser360, getUserAssets, getUserLessons, getUserReviews, getUserTimeline } from 'src/services/user360Api'
-import { getOpsEventsForUser } from 'src/services/opsApi'
-import { ops } from 'src/styles/opsSurface'
 
 export default function User360Page() {
   const router = useRouter()
@@ -27,7 +37,6 @@ export default function User360Page() {
   const [reviewsLoading, setReviewsLoading] = useState(false)
   const [assetsLoading, setAssetsLoading] = useState(false)
   const [timelineLoading, setTimelineLoading] = useState(false)
-  const [opsEventsLoading, setOpsEventsLoading] = useState(false)
 
   const [userData, setUserData] = useState(null)
   const [lessons, setLessons] = useState({ items: [], pagination: { page: 1, limit: 20, total: 0 } })
@@ -38,7 +47,6 @@ export default function User360Page() {
     savedSessions: { items: [], pagination: { page: 1, limit: 20, total: 0 } }
   })
   const [timeline, setTimeline] = useState({ items: [], pagination: { page: 1, limit: 30, total: 0 } })
-  const [opsEvents, setOpsEvents] = useState({ items: [], total: 0 })
 
   const [query, setQuery] = useState({
     lessons: { page: 1, limit: 20, sortBy: 'createdAt', sortOrder: 'desc', status: '', search: '' },
@@ -197,28 +205,6 @@ export default function User360Page() {
     }
   }, [userId, tab, query.activity])
 
-  useEffect(() => {
-    if (!userId || tab !== 7) return
-    let cancelled = false
-    ;(async () => {
-      setOpsEventsLoading(true)
-      try {
-        const d = await getOpsEventsForUser(userId, { page: 1, limit: 50 })
-        if (!cancelled) setOpsEvents({ items: d?.items || [], total: d?.total || 0 })
-      } catch (e) {
-        if (!cancelled) {
-          setOpsEvents({ items: [], total: 0 })
-          toast.error(e?.message || 'Failed to load issues')
-        }
-      } finally {
-        if (!cancelled) setOpsEventsLoading(false)
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [userId, tab])
-
   const refreshActiveTab = useCallback(async () => {
     if (!userId) return
     try {
@@ -234,9 +220,6 @@ export default function User360Page() {
         setAssets(await getUserAssets(userId, { ...query.assets, section: 'plans' }))
       } else if (tab === 5) {
         setTimeline(await getUserTimeline(userId, query.activity))
-      } else if (tab === 7) {
-        const d = await getOpsEventsForUser(userId, { page: 1, limit: 50 })
-        setOpsEvents({ items: d?.items || [], total: d?.total || 0 })
       }
     } catch (e) {
       toast.error(e?.message || 'Refresh failed')
@@ -249,141 +232,132 @@ export default function User360Page() {
   }
 
   const displayName =
-    userData?.overview?.identity?.fullname || userData?.user?.fullname || 'User profile'
-  const email = userData?.overview?.identity?.email || userData?.user?.email || ''
-  const accountType =
-    userData?.user?.account_type || userData?.overview?.identity?.account_type || 'trainer'
-  const listHref =
-    accountType === 'trainee'
-      ? '/apps/manage-trainee'
-      : accountType === 'trainer'
-        ? '/apps/manage-trainer'
-        : '/apps/users'
-  const listLabel =
-    accountType === 'trainee' ? 'Trainees' : accountType === 'trainer' ? 'Trainers' : 'Users'
+    userData?.overview?.identity?.fullname ||
+    userData?.user?.fullname ||
+    'User profile'
 
   if (!router.isReady) {
     return (
-      <AdminPageShell
-        bare
-        eyebrow='People · user 360'
-        icon='mdi:account-search-outline'
-        title='User 360.'
-        subtitle='Loading…'
-        loading
-      />
+      <Box sx={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'grey.50' }}>
+        <CircularProgress />
+      </Box>
     )
   }
 
   if (!userId) {
     return (
-      <AdminPageShell
-        bare
-        eyebrow='People · user 360'
-        icon='mdi:account-search-outline'
-        title='User not found.'
-        subtitle='The link may be invalid or the user id is missing.'
-        actions={
-          <Button component={Link} href='/apps/users' variant='contained' sx={{ textTransform: 'none' }}>
-            Back to users
+      <Container maxWidth='md' sx={{ py: 6 }}>
+        <Box sx={{ p: 4, borderRadius: 2, bgcolor: 'background.paper', boxShadow: 1 }}>
+          <Typography variant='h6' sx={{ mb: 1 }}>User not found</Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ mb: 3 }}>
+            The link may be invalid or the user id is missing.
+          </Typography>
+          <Button component={Link} href='/apps/manage-trainer' variant='contained'>
+            Back to trainers
           </Button>
-        }
-      />
+        </Box>
+      </Container>
     )
   }
 
   return (
-    <AdminPageShell
-      bare
-      eyebrow='People · user 360'
-      icon='mdi:account-search-outline'
-      title={overviewLoading && !userData ? 'Loading…' : `${displayName}.`}
-      subtitle={
-        email
-          ? `${email} · Full access view for support, moderation, and billing.`
-          : 'Full access view for support, moderation, and billing context.'
-      }
-      actions={
-        <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
-          <Button
-            component={Link}
-            href={listHref}
-            size='small'
-            variant='outlined'
-            sx={{ textTransform: 'none' }}
-          >
-            ← {listLabel}
-          </Button>
-          <Button
-            component={Link}
-            href={`/apps/logs?tab=login&userId=${userId}`}
-            size='small'
-            variant='outlined'
-            sx={{ textTransform: 'none' }}
-          >
-            Login history
-          </Button>
-          <Tooltip title='Copy MongoDB user id'>
+    <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh', pb: 6 }}>
+      <Container maxWidth='xl' sx={{ pt: 3 }}>
+        <Breadcrumbs sx={{ mb: 2 }} separator='/'>
+          <MuiLink component={Link} href='/home' underline='hover' color='inherit' sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <HomeOutlinedIcon sx={{ fontSize: 18 }} /> Home
+          </MuiLink>
+          <MuiLink component={Link} href='/apps/manage-trainer' underline='hover' color='inherit'>
+            Trainers
+          </MuiLink>
+          <Typography color='text.primary' sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <PersonSearchOutlinedIcon sx={{ fontSize: 18 }} /> User console
+          </Typography>
+        </Breadcrumbs>
+
+        <Stack
+          direction={{ xs: 'column', md: 'row' }}
+          spacing={2}
+          alignItems={{ xs: 'flex-start', md: 'center' }}
+          justifyContent='space-between'
+          sx={{ mb: 2 }}
+        >
+          <Box>
+            <Typography variant='h4' component='h1' sx={{ fontWeight: 700, letterSpacing: '-0.02em', mb: 0.5 }}>
+              {overviewLoading && !userData ? 'Loading…' : displayName}
+            </Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Full access view for support, moderation, and billing context.
+            </Typography>
+          </Box>
+          <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
             <Button
               size='small'
               variant='outlined'
-              startIcon={<ContentCopyOutlinedIcon />}
-              onClick={() => copyText('User ID', userId)}
+              component={Link}
+              href={`/apps/audit-logs?userId=${encodeURIComponent(userId)}`}
               sx={{ textTransform: 'none' }}
             >
-              Copy ID
+              Audit log
             </Button>
-          </Tooltip>
-          {email ? (
-            <Tooltip title='Copy email'>
-              <IconButton size='small' onClick={() => copyText('Email', email)} aria-label='copy email'>
-                <ContentCopyOutlinedIcon fontSize='small' />
-              </IconButton>
+            <ObservabilityLinks userId={userId} dense />
+            <Tooltip title='Copy MongoDB user id'>
+              <Button
+                size='small'
+                variant='outlined'
+                startIcon={<ContentCopyOutlinedIcon />}
+                onClick={() => copyText('User ID', userId)}
+                sx={{ textTransform: 'none' }}
+              >
+                Copy ID
+              </Button>
             </Tooltip>
-          ) : null}
+            {userData?.user?.email ? (
+              <Tooltip title='Copy email'>
+                <IconButton size='small' onClick={() => copyText('Email', userData.user.email)} aria-label='copy email'>
+                  <ContentCopyOutlinedIcon fontSize='small' />
+                </IconButton>
+              </Tooltip>
+            ) : null}
+          </Stack>
         </Stack>
-      }
-    >
-      <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute, mb: 2 }}>
-        <Box component={Link} href='/apps/users' sx={{ color: ops.indigo, textDecoration: 'none' }}>
-          All users
-        </Box>
-        {' · '}
-        <Box component={Link} href={listHref} sx={{ color: ops.indigo, textDecoration: 'none' }}>
-          {listLabel}
-        </Box>
-        {' · '}
-        {userId}
-      </Typography>
 
-      <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
-        {overviewLoading && !userData ? (
-          <Box sx={{ py: 12, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress size={28} sx={{ color: ops.ink }} />
-          </Box>
-        ) : (
-          <AdminUser360Tabs
-            userId={userId}
-            tab={tab}
-            onTabChange={setTab}
-            userData={userData}
-            lessons={lessons}
-            reviews={reviews}
-            assets={assets}
-            timeline={timeline}
-            opsEvents={opsEvents}
-            loadingLessons={lessonsLoading}
-            loadingReviews={reviewsLoading}
-            loadingAssets={assetsLoading}
-            loadingTimeline={timelineLoading}
-            loadingOpsEvents={opsEventsLoading}
-            onRefresh={refreshActiveTab}
-            query={query}
-            onQueryChange={updateSectionQuery}
-            hardDeletePolicy={userData?.policy}
-          />
-        )}
-      </OpsSurfaceCard>
-    </AdminPageShell>
+        <Box
+          sx={{
+            borderRadius: 2,
+            bgcolor: 'background.paper',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+            border: '1px solid',
+            borderColor: 'divider',
+            overflow: 'hidden'
+          }}
+        >
+          {overviewLoading && !userData ? (
+            <Box sx={{ py: 12, display: 'flex', justifyContent: 'center' }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <AdminUser360Tabs
+              userId={userId}
+              tab={tab}
+              onTabChange={setTab}
+              userData={userData}
+              lessons={lessons}
+              reviews={reviews}
+              assets={assets}
+              timeline={timeline}
+              loadingLessons={lessonsLoading}
+              loadingReviews={reviewsLoading}
+              loadingAssets={assetsLoading}
+              loadingTimeline={timelineLoading}
+              onRefresh={refreshActiveTab}
+              query={query}
+              onQueryChange={updateSectionQuery}
+              hardDeletePolicy={userData?.policy}
+            />
+          )}
+        </Box>
+      </Container>
+    </Box>
   )
 }

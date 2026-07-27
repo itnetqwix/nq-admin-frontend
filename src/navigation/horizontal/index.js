@@ -1,78 +1,15 @@
-/**
- * Horizontal nav — same route set / ACL subjects as vertical.
- * Groups mirror Business, People, Content, Library, Operations, Observability, Admin.
- */
 const navigation = () => [
   {
-    title: 'Dashboard',
+    title: 'Home',
     path: '/home',
-    icon: 'mdi:view-dashboard-outline',
+    icon: 'mdi:home-outline',
     action: 'read',
     subject: 'admin-nav-home'
   },
   {
-    title: 'Business',
-    icon: 'mdi:cash-multiple',
-    action: 'read',
-    subject: 'admin-nav-business',
-    children: [
-      {
-        title: 'Finance',
-        path: '/apps/finance',
-        icon: 'mdi:wallet-outline',
-        action: 'read',
-        subject: 'admin-nav-finance'
-      },
-      {
-        title: 'Stripe Connect',
-        path: '/apps/finance/connect',
-        icon: 'mdi:bank-transfer',
-        action: 'read',
-        subject: 'admin-nav-finance-connect'
-      },
-      {
-        title: 'Pricing & fees',
-        path: '/apps/pricing',
-        icon: 'mdi:currency-usd',
-        action: 'read',
-        subject: 'admin-nav-pricing'
-      },
-      {
-        title: 'Promo codes',
-        path: '/apps/promo-codes',
-        icon: 'mdi:tag-multiple-outline',
-        action: 'read',
-        subject: 'admin-nav-promo-codes'
-      },
-      {
-        title: 'Referrals',
-        path: '/apps/referrals',
-        icon: 'mdi:account-arrow-right-outline',
-        action: 'read',
-        subject: 'admin-nav-referrals'
-      },
-      {
-        title: 'Broadcasts',
-        path: '/apps/broadcasts',
-        icon: 'mdi:bullhorn-outline',
-        action: 'read',
-        subject: 'admin-nav-broadcasts'
-      }
-    ]
-  },
-  {
     title: 'People',
     icon: 'mdi:account-group-outline',
-    action: 'read',
-    subject: 'admin-nav-people',
     children: [
-      {
-        title: 'Directory',
-        path: '/apps/users',
-        icon: 'mdi:account-search-outline',
-        action: 'read',
-        subject: 'admin-nav-users-directory'
-      },
       {
         title: 'Trainers',
         path: '/apps/manage-trainer',
@@ -86,136 +23,26 @@ const navigation = () => [
         icon: 'mdi:account-school-outline',
         action: 'read',
         subject: 'admin-nav-trainees'
-      },
-      {
-        title: 'Trainer verifications',
-        path: '/apps/trainer-verifications',
-        icon: 'mdi:account-check-outline',
-        action: 'read',
-        subject: 'admin-nav-trainer-verifications'
-      },
-      {
-        title: 'Trainee reviews',
-        path: '/apps/trainee-account-reviews',
-        icon: 'mdi:account-clock-outline',
-        action: 'read',
-        subject: 'admin-nav-trainee-reviews'
-      },
-      {
-        title: 'Account deletions',
-        path: '/apps/account-deletions',
-        icon: 'mdi:account-remove-outline',
-        action: 'read',
-        subject: 'admin-nav-account-deletions'
       }
     ]
   },
   {
-    title: 'Content',
-    icon: 'mdi:cellphone-cog',
-    action: 'read',
-    subject: 'admin-nav-content',
+    title: 'Money',
+    icon: 'mdi:cash-multiple',
     children: [
-      {
-        title: 'Overview',
-        path: '/apps/cms',
-        icon: 'mdi:view-grid-outline',
-        action: 'read',
-        subject: 'admin-nav-cms-overview'
-      },
-      {
-        title: 'Banners',
-        path: '/apps/banners',
-        icon: 'mdi:image-multiple-outline',
-        action: 'read',
-        subject: 'admin-nav-banners'
-      },
-      {
-        title: 'Tips (offers)',
-        path: '/apps/tips',
-        icon: 'mdi:lightbulb-on-outline',
-        action: 'read',
-        subject: 'admin-nav-tips'
-      },
-      {
-        title: 'Blog & pages',
-        path: '/apps/cms-blog',
-        icon: 'mdi:post-outline',
-        action: 'read',
-        subject: 'admin-nav-cms-blog'
-      },
-      {
-        title: 'FAQ',
-        path: '/apps/cms-faq',
-        icon: 'mdi:help-circle-outline',
-        action: 'read',
-        subject: 'admin-nav-cms-faq'
-      },
-      {
-        title: 'Legal',
-        path: '/apps/cms-legal',
-        icon: 'mdi:file-document-outline',
-        action: 'read',
-        subject: 'admin-nav-cms-legal'
-      }
-    ]
-  },
-  {
-    title: 'Library',
-    icon: 'mdi:video-box-outline',
-    action: 'read',
-    subject: 'admin-nav-clips-library',
-    children: [
-      {
-        title: 'Categories',
-        path: '/apps/clip-taxonomy',
-        icon: 'mdi:folder-outline',
-        action: 'read',
-        subject: 'admin-nav-clip-taxonomy'
-      },
-      {
-        title: 'Library requests',
-        path: '/apps/library-submissions',
-        icon: 'mdi:clipboard-check-outline',
-        action: 'read',
-        subject: 'admin-nav-library-submissions'
-      },
-      {
-        title: 'Published clips',
-        path: '/apps/netqwix-library',
-        icon: 'mdi:library-outline',
-        action: 'read',
-        subject: 'admin-nav-netqwix-library'
-      }
-    ]
-  },
-  {
-    title: 'Operations',
-    icon: 'mdi:cog-outline',
-    action: 'read',
-    subject: 'admin-nav-operations',
-    children: [
-      {
-        title: 'Platform health',
-        path: '/apps/platform-health',
-        icon: 'mdi:heart-pulse',
-        action: 'read',
-        subject: 'admin-nav-platform-health'
-      },
       {
         title: 'Bookings',
         path: '/apps/booking',
-        icon: 'mdi:calendar-check-outline',
+        icon: 'mdi:briefcase-arrow-left-right-outline',
         action: 'read',
         subject: 'admin-nav-bookings'
-      },
-      {
-        title: 'User feedback',
-        path: '/apps/write-by-user',
-        icon: 'mdi:message-text-outline',
-        action: 'read',
-        subject: 'admin-nav-user-feedback'
-      },
+      }
+    ]
+  },
+  {
+    title: 'Ops',
+    icon: 'mdi:shield-account-outline',
+    children: [
       {
         title: 'Support tickets',
         path: '/apps/concern-by-user',
@@ -224,62 +51,73 @@ const navigation = () => [
         subject: 'admin-nav-support-tickets'
       },
       {
-        title: 'Call diagnostics',
-        path: '/apps/call-diagnostics',
-        icon: 'mdi:phone-in-talk-outline',
+        title: 'User feedback',
+        path: '/apps/write-by-user',
+        icon: 'mdi:account-question',
         action: 'read',
-        subject: 'admin-nav-call-diagnostics'
-      }
-    ]
-  },
-  {
-    title: 'Logs',
-    icon: 'mdi:chart-timeline-variant',
-    action: 'read',
-    subject: 'admin-nav-logs',
-    children: [
-      {
-        title: 'Logs hub',
-        path: '/apps/logs',
-        icon: 'mdi:view-dashboard-outline',
-        action: 'read',
-        subject: 'admin-nav-logs'
+        subject: 'admin-nav-user-feedback'
       },
       {
-        title: 'Platform activity',
-        path: '/apps/platform-activity',
-        icon: 'mdi:timeline-text-outline',
+        title: 'Failed jobs',
+        path: '/apps/failed-jobs',
+        icon: 'mdi:alert-octagon-outline',
         action: 'read',
-        subject: 'admin-nav-platform-activity'
+        subject: 'admin-nav-failed-jobs'
       },
       {
-        title: 'Audit trail',
+        title: 'Audit log',
         path: '/apps/audit-logs',
         icon: 'mdi:clipboard-text-clock-outline',
         action: 'read',
         subject: 'admin-nav-audit-logs'
       },
       {
-        title: 'Ops / errors',
-        path: '/apps/ops-logs',
-        icon: 'mdi:alert-circle-outline',
+        title: 'Call diagnostics',
+        path: '/apps/call-diagnostics',
+        icon: 'mdi:video-outline',
         action: 'read',
-        subject: 'admin-nav-ops-logs'
+        subject: 'admin-nav-call-diagnostics'
       }
     ]
   },
   {
-    title: 'Admin',
-    icon: 'mdi:shield-account-outline',
-    action: 'read',
-    subject: 'admin-nav-admin-settings',
+    title: 'Marketing',
+    icon: 'mdi:bullhorn-outline',
     children: [
       {
-        title: 'Admin roles',
-        path: '/apps/admin-roles',
-        icon: 'mdi:shield-key-outline',
+        title: 'CMS',
+        path: '/apps/cms',
+        icon: 'mdi:view-dashboard-edit-outline',
         action: 'read',
-        subject: 'admin-nav-admin-settings'
+        subject: 'admin-nav-cms'
+      },
+      {
+        title: 'Banners',
+        path: '/apps/cms/banners',
+        icon: 'mdi:image-multiple-outline',
+        action: 'read',
+        subject: 'admin-nav-banners'
+      },
+      {
+        title: 'Tips',
+        path: '/apps/cms/tips',
+        icon: 'mdi:lightbulb-outline',
+        action: 'read',
+        subject: 'admin-nav-tips'
+      },
+      {
+        title: 'Broadcasts',
+        path: '/apps/broadcasts',
+        icon: 'mdi:bullhorn-outline',
+        action: 'read',
+        subject: 'admin-nav-broadcasts'
+      },
+      {
+        title: 'Promo Codes',
+        path: '/apps/promo-codes',
+        icon: 'mdi:tag-multiple-outline',
+        action: 'read',
+        subject: 'admin-nav-promo-codes'
       }
     ]
   }
