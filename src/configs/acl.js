@@ -30,9 +30,13 @@ const defineRulesFor = (role, user) => {
   if (ok('nav_user_feedback')) can('read', 'admin-nav-user-feedback')
   if (ok('nav_support_tickets')) can('read', 'admin-nav-support-tickets')
   if (ok('nav_audit_logs')) can('read', 'admin-nav-audit-logs')
+  if (ok('nav_failed_jobs') || ok('nav_audit_logs')) can('read', 'admin-nav-failed-jobs')
   if (ok('nav_call_diagnostics')) can('read', 'admin-nav-call-diagnostics')
   if (ok('nav_promo_codes')) can('read', 'admin-nav-promo-codes')
   if (ok('nav_broadcasts')) can('read', 'admin-nav-broadcasts')
+  if (ok('nav_cms') || ok('nav_cms_overview')) can('read', 'admin-nav-cms')
+  if (ok('nav_banners') || ok('nav_cms')) can('read', 'admin-nav-banners')
+  if (ok('nav_tips') || ok('nav_cms')) can('read', 'admin-nav-tips')
 
   if (ok('can_manage_commission')) can('update', 'admin-action-commission')
   if (ok('can_process_refund')) can('update', 'admin-action-refund')

@@ -141,7 +141,12 @@ export default function BroadcastsPage() {
       setTab(1)
       fetchHistory()
     } catch (err) {
-      toast.error(err.message || 'Failed to send broadcast')
+      if (err?.status === 429) {
+        const wait = err.retryAfter ? ` Retry after ${err.retryAfter}s.` : ''
+        toast.error(`Rate limited — slow down.${wait}`)
+      } else {
+        toast.error(err.message || 'Failed to send broadcast')
+      }
     } finally {
       setSending(false)
     }
@@ -493,8 +498,17 @@ export default function BroadcastsPage() {
                     <strong>
                       {previewLoading ? 'Loading...' : recipientCount != null ? recipientCount : '--'}
                     </strong>
+                    {' · '}Server enforces ~1 broadcast / 60s per admin (429 if faster).
                   </Typography>
                 </Alert>
+                {recipientCount != null &&
+                recipientCount > 200 &&
+                selectedChannels.some(c => c === 'sms' || c === 'whatsapp') ? (
+                  <Alert severity='warning' sx={{ mt: 1 }}>
+                    Large SMS/WhatsApp audience ({recipientCount}). Carrier rate limits apply — prefer email/push for
+                    blasts, or split audience.
+                  </Alert>
+                ) : null}
               </Grid>
 
               {/* Send Button */}
@@ -504,7 +518,7 @@ export default function BroadcastsPage() {
                   variant='contained'
                   startIcon={<SendIcon />}
                   onClick={onSendClick}
-                  disabled={sending}
+                  disabled={sending || previewLoading || recipientCount === 0}
                   sx={{ bgcolor: '#000080', '&:hover': { bgcolor: '#0000a0' } }}
                 >
                   Send Broadcast
@@ -556,26 +570,34 @@ export default function BroadcastsPage() {
             You are about to send a broadcast to{' '}
             <strong>{recipientCount ?? '?'}</strong> {audience === 'All' ? 'users' : audience + 's'}.
           </Typography>
+          {recipientCount === 0 ? (
+            <Alert severity='error' sx={{ mb: 2 }}>
+              Preview count is 0 — cancel and change audience.
+            </Alert>
+          ) : null}
           <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
             <strong>Title:</strong> {title}
           </Typography>
           <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
             <strong>Channels:</strong> {selectedChannels.join(', ') || 'None'}
           </Typography>
-          <Typography variant='body2' color='text.secondary'>
+          <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
             <strong>Audience:</strong> {audience} ({statusFilter || 'all statuses'})
           </Typography>
+          <Alert severity='info' sx={{ mt: 1 }}>
+            Sends run in the background. History shows delivery stats. Do not double-click — cooldown is 60s.
+          </Alert>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmOpen(false)} disabled={sending}>Cancel</Button>
           <Button
             variant='contained'
             onClick={handleSend}
-            disabled={sending}
+            disabled={sending || !recipientCount}
             startIcon={<SendIcon />}
             sx={{ bgcolor: '#000080', '&:hover': { bgcolor: '#0000a0' } }}
           >
-            {sending ? 'Sending...' : 'Confirm & Send'}
+            {sending ? 'Sending...' : `Confirm & send to ${recipientCount ?? '?'}`}
           </Button>
         </DialogActions>
       </Dialog>

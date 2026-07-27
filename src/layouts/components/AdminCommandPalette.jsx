@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
@@ -7,51 +7,170 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
+import List from '@mui/material/List'
+import ListItemButton from '@mui/material/ListItemButton'
+import ListItemText from '@mui/material/ListItemText'
+import CircularProgress from '@mui/material/CircularProgress'
+import { searchAdminUsers } from 'src/services/adminOpsApi'
+import authConfig from 'src/configs/auth'
+import { requireApiBaseUrl } from 'src/utils/apiBase'
 
 const OID_RE = /^[a-f\d]{24}$/i
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i
+
+const STATIC_PAGES = [
+  { label: 'Home', path: '/home' },
+  { label: 'CMS', path: '/apps/cms' },
+  { label: 'Banners', path: '/apps/cms/banners' },
+  { label: 'Tips', path: '/apps/cms/tips' },
+  { label: 'Uploads', path: '/apps/cms/uploads' },
+  { label: 'Trainers', path: '/apps/manage-trainer' },
+  { label: 'Trainees', path: '/apps/manage-trainee' },
+  { label: 'Bookings', path: '/apps/booking' },
+  { label: 'Support tickets', path: '/apps/concern-by-user' },
+  { label: 'Failed jobs', path: '/apps/failed-jobs' },
+  { label: 'Audit log', path: '/apps/audit-logs' },
+  { label: 'Call diagnostics', path: '/apps/call-diagnostics' },
+  { label: 'Broadcasts', path: '/apps/broadcasts' },
+  { label: 'Promo codes', path: '/apps/promo-codes' }
+]
 
 export default function AdminCommandPalette({ open, onClose }) {
   const router = useRouter()
   const [value, setValue] = useState('')
+  const [hits, setHits] = useState([])
+  const [busy, setBusy] = useState(false)
+  const [hint, setHint] = useState('')
 
-  const go = useCallback(() => {
+  useEffect(() => {
+    if (!open) {
+      setValue('')
+      setHits([])
+      setHint('')
+    }
+  }, [open])
+
+  const goPath = useCallback(
+    path => {
+      void router.push(path)
+      onClose()
+    },
+    [router, onClose]
+  )
+
+  const run = useCallback(async () => {
     const q = value.trim()
     if (!q) return
-    if (OID_RE.test(q)) {
-      void router.push(`/apps/users/${q}`)
-      setValue('')
-      onClose()
+
+    if (q.startsWith('/')) {
+      goPath(q)
       return
     }
-    if (q.startsWith('/')) {
-      void router.push(q)
-      setValue('')
-      onClose()
+
+    if (OID_RE.test(q)) {
+      // Try booking detail first if path preference; User 360 is the common case
+      setBusy(true)
+      setHint('')
+      try {
+        const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
+        const base = requireApiBaseUrl()
+        const bookingRes = await fetch(`${base}/admin/booking/${q}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        const bookingJson = await bookingRes.json()
+        const bookingOk =
+          bookingRes.ok &&
+          String(bookingJson?.status ?? '').toLowerCase() !== 'fail' &&
+          (bookingJson?.result || bookingJson?.data)
+        if (bookingOk) {
+          goPath(`/apps/booking?bookingId=${q}`)
+          return
+        }
+      } catch {
+        /* fall through to user */
+      } finally {
+        setBusy(false)
+      }
+      goPath(`/apps/users/${q}`)
+      return
     }
-  }, [value, router, onClose])
+
+    if (EMAIL_RE.test(q) || q.length >= 2) {
+      setBusy(true)
+      setHint('')
+      try {
+        const users = await searchAdminUsers(q, 8)
+        setHits(
+          users.map(u => ({
+            id: String(u._id || u.id),
+            primary: u.fullname || u.email || String(u._id),
+            secondary: `${u.account_type || ''} · ${u.email || ''}`.trim()
+          }))
+        )
+        if (!users.length) setHint('No users matched')
+      } catch (e) {
+        setHint(e?.message || 'Search failed')
+        setHits([])
+      } finally {
+        setBusy(false)
+      }
+      return
+    }
+
+    setHint('Enter ObjectId, email, or /path')
+  }, [value, goPath])
+
+  const pageHits = STATIC_PAGES.filter(p => {
+    const q = value.trim().toLowerCase()
+    if (!q || q.startsWith('/') || OID_RE.test(q) || EMAIL_RE.test(q)) return false
+    return p.label.toLowerCase().includes(q) || p.path.includes(q)
+  })
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth='sm'>
-      <DialogTitle>Go to…</DialogTitle>
+      <DialogTitle>Jump to…</DialogTitle>
       <DialogContent>
         <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
-          Enter a user <strong>ObjectId</strong> to open User 360, or an internal path (e.g.{' '}
-          <code>/apps/booking</code>).
+          User id / email → User 360 · Booking ObjectId → bookings · path like{' '}
+          <code>/apps/failed-jobs</code>. ⌘/Ctrl+K.
         </Typography>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
           <TextField
             autoFocus
             fullWidth
             size='small'
-            label='User ID or path'
+            label='Search'
             value={value}
             onChange={e => setValue(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && go()}
+            onKeyDown={e => e.key === 'Enter' && void run()}
           />
-          <Button variant='contained' onClick={go}>
-            Go
+          <Button variant='contained' onClick={() => void run()} disabled={busy}>
+            {busy ? <CircularProgress size={18} color='inherit' /> : 'Go'}
           </Button>
         </Box>
+        {hint ? (
+          <Typography variant='caption' color='text.secondary' sx={{ mt: 1, display: 'block' }}>
+            {hint}
+          </Typography>
+        ) : null}
+        {pageHits.length ? (
+          <List dense sx={{ mt: 1 }}>
+            {pageHits.map(p => (
+              <ListItemButton key={p.path} onClick={() => goPath(p.path)}>
+                <ListItemText primary={p.label} secondary={p.path} />
+              </ListItemButton>
+            ))}
+          </List>
+        ) : null}
+        {hits.length ? (
+          <List dense sx={{ mt: 1 }}>
+            {hits.map(h => (
+              <ListItemButton key={h.id} onClick={() => goPath(`/apps/users/${h.id}`)}>
+                <ListItemText primary={h.primary} secondary={h.secondary} />
+              </ListItemButton>
+            ))}
+          </List>
+        ) : null}
       </DialogContent>
     </Dialog>
   )

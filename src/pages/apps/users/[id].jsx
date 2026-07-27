@@ -18,6 +18,7 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import AdminUser360Tabs from 'src/pages/components/user360/AdminUser360Tabs'
+import ObservabilityLinks from 'src/layouts/components/ObservabilityLinks'
 import { getUser360, getUserAssets, getUserLessons, getUserReviews, getUserTimeline } from 'src/services/user360Api'
 
 export default function User360Page() {
@@ -290,6 +291,16 @@ export default function User360Page() {
             </Typography>
           </Box>
           <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
+            <Button
+              size='small'
+              variant='outlined'
+              component={Link}
+              href={`/apps/audit-logs?userId=${encodeURIComponent(userId)}`}
+              sx={{ textTransform: 'none' }}
+            >
+              Audit log
+            </Button>
+            <ObservabilityLinks userId={userId} dense />
             <Tooltip title='Copy MongoDB user id'>
               <Button
                 size='small'

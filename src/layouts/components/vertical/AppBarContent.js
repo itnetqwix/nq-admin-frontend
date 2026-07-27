@@ -1,7 +1,7 @@
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -16,6 +16,17 @@ const AppBarContent = props => {
   const { hidden, settings, saveSettings, toggleNavVisibility } = props
   const [paletteOpen, setPaletteOpen] = useState(false)
 
+  useEffect(() => {
+    const onKey = e => {
+      if ((e.metaKey || e.ctrlKey) && String(e.key).toLowerCase() === 'k') {
+        e.preventDefault()
+        setPaletteOpen(true)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
   return (
     <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
       <Box className='actions-left' sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
@@ -25,7 +36,7 @@ const AppBarContent = props => {
           </IconButton>
         ) : null}
 
-        <IconButton color='inherit' onClick={() => setPaletteOpen(true)} title='Go to user or page'>
+        <IconButton color='inherit' onClick={() => setPaletteOpen(true)} title='Jump to (⌘/Ctrl+K)'>
           <Icon icon='mdi:magnify' />
         </IconButton>
         <AdminCommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
@@ -40,4 +51,3 @@ const AppBarContent = props => {
 }
 
 export default AppBarContent
-

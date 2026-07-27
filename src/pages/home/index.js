@@ -93,14 +93,16 @@ const Home = () => {
         <Grid container spacing={4} className='match-height' sx={{ mb: 2 }}>
           <Grid item xs={12}>
             <Alert severity='info' icon={false} sx={{ py: 0.5 }}>
-              <strong>API:</strong> {getAdminApiEnvLabel()}
               <Chip
                 component='span'
                 size='small'
                 label={socketConnected ? 'Realtime connected' : 'Realtime connecting'}
                 color={socketConnected ? 'success' : 'default'}
-                sx={{ ml: 2, verticalAlign: 'middle' }}
+                sx={{ verticalAlign: 'middle' }}
               />
+              <Typography component='span' variant='body2' sx={{ ml: 1 }}>
+                Env banner (top) shows API host — {getAdminApiEnvLabel()}
+              </Typography>
             </Alert>
           </Grid>
         </Grid>
@@ -183,7 +185,43 @@ const Home = () => {
                 onCardClick={() => router.push('/apps/manage-trainer')}
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={6} sm={3}>
+              <CardStatisticsVertical
+                color='error'
+                stats={metrics != null ? fmtInt(metrics.opsCallPreflightFailures24h ?? 0) : '—'}
+                trendNumber='24h'
+                trend='positive'
+                title='ICE / call failures'
+                chipText='Preflight & call errors'
+                icon={<Icon icon='mdi:video-off-outline' />}
+                onCardClick={() => router.push('/apps/call-diagnostics?eventType=CLIENT_PRECALL_CHECK')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <CardStatisticsVertical
+                color='warning'
+                stats={metrics != null ? fmtInt(metrics.pendingTrainerKyc ?? 0) : '—'}
+                trendNumber='KYC'
+                trend='positive'
+                title='Pending trainer KYC'
+                chipText='Incomplete'
+                icon={<Icon icon='mdi:card-account-details-outline' />}
+                onCardClick={() => router.push('/apps/manage-trainer?kyc=incomplete')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <CardStatisticsVertical
+                color='error'
+                stats='Open'
+                trendNumber='BullMQ'
+                trend='positive'
+                title='Failed jobs'
+                chipText='PDF / reminders'
+                icon={<Icon icon='mdi:alert-octagon-outline' />}
+                onCardClick={() => router.push('/apps/failed-jobs')}
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
               <CardStatisticsVertical
                 color='primary'
                 stats='Open'
