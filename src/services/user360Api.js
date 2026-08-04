@@ -150,3 +150,25 @@ export const getCallDiagnostics = async (query = {}) => {
   if (isApiFailure(data, response)) throw new Error(readError(data))
   return data?.data || { diagnostics: [], total: 0, limit: 25, skip: 0 }
 }
+
+/** Recent live lessons (both joined) for ops triage. */
+export const getLiveLessons = async (query = {}) => {
+  const response = await fetch(apiUrl(`/admin/live-lessons${toQueryString(query)}`), {
+    method: 'GET',
+    headers: getAuthHeaders()
+  })
+  const data = await response.json()
+  if (isApiFailure(data, response)) throw new Error(readError(data))
+  return data?.data || { hours: 48, items: [] }
+}
+
+/** One session: both participants, clients, clip play events, timeline. */
+export const getLiveLessonDebug = async sessionId => {
+  const response = await fetch(apiUrl(`/admin/live-lessons/${encodeURIComponent(sessionId)}`), {
+    method: 'GET',
+    headers: getAuthHeaders()
+  })
+  const data = await response.json()
+  if (isApiFailure(data, response)) throw new Error(readError(data))
+  return data?.data || null
+}
