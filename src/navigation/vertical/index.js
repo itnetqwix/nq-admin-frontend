@@ -409,6 +409,13 @@ const navigation = () => {
           icon: 'mdi:video-outline',
           action: 'read',
           subject: 'admin-nav-call-diagnostics'
+        },
+        {
+          title: 'Live lessons',
+          path: '/apps/live-lessons',
+          icon: 'mdi:record-rec',
+          action: 'read',
+          subject: 'admin-nav-call-diagnostics'
         }
       ]
     },

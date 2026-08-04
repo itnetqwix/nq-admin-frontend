@@ -141,37 +141,6 @@ export const getAuditLogs = async (userId, query = {}) => {
   return unwrap(data) || { items: [], pagination: { page: 1, limit: 20, total: 0 } }
 }
 
-export const getPlatformActivity = async (query = {}) => {
-  const qs = toQueryString(query)
-  // Prefer /logs/activity (logs hub); fall back to legacy /platform-activity.
-  const paths = [`/admin/logs/activity${qs}`, `/admin/platform-activity${qs}`]
-  let lastError = 'Failed to load platform activity'
-
-  for (const path of paths) {
-    const response = await fetch(apiUrl(path), {
-      method: 'GET',
-      headers: getAuthHeaders()
-    })
-    let data = null
-    try {
-      data = await response.json()
-    } catch {
-      data = null
-    }
-    if (response.status === 404) {
-      lastError =
-        'Platform activity API not found on this server. Redeploy nq-backend (route: GET /admin/platform-activity).'
-      continue
-    }
-    if (isApiFailure(data, response)) {
-      throw new Error(readError(data) || lastError)
-    }
-    return unwrap(data) || { items: [], pagination: { page: 1, limit: 25, total: 0 }, counts: {} }
-  }
-
-  throw new Error(lastError)
-}
-
 export const getCallDiagnostics = async (query = {}) => {
   const response = await fetch(apiUrl(`/admin/call-diagnostics${toQueryString(query)}`), {
     method: 'GET',
@@ -182,50 +151,24 @@ export const getCallDiagnostics = async (query = {}) => {
   return data?.data || { diagnostics: [], total: 0, limit: 25, skip: 0 }
 }
 
-const unwrapData = data => data?.data ?? unwrap(data)
-
-export const getUserSupportTickets = async userId => {
-  if (!userId || userId === 'undefined') throw new Error('Invalid user id')
-  const response = await fetch(apiUrl(`/admin/users/${userId}/support-tickets`), {
+/** Recent live lessons (both joined) for ops triage. */
+export const getLiveLessons = async (query = {}) => {
+  const response = await fetch(apiUrl(`/admin/live-lessons${toQueryString(query)}`), {
     method: 'GET',
     headers: getAuthHeaders()
   })
   const data = await response.json()
   if (isApiFailure(data, response)) throw new Error(readError(data))
-  return unwrapData(data) || { feedback: [], concerns: [] }
+  return data?.data || { hours: 48, items: [] }
 }
 
-export const getUserReferrals = async userId => {
-  if (!userId || userId === 'undefined') throw new Error('Invalid user id')
-  const response = await fetch(apiUrl(`/admin/users/${userId}/referrals`), {
+/** One session: both participants, clients, clip play events, timeline. */
+export const getLiveLessonDebug = async sessionId => {
+  const response = await fetch(apiUrl(`/admin/live-lessons/${encodeURIComponent(sessionId)}`), {
     method: 'GET',
     headers: getAuthHeaders()
   })
   const data = await response.json()
   if (isApiFailure(data, response)) throw new Error(readError(data))
-  return unwrapData(data)
-}
-
-export const revokeUserSession = async (userId, sessionId) => {
-  if (!userId || !sessionId) throw new Error('userId and sessionId required')
-  const response = await fetch(apiUrl(`/admin/users/${userId}/sessions/${sessionId}/revoke`), {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({})
-  })
-  const data = await response.json()
-  if (isApiFailure(data, response)) throw new Error(readError(data))
-  return unwrapData(data) || data?.data || { revoked: true }
-}
-
-export const revokeAllUserSessions = async userId => {
-  if (!userId || userId === 'undefined') throw new Error('Invalid user id')
-  const response = await fetch(apiUrl(`/admin/users/${userId}/sessions/revoke-all`), {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({})
-  })
-  const data = await response.json()
-  if (isApiFailure(data, response)) throw new Error(readError(data))
-  return unwrapData(data) || data?.data || { revokedCount: 0 }
+  return data?.data || null
 }

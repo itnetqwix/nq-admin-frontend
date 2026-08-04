@@ -30,6 +30,7 @@ API: `GET /admin/call-diagnostics?sessionId=&userId=&eventType=&from=&to=`
 | `CLIENT_PRECALL_CHECK` | Device/API readiness before join | `preflight.passed=false` + reason (`NO_CAMERA`, `NO_MICROPHONE`, `NO_RTCPeerConnection`, …) → user-side hardware/permission; not ICE |
 | `CLIENT_CALL_DIAGNOSTICS` | Client env snapshot | `env.connectionType`, `rtt`, platform — useful for “corporate Wi‑Fi / cellular” |
 | `CALL_QUALITY_STATS` | In-call WebRTC stats | `overallScore`, `rtt`, `usingRelay`, candidate types — high relay % or high RTT → TURN/NAT path |
+| `CLIENT_CLIP_PLAYBACK` | Clip play/pause media outcome | Prefer **Live lessons** (`/apps/live-lessons`) — both users + clip log |
 
 ### During a bad call
 

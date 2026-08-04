@@ -13,7 +13,8 @@ const EVENT_TYPES = [
   { value: '', label: 'All events' },
   { value: 'CLIENT_PRECALL_CHECK', label: 'Preflight check' },
   { value: 'CLIENT_CALL_DIAGNOSTICS', label: 'Client env' },
-  { value: 'CALL_QUALITY_STATS', label: 'In-call quality' }
+  { value: 'CALL_QUALITY_STATS', label: 'In-call quality' },
+  { value: 'CLIENT_CLIP_PLAYBACK', label: 'Clip play/pause' }
 ]
 
 export default function CallDiagnosticsPage() {
@@ -56,7 +57,8 @@ export default function CallDiagnosticsPage() {
             ? '—'
             : r.preflightCheck.passed
               ? 'pass'
-              : r.preflightCheck.reason || 'fail'
+              : r.preflightCheck.reason || 'fail',
+          clipAction: r.clipPlayback?.action || '—'
         }))
       )
     } catch (e) {
@@ -88,7 +90,8 @@ export default function CallDiagnosticsPage() {
     { field: 'role', headerName: 'Role', width: 90, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
     { field: 'score', headerName: 'Score', width: 90, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
     { field: 'rtt', headerName: 'RTT', width: 90, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
-    { field: 'preflight', headerName: 'Preflight', width: 120, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] }
+    { field: 'preflight', headerName: 'Preflight', width: 120, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
+    { field: 'clipAction', headerName: 'Clip action', width: 120, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] }
   ]
 
   return (
