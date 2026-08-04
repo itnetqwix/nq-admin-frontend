@@ -20,6 +20,16 @@ const handle = async res => {
   return data?.data ?? data?.result ?? data
 }
 
+/** Full envelope when page handlers expect data at top level. */
+const handleEnvelope = async res => {
+  const data = await res.json()
+  if (!res.ok || String(data?.status ?? '').toLowerCase() === 'fail') {
+    const msg = typeof data?.error === 'string' ? data.error : data?.error?.message || 'Request failed'
+    throw new Error(msg)
+  }
+  return data
+}
+
 const qs = query => {
   const p = new URLSearchParams()
   Object.entries(query || {}).forEach(([k, v]) => {
@@ -66,6 +76,102 @@ export const toggleTip = id =>
 export const deleteTip = id =>
   fetch(api(`/admin/tips/${id}`), { method: 'DELETE', headers: headers() }).then(handle)
 
+/* ── Blog / CMS pages ─────────────────────────────────────────────── */
+
+export const listCmsPages = async type => {
+  const q = type ? `?type=${encodeURIComponent(type)}` : ''
+  return fetch(api(`/admin/cms/pages${q}`), { headers: headers() }).then(handleEnvelope)
+}
+
+export const createCmsPage = async body =>
+  fetch(api('/admin/cms/pages'), {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(body)
+  }).then(handleEnvelope)
+
+export const updateCmsPage = async (id, body) =>
+  fetch(api(`/admin/cms/pages/${id}`), {
+    method: 'PATCH',
+    headers: headers(),
+    body: JSON.stringify(body)
+  }).then(handleEnvelope)
+
+export const toggleCmsPage = async id =>
+  fetch(api(`/admin/cms/pages/${id}/toggle`), { method: 'PATCH', headers: headers() }).then(handleEnvelope)
+
+export const deleteCmsPage = async id =>
+  fetch(api(`/admin/cms/pages/${id}`), { method: 'DELETE', headers: headers() }).then(handleEnvelope)
+
+/* ── FAQ ──────────────────────────────────────────────────────────── */
+
+export const getAdminFaq = async () =>
+  fetch(api('/admin/cms/faq'), { headers: headers() }).then(handleEnvelope)
+
+export const publishAdminFaq = async body =>
+  fetch(api('/admin/cms/faq'), {
+    method: 'PUT',
+    headers: headers(),
+    body: JSON.stringify(body)
+  }).then(handleEnvelope)
+
+export const saveFaqDraft = async body =>
+  fetch(api('/admin/cms/faq/draft'), {
+    method: 'PATCH',
+    headers: headers(),
+    body: JSON.stringify(body)
+  }).then(handleEnvelope)
+
+export const publishFaq = async (body = {}) =>
+  fetch(api('/admin/cms/faq/publish'), {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(body)
+  }).then(handleEnvelope)
+
+export const seedAdminFaq = async (body = {}) =>
+  fetch(api('/admin/cms/faq/seed'), {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(body)
+  }).then(handleEnvelope)
+
+/* ── Legal ────────────────────────────────────────────────────────── */
+
+export const listLegalDocuments = async () =>
+  fetch(api('/admin/cms/legal'), { headers: headers() }).then(handleEnvelope)
+
+export const upsertLegalDocument = async (slug, body) =>
+  fetch(api(`/admin/cms/legal/${slug}`), {
+    method: 'PUT',
+    headers: headers(),
+    body: JSON.stringify(body)
+  }).then(handleEnvelope)
+
+export const saveLegalDraft = async (slug, body) =>
+  fetch(api(`/admin/cms/legal/${slug}/draft`), {
+    method: 'PATCH',
+    headers: headers(),
+    body: JSON.stringify(body)
+  }).then(handleEnvelope)
+
+export const getLegalNotifyCount = async () =>
+  fetch(api('/admin/cms/legal/notify-count'), { headers: headers() }).then(handleEnvelope)
+
+export const publishLegal = async (slug, body = {}) =>
+  fetch(api(`/admin/cms/legal/${slug}/publish`), {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(body)
+  }).then(handleEnvelope)
+
+export const seedLegalDocuments = async (body = {}) =>
+  fetch(api('/admin/cms/legal/seed'), {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(body)
+  }).then(handleEnvelope)
+
 /** Presign → PUT with progress. Returns public mediaUrl. */
 export function uploadCmsAsset(file, kind = 'banners', onProgress) {
   const max = 5 * 1024 * 1024
@@ -77,6 +183,9 @@ export function uploadCmsAsset(file, kind = 'banners', onProgress) {
   if (file.size > max) {
     return Promise.reject(new Error('Image must be ≤ 5 MB'))
   }
+
+  // onProgress may be omitted when called as uploadCmsAsset(file, kind)
+  const progressCb = typeof onProgress === 'function' ? onProgress : null
 
   return fetch(api('/admin/cms/asset-presign'), {
     method: 'POST',
@@ -90,17 +199,21 @@ export function uploadCmsAsset(file, kind = 'banners', onProgress) {
   })
     .then(handle)
     .then(
-      ({ uploadUrl, mediaUrl, expiresIn }) =>
+      ({ uploadUrl, mediaUrl, expiresIn, key }) =>
         new Promise((resolve, reject) => {
+          if (!uploadUrl || !mediaUrl) {
+            reject(new Error('Presign response missing upload URL.'))
+            return
+          }
           const xhr = new XMLHttpRequest()
           xhr.open('PUT', uploadUrl)
           xhr.setRequestHeader('Content-Type', file.type)
           xhr.upload.onprogress = e => {
-            if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100))
+            if (e.lengthComputable && progressCb) progressCb(Math.round((e.loaded / e.total) * 100))
           }
           xhr.onload = () => {
             if (xhr.status >= 200 && xhr.status < 300) {
-              resolve({ mediaUrl, expiresIn })
+              resolve({ mediaUrl, expiresIn, key })
             } else {
               reject(new Error(`S3 upload failed (${xhr.status})`))
             }

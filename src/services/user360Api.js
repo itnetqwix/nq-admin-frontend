@@ -172,3 +172,81 @@ export const getLiveLessonDebug = async sessionId => {
   if (isApiFailure(data, response)) throw new Error(readError(data))
   return data?.data || null
 }
+
+export const getPlatformActivity = async (query = {}) => {
+  const qs = toQueryString(query)
+  const paths = [`/admin/logs/activity${qs}`, `/admin/platform-activity${qs}`]
+  let lastError = 'Failed to load platform activity'
+
+  for (const path of paths) {
+    const response = await fetch(apiUrl(path), {
+      method: 'GET',
+      headers: getAuthHeaders()
+    })
+    let data = null
+    try {
+      data = await response.json()
+    } catch {
+      data = null
+    }
+    if (response.status === 404) {
+      lastError =
+        'Platform activity API not found on this server. Redeploy nq-backend (route: GET /admin/platform-activity).'
+      continue
+    }
+    if (isApiFailure(data, response)) {
+      throw new Error(readError(data) || lastError)
+    }
+    return unwrap(data) || { items: [], pagination: { page: 1, limit: 25, total: 0 }, counts: {} }
+  }
+
+  throw new Error(lastError)
+}
+
+const unwrapData = data => data?.data ?? unwrap(data)
+
+export const getUserSupportTickets = async userId => {
+  if (!userId || userId === 'undefined') throw new Error('Invalid user id')
+  const response = await fetch(apiUrl(`/admin/users/${userId}/support-tickets`), {
+    method: 'GET',
+    headers: getAuthHeaders()
+  })
+  const data = await response.json()
+  if (isApiFailure(data, response)) throw new Error(readError(data))
+  return unwrapData(data) || { feedback: [], concerns: [] }
+}
+
+export const getUserReferrals = async userId => {
+  if (!userId || userId === 'undefined') throw new Error('Invalid user id')
+  const response = await fetch(apiUrl(`/admin/users/${userId}/referrals`), {
+    method: 'GET',
+    headers: getAuthHeaders()
+  })
+  const data = await response.json()
+  if (isApiFailure(data, response)) throw new Error(readError(data))
+  return unwrapData(data)
+}
+
+export const revokeUserSession = async (userId, sessionId) => {
+  if (!userId || !sessionId) throw new Error('userId and sessionId required')
+  const response = await fetch(apiUrl(`/admin/users/${userId}/sessions/${sessionId}/revoke`), {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({})
+  })
+  const data = await response.json()
+  if (isApiFailure(data, response)) throw new Error(readError(data))
+  return unwrapData(data) || data?.data || { revoked: true }
+}
+
+export const revokeAllUserSessions = async userId => {
+  if (!userId || userId === 'undefined') throw new Error('Invalid user id')
+  const response = await fetch(apiUrl(`/admin/users/${userId}/sessions/revoke-all`), {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({})
+  })
+  const data = await response.json()
+  if (isApiFailure(data, response)) throw new Error(readError(data))
+  return unwrapData(data) || data?.data || { revokedCount: 0 }
+}
