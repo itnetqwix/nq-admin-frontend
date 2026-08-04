@@ -13,32 +13,37 @@ const AuthGuard = props => {
   const { children, fallback } = props
   const auth = useAuth()
   const router = useRouter()
-  useEffect(
-    () => {
-      if (!router.isReady) {
-        return
-      }
-      if (auth.user === null && !window.localStorage.getItem('userData')) {
-        if (router.asPath !== '/') {
-          router.replace({
-            pathname: '/login',
-            query: { returnUrl: router.asPath }
-          })
-        } else {
-          router.replace('/login')
-        }
 
-        return
+  useEffect(() => {
+    if (!router.isReady || !auth.bootstrapped) return
+
+    if (auth.user === null) {
+      if (router.asPath !== '/') {
+        void router.replace({
+          pathname: '/login',
+          query: { returnUrl: router.asPath }
+        })
+      } else {
+        void router.replace('/login')
       }
-      // ponytail: lock all routes until TOTP enroll finishes when backend requires MFA
-      if (auth.mfaEnrollmentRequired && !router.pathname.startsWith(MFA_ENROLL_PATH)) {
-        router.replace(MFA_ENROLL_PATH)
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [router.route, router.isReady, auth.mfaEnrollmentRequired, auth.user]
-  )
-  if (auth.loading || auth.user === null) {
+      return
+    }
+
+    // Prod backend returns mfa_enrollment_required until TOTP is enabled.
+    if (auth.mfaEnrollmentRequired && !router.pathname.startsWith(MFA_ENROLL_PATH)) {
+      void router.replace(MFA_ENROLL_PATH)
+    }
+  }, [
+    router.isReady,
+    router.asPath,
+    router.pathname,
+    auth.bootstrapped,
+    auth.user,
+    auth.mfaEnrollmentRequired,
+    router
+  ])
+
+  if (!auth.bootstrapped || auth.loading || auth.user === null) {
     return fallback
   }
   if (auth.mfaEnrollmentRequired && !router.pathname.startsWith(MFA_ENROLL_PATH)) {

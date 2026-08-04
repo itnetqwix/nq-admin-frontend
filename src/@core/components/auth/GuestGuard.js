@@ -11,15 +11,27 @@ const GuestGuard = props => {
   const { children, fallback } = props
   const auth = useAuth()
   const router = useRouter()
+
   useEffect(() => {
-    if (!router.isReady || !auth.bootstrapped || auth.loading) {
+    if (!router.isReady || !auth.bootstrapped || auth.loading) return
+    if (!auth.user) return
+
+    // Already signed in — never leave them stuck on login while MFA pending.
+    if (auth.mfaEnrollmentRequired) {
+      void router.replace('/pages/mfa-enroll')
       return
     }
-    if (auth.user) {
-      router.replace('/home')
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.route, auth.user, auth.bootstrapped, auth.loading])
+    void router.replace('/home')
+  }, [
+    router.isReady,
+    router.route,
+    auth.user,
+    auth.bootstrapped,
+    auth.loading,
+    auth.mfaEnrollmentRequired,
+    router
+  ])
+
   if (!auth.bootstrapped || auth.loading || auth.user !== null) {
     return fallback
   }
