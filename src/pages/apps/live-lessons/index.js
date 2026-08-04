@@ -2,37 +2,31 @@ import {
   Box,
   Button,
   Chip,
-  Divider,
-  Grid,
+  InputAdornment,
   MenuItem,
   Stack,
   TextField,
   Typography
 } from '@mui/material'
-import { DataGrid } from '@mui/x-data-grid'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
-import styles from 'styles/common.module.css'
 import moment from 'moment'
-import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import AdminPageShell from 'src/layouts/components/AdminPageShell'
 import ObservabilityLinks from 'src/layouts/components/ObservabilityLinks'
 import { getLiveLessonDebug, getLiveLessons } from 'src/services/user360Api'
+import { ops } from 'src/styles/opsSurface'
+import Icon from 'src/@core/components/icon'
 
 function personLabel(p) {
   if (!p) return '—'
   return p.name || p.email || p.id || '—'
 }
 
-function clipActionLabel(cp) {
-  if (!cp) return '—'
-  const a = cp.action || '—'
-  const bits = [a]
-  if (cp.source) bits.push(`src:${cp.source}`)
-  if (cp.videoPaused != null) bits.push(cp.videoPaused ? 'paused' : 'playing')
-  if (cp.readyState != null) bits.push(`rs:${cp.readyState}`)
-  if (cp.error) bits.push(String(cp.error))
-  return bits.join(' · ')
+function shortId(id) {
+  if (!id) return '—'
+  const s = String(id)
+  return s.length > 10 ? `${s.slice(0, 6)}…${s.slice(-4)}` : s
 }
 
 async function copyText(text) {
@@ -53,53 +47,117 @@ async function copyText(text) {
   if (!ok) throw new Error('Copy failed')
 }
 
-function RoleCard({ title, rollup }) {
-  if (!rollup) return null
-  const failActions = Object.entries(rollup.actionCounts || {})
-    .filter(([k]) => k === 'play_fail' || k === 'stuck_paused' || k === 'play_gesture')
-    .map(([k, v]) => `${k}:${v}`)
-    .join(' ')
+const KIND_META = {
+  lifecycle: { label: 'Lifecycle', color: ops.indigo, bg: ops.softIndigo },
+  join: { label: 'Join', color: '#0f766e', bg: ops.softMint },
+  clip: { label: 'Clip', color: '#0369a1', bg: ops.softSky },
+  call: { label: 'Call', color: '#a16207', bg: ops.softAmber },
+  ops: { label: 'Ops', color: '#7c3aed', bg: ops.softIndigo },
+  extension: { label: 'Ext', color: '#4338ca', bg: ops.softIndigo },
+  note: { label: 'Note', color: ops.mute, bg: ops.canvasSoft2 }
+}
+
+const SEV_DOT = {
+  info: ops.mute,
+  ok: '#059669',
+  warn: ops.warning,
+  error: ops.error
+}
+
+function StoryRow({ item }) {
+  const kind = KIND_META[item.kind] || KIND_META.note
+  const when = item.at ? moment(item.at).format('HH:mm:ss') : '—'
+  const day = item.at ? moment(item.at).format('MMM D') : ''
   return (
-    <Box sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 1, height: '100%' }}>
-      <Stack direction='row' spacing={1} alignItems='center' sx={{ mb: 0.5 }}>
-        <Typography variant='caption' color='text.secondary'>
-          {title}
+    <Box
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: { xs: '64px 1fr', sm: '72px 72px 1fr' },
+        gap: 1.25,
+        py: 1.25,
+        px: 1.5,
+        borderBottom: `1px solid ${ops.hairline}`,
+        bgcolor: item.severity === 'error' ? ops.errorSoft : item.severity === 'warn' ? ops.softAmber : 'transparent',
+        '&:hover': { bgcolor: ops.canvasSoft }
+      }}
+    >
+      <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+        <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute }}>{day}</Typography>
+        <Typography sx={{ fontFamily: ops.mono, fontSize: 12, fontWeight: 600, color: ops.ink }}>{when}</Typography>
+      </Box>
+      <Box>
+        <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute, display: { sm: 'none' } }}>
+          {day} {when}
         </Typography>
-        {rollup.failureCount > 0 ? (
+        <Chip
+          size='small'
+          label={kind.label}
+          sx={{
+            height: 22,
+            fontSize: 11,
+            fontWeight: 600,
+            bgcolor: kind.bg,
+            color: kind.color,
+            borderRadius: ops.radiusSm
+          }}
+        />
+      </Box>
+      <Box sx={{ minWidth: 0 }}>
+        <Stack direction='row' spacing={1} alignItems='center'>
+          <Box
+            sx={{
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              bgcolor: SEV_DOT[item.severity] || SEV_DOT.info,
+              flexShrink: 0
+            }}
+          />
+          <Typography sx={{ fontWeight: 600, fontSize: 14, letterSpacing: '-0.2px' }}>{item.title}</Typography>
+          {item.role ? (
+            <Chip size='small' variant='outlined' label={item.role} sx={{ height: 20, fontSize: 10 }} />
+          ) : null}
+        </Stack>
+        {item.detail ? (
+          <Typography variant='body2' color='text.secondary' sx={{ mt: 0.35, lineHeight: 1.5, wordBreak: 'break-word' }}>
+            {item.detail}
+          </Typography>
+        ) : null}
+      </Box>
+    </Box>
+  )
+}
+
+function PersonCard({ label, person, rollup }) {
+  return (
+    <Box
+      sx={{
+        p: 2,
+        borderRadius: ops.radiusMd,
+        bgcolor: ops.canvasSoft,
+        boxShadow: ops.shadowCard,
+        height: '100%'
+      }}
+    >
+      <Typography sx={{ fontSize: 11, fontFamily: ops.mono, color: ops.mute, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+        {label}
+      </Typography>
+      <Typography sx={{ fontWeight: 700, fontSize: 17, mt: 0.5, letterSpacing: '-0.3px' }}>{personLabel(person)}</Typography>
+      <Typography variant='body2' color='text.secondary' sx={{ wordBreak: 'break-all' }}>
+        {person?.email || '—'}
+      </Typography>
+      <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute, mt: 0.75 }}>{person?.id || '—'}</Typography>
+      <Stack direction='row' spacing={0.75} flexWrap='wrap' useFlexGap sx={{ mt: 1.25 }}>
+        {rollup?.client ? <Chip size='small' label={rollup.client} /> : null}
+        <Chip size='small' variant='outlined' label={`${rollup?.clipEventCount ?? 0} clip logs`} />
+        {(rollup?.failureCount ?? 0) > 0 ? (
           <Chip size='small' color='warning' label={`${rollup.failureCount} fail`} />
         ) : (
           <Chip size='small' variant='outlined' label='no fails' />
         )}
-        {rollup.client ? <Chip size='small' label={rollup.client} /> : null}
       </Stack>
-      <Typography variant='body1' sx={{ fontWeight: 600 }}>
-        {personLabel(rollup.user)}
-      </Typography>
-      <Typography variant='caption' color='text.secondary' sx={{ display: 'block' }}>
-        {rollup.user?.email || '—'}
-      </Typography>
-      <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 0.5 }}>
-        id: {rollup.user?.id || '—'}
-      </Typography>
-      <Typography variant='body2' sx={{ mt: 1, fontFamily: 'ui-monospace, monospace', fontSize: 12 }}>
-        clip events: {rollup.clipEventCount} · {JSON.stringify(rollup.actionCounts || {})}
-      </Typography>
-      {failActions ? (
-        <Typography variant='body2' color='warning.main' sx={{ fontSize: 12 }}>
-          fails: {failActions}
-        </Typography>
-      ) : null}
-      <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 0.75 }}>
-        quality score {rollup.quality?.avgScore ?? '—'} · rtt {rollup.quality?.avgRttMs ?? '—'}ms · relay{' '}
-        {rollup.quality?.relayPct ?? '—'}%
-      </Typography>
-      <Typography
-        variant='caption'
-        color='text.secondary'
-        sx={{ display: 'block', mt: 0.5, wordBreak: 'break-all' }}
-        title={rollup.env?.userAgent || ''}
-      >
-        ua: {rollup.env?.userAgent ? String(rollup.env.userAgent).slice(0, 100) : '—'}
+      <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1 }}>
+        quality {rollup?.quality?.avgScore ?? '—'} · rtt {rollup?.quality?.avgRttMs ?? '—'}ms
       </Typography>
     </Box>
   )
@@ -108,12 +166,13 @@ function RoleCard({ title, rollup }) {
 export default function LiveLessonsPage() {
   const router = useRouter()
   const [hours, setHours] = useState(48)
+  const [search, setSearch] = useState('')
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
   const [detailLoading, setDetailLoading] = useState(false)
   const [detail, setDetail] = useState(null)
-  const [roleFilter, setRoleFilter] = useState('all')
-  const [actionFilter, setActionFilter] = useState('all')
+  const [storyFilter, setStoryFilter] = useState('all')
+
   const selectedId = useMemo(() => {
     if (!router.isReady) return ''
     const q = router.query.sessionId
@@ -123,21 +182,8 @@ export default function LiveLessonsPage() {
   const loadList = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await getLiveLessons({ hours, limit: 50 })
-      const items = data?.items || []
-      setRows(
-        items.map(r => ({
-          id: r.sessionId,
-          live: !!r.live,
-          status: r.status || '—',
-          bothJoinedAt: r.bothJoinedAt,
-          actualEndAt: r.actualEndAt,
-          trainer: personLabel(r.trainer),
-          trainee: personLabel(r.trainee),
-          clipPlaybackEvents: r.clipPlaybackEvents ?? 0,
-          isInstant: !!r.isInstant
-        }))
-      )
+      const data = await getLiveLessons({ hours, limit: 60 })
+      setRows(data?.items || [])
     } catch (e) {
       toast.error(e?.message || 'Failed to load live lessons')
       setRows([])
@@ -184,311 +230,264 @@ export default function LiveLessonsPage() {
     )
   }
 
-  const shareText = detail?.shareText || ''
-  const shareJson = useMemo(() => {
-    if (!detail?.sharePack) return ''
-    try {
-      return JSON.stringify(detail.sharePack, null, 2)
-    } catch {
-      return ''
+  const filteredRows = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return rows
+    return rows.filter(r => {
+      const blob = [
+        r.title,
+        r.sessionId,
+        r.trainer?.name,
+        r.trainer?.email,
+        r.trainee?.name,
+        r.trainee?.email,
+        r.status
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+      return blob.includes(q)
+    })
+  }, [rows, search])
+
+  const story = detail?.story || []
+  const filteredStory = useMemo(() => {
+    if (storyFilter === 'all') return story
+    if (storyFilter === 'clip') return story.filter(s => s.kind === 'clip')
+    if (storyFilter === 'call') return story.filter(s => s.kind === 'call' || s.kind === 'join')
+    if (storyFilter === 'lifecycle') {
+      return story.filter(s => s.kind === 'lifecycle' || s.kind === 'join' || s.kind === 'extension' || s.kind === 'ops')
     }
-  }, [detail])
+    if (storyFilter === 'problems') {
+      return story.filter(s => s.severity === 'error' || s.severity === 'warn')
+    }
+    return story
+  }, [story, storyFilter])
 
   const onCopyPack = async () => {
     try {
-      await copyText(shareText || shareJson)
-      toast.success(`Copied share pack (${(shareText || shareJson).length} chars)`)
+      await copyText(detail?.shareText || '')
+      toast.success('Copied full share pack')
     } catch (e) {
       toast.error(e?.message || 'Copy failed')
     }
   }
 
-  const onCopyJson = async () => {
-    try {
-      await copyText(shareJson || shareText)
-      toast.success('Copied raw JSON pack')
-    } catch (e) {
-      toast.error(e?.message || 'Copy failed')
-    }
-  }
-
-  const onCopySessionId = async () => {
-    try {
-      await copyText(selectedId)
-      toast.success('Session id copied')
-    } catch (e) {
-      toast.error(e?.message || 'Copy failed')
-    }
-  }
-
-  const onCopyFailuresOnly = async () => {
-    if (!detail) return
-    const coach = detail.byRole?.trainer
-    const trainee = detail.byRole?.trainee
-    const lines = [
-      `=== CLIP FAILURES ONLY · session ${detail.sessionId} ===`,
-      `Coach: ${coach?.user?.email || coach?.user?.name || coach?.user?.id || '—'}`,
-      ...(coach?.failures || []).map(
-        f =>
-          `  [coach] ${f.at} ${f.action} err=${f.error ?? '—'} rs=${f.readyState ?? '—'} paused=${f.videoPaused ?? '—'}`
-      ),
-      `Trainee: ${trainee?.user?.email || trainee?.user?.name || trainee?.user?.id || '—'}`,
-      ...(trainee?.failures || []).map(
-        f =>
-          `  [trainee] ${f.at} ${f.action} err=${f.error ?? '—'} rs=${f.readyState ?? '—'} paused=${f.videoPaused ?? '—'}`
-      ),
-      '',
-      ...(detail.heuristics || []).map(h => `- ${h}`)
-    ]
-    try {
-      await copyText(lines.join('\n'))
-      toast.success('Copied failures + heuristics')
-    } catch (e) {
-      toast.error(e?.message || 'Copy failed')
-    }
-  }
-
-  const listColumns = [
-    {
-      field: 'live',
-      headerName: 'Live',
-      width: 90,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
-      renderCell: p =>
-        p.value ? <Chip size='small' color='error' label='LIVE' /> : <Chip size='small' label='ended' variant='outlined' />
-    },
-    {
-      field: 'bothJoinedAt',
-      headerName: 'Both joined',
-      width: 160,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
-      valueFormatter: p => (p.value ? moment(p.value).format('MM-DD HH:mm:ss') : '—')
-    },
-    {
-      field: 'trainer',
-      headerName: 'Coach',
-      flex: 1,
-      minWidth: 140,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class']
-    },
-    {
-      field: 'trainee',
-      headerName: 'Trainee',
-      flex: 1,
-      minWidth: 140,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class']
-    },
-    {
-      field: 'clipPlaybackEvents',
-      headerName: 'Clip log',
-      width: 90,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class']
-    },
-    {
-      field: 'status',
-      headerName: 'Status',
-      width: 110,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class']
-    },
-    {
-      field: 'id',
-      headerName: 'Session',
-      width: 220,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class']
-    }
-  ]
-
-  const filteredClipEvents = useMemo(() => {
-    let list = detail?.clipEvents || []
-    if (roleFilter === 'trainer' || roleFilter === 'trainee') {
-      list = list.filter(e => e.role === roleFilter)
-    }
-    if (actionFilter === 'fails') {
-      list = list.filter(e =>
-        ['play_fail', 'stuck_paused', 'play_gesture'].includes(String(e.clipPlayback?.action || ''))
-      )
-    } else if (actionFilter !== 'all') {
-      list = list.filter(e => String(e.clipPlayback?.action || '') === actionFilter)
-    }
-    return list
-  }, [detail, roleFilter, actionFilter])
-
-  const clipRows = filteredClipEvents.map((e, i) => ({
-    id: `${e.at || i}-${i}`,
-    at: e.at,
-    role: e.role || '—',
-    user: personLabel(e.user),
-    email: e.user?.email || '—',
-    action: e.clipPlayback?.action || '—',
-    detail: clipActionLabel(e.clipPlayback),
-    t: e.clipPlayback?.currentTime,
-    readyState: e.clipPlayback?.readyState,
-    ua: e.clipPlayback?.ua ? String(e.clipPlayback.ua).slice(0, 48) : '—'
-  }))
-
-  const clipColumns = [
-    {
-      field: 'at',
-      headerName: 'When',
-      width: 160,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
-      valueFormatter: p => (p.value ? moment(p.value).format('HH:mm:ss.SSS') : '—')
-    },
-    { field: 'role', headerName: 'Role', width: 90, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
-    { field: 'user', headerName: 'User', width: 120, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
-    { field: 'email', headerName: 'Email', width: 160, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
-    { field: 'action', headerName: 'Action', width: 120, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
-    {
-      field: 'detail',
-      headerName: 'Media snapshot',
-      flex: 1,
-      minWidth: 220,
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class']
-    },
-    { field: 't', headerName: 't(s)', width: 70, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
-    { field: 'readyState', headerName: 'RS', width: 60, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] }
-  ]
-
-  const participantRows = (detail?.participants || []).map((p, i) => ({
-    id: p.userId || i,
-    role: p.role || '—',
-    userId: p.userId || '—',
-    client: p.client || '—',
-    updatedAt: p.updatedAt ? moment(p.updatedAt).format('HH:mm:ss') : '—'
-  }))
+  const listView = !selectedId
 
   return (
     <AdminPageShell
       title='Live lessons'
-      subtitle='One session → both users → clip/console-style logs. Copy the share pack and paste it in chat for root-cause triage.'
+      eyebrow='OPS · LESSONS'
+      icon='mdi:record-rec'
+      subtitle={
+        listView
+          ? 'Every live session as coach ↔ trainee. Open one to see the full story: created → join → play/pause → call quality.'
+          : detail?.title || 'Session story'
+      }
+      bare
       actions={
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-          <Button variant='outlined' onClick={() => void loadList()}>
+          {!listView ? (
+            <Button variant='outlined' startIcon={<Icon icon='mdi:arrow-left' />} onClick={() => selectSession('')}>
+              All lessons
+            </Button>
+          ) : null}
+          <Button variant='outlined' onClick={() => void loadList()} disabled={loading}>
             Refresh list
           </Button>
           {selectedId ? (
             <Button variant='contained' onClick={() => void loadDetail(selectedId)} disabled={detailLoading}>
-              Refresh session
+              Refresh story
             </Button>
           ) : null}
         </Stack>
       }
-      contentSx={{ p: 0 }}
     >
-      <AdminPageSection>
-        <Grid container spacing={2} sx={{ mb: 2 }}>
-          <Grid item xs={12} md={3}>
-            <TextField
-              select
-              size='small'
-              fullWidth
-              label='Lookback'
-              value={hours}
-              onChange={e => setHours(Number(e.target.value))}
-            >
-              {[12, 24, 48, 72, 168].map(h => (
-                <MenuItem key={h} value={h}>
-                  {h}h
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid item xs={12} md={9}>
-            <Typography variant='body2' color='text.secondary' sx={{ pt: 1 }}>
-              Click a row → coach + trainee cards → <strong>Copy full share pack</strong> (includes console-style clip
-              log, UAs, quality, heuristics). Only that session’s two users.
+      {listView ? (
+        <Box
+          sx={{
+            borderRadius: ops.radiusLg,
+            bgcolor: 'background.paper',
+            boxShadow: ops.shadowCard,
+            overflow: 'hidden'
+          }}
+        >
+          <Box sx={{ p: { xs: 2, sm: 3 } }}>
+            <Typography sx={{ fontWeight: 700, fontSize: 16, letterSpacing: '-0.3px' }}>
+              Recent live sessions
             </Typography>
-          </Grid>
-        </Grid>
+            <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5, mb: 2 }}>
+              Sorted by both joined. Search by coach, trainee, email, or session id. Click a row for the full story.
+            </Typography>
 
-        <Box className='admin-data-grid' sx={{ height: selectedId ? 260 : 520, width: '100%', mb: 2 }}>
-          <DataGrid
-            rows={rows}
-            columns={listColumns}
-            loading={loading}
-            pageSizeOptions={[25, 50]}
-            initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
-            disableRowSelectionOnClick
-            onRowClick={p => selectSession(p.id)}
-            getRowClassName={p => (p.id === selectedId ? 'Mui-selected' : '')}
-          />
-        </Box>
-
-        {selectedId ? (
-          <>
-            <Divider sx={{ my: 2 }} />
-            <Stack
-              direction={{ xs: 'column', sm: 'row' }}
-              spacing={1}
-              alignItems={{ sm: 'center' }}
-              flexWrap='wrap'
-              useFlexGap
-              sx={{ mb: 1.5 }}
-            >
-              <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
-                Session {selectedId}
-              </Typography>
-              {detail?.live ? <Chip size='small' color='error' label='LIVE now' /> : null}
-              <Button size='small' onClick={() => selectSession('')}>
-                Clear
-              </Button>
-              <Button size='small' variant='outlined' onClick={() => void onCopySessionId()}>
-                Copy session id
-              </Button>
-              <Button
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 2 }}>
+              <TextField
                 size='small'
-                variant='contained'
-                color='primary'
-                onClick={() => void onCopyPack()}
-                disabled={!shareText && !shareJson}
-              >
-                Copy full share pack
-              </Button>
-              <Button size='small' variant='outlined' onClick={() => void onCopyJson()} disabled={!shareJson}>
-                Copy JSON
-              </Button>
-              <Button size='small' variant='outlined' color='warning' onClick={() => void onCopyFailuresOnly()}>
-                Copy failures only
-              </Button>
-              <Button
+                placeholder='Search coach, trainee, session…'
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position='start'>
+                      <Icon icon='mdi:magnify' fontSize={18} />
+                    </InputAdornment>
+                  )
+                }}
+              />
+              <TextField
+                select
                 size='small'
-                variant='outlined'
-                href={`/apps/call-diagnostics?sessionId=${encodeURIComponent(selectedId)}`}
+                label='Lookback'
+                value={hours}
+                onChange={e => setHours(Number(e.target.value))}
+                sx={{ minWidth: 120 }}
               >
-                Call diagnostics
-              </Button>
+                {[12, 24, 48, 72, 168].map(h => (
+                  <MenuItem key={h} value={h}>
+                    {h}h
+                  </MenuItem>
+                ))}
+              </TextField>
             </Stack>
-            <ObservabilityLinks sessionId={selectedId} />
 
+            {loading ? (
+              <Typography color='text.secondary'>Loading…</Typography>
+            ) : filteredRows.length === 0 ? (
+              <Typography color='text.secondary'>No live lessons in this window.</Typography>
+            ) : (
+              <Stack spacing={0}>
+                {filteredRows.map(r => {
+                  const coach = personLabel(r.trainer)
+                  const trainee = personLabel(r.trainee)
+                  return (
+                    <Box
+                      key={r.sessionId}
+                      onClick={() => selectSession(r.sessionId)}
+                      sx={{
+                        display: 'grid',
+                        gridTemplateColumns: {
+                          xs: '1fr',
+                          md: 'minmax(0,1.4fr) minmax(0,1.2fr) 140px 100px 110px'
+                        },
+                        gap: 1.25,
+                        alignItems: 'center',
+                        py: 1.75,
+                        px: 1.5,
+                        mx: { xs: -0.5, sm: -1 },
+                        borderBottom: `1px solid ${ops.hairline}`,
+                        cursor: 'pointer',
+                        transition: 'background 120ms',
+                        '&:hover': { bgcolor: ops.canvasSoft }
+                      }}
+                    >
+                      <Box>
+                        <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
+                          {r.live ? (
+                            <Chip size='small' color='error' label='LIVE' sx={{ fontWeight: 700 }} />
+                          ) : (
+                            <Chip size='small' variant='outlined' label='ended' />
+                          )}
+                          {r.isInstant ? <Chip size='small' variant='outlined' label='instant' /> : null}
+                          {(r.clipFailEvents || 0) > 0 ? (
+                            <Chip size='small' color='warning' label={`${r.clipFailEvents} clip issues`} />
+                          ) : null}
+                        </Stack>
+                        <Typography sx={{ fontWeight: 700, fontSize: 16, mt: 0.75, letterSpacing: '-0.3px' }}>
+                          {coach}{' '}
+                          <Box component='span' sx={{ color: ops.mute, fontWeight: 500 }}>
+                            ↔
+                          </Box>{' '}
+                          {trainee}
+                        </Typography>
+                        <Typography variant='caption' color='text.secondary' sx={{ display: { md: 'none' } }}>
+                          {shortId(r.sessionId)}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                        <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.mute }}>session</Typography>
+                        <Typography sx={{ fontFamily: ops.mono, fontSize: 13 }}>{r.sessionId}</Typography>
+                      </Box>
+                      <Box>
+                        <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.mute }}>both joined</Typography>
+                        <Typography sx={{ fontSize: 13 }}>
+                          {r.bothJoinedAt ? moment(r.bothJoinedAt).format('MMM D · HH:mm') : '—'}
+                        </Typography>
+                      </Box>
+                      <Box>
+                        <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.mute }}>clip log</Typography>
+                        <Typography sx={{ fontSize: 13, fontWeight: 600 }}>{r.clipPlaybackEvents ?? 0}</Typography>
+                      </Box>
+                      <Box sx={{ textAlign: { md: 'right' } }}>
+                        <Button size='small' endIcon={<Icon icon='mdi:chevron-right' />}>
+                          Open story
+                        </Button>
+                      </Box>
+                    </Box>
+                  )
+                })}
+              </Stack>
+            )}
+          </Box>
+        </Box>
+      ) : (
+        <Stack spacing={2}>
+          <Box
+            sx={{
+              p: { xs: 2, sm: 2.5 },
+              borderRadius: ops.radiusLg,
+              bgcolor: 'background.paper',
+              boxShadow: ops.shadowCard
+            }}
+          >
             {detailLoading && !detail ? (
-              <Typography variant='body2' color='text.secondary'>
-                Loading…
-              </Typography>
+              <Typography color='text.secondary'>Loading session story…</Typography>
             ) : detail ? (
               <>
-                {(detail.heuristics || []).length > 0 ? (
-                  <Box
-                    sx={{
-                      mb: 2,
-                      p: 1.5,
-                      borderRadius: 1,
-                      bgcolor: 'action.hover',
-                      border: '1px solid',
-                      borderColor: 'warning.main'
-                    }}
-                  >
-                    <Typography variant='subtitle2' sx={{ mb: 0.5 }}>
-                      Auto hints for this lesson
+                <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} justifyContent='space-between' alignItems={{ md: 'flex-start' }}>
+                  <Box>
+                    <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
+                      {detail.live ? <Chip size='small' color='error' label='LIVE NOW' /> : <Chip size='small' label='Ended' />}
+                      {detail.isInstant ? <Chip size='small' variant='outlined' label='Instant' /> : null}
+                      <Chip size='small' variant='outlined' label={detail.status || '—'} />
+                    </Stack>
+                    <Typography sx={{ fontWeight: 700, fontSize: { xs: 20, md: 24 }, mt: 1, letterSpacing: '-0.5px' }}>
+                      {personLabel(detail.trainer)} ↔ {personLabel(detail.trainee)}
                     </Typography>
+                    <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.mute, mt: 0.5 }}>
+                      session {detail.sessionId}
+                    </Typography>
+                    <Typography variant='body2' color='text.secondary' sx={{ mt: 0.75 }}>
+                      Joined {detail.bothJoinedAt ? moment(detail.bothJoinedAt).format('MMM D YYYY · HH:mm:ss') : '—'}
+                      {detail.actualEndAt
+                        ? ` · ended ${moment(detail.actualEndAt).format('HH:mm:ss')}`
+                        : detail.live
+                          ? ' · still in lesson'
+                          : ''}
+                    </Typography>
+                  </Box>
+                  <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                    <Button size='small' variant='outlined' onClick={() => void copyText(detail.sessionId).then(() => toast.success('Session id copied'))}>
+                      Copy id
+                    </Button>
+                    <Button size='small' variant='contained' onClick={() => void onCopyPack()}>
+                      Copy share pack
+                    </Button>
+                    <Button
+                      size='small'
+                      variant='outlined'
+                      href={`/apps/call-diagnostics?sessionId=${encodeURIComponent(detail.sessionId)}`}
+                    >
+                      Call diagnostics
+                    </Button>
+                  </Stack>
+                </Stack>
+                <ObservabilityLinks sessionId={detail.sessionId} dense />
+
+                {(detail.heuristics || []).length > 0 ? (
+                  <Box sx={{ mt: 2, p: 1.5, borderRadius: ops.radiusMd, bgcolor: ops.softAmber }}>
+                    <Typography sx={{ fontWeight: 600, mb: 0.5 }}>Auto hints</Typography>
                     {(detail.heuristics || []).map((h, i) => (
                       <Typography key={i} variant='body2' sx={{ mb: 0.25 }}>
                         · {h}
@@ -497,154 +496,109 @@ export default function LiveLessonsPage() {
                   </Box>
                 ) : null}
 
-                <Grid container spacing={2} sx={{ mb: 2, mt: 0.5 }}>
-                  <Grid item xs={12} md={6}>
-                    <RoleCard title='Coach (this lesson)' rollup={detail.byRole?.trainer} />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <RoleCard title='Trainee (this lesson)' rollup={detail.byRole?.trainee} />
-                  </Grid>
-                </Grid>
-
-                <Typography variant='subtitle2' sx={{ mb: 1 }}>
-                  Share pack preview — select + copy, or use the button above
-                </Typography>
-                <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
-                  Paste this entire block here for diagnosis. Browser filter <code>[clipPlayback]</code> · server{' '}
-                  <code>[ClipPlayback]</code>.
-                </Typography>
                 <Box
-                  component='textarea'
-                  readOnly
-                  value={shareText || '(no pack — refresh after backend deploy)'}
-                  onFocus={e => e.target.select()}
                   sx={{
-                    display: 'block',
-                    width: '100%',
-                    minHeight: 220,
-                    maxHeight: 360,
-                    mb: 2,
-                    p: 1.5,
-                    fontSize: 11.5,
-                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-                    lineHeight: 1.45,
-                    borderRadius: 1,
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    bgcolor: 'action.hover',
-                    color: 'text.primary',
-                    resize: 'vertical'
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                    gap: 1.5,
+                    mt: 2
                   }}
-                />
-
-                <Typography variant='subtitle2' sx={{ mb: 1 }}>
-                  Clients in room
-                </Typography>
-                <Box
-                  className='admin-data-grid'
-                  sx={{ height: Math.min(180, 52 + Math.max(participantRows.length, 1) * 42), width: '100%', mb: 2 }}
                 >
-                  <DataGrid
-                    rows={participantRows}
-                    columns={[
-                      { field: 'role', headerName: 'Role', width: 100, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
-                      { field: 'client', headerName: 'Client', width: 100, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
-                      { field: 'userId', headerName: 'User id', flex: 1, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
-                      { field: 'updatedAt', headerName: 'Seen', width: 90, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] }
-                    ]}
-                    hideFooter
-                    disableRowSelectionOnClick
-                  />
+                  <PersonCard label='Coach' person={detail.trainer} rollup={detail.byRole?.trainer} />
+                  <PersonCard label='Trainee' person={detail.trainee} rollup={detail.byRole?.trainee} />
                 </Box>
-
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mb: 1 }} alignItems={{ sm: 'center' }}>
-                  <Typography variant='subtitle2' sx={{ flex: 1 }}>
-                    Clip play / pause log ({clipRows.length}
-                    {filteredClipEvents.length !== (detail.clipEvents || []).length
-                      ? ` filtered / ${detail.clipEvents?.length || 0}`
-                      : ''}
-                    )
-                  </Typography>
-                  <TextField
-                    select
-                    size='small'
-                    label='Role'
-                    value={roleFilter}
-                    onChange={e => setRoleFilter(e.target.value)}
-                    sx={{ minWidth: 120 }}
-                  >
-                    <MenuItem value='all'>Both users</MenuItem>
-                    <MenuItem value='trainer'>Coach only</MenuItem>
-                    <MenuItem value='trainee'>Trainee only</MenuItem>
-                  </TextField>
-                  <TextField
-                    select
-                    size='small'
-                    label='Actions'
-                    value={actionFilter}
-                    onChange={e => setActionFilter(e.target.value)}
-                    sx={{ minWidth: 140 }}
-                  >
-                    <MenuItem value='all'>All actions</MenuItem>
-                    <MenuItem value='fails'>Fails only</MenuItem>
-                    <MenuItem value='play_ok'>play_ok</MenuItem>
-                    <MenuItem value='play_fail'>play_fail</MenuItem>
-                    <MenuItem value='stuck_paused'>stuck_paused</MenuItem>
-                    <MenuItem value='remote_play'>remote_play</MenuItem>
-                    <MenuItem value='play_intent'>play_intent</MenuItem>
-                  </TextField>
-                </Stack>
-                <Box className='admin-data-grid' sx={{ height: 360, width: '100%', mb: 2 }}>
-                  <DataGrid
-                    rows={clipRows}
-                    columns={clipColumns}
-                    pageSizeOptions={[25, 50]}
-                    initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
-                    disableRowSelectionOnClick
-                    getRowClassName={p =>
-                      p.row.action === 'play_fail' || p.row.action === 'stuck_paused' ? 'MuiDataGrid-row--error' : ''
-                    }
-                  />
-                </Box>
-
-                {detail.timeline ? (
-                  <>
-                    <Typography variant='subtitle2' sx={{ mb: 1 }}>
-                      Session timeline (ops + joins)
-                    </Typography>
-                    <Box
-                      component='pre'
-                      sx={{
-                        m: 0,
-                        p: 1.5,
-                        maxHeight: 200,
-                        overflow: 'auto',
-                        fontSize: 12,
-                        bgcolor: 'action.hover',
-                        borderRadius: 1
-                      }}
-                    >
-                      {JSON.stringify(
-                        {
-                          bothJoinedAt: detail.bothJoinedAt,
-                          actualEndAt: detail.actualEndAt,
-                          timeline: detail.timeline
-                        },
-                        null,
-                        2
-                      )}
-                    </Box>
-                  </>
-                ) : null}
               </>
             ) : (
-              <Typography variant='body2' color='text.secondary'>
-                No detail for this session.
-              </Typography>
+              <Typography color='text.secondary'>Could not load this session.</Typography>
             )}
-          </>
-        ) : null}
-      </AdminPageSection>
+          </Box>
+
+          {detail ? (
+            <Box
+              sx={{
+                borderRadius: ops.radiusLg,
+                bgcolor: 'background.paper',
+                boxShadow: ops.shadowCard,
+                overflow: 'hidden'
+              }}
+            >
+              <Box sx={{ p: 2, borderBottom: `1px solid ${ops.hairline}` }}>
+                <Typography sx={{ fontWeight: 700, fontSize: 16, letterSpacing: '-0.3px' }}>
+                  Full lesson story
+                </Typography>
+                <Typography variant='body2' color='text.secondary' sx={{ mt: 0.35 }}>
+                  Created → both joined → clip play/pause → call quality → end. Filter to scan faster.
+                </Typography>
+                <Stack direction='row' spacing={0.75} flexWrap='wrap' useFlexGap sx={{ mt: 1.5 }}>
+                  {[
+                    { id: 'all', label: `All (${story.length})` },
+                    { id: 'lifecycle', label: 'Life / join / ops' },
+                    { id: 'clip', label: 'Clips' },
+                    { id: 'call', label: 'Call quality' },
+                    { id: 'problems', label: 'Problems only' }
+                  ].map(f => (
+                    <Chip
+                      key={f.id}
+                      size='small'
+                      label={f.label}
+                      onClick={() => setStoryFilter(f.id)}
+                      color={storyFilter === f.id ? 'primary' : 'default'}
+                      variant={storyFilter === f.id ? 'filled' : 'outlined'}
+                      sx={{ cursor: 'pointer' }}
+                    />
+                  ))}
+                </Stack>
+              </Box>
+
+              {filteredStory.length === 0 ? (
+                <Box sx={{ p: 3 }}>
+                  <Typography color='text.secondary'>
+                    No story events yet for this filter. Clip rows appear after both web clients play with the new
+                    telemetry deployed.
+                  </Typography>
+                </Box>
+              ) : (
+                <Box sx={{ maxHeight: 640, overflow: 'auto' }}>
+                  {filteredStory.map((item, i) => (
+                    <StoryRow key={`${item.ts}-${item.title}-${i}`} item={item} />
+                  ))}
+                </Box>
+              )}
+            </Box>
+          ) : null}
+
+          {detail?.shareText ? (
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: ops.radiusLg,
+                bgcolor: 'background.paper',
+                boxShadow: ops.shadowCard
+              }}
+            >
+              <Typography sx={{ fontWeight: 600, mb: 1 }}>Share pack (for chat / tickets)</Typography>
+              <Box
+                component='textarea'
+                readOnly
+                value={detail.shareText}
+                onFocus={e => e.target.select()}
+                sx={{
+                  width: '100%',
+                  minHeight: 160,
+                  maxHeight: 280,
+                  p: 1.5,
+                  fontSize: 11,
+                  fontFamily: ops.mono,
+                  borderRadius: ops.radiusSm,
+                  border: `1px solid ${ops.hairline}`,
+                  bgcolor: ops.canvasSoft,
+                  resize: 'vertical'
+                }}
+              />
+            </Box>
+          ) : null}
+        </Stack>
+      )}
     </AdminPageShell>
   )
 }
