@@ -35,6 +35,76 @@ function clipActionLabel(cp) {
   return bits.join(' · ')
 }
 
+async function copyText(text) {
+  if (!text) throw new Error('Nothing to copy')
+  if (navigator?.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text)
+    return
+  }
+  const ta = document.createElement('textarea')
+  ta.value = text
+  ta.setAttribute('readonly', '')
+  ta.style.position = 'fixed'
+  ta.style.left = '-9999px'
+  document.body.appendChild(ta)
+  ta.select()
+  const ok = document.execCommand('copy')
+  document.body.removeChild(ta)
+  if (!ok) throw new Error('Copy failed')
+}
+
+function RoleCard({ title, rollup }) {
+  if (!rollup) return null
+  const failActions = Object.entries(rollup.actionCounts || {})
+    .filter(([k]) => k === 'play_fail' || k === 'stuck_paused' || k === 'play_gesture')
+    .map(([k, v]) => `${k}:${v}`)
+    .join(' ')
+  return (
+    <Box sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 1, height: '100%' }}>
+      <Stack direction='row' spacing={1} alignItems='center' sx={{ mb: 0.5 }}>
+        <Typography variant='caption' color='text.secondary'>
+          {title}
+        </Typography>
+        {rollup.failureCount > 0 ? (
+          <Chip size='small' color='warning' label={`${rollup.failureCount} fail`} />
+        ) : (
+          <Chip size='small' variant='outlined' label='no fails' />
+        )}
+        {rollup.client ? <Chip size='small' label={rollup.client} /> : null}
+      </Stack>
+      <Typography variant='body1' sx={{ fontWeight: 600 }}>
+        {personLabel(rollup.user)}
+      </Typography>
+      <Typography variant='caption' color='text.secondary' sx={{ display: 'block' }}>
+        {rollup.user?.email || '—'}
+      </Typography>
+      <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 0.5 }}>
+        id: {rollup.user?.id || '—'}
+      </Typography>
+      <Typography variant='body2' sx={{ mt: 1, fontFamily: 'ui-monospace, monospace', fontSize: 12 }}>
+        clip events: {rollup.clipEventCount} · {JSON.stringify(rollup.actionCounts || {})}
+      </Typography>
+      {failActions ? (
+        <Typography variant='body2' color='warning.main' sx={{ fontSize: 12 }}>
+          fails: {failActions}
+        </Typography>
+      ) : null}
+      <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 0.75 }}>
+        quality score {rollup.quality?.avgScore ?? '—'} · rtt {rollup.quality?.avgRttMs ?? '—'}ms · relay{' '}
+        {rollup.quality?.relayPct ?? '—'}%
+      </Typography>
+      <Typography
+        variant='caption'
+        color='text.secondary'
+        sx={{ display: 'block', mt: 0.5, wordBreak: 'break-all' }}
+        title={rollup.env?.userAgent || ''}
+      >
+        ua: {rollup.env?.userAgent ? String(rollup.env.userAgent).slice(0, 100) : '—'}
+      </Typography>
+    </Box>
+  )
+}
+
 export default function LiveLessonsPage() {
   const router = useRouter()
   const [hours, setHours] = useState(48)
@@ -42,6 +112,8 @@ export default function LiveLessonsPage() {
   const [loading, setLoading] = useState(false)
   const [detailLoading, setDetailLoading] = useState(false)
   const [detail, setDetail] = useState(null)
+  const [roleFilter, setRoleFilter] = useState('all')
+  const [actionFilter, setActionFilter] = useState('all')
   const selectedId = useMemo(() => {
     if (!router.isReady) return ''
     const q = router.query.sessionId
@@ -112,6 +184,70 @@ export default function LiveLessonsPage() {
     )
   }
 
+  const shareText = detail?.shareText || ''
+  const shareJson = useMemo(() => {
+    if (!detail?.sharePack) return ''
+    try {
+      return JSON.stringify(detail.sharePack, null, 2)
+    } catch {
+      return ''
+    }
+  }, [detail])
+
+  const onCopyPack = async () => {
+    try {
+      await copyText(shareText || shareJson)
+      toast.success(`Copied share pack (${(shareText || shareJson).length} chars)`)
+    } catch (e) {
+      toast.error(e?.message || 'Copy failed')
+    }
+  }
+
+  const onCopyJson = async () => {
+    try {
+      await copyText(shareJson || shareText)
+      toast.success('Copied raw JSON pack')
+    } catch (e) {
+      toast.error(e?.message || 'Copy failed')
+    }
+  }
+
+  const onCopySessionId = async () => {
+    try {
+      await copyText(selectedId)
+      toast.success('Session id copied')
+    } catch (e) {
+      toast.error(e?.message || 'Copy failed')
+    }
+  }
+
+  const onCopyFailuresOnly = async () => {
+    if (!detail) return
+    const coach = detail.byRole?.trainer
+    const trainee = detail.byRole?.trainee
+    const lines = [
+      `=== CLIP FAILURES ONLY · session ${detail.sessionId} ===`,
+      `Coach: ${coach?.user?.email || coach?.user?.name || coach?.user?.id || '—'}`,
+      ...(coach?.failures || []).map(
+        f =>
+          `  [coach] ${f.at} ${f.action} err=${f.error ?? '—'} rs=${f.readyState ?? '—'} paused=${f.videoPaused ?? '—'}`
+      ),
+      `Trainee: ${trainee?.user?.email || trainee?.user?.name || trainee?.user?.id || '—'}`,
+      ...(trainee?.failures || []).map(
+        f =>
+          `  [trainee] ${f.at} ${f.action} err=${f.error ?? '—'} rs=${f.readyState ?? '—'} paused=${f.videoPaused ?? '—'}`
+      ),
+      '',
+      ...(detail.heuristics || []).map(h => `- ${h}`)
+    ]
+    try {
+      await copyText(lines.join('\n'))
+      toast.success('Copied failures + heuristics')
+    } catch (e) {
+      toast.error(e?.message || 'Copy failed')
+    }
+  }
+
   const listColumns = [
     {
       field: 'live',
@@ -169,11 +305,27 @@ export default function LiveLessonsPage() {
     }
   ]
 
-  const clipRows = (detail?.clipEvents || []).map((e, i) => ({
+  const filteredClipEvents = useMemo(() => {
+    let list = detail?.clipEvents || []
+    if (roleFilter === 'trainer' || roleFilter === 'trainee') {
+      list = list.filter(e => e.role === roleFilter)
+    }
+    if (actionFilter === 'fails') {
+      list = list.filter(e =>
+        ['play_fail', 'stuck_paused', 'play_gesture'].includes(String(e.clipPlayback?.action || ''))
+      )
+    } else if (actionFilter !== 'all') {
+      list = list.filter(e => String(e.clipPlayback?.action || '') === actionFilter)
+    }
+    return list
+  }, [detail, roleFilter, actionFilter])
+
+  const clipRows = filteredClipEvents.map((e, i) => ({
     id: `${e.at || i}-${i}`,
     at: e.at,
     role: e.role || '—',
     user: personLabel(e.user),
+    email: e.user?.email || '—',
     action: e.clipPlayback?.action || '—',
     detail: clipActionLabel(e.clipPlayback),
     t: e.clipPlayback?.currentTime,
@@ -191,7 +343,8 @@ export default function LiveLessonsPage() {
       valueFormatter: p => (p.value ? moment(p.value).format('HH:mm:ss.SSS') : '—')
     },
     { field: 'role', headerName: 'Role', width: 90, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
-    { field: 'user', headerName: 'User', width: 140, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
+    { field: 'user', headerName: 'User', width: 120, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
+    { field: 'email', headerName: 'Email', width: 160, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
     { field: 'action', headerName: 'Action', width: 120, headerClassName: styles['header-class'], cellClassName: styles['cell-class'] },
     {
       field: 'detail',
@@ -216,9 +369,9 @@ export default function LiveLessonsPage() {
   return (
     <AdminPageShell
       title='Live lessons'
-      subtitle='Both joined participants, client kind (web/ios/android), clip play/pause media logs, and ops timeline. Prefer this over raw call-diagnostics when debugging clip sync.'
+      subtitle='One session → both users → clip/console-style logs. Copy the share pack and paste it in chat for root-cause triage.'
       actions={
-        <Stack direction='row' spacing={1}>
+        <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
           <Button variant='outlined' onClick={() => void loadList()}>
             Refresh list
           </Button>
@@ -251,13 +404,13 @@ export default function LiveLessonsPage() {
           </Grid>
           <Grid item xs={12} md={9}>
             <Typography variant='body2' color='text.secondary' sx={{ pt: 1 }}>
-              Row click → both users + clip log. Look for <code>play_fail</code> / <code>stuck_paused</code> on one side only
-              (trainer plays / trainee frozen and reverse). Cross-check call diagnostics for RTT.
+              Click a row → coach + trainee cards → <strong>Copy full share pack</strong> (includes console-style clip
+              log, UAs, quality, heuristics). Only that session’s two users.
             </Typography>
           </Grid>
         </Grid>
 
-        <Box className='admin-data-grid' sx={{ height: selectedId ? 280 : 520, width: '100%', mb: 2 }}>
+        <Box className='admin-data-grid' sx={{ height: selectedId ? 260 : 520, width: '100%', mb: 2 }}>
           <DataGrid
             rows={rows}
             columns={listColumns}
@@ -273,13 +426,38 @@ export default function LiveLessonsPage() {
         {selectedId ? (
           <>
             <Divider sx={{ my: 2 }} />
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ sm: 'center' }} sx={{ mb: 1.5 }}>
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              spacing={1}
+              alignItems={{ sm: 'center' }}
+              flexWrap='wrap'
+              useFlexGap
+              sx={{ mb: 1.5 }}
+            >
               <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
                 Session {selectedId}
               </Typography>
               {detail?.live ? <Chip size='small' color='error' label='LIVE now' /> : null}
               <Button size='small' onClick={() => selectSession('')}>
                 Clear
+              </Button>
+              <Button size='small' variant='outlined' onClick={() => void onCopySessionId()}>
+                Copy session id
+              </Button>
+              <Button
+                size='small'
+                variant='contained'
+                color='primary'
+                onClick={() => void onCopyPack()}
+                disabled={!shareText && !shareJson}
+              >
+                Copy full share pack
+              </Button>
+              <Button size='small' variant='outlined' onClick={() => void onCopyJson()} disabled={!shareJson}>
+                Copy JSON
+              </Button>
+              <Button size='small' variant='outlined' color='warning' onClick={() => void onCopyFailuresOnly()}>
+                Copy failures only
               </Button>
               <Button
                 size='small'
@@ -297,35 +475,75 @@ export default function LiveLessonsPage() {
               </Typography>
             ) : detail ? (
               <>
+                {(detail.heuristics || []).length > 0 ? (
+                  <Box
+                    sx={{
+                      mb: 2,
+                      p: 1.5,
+                      borderRadius: 1,
+                      bgcolor: 'action.hover',
+                      border: '1px solid',
+                      borderColor: 'warning.main'
+                    }}
+                  >
+                    <Typography variant='subtitle2' sx={{ mb: 0.5 }}>
+                      Auto hints for this lesson
+                    </Typography>
+                    {(detail.heuristics || []).map((h, i) => (
+                      <Typography key={i} variant='body2' sx={{ mb: 0.25 }}>
+                        · {h}
+                      </Typography>
+                    ))}
+                  </Box>
+                ) : null}
+
                 <Grid container spacing={2} sx={{ mb: 2, mt: 0.5 }}>
                   <Grid item xs={12} md={6}>
-                    <Box sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-                      <Typography variant='caption' color='text.secondary'>
-                        Coach
-                      </Typography>
-                      <Typography variant='body1'>{personLabel(detail.trainer)}</Typography>
-                      <Typography variant='caption' color='text.secondary' sx={{ display: 'block' }}>
-                        {detail.trainer?.email || detail.trainer?.id || ''}
-                      </Typography>
-                    </Box>
+                    <RoleCard title='Coach (this lesson)' rollup={detail.byRole?.trainer} />
                   </Grid>
                   <Grid item xs={12} md={6}>
-                    <Box sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-                      <Typography variant='caption' color='text.secondary'>
-                        Trainee
-                      </Typography>
-                      <Typography variant='body1'>{personLabel(detail.trainee)}</Typography>
-                      <Typography variant='caption' color='text.secondary' sx={{ display: 'block' }}>
-                        {detail.trainee?.email || detail.trainee?.id || ''}
-                      </Typography>
-                    </Box>
+                    <RoleCard title='Trainee (this lesson)' rollup={detail.byRole?.trainee} />
                   </Grid>
                 </Grid>
 
                 <Typography variant='subtitle2' sx={{ mb: 1 }}>
+                  Share pack preview — select + copy, or use the button above
+                </Typography>
+                <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
+                  Paste this entire block here for diagnosis. Browser filter <code>[clipPlayback]</code> · server{' '}
+                  <code>[ClipPlayback]</code>.
+                </Typography>
+                <Box
+                  component='textarea'
+                  readOnly
+                  value={shareText || '(no pack — refresh after backend deploy)'}
+                  onFocus={e => e.target.select()}
+                  sx={{
+                    display: 'block',
+                    width: '100%',
+                    minHeight: 220,
+                    maxHeight: 360,
+                    mb: 2,
+                    p: 1.5,
+                    fontSize: 11.5,
+                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                    lineHeight: 1.45,
+                    borderRadius: 1,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    bgcolor: 'action.hover',
+                    color: 'text.primary',
+                    resize: 'vertical'
+                  }}
+                />
+
+                <Typography variant='subtitle2' sx={{ mb: 1 }}>
                   Clients in room
                 </Typography>
-                <Box className='admin-data-grid' sx={{ height: Math.min(180, 52 + participantRows.length * 42), width: '100%', mb: 2 }}>
+                <Box
+                  className='admin-data-grid'
+                  sx={{ height: Math.min(180, 52 + Math.max(participantRows.length, 1) * 42), width: '100%', mb: 2 }}
+                >
                   <DataGrid
                     rows={participantRows}
                     columns={[
@@ -339,12 +557,43 @@ export default function LiveLessonsPage() {
                   />
                 </Box>
 
-                <Typography variant='subtitle2' sx={{ mb: 1 }}>
-                  Clip play / pause log ({clipRows.length})
-                </Typography>
-                <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
-                  Browser console on each client: filter <code>[clipPlayback]</code>. Server: <code>[ClipPlayback]</code>.
-                </Typography>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mb: 1 }} alignItems={{ sm: 'center' }}>
+                  <Typography variant='subtitle2' sx={{ flex: 1 }}>
+                    Clip play / pause log ({clipRows.length}
+                    {filteredClipEvents.length !== (detail.clipEvents || []).length
+                      ? ` filtered / ${detail.clipEvents?.length || 0}`
+                      : ''}
+                    )
+                  </Typography>
+                  <TextField
+                    select
+                    size='small'
+                    label='Role'
+                    value={roleFilter}
+                    onChange={e => setRoleFilter(e.target.value)}
+                    sx={{ minWidth: 120 }}
+                  >
+                    <MenuItem value='all'>Both users</MenuItem>
+                    <MenuItem value='trainer'>Coach only</MenuItem>
+                    <MenuItem value='trainee'>Trainee only</MenuItem>
+                  </TextField>
+                  <TextField
+                    select
+                    size='small'
+                    label='Actions'
+                    value={actionFilter}
+                    onChange={e => setActionFilter(e.target.value)}
+                    sx={{ minWidth: 140 }}
+                  >
+                    <MenuItem value='all'>All actions</MenuItem>
+                    <MenuItem value='fails'>Fails only</MenuItem>
+                    <MenuItem value='play_ok'>play_ok</MenuItem>
+                    <MenuItem value='play_fail'>play_fail</MenuItem>
+                    <MenuItem value='stuck_paused'>stuck_paused</MenuItem>
+                    <MenuItem value='remote_play'>remote_play</MenuItem>
+                    <MenuItem value='play_intent'>play_intent</MenuItem>
+                  </TextField>
+                </Stack>
                 <Box className='admin-data-grid' sx={{ height: 360, width: '100%', mb: 2 }}>
                   <DataGrid
                     rows={clipRows}
@@ -358,7 +607,7 @@ export default function LiveLessonsPage() {
                   />
                 </Box>
 
-                {detail.timeline?.opsEvents?.length || detail.timeline?.events?.length ? (
+                {detail.timeline ? (
                   <>
                     <Typography variant='subtitle2' sx={{ mb: 1 }}>
                       Session timeline (ops + joins)
@@ -368,7 +617,7 @@ export default function LiveLessonsPage() {
                       sx={{
                         m: 0,
                         p: 1.5,
-                        maxHeight: 240,
+                        maxHeight: 200,
                         overflow: 'auto',
                         fontSize: 12,
                         bgcolor: 'action.hover',
