@@ -129,6 +129,7 @@ function StoryRow({ item }) {
 }
 
 function PersonCard({ label, person, rollup }) {
+  const lastFail = Array.isArray(rollup?.failures) ? rollup.failures[rollup.failures.length - 1] : null
   return (
     <Box
       sx={{
@@ -149,6 +150,9 @@ function PersonCard({ label, person, rollup }) {
       <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute, mt: 0.75 }}>{person?.id || '—'}</Typography>
       <Stack direction='row' spacing={0.75} flexWrap='wrap' useFlexGap sx={{ mt: 1.25 }}>
         {rollup?.client ? <Chip size='small' label={rollup.client} /> : null}
+        {(rollup?.buildIds || []).slice(0, 2).map(b => (
+          <Chip key={b} size='small' variant='outlined' label={`build ${b}`} sx={{ fontFamily: ops.mono, fontSize: 10 }} />
+        ))}
         <Chip size='small' variant='outlined' label={`${rollup?.clipEventCount ?? 0} clip logs`} />
         {(rollup?.failureCount ?? 0) > 0 ? (
           <Chip size='small' color='warning' label={`${rollup.failureCount} fail`} />
@@ -159,6 +163,25 @@ function PersonCard({ label, person, rollup }) {
       <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1 }}>
         quality {rollup?.quality?.avgScore ?? '—'} · rtt {rollup?.quality?.avgRttMs ?? '—'}ms
       </Typography>
+      {lastFail ? (
+        <Typography
+          sx={{
+            mt: 1,
+            fontFamily: ops.mono,
+            fontSize: 10,
+            color: ops.warning,
+            lineHeight: 1.4,
+            wordBreak: 'break-word'
+          }}
+        >
+          last fail: {lastFail.action}
+          {lastFail.error ? ` err=${lastFail.error}` : ''}
+          {lastFail.playWaitMs != null ? ` waitMs=${lastFail.playWaitMs}` : ''}
+          {lastFail.livePlayingCount != null ? ` live=${lastFail.livePlayingCount}` : ''}
+          {lastFail.seeking != null ? ` seeking=${lastFail.seeking}` : ''}
+          {lastFail.readyState != null ? ` rs=${lastFail.readyState}` : ''}
+        </Typography>
+      ) : null}
     </Box>
   )
 }
@@ -491,6 +514,17 @@ export default function LiveLessonsPage() {
                     {(detail.heuristics || []).map((h, i) => (
                       <Typography key={i} variant='body2' sx={{ mb: 0.25 }}>
                         · {h}
+                      </Typography>
+                    ))}
+                  </Box>
+                ) : null}
+
+                {(detail.latencyLines || []).length > 0 ? (
+                  <Box sx={{ mt: 1.5, p: 1.5, borderRadius: ops.radiusMd, bgcolor: ops.softSky || ops.canvasSoft2 }}>
+                    <Typography sx={{ fontWeight: 600, mb: 0.5 }}>Sync latency</Typography>
+                    {(detail.latencyLines || []).slice(0, 10).map((l, i) => (
+                      <Typography key={i} variant='body2' sx={{ fontFamily: ops.mono, fontSize: 11, mb: 0.25 }}>
+                        {l}
                       </Typography>
                     ))}
                   </Box>
