@@ -20,17 +20,6 @@ const handleRes = async response => {
   return data
 }
 
-<<<<<<< HEAD
-export const getPromoAdminStats = async () => {
-  const res = await fetch(apiUrl('/admin/promo-codes/stats'), {
-    method: 'GET',
-    headers: getAuthHeaders()
-  })
-  return handleRes(res)
-}
-
-=======
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
 export const listPromoCodes = async (query = {}) => {
   const params = new URLSearchParams()
   Object.entries(query).forEach(([k, v]) => {

@@ -34,17 +34,6 @@ export const listBroadcasts = async (query = {}) => {
   return handleRes(res)
 }
 
-<<<<<<< HEAD
-export const getBroadcastDeliveryStats = async (days = 14) => {
-  const res = await fetch(apiUrl(`/admin/broadcasts/stats?days=${days}`), {
-    method: 'GET',
-    headers: getAuthHeaders()
-  })
-  return handleRes(res)
-}
-
-=======
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
 export const getBroadcastById = async id => {
   const res = await fetch(apiUrl(`/admin/broadcasts/${id}`), {
     method: 'GET',

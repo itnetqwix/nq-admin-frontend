@@ -74,7 +74,7 @@
     "react-dom": "18.2.0",
     "react-draft-wysiwyg": "1.15.0",
     "react-dropzone": "14.2.3",
-    "react-easy-crop": "^6.0.2",
+    "react-easy-crop": "^6.2.3",
     "react-feather": "^2.0.10",
     "react-hook-form": "^7.43.5",
     "react-hot-toast": "2.4.0",

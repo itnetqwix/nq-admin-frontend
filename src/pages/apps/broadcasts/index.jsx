@@ -1,54 +1,24 @@
-<<<<<<< HEAD
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-=======
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
 import {
   Alert,
   Box, Button, Checkbox, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
   FormControl, FormControlLabel, FormGroup, Grid, IconButton, InputLabel, MenuItem,
-<<<<<<< HEAD
-  Radio, RadioGroup, Select, TextField, Tooltip, Typography
-} from '@mui/material'
-import AdminDataGrid from 'src/components/admin/AdminDataGrid'
-import AdminFilterBar from 'src/components/admin/AdminFilterBar'
-import AdminGridContainer from 'src/components/admin/AdminGridContainer'
-import AdminTabs from 'src/components/admin/AdminTabs'
-import { useAdminConfirm } from 'src/components/admin'
-import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
-import OpsMetricTile from 'src/components/admin/OpsMetricTile'
-import OpsSurfaceCard from 'src/components/admin/OpsSurfaceCard'
-import SendIcon from '@mui/icons-material/Send'
-=======
   Radio, RadioGroup, Select, Tab, Tabs, TextField, Tooltip, Typography
 } from '@mui/material'
 import { DataGrid } from '@mui/x-data-grid'
 import SendIcon from '@mui/icons-material/Send'
 import RefreshIcon from '@mui/icons-material/Refresh'
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import ReplayIcon from '@mui/icons-material/Replay'
 import toast from 'react-hot-toast'
 import dynamic from 'next/dynamic'
-<<<<<<< HEAD
 import { EditorState, convertToRaw } from 'draft-js'
 import draftToHtml from 'draftjs-to-html'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 
-import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
-import { AbilityContext } from 'src/layouts/components/acl/Can'
-import { ops } from 'src/styles/opsSurface'
-import MiniSparkline, { fillDailySeries } from 'src/components/admin/MiniSparkline'
-=======
-import { EditorState, convertToRaw, ContentState } from 'draft-js'
-import draftToHtml from 'draftjs-to-html'
-import htmlToDraft from 'html-to-draftjs'
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
-
 import styles from 'styles/common.module.css'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
 import { EditorWrapper } from 'src/@core/styles/libs/react-draft-wysiwyg'
 import {
   listBroadcasts,
@@ -56,12 +26,7 @@ import {
   createBroadcast,
   resendBroadcast,
   deleteBroadcast,
-<<<<<<< HEAD
-  getRecipientPreviewCount,
-  getBroadcastDeliveryStats
-=======
   getRecipientPreviewCount
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
 } from 'src/services/broadcastApi'
 
 const Editor = dynamic(() => import('react-draft-wysiwyg').then(mod => mod.Editor), { ssr: false })
@@ -88,14 +53,6 @@ function stripHtml(html) {
 }
 
 export default function BroadcastsPage() {
-<<<<<<< HEAD
-  const ability = useContext(AbilityContext)
-  const fullAccess = ability?.can('manage', 'all') ?? false
-  const canSend = fullAccess || (ability?.can('create', 'admin-action-broadcast') ?? false)
-  const canDelete = fullAccess || (ability?.can('delete', 'admin-action-broadcast') ?? false)
-  const { confirm, ConfirmDialog } = useAdminConfirm()
-=======
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
   const [tab, setTab] = useState(0)
 
   // ─── Compose state ──────────────────────────────────────────
@@ -119,23 +76,16 @@ export default function BroadcastsPage() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
   const searchTimer = useRef(null)
-<<<<<<< HEAD
-  const [deliveryStats, setDeliveryStats] = useState(null)
-=======
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
 
   // ─── Detail dialog state ───────────────────────────────────
   const [detailOpen, setDetailOpen] = useState(false)
   const [detailData, setDetailData] = useState(null)
   const [detailLoading, setDetailLoading] = useState(false)
 
-<<<<<<< HEAD
-=======
   // ─── Delete state ──────────────────────────────────────────
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
 
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
   // ─── Recipient Preview ────────────────────────────────────
   useEffect(() => {
     if (previewTimer.current) clearTimeout(previewTimer.current)
@@ -234,13 +184,6 @@ export default function BroadcastsPage() {
   }
 
   const onSendClick = () => {
-<<<<<<< HEAD
-    if (!canSend) {
-      toast.error('You cannot send broadcasts')
-      return
-    }
-=======
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
     if (!validateCompose()) return
     setConfirmOpen(true)
   }
@@ -249,22 +192,10 @@ export default function BroadcastsPage() {
   const fetchHistory = useCallback(async () => {
     setLoading(true)
     try {
-<<<<<<< HEAD
-      const [data, statsRes] = await Promise.all([
-        listBroadcasts({ search, page, limit: pageSize }),
-        getBroadcastDeliveryStats(14).catch(() => null)
-      ])
-      const list = data?.result?.broadcasts || []
-      setBroadcasts(list.map(b => ({ ...b, id: b._id })))
-      setTotal(data?.result?.total || 0)
-      const stats = statsRes?.result || statsRes?.data || statsRes
-      if (stats?.dailyDeliveries) setDeliveryStats(stats)
-=======
       const data = await listBroadcasts({ search, page, limit: pageSize })
       const list = data?.result?.broadcasts || []
       setBroadcasts(list.map(b => ({ ...b, id: b._id })))
       setTotal(data?.result?.total || 0)
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
     } catch (err) {
       toast.error(err.message || 'Failed to load broadcasts')
     } finally {
@@ -300,19 +231,8 @@ export default function BroadcastsPage() {
     }
   }
 
-<<<<<<< HEAD
-  const requestResend = async id => {
-    const ok = await confirm({
-      title: 'Resend broadcast?',
-      message: 'Delivery will be retried for failed recipients.',
-      confirmLabel: 'Resend',
-      variant: 'warning'
-    })
-    if (!ok) return
-=======
   // ─── Resend ───────────────────────────────────────────────
   const handleResend = async id => {
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
     try {
       await resendBroadcast(id)
       toast.success('Broadcast resend initiated.')
@@ -323,26 +243,6 @@ export default function BroadcastsPage() {
     }
   }
 
-<<<<<<< HEAD
-  const requestDelete = async row => {
-    if (!canDelete) {
-      toast.error('You cannot delete broadcasts')
-      return
-    }
-    const ok = await confirm({
-      title: 'Delete broadcast?',
-      message: `"${row.title}" will be removed permanently.`,
-      confirmLabel: 'Delete',
-      variant: 'danger'
-    })
-    if (!ok) return
-    try {
-      await deleteBroadcast(row._id)
-      toast.success('Broadcast deleted.')
-      fetchHistory()
-    } catch (err) {
-      toast.error(err.message || 'Delete failed')
-=======
   // ─── Delete ───────────────────────────────────────────────
   const handleDelete = async () => {
     if (!deleteTarget) return
@@ -356,7 +256,6 @@ export default function BroadcastsPage() {
       toast.error(err.message || 'Delete failed')
     } finally {
       setDeleteLoading(false)
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
     }
   }
 
@@ -367,31 +266,22 @@ export default function BroadcastsPage() {
       headerName: 'Title',
       flex: 1.5,
       minWidth: 200,
-<<<<<<< HEAD
-=======
       headerClassName: styles['header-class'],
       cellClassName: styles['cell-class'],
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
     },
     {
       field: 'audience',
       headerName: 'Audience',
       width: 110,
-<<<<<<< HEAD
-=======
       headerClassName: styles['header-class'],
       cellClassName: styles['cell-class'],
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
     },
     {
       field: 'channels',
       headerName: 'Channels',
       width: 220,
-<<<<<<< HEAD
-=======
       headerClassName: styles['header-class'],
       cellClassName: styles['cell-class'],
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
       renderCell: p => (
         <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
           {(p.value || []).map(ch => (
@@ -404,11 +294,8 @@ export default function BroadcastsPage() {
       field: 'status',
       headerName: 'Status',
       width: 110,
-<<<<<<< HEAD
-=======
       headerClassName: styles['header-class'],
       cellClassName: styles['cell-class'],
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
       renderCell: p => (
         <Chip label={p.value} size='small' color={STATUS_COLORS[p.value] || 'default'} />
       ),
@@ -417,30 +304,6 @@ export default function BroadcastsPage() {
       field: 'stats',
       headerName: 'Recipients',
       width: 110,
-<<<<<<< HEAD
-      renderCell: p => p.value?.total_recipients ?? '--',
-    },
-    {
-      field: 'delivery_spark',
-      headerName: '14d sent',
-      width: 100,
-      sortable: false,
-      renderCell: p => (
-        <MiniSparkline
-          values={
-            Array.isArray(p.row.delivery_daily) && p.row.delivery_daily.length
-              ? p.row.delivery_daily
-              : []
-          }
-          width={80}
-        />
-      ),
-    },
-    {
-      field: 'sent_at',
-      headerName: 'Sent At',
-      width: 170,
-=======
       headerClassName: styles['header-class'],
       cellClassName: styles['cell-class'],
       renderCell: p => p.value?.total_recipients ?? '--',
@@ -451,7 +314,6 @@ export default function BroadcastsPage() {
       width: 170,
       headerClassName: styles['header-class'],
       cellClassName: styles['cell-class'],
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
       renderCell: p => p.value ? new Date(p.value).toLocaleString() : '--',
     },
     {
@@ -459,11 +321,8 @@ export default function BroadcastsPage() {
       headerName: 'Actions',
       width: 140,
       sortable: false,
-<<<<<<< HEAD
-=======
       headerClassName: styles['header-class-last'],
       cellClassName: styles['cell-class-last'],
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
       renderCell: p => (
         <Box>
           <Tooltip title='View Details'>
@@ -473,21 +332,13 @@ export default function BroadcastsPage() {
           </Tooltip>
           {p.row.status === 'failed' && (
             <Tooltip title='Resend'>
-<<<<<<< HEAD
-              <IconButton size='small' color='warning' onClick={e => { e.stopPropagation(); void requestResend(p.row._id) }}>
-=======
               <IconButton size='small' color='warning' onClick={e => { e.stopPropagation(); handleResend(p.row._id) }}>
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
                 <ReplayIcon fontSize='small' />
               </IconButton>
             </Tooltip>
           )}
           <Tooltip title='Delete'>
-<<<<<<< HEAD
-            <IconButton size='small' color='error' onClick={e => { e.stopPropagation(); void requestDelete(p.row) }}>
-=======
             <IconButton size='small' color='error' onClick={e => { e.stopPropagation(); setDeleteTarget(p.row) }}>
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
               <DeleteOutlineIcon fontSize='small' />
             </IconButton>
           </Tooltip>
@@ -531,25 +382,6 @@ export default function BroadcastsPage() {
   return (
     <>
       <AdminPageShell
-<<<<<<< HEAD
-        bare
-        eyebrow='Revenue · broadcasts'
-        icon='mdi:bullhorn-outline'
-        title='Broadcasts.'
-        subtitle='Compose and send across email, SMS, WhatsApp, in-app, and push. Send / delete respect RBAC.'
-        actions={
-          !canSend ? <Chip label='Send disabled for your role' size='small' sx={{ fontFamily: ops.mono }} /> : null
-        }
-      >
-        <AdminTabs
-          value={tab}
-          onChange={setTab}
-          tabs={[
-            { value: 0, label: 'Compose' },
-            { value: 1, label: 'History' }
-          ]}
-        />
-=======
         title='Broadcasts'
         subtitle='Send messages to your users via Email, SMS, WhatsApp, In-App notifications, and Push notifications.'
         contentSx={{ p: 0 }}
@@ -560,7 +392,6 @@ export default function BroadcastsPage() {
             <Tab label='History' />
           </Tabs>
         </Box>
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
 
         {/* ─── COMPOSE TAB ─────────────────────────────────── */}
         {tab === 0 && (
@@ -700,93 +531,6 @@ export default function BroadcastsPage() {
         {/* ─── HISTORY TAB ─────────────────────────────────── */}
         {tab === 1 && (
           <AdminPageSection>
-<<<<<<< HEAD
-            {(() => {
-              const sentSeries = deliveryStats?.dailyDeliveries?.length
-                ? fillDailySeries(deliveryStats.dailyDeliveries, 14, 'sent')
-                : []
-              const failedSeries = deliveryStats?.dailyDeliveries?.length
-                ? fillDailySeries(deliveryStats.dailyDeliveries, 14, 'failed')
-                : []
-              const sentTotal = sentSeries.reduce((a, b) => a + b, 0)
-              const failedTotal = failedSeries.reduce((a, b) => a + b, 0)
-              return (
-                <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
-                  <Grid item xs={6} sm={3}>
-                    <OpsMetricTile
-                      icon='mdi:send-check'
-                      label='Sent (14d)'
-                      value={String(sentTotal)}
-                      hint='Platform deliveries'
-                      tone='accent'
-                    />
-                  </Grid>
-                  <Grid item xs={6} sm={3}>
-                    <OpsMetricTile
-                      icon='mdi:alert-circle-outline'
-                      label='Failed (14d)'
-                      value={String(failedTotal)}
-                      hint='Delivery errors'
-                      tone={failedTotal > 0 ? 'danger' : 'default'}
-                    />
-                  </Grid>
-                  <Grid item xs={6} sm={3}>
-                    <OpsMetricTile
-                      icon='mdi:history'
-                      label='In this view'
-                      value={String(total)}
-                      hint='Matching search'
-                    />
-                  </Grid>
-                  <Grid item xs={6} sm={3}>
-                    <Box
-                      sx={{
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        px: 1,
-                        py: 1.5,
-                        borderRadius: ops.radiusMd,
-                        border: `1px solid ${ops.hairline}`,
-                        bgcolor: ops.canvasSoft
-                      }}
-                    >
-                      <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute, mb: 0.5 }}>
-                        14d trend
-                      </Typography>
-                      <MiniSparkline values={sentSeries} width={96} height={28} />
-                    </Box>
-                  </Grid>
-                </Grid>
-              )
-            })()}
-            <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
-              <Box sx={{ p: { xs: 2, sm: 2.5 }, borderBottom: `1px solid ${ops.hairline}` }}>
-                <AdminFilterBar
-                  searchPlaceholder='Search broadcasts…'
-                  onSearchChange={handleSearchChange}
-                  resultCount={total}
-                  onRefresh={() => void fetchHistory()}
-                  refreshLoading={loading}
-                />
-              </Box>
-              <AdminGridContainer>
-                <AdminDataGrid
-                  autoHeight={false}
-                  rows={broadcasts}
-                  columns={historyColumns}
-                  loading={loading}
-                  rowCount={total}
-                  paginationMode='server'
-                  paginationModel={{ page: page - 1, pageSize }}
-                  onPaginationModelChange={m => { setPage(m.page + 1); setPageSize(m.pageSize) }}
-                  sx={{ '& .MuiDataGrid-cell': { py: 1 } }}
-                  emptyMessage='No broadcasts in this view.'
-                />
-              </AdminGridContainer>
-            </OpsSurfaceCard>
-=======
             <Box sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center' }}>
               <TextField
                 size='small'
@@ -814,7 +558,6 @@ export default function BroadcastsPage() {
               getRowClassName={p => p.indexRelativeToCurrentPage % 2 === 0 ? styles['even-row'] : styles['odd-row']}
               sx={{ border: 'none', '& .MuiDataGrid-cell': { py: 1 } }}
             />
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
           </AdminPageSection>
         )}
       </AdminPageShell>
@@ -940,13 +683,6 @@ export default function BroadcastsPage() {
 
               {/* Delivery Log */}
               <Typography variant='subtitle2' sx={{ mb: 1 }}>Delivery Log</Typography>
-<<<<<<< HEAD
-              <AdminDataGrid
-                rows={logRows}
-                columns={logColumns}
-                pageSizeOptions={[10, 25, 50]}
-                initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
-=======
               <DataGrid
                 rows={logRows}
                 columns={logColumns}
@@ -954,7 +690,6 @@ export default function BroadcastsPage() {
                 pageSizeOptions={[10, 25, 50]}
                 initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
                 disableRowSelectionOnClick
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
                 sx={{ border: 'none' }}
               />
               {logRows.length === 0 && (
@@ -970,11 +705,7 @@ export default function BroadcastsPage() {
             <Button
               color='warning'
               startIcon={<ReplayIcon />}
-<<<<<<< HEAD
-              onClick={() => void requestResend(detailData._id)}
-=======
               onClick={() => handleResend(detailData._id)}
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
             >
               Resend
             </Button>
@@ -984,9 +715,6 @@ export default function BroadcastsPage() {
       </Dialog>
 
       {/* ─── DELETE CONFIRMATION ───────────────────────────── */}
-<<<<<<< HEAD
-      {ConfirmDialog}
-=======
       <Dialog open={!!deleteTarget} onClose={() => !deleteLoading && setDeleteTarget(null)} maxWidth='xs' fullWidth>
         <DialogTitle>Delete Broadcast</DialogTitle>
         <DialogContent>
@@ -1008,7 +736,6 @@ export default function BroadcastsPage() {
           </Button>
         </DialogActions>
       </Dialog>
->>>>>>> 7da6433 (Add Promo Codes management functionality including new page, API integration, and navigation updates. Enhance ACL rules for access control and update navigation structure to include Promo Codes section.)
     </>
   )
 }

@@ -9,7 +9,7 @@ let inited = false
 let lastCustomId = null
 
 /** Ad blockers block clarity.ms — treat as optional telemetry, not a hard dependency. */
-function clarityBlocked(): boolean {
+function clarityBlocked() {
   if (typeof window === 'undefined') return true
   try {
     return window.localStorage.getItem('nq:clarity-blocked') === '1'
