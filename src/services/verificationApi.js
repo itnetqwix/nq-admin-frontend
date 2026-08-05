@@ -9,7 +9,11 @@ const headers = () => ({
 const api = path => `${requireApiBaseUrl()}${path}`
 
 export async function getTrainerVerifications(query = {}) {
-  const params = new URLSearchParams(query).toString()
+  const params = new URLSearchParams()
+  Object.entries(query).forEach(([k, v]) => {
+    if (v === undefined || v === null || v === '') return
+    params.set(k, String(v))
+  })
   const res = await fetch(api(`/admin/trainer-verifications?${params}`), { headers: headers() })
   const data = await res.json()
   if (!res.ok) throw new Error(data?.message || 'Failed to load queue')
@@ -23,10 +27,11 @@ export async function getTrainerVerificationDetail(userId) {
   return data?.data ?? data
 }
 
-export async function approveTrainerVerification(userId) {
+export async function approveTrainerVerification(userId, { force = false } = {}) {
   const res = await fetch(api(`/admin/trainer-verifications/${userId}/approve`), {
     method: 'POST',
-    headers: headers()
+    headers: headers(),
+    body: JSON.stringify({ force: Boolean(force) })
   })
   const data = await res.json()
   if (!res.ok) throw new Error(data?.message || 'Approve failed')
