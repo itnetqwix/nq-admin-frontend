@@ -2,17 +2,23 @@ import {
   Box,
   Button,
   Chip,
-  InputAdornment,
+  Grid,
   MenuItem,
   Stack,
   TextField,
   Typography
 } from '@mui/material'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import moment from 'moment'
-import AdminPageShell from 'src/layouts/components/AdminPageShell'
+import {
+  AdminEmptyState,
+  AdminFilterBar,
+  OpsMetricTile,
+  OpsSurfaceCard
+} from 'src/components/admin'
+import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import ObservabilityLinks from 'src/layouts/components/ObservabilityLinks'
 import { getLiveLessonDebug, getLiveLessons } from 'src/services/user360Api'
 import { ops } from 'src/styles/opsSurface'
@@ -62,6 +68,36 @@ const SEV_DOT = {
   ok: '#059669',
   warn: ops.warning,
   error: ops.error
+}
+
+const LOOKBACK_PRESETS = [
+  { hours: 24, label: '24h' },
+  { hours: 72, label: '3d' },
+  { hours: 168, label: '7d' },
+  { hours: 360, label: '15d' },
+  { hours: 720, label: '30d' }
+]
+
+const DEFAULT_HOURS = 360 // 15 days
+
+function FilterChip({ active, label, onClick }) {
+  return (
+    <Chip
+      size='small'
+      clickable
+      onClick={onClick}
+      label={label}
+      sx={{
+        height: 28,
+        fontFamily: ops.mono,
+        fontSize: 11,
+        fontWeight: active ? 600 : 500,
+        bgcolor: active ? ops.softIndigo : ops.canvas,
+        color: active ? ops.indigoDeep : ops.body,
+        border: `1px solid ${active ? ops.indigo : ops.hairline}`
+      }}
+    />
+  )
 }
 
 function StoryRow({ item }) {
@@ -188,9 +224,27 @@ function PersonCard({ label, person, rollup }) {
 
 export default function LiveLessonsPage() {
   const router = useRouter()
-  const [hours, setHours] = useState(48)
-  const [search, setSearch] = useState('')
+  const searchTimer = useRef(null)
+
+  const [hours, setHours] = useState(DEFAULT_HOURS)
+  const [fromDate, setFromDate] = useState('')
+  const [toDate, setToDate] = useState('')
+  const [qInput, setQInput] = useState('')
+  const [q, setQ] = useState('')
+  const [trainerInput, setTrainerInput] = useState('')
+  const [traineeInput, setTraineeInput] = useState('')
+  const [trainer, setTrainer] = useState('')
+  const [trainee, setTrainee] = useState('')
+  const [live, setLive] = useState('') // '' | '1' | '0'
+  const [kind, setKind] = useState('') // '' | instant | scheduled
+  const [hasClipIssues, setHasClipIssues] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [limit, setLimit] = useState(40)
+  const [skip, setSkip] = useState(0)
+
   const [rows, setRows] = useState([])
+  const [total, setTotal] = useState(0)
+  const [summary, setSummary] = useState({ returned: 0, live: 0, withClipIssues: 0 })
   const [loading, setLoading] = useState(false)
   const [detailLoading, setDetailLoading] = useState(false)
   const [detail, setDetail] = useState(null)
@@ -198,22 +252,46 @@ export default function LiveLessonsPage() {
 
   const selectedId = useMemo(() => {
     if (!router.isReady) return ''
-    const q = router.query.sessionId
-    return q ? String(Array.isArray(q) ? q[0] : q) : ''
+    const sid = router.query.sessionId
+    return sid ? String(Array.isArray(sid) ? sid[0] : sid) : ''
   }, [router.isReady, router.query.sessionId])
+
+  const listView = !selectedId
+  const usingDateRange = Boolean(fromDate || toDate)
+  const activeAdvanced = Boolean(fromDate || toDate || trainer || trainee || hasClipIssues)
 
   const loadList = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await getLiveLessons({ hours, limit: 60 })
+      const params = {
+        limit,
+        skip,
+        live: live || undefined,
+        kind: kind || undefined,
+        hasClipIssues: hasClipIssues ? '1' : undefined,
+        q: q || undefined,
+        trainer: trainer || undefined,
+        trainee: trainee || undefined
+      }
+      if (usingDateRange) {
+        if (fromDate) params.from = fromDate
+        if (toDate) params.to = toDate
+      } else {
+        params.hours = hours
+      }
+      const data = await getLiveLessons(params)
       setRows(data?.items || [])
+      setTotal(Number(data?.total) || (data?.items || []).length)
+      setSummary(data?.summary || { returned: (data?.items || []).length, live: 0, withClipIssues: 0 })
     } catch (e) {
       toast.error(e?.message || 'Failed to load live lessons')
       setRows([])
+      setTotal(0)
+      setSummary({ returned: 0, live: 0, withClipIssues: 0 })
     } finally {
       setLoading(false)
     }
-  }, [hours])
+  }, [hours, fromDate, toDate, usingDateRange, limit, skip, live, kind, hasClipIssues, q, trainer, trainee])
 
   const loadDetail = useCallback(async sessionId => {
     if (!sessionId) {
@@ -233,14 +311,58 @@ export default function LiveLessonsPage() {
   }, [])
 
   useEffect(() => {
-    if (!router.isReady) return
+    if (!router.isReady || !listView) return
     void loadList()
-  }, [router.isReady, loadList])
+  }, [router.isReady, listView, loadList])
 
   useEffect(() => {
     if (!router.isReady) return
     void loadDetail(selectedId)
   }, [router.isReady, selectedId, loadDetail])
+
+  // Hydrate filters from URL when opening list
+  useEffect(() => {
+    if (!router.isReady || selectedId) return
+    const query = router.query
+    if (query.q) {
+      const v = String(Array.isArray(query.q) ? query.q[0] : query.q)
+      setQInput(v)
+      setQ(v)
+    }
+    if (query.trainer) {
+      const v = String(Array.isArray(query.trainer) ? query.trainer[0] : query.trainer)
+      setTrainerInput(v)
+      setTrainer(v)
+      setFiltersOpen(true)
+    }
+    if (query.trainee) {
+      const v = String(Array.isArray(query.trainee) ? query.trainee[0] : query.trainee)
+      setTraineeInput(v)
+      setTrainee(v)
+      setFiltersOpen(true)
+    }
+    if (query.hours) setHours(Number(query.hours) || DEFAULT_HOURS)
+    if (query.from) {
+      setFromDate(String(Array.isArray(query.from) ? query.from[0] : query.from))
+      setFiltersOpen(true)
+    }
+    if (query.to) {
+      setToDate(String(Array.isArray(query.to) ? query.to[0] : query.to))
+      setFiltersOpen(true)
+    }
+    if (query.live != null) setLive(String(Array.isArray(query.live) ? query.live[0] : query.live))
+    if (query.kind) setKind(String(Array.isArray(query.kind) ? query.kind[0] : query.kind))
+    // only on first ready
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.isReady])
+
+  const scheduleDebounced = (value, setApplied) => {
+    if (searchTimer.current) clearTimeout(searchTimer.current)
+    searchTimer.current = setTimeout(() => {
+      setApplied(value.trim())
+      setSkip(0)
+    }, 400)
+  }
 
   const selectSession = id => {
     void router.push(
@@ -252,26 +374,6 @@ export default function LiveLessonsPage() {
       { shallow: true }
     )
   }
-
-  const filteredRows = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    if (!q) return rows
-    return rows.filter(r => {
-      const blob = [
-        r.title,
-        r.sessionId,
-        r.trainer?.name,
-        r.trainer?.email,
-        r.trainee?.name,
-        r.trainee?.email,
-        r.status
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
-      return blob.includes(q)
-    })
-  }, [rows, search])
 
   const story = detail?.story || []
   const filteredStory = useMemo(() => {
@@ -296,7 +398,34 @@ export default function LiveLessonsPage() {
     }
   }
 
-  const listView = !selectedId
+  const applyNameFilters = () => {
+    setTrainer(trainerInput.trim())
+    setTrainee(traineeInput.trim())
+    setSkip(0)
+  }
+
+  const clearAdvanced = () => {
+    setFromDate('')
+    setToDate('')
+    setTrainerInput('')
+    setTraineeInput('')
+    setTrainer('')
+    setTrainee('')
+    setHasClipIssues(false)
+    setHours(DEFAULT_HOURS)
+    setSkip(0)
+  }
+
+  const setPresetHours = h => {
+    setHours(h)
+    setFromDate('')
+    setToDate('')
+    setSkip(0)
+  }
+
+  const page = Math.floor(skip / limit) + 1
+  const canPrev = skip > 0
+  const canNext = skip + rows.length < total
 
   return (
     <AdminPageShell
@@ -305,7 +434,7 @@ export default function LiveLessonsPage() {
       icon='mdi:record-rec'
       subtitle={
         listView
-          ? 'Every live session as coach ↔ trainee. Open one to see the full story: created → join → play/pause → call quality.'
+          ? 'Both-joined sessions — search by coach or trainee, filter by date / live / clip issues, open a row for the full story.'
           : detail?.title || 'Session story'
       }
       bare
@@ -316,144 +445,353 @@ export default function LiveLessonsPage() {
               All lessons
             </Button>
           ) : null}
-          <Button variant='outlined' onClick={() => void loadList()} disabled={loading}>
-            Refresh list
+          <Button
+            variant='outlined'
+            onClick={() => void (listView ? loadList() : loadDetail(selectedId))}
+            disabled={listView ? loading : detailLoading}
+          >
+            Refresh
           </Button>
-          {selectedId ? (
-            <Button variant='contained' onClick={() => void loadDetail(selectedId)} disabled={detailLoading}>
-              Refresh story
-            </Button>
-          ) : null}
         </Stack>
       }
     >
       {listView ? (
-        <Box
-          sx={{
-            borderRadius: ops.radiusLg,
-            bgcolor: 'background.paper',
-            boxShadow: ops.shadowCard,
-            overflow: 'hidden'
-          }}
-        >
-          <Box sx={{ p: { xs: 2, sm: 3 } }}>
-            <Typography sx={{ fontWeight: 700, fontSize: 16, letterSpacing: '-0.3px' }}>
-              Recent live sessions
-            </Typography>
-            <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5, mb: 2 }}>
-              Sorted by both joined. Search by coach, trainee, email, or session id. Click a row for the full story.
-            </Typography>
-
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 2 }}>
-              <TextField
-                size='small'
-                placeholder='Search coach, trainee, session…'
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position='start'>
-                      <Icon icon='mdi:magnify' fontSize={18} />
-                    </InputAdornment>
-                  )
+        <Stack spacing={2}>
+          <Grid container spacing={1.5}>
+            <Grid item xs={6} sm={3}>
+              <OpsMetricTile
+                icon='mdi:video-account'
+                label='In window'
+                value={total.toLocaleString()}
+                hint={usingDateRange ? 'Custom dates' : `Last ${Math.round(hours / 24)}d`}
+                tone='accent'
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <OpsMetricTile
+                icon='mdi:broadcast'
+                label='Live now'
+                value={String(summary.live ?? 0)}
+                hint='On this page'
+                tone={summary.live ? 'danger' : 'default'}
+                onClick={() => {
+                  setLive(live === '1' ? '' : '1')
+                  setSkip(0)
                 }}
               />
-              <TextField
-                select
-                size='small'
-                label='Lookback'
-                value={hours}
-                onChange={e => setHours(Number(e.target.value))}
-                sx={{ minWidth: 120 }}
-              >
-                {[12, 24, 48, 72, 168].map(h => (
-                  <MenuItem key={h} value={h}>
-                    {h}h
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Stack>
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <OpsMetricTile
+                icon='mdi:alert-circle-outline'
+                label='Clip issues'
+                value={String(summary.withClipIssues ?? 0)}
+                hint='On this page'
+                tone={summary.withClipIssues ? 'warn' : 'default'}
+                onClick={() => {
+                  setHasClipIssues(v => !v)
+                  setSkip(0)
+                  setFiltersOpen(true)
+                }}
+              />
+            </Grid>
+            <Grid item xs={6} sm={3}>
+              <OpsMetricTile
+                icon='mdi:calendar-range'
+                label='Default window'
+                value='15d'
+                hint='Max lookback 45d'
+                tone='default'
+                onClick={() => setPresetHours(DEFAULT_HOURS)}
+              />
+            </Grid>
+          </Grid>
 
-            {loading ? (
-              <Typography color='text.secondary'>Loading…</Typography>
-            ) : filteredRows.length === 0 ? (
-              <Typography color='text.secondary'>No live lessons in this window.</Typography>
-            ) : (
-              <Stack spacing={0}>
-                {filteredRows.map(r => {
-                  const coach = personLabel(r.trainer)
-                  const trainee = personLabel(r.trainee)
-                  return (
-                    <Box
-                      key={r.sessionId}
-                      onClick={() => selectSession(r.sessionId)}
-                      sx={{
-                        display: 'grid',
-                        gridTemplateColumns: {
-                          xs: '1fr',
-                          md: 'minmax(0,1.4fr) minmax(0,1.2fr) 140px 100px 110px'
-                        },
-                        gap: 1.25,
-                        alignItems: 'center',
-                        py: 1.75,
-                        px: 1.5,
-                        mx: { xs: -0.5, sm: -1 },
-                        borderBottom: `1px solid ${ops.hairline}`,
-                        cursor: 'pointer',
-                        transition: 'background 120ms',
-                        '&:hover': { bgcolor: ops.canvasSoft }
-                      }}
-                    >
-                      <Box>
-                        <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
-                          {r.live ? (
-                            <Chip size='small' color='error' label='LIVE' sx={{ fontWeight: 700 }} />
-                          ) : (
-                            <Chip size='small' variant='outlined' label='ended' />
-                          )}
-                          {r.isInstant ? <Chip size='small' variant='outlined' label='instant' /> : null}
-                          {(r.clipFailEvents || 0) > 0 ? (
-                            <Chip size='small' color='warning' label={`${r.clipFailEvents} clip issues`} />
-                          ) : null}
-                        </Stack>
-                        <Typography sx={{ fontWeight: 700, fontSize: 16, mt: 0.75, letterSpacing: '-0.3px' }}>
-                          {coach}{' '}
-                          <Box component='span' sx={{ color: ops.mute, fontWeight: 500 }}>
-                            ↔
-                          </Box>{' '}
-                          {trainee}
-                        </Typography>
-                        <Typography variant='caption' color='text.secondary' sx={{ display: { md: 'none' } }}>
-                          {shortId(r.sessionId)}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-                        <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.mute }}>session</Typography>
-                        <Typography sx={{ fontFamily: ops.mono, fontSize: 13 }}>{r.sessionId}</Typography>
-                      </Box>
-                      <Box>
-                        <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.mute }}>both joined</Typography>
-                        <Typography sx={{ fontSize: 13 }}>
-                          {r.bothJoinedAt ? moment(r.bothJoinedAt).format('MMM D · HH:mm') : '—'}
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.mute }}>clip log</Typography>
-                        <Typography sx={{ fontSize: 13, fontWeight: 600 }}>{r.clipPlaybackEvents ?? 0}</Typography>
-                      </Box>
-                      <Box sx={{ textAlign: { md: 'right' } }}>
-                        <Button size='small' endIcon={<Icon icon='mdi:chevron-right' />}>
-                          Open story
+          <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
+            <AdminPageSection>
+              <AdminFilterBar
+                searchPlaceholder='Coach, trainee, email, or session id…'
+                searchValue={qInput}
+                onSearchChange={e => {
+                  setQInput(e.target.value)
+                  scheduleDebounced(e.target.value, setQ)
+                }}
+                onRefresh={() => void loadList()}
+                refreshLoading={loading}
+                resultCount={total}
+                helperText='Server search by name/email. Presets default to last 15 days of both-joined lessons.'
+              >
+                {LOOKBACK_PRESETS.map(p => (
+                  <FilterChip
+                    key={p.hours}
+                    active={!usingDateRange && hours === p.hours}
+                    label={p.label}
+                    onClick={() => setPresetHours(p.hours)}
+                  />
+                ))}
+                <FilterChip active={live === ''} label='Any state' onClick={() => { setLive(''); setSkip(0) }} />
+                <FilterChip active={live === '1'} label='Live' onClick={() => { setLive('1'); setSkip(0) }} />
+                <FilterChip active={live === '0'} label='Ended' onClick={() => { setLive('0'); setSkip(0) }} />
+                <FilterChip active={kind === ''} label='Any kind' onClick={() => { setKind(''); setSkip(0) }} />
+                <FilterChip active={kind === 'instant'} label='Instant' onClick={() => { setKind('instant'); setSkip(0) }} />
+                <FilterChip active={kind === 'scheduled'} label='Scheduled' onClick={() => { setKind('scheduled'); setSkip(0) }} />
+                <Button
+                  size='small'
+                  variant={filtersOpen || activeAdvanced ? 'contained' : 'outlined'}
+                  onClick={() => setFiltersOpen(v => !v)}
+                  sx={{
+                    textTransform: 'none',
+                    height: 28,
+                    fontSize: 12,
+                    ...(filtersOpen || activeAdvanced ? { bgcolor: ops.indigo, boxShadow: 'none' } : {})
+                  }}
+                >
+                  More filters{activeAdvanced ? ' · on' : ''}
+                </Button>
+              </AdminFilterBar>
+
+              {filtersOpen ? (
+                <Box
+                  sx={{
+                    mb: 2.5,
+                    p: 2,
+                    borderRadius: ops.radiusSm,
+                    bgcolor: ops.canvas,
+                    border: `1px solid ${ops.hairline}`
+                  }}
+                >
+                  <Grid container spacing={1.5} alignItems='center'>
+                    <Grid item xs={12} sm={6} md={3}>
+                      <TextField
+                        size='small'
+                        fullWidth
+                        label='Trainer name / email'
+                        value={trainerInput}
+                        onChange={e => setTrainerInput(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') applyNameFilters()
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={3}>
+                      <TextField
+                        size='small'
+                        fullWidth
+                        label='Trainee name / email'
+                        value={traineeInput}
+                        onChange={e => setTraineeInput(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') applyNameFilters()
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={2}>
+                      <TextField
+                        size='small'
+                        fullWidth
+                        type='date'
+                        label='Joined from'
+                        InputLabelProps={{ shrink: true }}
+                        value={fromDate}
+                        onChange={e => {
+                          setFromDate(e.target.value)
+                          setSkip(0)
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={2}>
+                      <TextField
+                        size='small'
+                        fullWidth
+                        type='date'
+                        label='Joined to'
+                        InputLabelProps={{ shrink: true }}
+                        value={toDate}
+                        onChange={e => {
+                          setToDate(e.target.value)
+                          setSkip(0)
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={2}>
+                      <TextField
+                        select
+                        size='small'
+                        fullWidth
+                        label='Page size'
+                        value={limit}
+                        onChange={e => {
+                          setLimit(Number(e.target.value))
+                          setSkip(0)
+                        }}
+                      >
+                        {[20, 40, 60, 100].map(n => (
+                          <MenuItem key={n} value={n}>
+                            {n} / page
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                        <Button size='small' variant='contained' onClick={applyNameFilters} sx={{ textTransform: 'none' }}>
+                          Apply name filters
                         </Button>
+                        <Button
+                          size='small'
+                          variant={hasClipIssues ? 'contained' : 'outlined'}
+                          color={hasClipIssues ? 'warning' : 'inherit'}
+                          onClick={() => {
+                            setHasClipIssues(v => !v)
+                            setSkip(0)
+                          }}
+                          sx={{ textTransform: 'none' }}
+                        >
+                          Clip issues only
+                        </Button>
+                        <Button size='small' variant='text' onClick={clearAdvanced} sx={{ textTransform: 'none' }}>
+                          Clear advanced
+                        </Button>
+                      </Stack>
+                    </Grid>
+                  </Grid>
+                </Box>
+              ) : null}
+
+              {loading && rows.length === 0 ? (
+                <Typography color='text.secondary' sx={{ py: 4, textAlign: 'center' }}>
+                  Loading live lessons…
+                </Typography>
+              ) : rows.length === 0 ? (
+                <AdminEmptyState
+                  title='No live lessons match'
+                  description='Try last 15 days, clear name filters, or widen the date range. Only sessions where both users joined appear here.'
+                  actionLabel='Reset to 15 days'
+                  onAction={clearAdvanced}
+                  compact
+                />
+              ) : (
+                <Stack spacing={0}>
+                  {rows.map(r => {
+                    const coach = personLabel(r.trainer)
+                    const traineeLabel = personLabel(r.trainee)
+                    const durationMin =
+                      r.bothJoinedAt && r.actualEndAt
+                        ? Math.max(0, Math.round((new Date(r.actualEndAt) - new Date(r.bothJoinedAt)) / 60000))
+                        : null
+                    return (
+                      <Box
+                        key={r.sessionId}
+                        onClick={() => selectSession(r.sessionId)}
+                        sx={{
+                          display: 'grid',
+                          gridTemplateColumns: {
+                            xs: '1fr',
+                            md: 'minmax(0,1.5fr) minmax(0,1fr) 130px 90px 90px 100px'
+                          },
+                          gap: 1.25,
+                          alignItems: 'center',
+                          py: 1.75,
+                          px: 1.5,
+                          mx: { xs: -0.5, sm: -1 },
+                          borderBottom: `1px solid ${ops.hairline}`,
+                          cursor: 'pointer',
+                          transition: 'background 120ms',
+                          '&:hover': { bgcolor: ops.canvasSoft }
+                        }}
+                      >
+                        <Box>
+                          <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
+                            {r.live ? (
+                              <Chip size='small' color='error' label='LIVE' sx={{ fontWeight: 700 }} />
+                            ) : (
+                              <Chip size='small' variant='outlined' label='ended' />
+                            )}
+                            {r.isInstant ? <Chip size='small' variant='outlined' label='instant' /> : null}
+                            {r.status ? (
+                              <Chip size='small' variant='outlined' label={r.status} sx={{ fontFamily: ops.mono, fontSize: 10 }} />
+                            ) : null}
+                            {(r.clipFailEvents || 0) > 0 ? (
+                              <Chip size='small' color='warning' label={`${r.clipFailEvents} clip issues`} />
+                            ) : null}
+                          </Stack>
+                          <Typography sx={{ fontWeight: 700, fontSize: 16, mt: 0.75, letterSpacing: '-0.3px' }}>
+                            {coach}{' '}
+                            <Box component='span' sx={{ color: ops.mute, fontWeight: 500 }}>
+                              ↔
+                            </Box>{' '}
+                            {traineeLabel}
+                          </Typography>
+                          <Typography variant='caption' color='text.secondary' sx={{ display: 'block' }}>
+                            {[r.trainer?.email, r.trainee?.email].filter(Boolean).join(' · ') || shortId(r.sessionId)}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                          <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.mute }}>session</Typography>
+                          <Typography sx={{ fontFamily: ops.mono, fontSize: 12 }} noWrap>
+                            {r.sessionId}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.mute }}>both joined</Typography>
+                          <Typography sx={{ fontSize: 13 }}>
+                            {r.bothJoinedAt ? moment(r.bothJoinedAt).format('MMM D · HH:mm') : '—'}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.mute }}>mins</Typography>
+                          <Typography sx={{ fontSize: 13, fontWeight: 600 }}>
+                            {r.live ? 'live' : durationMin != null ? durationMin : '—'}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography sx={{ fontFamily: ops.mono, fontSize: 12, color: ops.mute }}>clips</Typography>
+                          <Typography sx={{ fontSize: 13, fontWeight: 600 }}>{r.clipPlaybackEvents ?? 0}</Typography>
+                        </Box>
+                        <Box sx={{ textAlign: { md: 'right' } }}>
+                          <Button size='small' endIcon={<Icon icon='mdi:chevron-right' />}>
+                            Story
+                          </Button>
+                        </Box>
                       </Box>
-                    </Box>
-                  )
-                })}
-              </Stack>
-            )}
-          </Box>
-        </Box>
+                    )
+                  })}
+                </Stack>
+              )}
+
+              {total > 0 ? (
+                <Stack
+                  direction='row'
+                  spacing={1}
+                  alignItems='center'
+                  justifyContent='space-between'
+                  sx={{ mt: 2, pt: 1.5, borderTop: `1px solid ${ops.hairline}` }}
+                >
+                  <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute }}>
+                    Page {page} · showing {rows.length} of {total.toLocaleString()}
+                  </Typography>
+                  <Stack direction='row' spacing={1}>
+                    <Button
+                      size='small'
+                      variant='outlined'
+                      disabled={!canPrev || loading}
+                      onClick={() => setSkip(s => Math.max(0, s - limit))}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      size='small'
+                      variant='outlined'
+                      disabled={!canNext || loading}
+                      onClick={() => setSkip(s => s + limit)}
+                    >
+                      Next
+                    </Button>
+                  </Stack>
+                </Stack>
+              ) : null}
+            </AdminPageSection>
+          </OpsSurfaceCard>
+        </Stack>
       ) : (
         <Stack spacing={2}>
           <Box
