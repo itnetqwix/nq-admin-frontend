@@ -14,7 +14,8 @@ const EVENT_TYPES = [
   { value: 'CLIENT_PRECALL_CHECK', label: 'Preflight check' },
   { value: 'CLIENT_CALL_DIAGNOSTICS', label: 'Client env' },
   { value: 'CALL_QUALITY_STATS', label: 'In-call quality' },
-  { value: 'CLIENT_CLIP_PLAYBACK', label: 'Clip play/pause' }
+  { value: 'CLIENT_CLIP_PLAYBACK', label: 'Clip play/pause' },
+  { value: 'CLIENT_LESSON_ACTION', label: 'Mute / stream / draw / plan' }
 ]
 
 export default function CallDiagnosticsPage() {
@@ -58,7 +59,7 @@ export default function CallDiagnosticsPage() {
             : r.preflightCheck.passed
               ? 'pass'
               : r.preflightCheck.reason || 'fail',
-          clipAction: r.clipPlayback?.action || '—'
+          clipAction: r.clipPlayback?.action || r.lessonAction?.action || '—'
         }))
       )
     } catch (e) {

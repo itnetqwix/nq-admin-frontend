@@ -379,6 +379,9 @@ export default function LiveLessonsPage() {
   const filteredStory = useMemo(() => {
     if (storyFilter === 'all') return story
     if (storyFilter === 'clip') return story.filter(s => s.kind === 'clip')
+    if (storyFilter === 'media') {
+      return story.filter(s => s.kind === 'media' || s.kind === 'annotation' || s.kind === 'plan')
+    }
     if (storyFilter === 'call') return story.filter(s => s.kind === 'call' || s.kind === 'join')
     if (storyFilter === 'lifecycle') {
       return story.filter(s => s.kind === 'lifecycle' || s.kind === 'join' || s.kind === 'extension' || s.kind === 'ops')
@@ -899,12 +902,13 @@ export default function LiveLessonsPage() {
                   Full lesson story
                 </Typography>
                 <Typography variant='body2' color='text.secondary' sx={{ mt: 0.35 }}>
-                  Created → both joined → clip play/pause → call quality → end. Filter to scan faster.
+                  Created → both joined → mute/camera/stream → annotations → clips → game plan PDF → end.
                 </Typography>
                 <Stack direction='row' spacing={0.75} flexWrap='wrap' useFlexGap sx={{ mt: 1.5 }}>
                   {[
                     { id: 'all', label: `All (${story.length})` },
                     { id: 'lifecycle', label: 'Life / join / ops' },
+                    { id: 'media', label: 'Media / draw / plan' },
                     { id: 'clip', label: 'Clips' },
                     { id: 'call', label: 'Call quality' },
                     { id: 'problems', label: 'Problems only' }
@@ -925,8 +929,8 @@ export default function LiveLessonsPage() {
               {filteredStory.length === 0 ? (
                 <Box sx={{ p: 3 }}>
                   <Typography color='text.secondary'>
-                    No story events yet for this filter. Clip rows appear after both web clients play with the new
-                    telemetry deployed.
+                    No story events yet for this filter. Media/mute/draw/plan rows appear once clients with the new
+                    telemetry are in a live lesson.
                   </Typography>
                 </Box>
               ) : (
