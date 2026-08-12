@@ -185,6 +185,12 @@ function PersonCard({ label, person, rollup }) {
       </Typography>
       <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute, mt: 0.75 }}>{person?.id || '—'}</Typography>
       <Stack direction='row' spacing={0.75} flexWrap='wrap' useFlexGap sx={{ mt: 1.25 }}>
+        {rollup?.env?.os || rollup?.env?.country ? (
+          <Chip
+            size='small'
+            label={[rollup.env.os, rollup.env.country].filter(Boolean).join(' · ')}
+          />
+        ) : null}
         {rollup?.client ? <Chip size='small' label={rollup.client} /> : null}
         {(rollup?.buildIds || []).slice(0, 2).map(b => (
           <Chip key={b} size='small' variant='outlined' label={`build ${b}`} sx={{ fontFamily: ops.mono, fontSize: 10 }} />
