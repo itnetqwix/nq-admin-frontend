@@ -18,6 +18,13 @@ const navigation = () => [
         subject: 'admin-nav-trainers'
       },
       {
+        title: 'Trainer verifications',
+        path: '/apps/trainer-verifications',
+        icon: 'mdi:account-check-outline',
+        action: 'read',
+        subject: 'admin-nav-trainer-verifications'
+      },
+      {
         title: 'Trainees',
         path: '/apps/manage-trainee',
         icon: 'mdi:account-school-outline',
