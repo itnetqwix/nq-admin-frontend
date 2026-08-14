@@ -170,6 +170,5 @@ export default function OverviewTab({ summary, jumpTo, router, setDetail }) {
             </Grid>
           </Grid>
         </Stack>
-      ) : (
   )
 }
