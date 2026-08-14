@@ -38,7 +38,8 @@ export async function listUsers({
   from = '',
   to = '',
   min_sessions = '',
-  max_sessions = ''
+  max_sessions = '',
+  kyc = ''
 } = {}) {
   const base = getApiBaseUrl()
   if (!base) throw new Error('API base URL is not configured')
@@ -56,6 +57,7 @@ export async function listUsers({
   if (to) params.set('to', to)
   if (min_sessions !== '' && min_sessions != null) params.set('min_sessions', String(min_sessions))
   if (max_sessions !== '' && max_sessions != null) params.set('max_sessions', String(max_sessions))
+  if (kyc) params.set('kyc', kyc)
   const res = await fetch(`${base}/admin/users?${params.toString()}`, { headers: headers() })
   const data = await res.json()
   if (!res.ok || data?.status === 'fail') {
@@ -71,8 +73,25 @@ export async function listUsers({
   }
 }
 
-export async function listTrainers(search) {
-  return fetchUserList('/user/get-all-trainer', search)
+/** All trainer accounts for admin (pending / incomplete KYC included). Pages until exhausted. */
+export async function listTrainers(search = '', extra = {}) {
+  const all = []
+  let page = 1
+  let total = Infinity
+  while (all.length < total && page <= 50) {
+    const data = await listUsers({
+      page,
+      limit: 100,
+      search,
+      account_type: 'trainer',
+      kyc: extra.kyc || ''
+    })
+    all.push(...data.items)
+    total = Number(data.total) || 0
+    if (!data.items.length) break
+    page += 1
+  }
+  return all
 }
 
 export async function listTrainees(search) {

@@ -23,23 +23,60 @@ const defineRulesFor = (role, user) => {
     return rules
   }
 
-  if (ok('nav_home')) can('read', 'admin-nav-home')
-  if (ok('nav_trainers')) can('read', 'admin-nav-trainers')
+  const nav = [
+    ['nav_home', 'admin-nav-home'],
+    ['nav_users_directory', 'admin-nav-users-directory'],
+    ['nav_trainers', 'admin-nav-trainers'],
+    ['nav_trainees', 'admin-nav-trainees'],
+    ['nav_trainee_reviews', 'admin-nav-trainee-reviews'],
+    ['nav_account_deletions', 'admin-nav-account-deletions'],
+    ['nav_bookings', 'admin-nav-bookings'],
+    ['nav_user_feedback', 'admin-nav-user-feedback'],
+    ['nav_support_tickets', 'admin-nav-support-tickets'],
+    ['nav_audit_logs', 'admin-nav-audit-logs'],
+    ['nav_call_diagnostics', 'admin-nav-call-diagnostics'],
+    ['nav_promo_codes', 'admin-nav-promo-codes'],
+    ['nav_broadcasts', 'admin-nav-broadcasts'],
+    ['nav_cms_blog', 'admin-nav-cms-blog'],
+    ['nav_cms_faq', 'admin-nav-cms-faq'],
+    ['nav_cms_legal', 'admin-nav-cms-legal'],
+    ['nav_netqwix_library', 'admin-nav-netqwix-library'],
+    ['nav_clip_taxonomy', 'admin-nav-clip-taxonomy'],
+    ['nav_library_submissions', 'admin-nav-library-submissions'],
+    ['nav_platform_activity', 'admin-nav-platform-activity'],
+    ['nav_ops_logs', 'admin-nav-ops-logs'],
+    ['nav_logs', 'admin-nav-logs'],
+    ['nav_finance', 'admin-nav-finance'],
+    ['nav_finance_connect', 'admin-nav-finance-connect'],
+    ['nav_pricing', 'admin-nav-pricing'],
+    ['nav_referrals', 'admin-nav-referrals'],
+    ['nav_platform_health', 'admin-nav-platform-health']
+  ]
+  nav.forEach(([key, subject]) => {
+    if (ok(key)) can('read', subject)
+  })
+
   if (ok('nav_trainer_verifications') || ok('nav_trainers')) {
     can('read', 'admin-nav-trainer-verifications')
   }
-  if (ok('nav_trainees')) can('read', 'admin-nav-trainees')
-  if (ok('nav_bookings')) can('read', 'admin-nav-bookings')
-  if (ok('nav_user_feedback')) can('read', 'admin-nav-user-feedback')
-  if (ok('nav_support_tickets')) can('read', 'admin-nav-support-tickets')
-  if (ok('nav_audit_logs')) can('read', 'admin-nav-audit-logs')
-  if (ok('nav_failed_jobs') || ok('nav_audit_logs')) can('read', 'admin-nav-failed-jobs')
-  if (ok('nav_call_diagnostics')) can('read', 'admin-nav-call-diagnostics')
-  if (ok('nav_promo_codes')) can('read', 'admin-nav-promo-codes')
-  if (ok('nav_broadcasts')) can('read', 'admin-nav-broadcasts')
-  if (ok('nav_cms') || ok('nav_cms_overview')) can('read', 'admin-nav-cms')
+  if (ok('nav_failed_jobs') || ok('nav_audit_logs') || ok('nav_ops_logs')) {
+    can('read', 'admin-nav-failed-jobs')
+  }
+  if (ok('nav_cms') || ok('nav_cms_overview')) {
+    can('read', 'admin-nav-cms')
+    can('read', 'admin-nav-cms-overview')
+  }
   if (ok('nav_banners') || ok('nav_cms')) can('read', 'admin-nav-banners')
   if (ok('nav_tips') || ok('nav_cms')) can('read', 'admin-nav-tips')
+  if (ok('nav_clips')) {
+    can('read', 'admin-nav-netqwix-library')
+    can('read', 'admin-nav-clip-taxonomy')
+    can('read', 'admin-nav-library-submissions')
+  }
+  if (ok('nav_admin_settings') || ok('can_view_admin_roles')) {
+    can('read', 'admin-nav-admin-settings')
+  }
+  if (ok('can_assign_admin_roles')) can('update', 'admin-nav-admin-settings')
 
   if (ok('can_manage_commission')) can('update', 'admin-action-commission')
   if (ok('can_process_refund')) can('update', 'admin-action-refund')

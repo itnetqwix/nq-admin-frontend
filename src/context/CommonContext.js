@@ -1,6 +1,7 @@
 import { createContext, useState } from 'react'
 import authConfig from 'src/configs/auth'
 import { getApiBaseUrl } from 'src/utils/apiBase'
+import { listTrainers } from 'src/services/userAdminApi'
 
 const defaultProvider = {
   trainerList: [],
@@ -26,23 +27,15 @@ const CommonProvider = ({ children }) => {
   const [writeByUsers, setWriteByUsers] = useState(defaultProvider.writeByUsers)
   const [concernByUsers, setConcernByUsers] = useState(defaultProvider.concernByUsers)
 
-  const getTrainersList = async (search = '') => {
-    const base = getApiBaseUrl()
-    if (!base) {
-      console.error('NEXT_PUBLIC_API_BASE_URL is missing; cannot load trainers.')
-      setTrainerList([])
-      return
-    }
+  const getTrainersList = async (search = '', extra = {}) => {
     const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
     if (!token) {
       setTrainerList([])
       return
     }
     try {
-      const qs = search && String(search).trim() ? `?search=${encodeURIComponent(String(search).trim())}` : ''
-      const res = await fetch(`${base}/user/get-all-trainer${qs}`, { headers: authHeaders() })
-      const response = await res.json().catch(() => ({}))
-      setTrainerList(response?.result?.map(e => ({ ...e, id: e._id })) ?? [])
+      const items = await listTrainers(search, extra)
+      setTrainerList(items.map(e => ({ ...e, id: e._id || e.id })))
     } catch {
       setTrainerList([])
     }

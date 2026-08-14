@@ -78,27 +78,14 @@ export default function ManageTrainer() {
   } = common;
 
 
-  // console.log(common)
+  const kycQuery = router.isReady ? String(router.query?.kyc || '') : ''
+  const kycOpts = kycQuery === 'incomplete' || kycQuery === '0' ? { kyc: 'incomplete' } : {}
+
   useEffect(() => {
-    const kyc = router.isReady ? String(router.query?.kyc || '') : ''
-    if (kyc === 'incomplete' || kyc === '0') {
-      const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
-      if (!token) return
-      fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/users?account_type=trainer&kyc=incomplete&limit=100&page=1`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      )
-        .then(r => r.json())
-        .then(body => {
-          const items = body?.data?.items || []
-          setTrainerList(items.map(e => ({ ...e, id: e._id })))
-        })
-        .catch(() => toast.error('Could not load pending KYC trainers'))
-      return
-    }
-    getTrainersList()
+    if (!router.isReady) return
+    getTrainersList('', kycOpts)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.isReady, router.query?.kyc])
+  }, [router.isReady, kycQuery])
 
   const [currentPage, setCurrentPage] = useState(1);
   const [openDeletePopup, setOpenDeletePopup] = useState(false);
@@ -305,7 +292,7 @@ export default function ManageTrainer() {
   function scheduleTrainerSearch(searchText) {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
     searchTimerRef.current = setTimeout(() => {
-      getTrainersList(searchText || "")
+      getTrainersList(searchText || '', kycOpts)
     }, 400)
   }
 
@@ -326,8 +313,8 @@ export default function ManageTrainer() {
           title='Trainers'
           subtitle={
             String(router.query?.kyc || '') === 'incomplete'
-              ? 'Filtered: pending KYC (from ops home). Clear ?kyc= to see the bookable directory.'
-              : 'Search the directory and click a row to open User 360.'
+              ? 'Filtered: pending KYC (from ops home). Clear ?kyc= to see all trainers.'
+              : 'All trainer accounts, including pending and incomplete KYC. Search and click a row to open User 360.'
           }
           actions={
             <CustomButton component={Link} variant='contained' href='/apps/manage-trainer' startIcon={<MenuIcon />}>
