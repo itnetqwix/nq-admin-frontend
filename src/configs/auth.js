@@ -1,11 +1,11 @@
 export default {
-  meEndpoint: '/auth/me',
-  loginEndpoint: '/jwt/login',
+  meEndpoint: '/user/me',
+  loginEndpoint: '/auth/login',
   registerEndpoint: '/auth/signup',
+  logoutEndpoint: '/auth/logout',
   storageTokenKeyName: 'accessToken',
   storageRefreshKeyName: 'refreshToken',
   storageRememberKeyName: 'rememberMe',
-  /** Refresh endpoint — POST { refresh_token } */
   refreshEndpoint: '/auth/refresh',
   onTokenExpiration: 'refreshToken'
 }

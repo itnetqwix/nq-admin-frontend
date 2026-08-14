@@ -78,6 +78,13 @@ export async function getLoginHistory(query = {}) {
   return parse(res)
 }
 
+export async function getAdminAccessLogs(query = {}) {
+  const res = await fetch(apiUrl(`/admin/logs/admin-access${toQuery(query)}`), {
+    headers: getAuthHeaders()
+  })
+  return parse(res)
+}
+
 export async function exportLogs(kind = 'activity', limit = 500, filters = {}) {
   const res = await fetch(apiUrl('/admin/logs/export'), {
     method: 'POST',

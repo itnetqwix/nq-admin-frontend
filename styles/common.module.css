@@ -162,155 +162,61 @@
     margin-left: 206px !important;
 }
 
-.layout-vertical-nav.css-vrdvqg-MuiDrawer-docked:hover~.layout-content-wrapper {
-    width: auto !important;
-    margin-left: auto !important;
-}
 
-.css-gxx9e0-MuiGrid-root {
-    width: 100% !important;
-}
 
-/* Nav active state is styled in VerticalNavLink (theme); remove legacy green override */
 
-.css-1xk1i05-MuiDataGrid-columnHeaderTitle {
-    text-transform: capitalize !important;
-    font-size: 0.8125rem !important;
-    font-weight: 600 !important;
-    color: #475569 !important;
-}
 
-.css-10te5fh-MuiModal-root-MuiDialog-root {
-    bottom: auto !important;
-}
 
-/* List open close inner Text Dev */
 
-.css-1yyqwc3-MuiTypography-root {
-    font-weight: 600 !important;
-    font-size: 0.85rem !important;
-    color: rgb(57 58 64 / 99%) !important;
-}
 
-/* Production  */
-.css-jjguvf {
-    font-weight: 600 !important;
-    font-size: 0.85rem !important;
-    color: rgb(57 58 64 / 99%) !important;
-}
 
-/*- width 80vw to 100% -*/
 
-.css-1jmrjkl {
-    width: 100% !important;
-    min-width: 100% !important;
-}
 
-/* -------------------------------------- */
 
-.css-v178j-MuiPaper-root-MuiDialog-paper {
-    border-radius: 0% !important;
-}
 
-.css-1c06ccv-MuiInputBase-root-MuiOutlinedInput-root {
-    border-radius: 0% !important;
-}
 
-.css-1k8svdy-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root {
-    border-radius: 0% !important;
-}
 
-.css-1c06ccv-MuiInputBase-root-MuiOutlinedInput-root {
-    border-radius: 0%;
-}
 
-.css-u9drjp {
-    font-weight: 600 !important;
-    font-size: 0.85rem !important;
-    color: rgb(57 58 64 / 99%) !important;
-}
 
-.css-b0xf1q-MuiButtonBase-root-MuiMenuItem-root {
-    font-weight: 600 !important;
-    font-size: 0.85rem !important;
-    color: rgb(57 58 64 / 99%) !important;
-}
 
-.css-1olnruq-MuiTypography-root {
-    font-weight: 600 !important;
-    font-size: 0.85rem !important;
-    color: rgb(57 58 64 / 99%) !important;
-}
 
-.css-13bipk2-MuiTypography-root {
-    font-weight: 600 !important;
-    font-size: 0.85rem !important;
-    color: rgb(57 58 64 / 99%) !important;
-}
 
-.css-15j5rni-MuiTypography-root {
-    font-weight: 600 !important;
-    font-size: 0.85rem !important;
-    color: rgb(57 58 64 / 99%) !important;
-}
 
-.css-1rlt5ue-MuiDataGrid-root {
 
-    border: 1px solid rgba(233, 233, 236, 1) !important;
-    border-radius: 0% !important;
-}
 
-.css-19btax1-MuiDataGrid-columnHeaders {
-    border-radius: 0% !important;
-}
 
-.css-v178j-MuiPaper-root-MuiDialog-paper {
-    border-radius: 0% !important;
-}
 
-.css-1c06ccv-MuiInputBase-root-MuiOutlinedInput-root {
-    border-radius: 0% !important;
-}
 
-.css-1k8svdy-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root {
-    border-radius: 0% !important;
-}
 
-.css-1c06ccv-MuiInputBase-root-MuiOutlinedInput-root {
-    border-radius: 0%;
-}
 
-.css-1rlt5ue-MuiDataGrid-root .MuiDataGrid-row:last-child .MuiDataGrid-cell {
-    border-bottom: 1px solid rgba(233, 233, 236, 1) !important;
-}
 
-/* This is dropdown text class */
 
-.css-12lip6b-MuiButtonBase-root-MuiMenuItem-root {
-    font-weight: 600 !important;
-    color: black !important;
-    font-size: 0.9rem !important;
-}
 
-.css-ruzch6-MuiPaper-root {
-    min-width: 90% !important;
-    height: 100% !important;
-}
 
-.css-eae4jk-MuiTypography-root {
-    font-weight: 600 !important;
-    font-size: x-large !important;
-}
 
-.css-1eush7a-MuiTypography-root {
-    font-size: large !important;
-}
 
-/*-Meraj Added-*/
 
-.css-n4nq85 {
-    max-width: 100% !important;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .status-booking {
     padding: 7px;
@@ -540,11 +446,7 @@ label.labelheader {
     border-bottom-left-radius: 5px;
 }
 
-.left_input_box .group .css-1c06ccv-MuiInputBase-root-MuiOutlinedInput-root {
-    border-top-right-radius: 5px !important;
-    border-bottom-right-radius: 5px !important;
-    width: 200px;
-}
+
 
 .left_input_box .group {
     display: flex;
@@ -572,12 +474,7 @@ label.labelheader {
     color: #373737;
 }
 
-.MuiAutocomplete-hasPopupIcon.css-kll0o7-MuiAutocomplete-root .MuiOutlinedInput-root,
-.MuiAutocomplete-hasClearIcon.css-kll0o7-MuiAutocomplete-root .MuiOutlinedInput-root {
-    border-radius: 0.25rem;
-    height: calc(1.5em + 0.75rem + 2px);
-    padding: 0;
-}
+
 
 
 /* ---------------10-08--2023---------------- */

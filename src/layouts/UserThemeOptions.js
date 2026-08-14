@@ -20,12 +20,11 @@ const UserThemeOptions = () => {
             WebkitFontSmoothing: 'antialiased'
           },
           '::selection': {
-            backgroundColor: '#171717',
+            backgroundColor: ops.ink,
             color: '#F2F2F2'
           },
           code: {
-            fontFamily:
-              'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace'
+            fontFamily: ops.mono
           }
         }
       },
@@ -86,7 +85,7 @@ const UserThemeOptions = () => {
             boxShadow: cardShadow,
             border: 'none',
             backgroundImage: 'none',
-            backgroundColor: '#ffffff'
+            backgroundColor: ops.canvas
           }
         }
       },
@@ -141,8 +140,7 @@ const UserThemeOptions = () => {
           sizeSmall: {
             height: 22,
             fontSize: '0.6875rem',
-            fontFamily:
-              'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+            fontFamily: ops.mono
           }
         }
       },
@@ -201,7 +199,7 @@ const UserThemeOptions = () => {
           indicator: ({ theme }) => ({
             height: 2,
             borderRadius: 1,
-            backgroundColor: theme.palette.mode === 'light' ? '#171717' : theme.palette.primary.main
+            backgroundColor: theme.palette.mode === 'light' ? ops.ink : theme.palette.primary.main
           })
         }
       },
@@ -210,8 +208,7 @@ const UserThemeOptions = () => {
           root: ({ theme }) => ({
             backgroundColor: theme.palette.customColors.tableHeaderBg,
             '& .MuiTableCell-head': {
-              fontFamily:
-                'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+              fontFamily: ops.mono,
               fontSize: '0.6875rem',
               fontWeight: 500,
               letterSpacing: '0.06em',

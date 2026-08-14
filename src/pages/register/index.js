@@ -44,6 +44,10 @@ const Register = () => {
     event.preventDefault()
     setErrorMessage('')
 
+    if (!registerEnabled) {
+      setErrorMessage('Public admin registration is disabled on this environment.')
+      return
+    }
     if (!formValues.fullname?.trim() || !formValues.email?.trim() || !formValues.mobile_no?.trim() || !formValues.password) {
       setErrorMessage('All fields are required.')
       return
@@ -161,7 +165,7 @@ const Register = () => {
           size='large'
           type='submit'
           variant='contained'
-          disabled={isSubmitting || !acceptedTerms}
+          disabled={isSubmitting || !acceptedTerms || !registerEnabled}
           sx={{ mb: 2.5, bgcolor: ops.ink, '&:hover': { bgcolor: '#000' }, textTransform: 'none', fontWeight: 600 }}
         >
           {isSubmitting ? 'Creating…' : 'Create admin account'}

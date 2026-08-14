@@ -19,7 +19,7 @@ class CustomDocument extends Document {
           <link rel='preconnect' href='https://fonts.gstatic.com' />
           <link
             rel='stylesheet'
-            href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap'
+            href='https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;500;600&display=swap'
           />
           <link rel='apple-touch-icon' sizes='180x180' href='/images/apple-touch-icon.png' />
           <link rel='shortcut icon' href='/images/favicon.png' />

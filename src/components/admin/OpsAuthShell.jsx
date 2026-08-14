@@ -6,14 +6,11 @@ import themeConfig from 'src/configs/themeConfig'
 import { ops } from 'src/styles/opsSurface'
 
 const HIGHLIGHTS = [
-  { icon: '◆', title: 'People & verifications', body: 'Trainers, trainees, and account reviews in one place.' },
-  { icon: '◇', title: 'Ops & bookings', body: 'Live queues, tickets, and call diagnostics.' },
-  { icon: '○', title: 'Logs & roles', body: 'Who did what, when — with admin RBAC.' }
+  { title: 'People', body: 'Trainers, trainees, and account reviews.' },
+  { title: 'Live desk', body: 'Lessons, tickets, and call diagnostics as they happen.' },
+  { title: 'Audit', body: 'Who did what, from which app, with RBAC.' }
 ]
 
-/**
- * Guest auth chrome — night rail + brand + canvas form.
- */
 export default function OpsAuthShell({
   eyebrow = 'Admin',
   title,
@@ -22,13 +19,7 @@ export default function OpsAuthShell({
   footerNote = 'Restricted · staff only'
 }) {
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        bgcolor: ops.canvasSoft
-      }}
-    >
+    <Box sx={{ minHeight: '100vh', display: 'flex', bgcolor: ops.canvasSoft }}>
       <Box
         sx={{
           display: { xs: 'none', md: 'flex' },
@@ -43,38 +34,22 @@ export default function OpsAuthShell({
           backgroundImage: ops.meshAuth
         }}
       >
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            bgcolor: 'rgba(21,15,35,0.55)',
-            pointerEvents: 'none'
-          }}
-        />
+        <Box sx={{ position: 'absolute', inset: 0, bgcolor: 'rgba(14,18,24,0.55)', pointerEvents: 'none' }} />
         <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 1.75 }}>
           <Box
             sx={{
-              width: 44,
-              height: 44,
+              height: 40,
+              px: 1.25,
               borderRadius: ops.radiusMd,
               bgcolor: 'rgba(255,255,255,0.08)',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              border: '1px solid rgba(255,255,255,0.12)',
-              overflow: 'hidden'
+              border: '1px solid rgba(255,255,255,0.12)'
             }}
           >
-            <Image width={32} height={32} src='/images/netquix_logo.png' alt='NetQwix' style={{ objectFit: 'contain' }} />
+            <Image width={120} height={28} src='/images/netquix_logo.png' alt='NetQwix' style={{ objectFit: 'contain' }} />
           </Box>
-          <Box>
-            <Typography sx={{ fontWeight: 700, letterSpacing: '-0.4px', fontSize: 18 }}>
-              {themeConfig.templateName}
-            </Typography>
-            <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.onNightMuted }}>
-              Operations console
-            </Typography>
-          </Box>
+          <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.onNightMuted }}>Match desk</Typography>
         </Box>
 
         <Box sx={{ position: 'relative', maxWidth: 400 }}>
@@ -82,7 +57,7 @@ export default function OpsAuthShell({
             sx={{
               fontFamily: ops.mono,
               fontSize: 11,
-              color: ops.lime,
+              color: ops.live,
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
               mb: 1.5
@@ -91,15 +66,15 @@ export default function OpsAuthShell({
             {eyebrow}
           </Typography>
           <Typography sx={{ fontWeight: 600, fontSize: 28, letterSpacing: '-0.8px', lineHeight: 1.25, mb: 1.5 }}>
-            Run the platform with confidence.
+            {themeConfig.templateName} operations
           </Typography>
           <Typography sx={{ fontSize: 14, color: ops.onNightMuted, lineHeight: 1.65, mb: 3 }}>
-            Sign in with your administrator email or Google account. Sessions are logged for security and audit.
+            Sign in with your administrator email. Sessions are logged.
           </Typography>
           <Stack spacing={1.75}>
             {HIGHLIGHTS.map(h => (
               <Box key={h.title} sx={{ display: 'flex', gap: 1.5 }}>
-                <Typography sx={{ color: ops.lime, fontFamily: ops.mono, fontSize: 12, mt: 0.25 }}>{h.icon}</Typography>
+                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: ops.live, mt: 0.75, flexShrink: 0 }} />
                 <Box>
                   <Typography sx={{ fontSize: 13, fontWeight: 600, mb: 0.25 }}>{h.title}</Typography>
                   <Typography sx={{ fontSize: 12, color: ops.onNightMuted, lineHeight: 1.5 }}>{h.body}</Typography>
@@ -128,11 +103,7 @@ export default function OpsAuthShell({
       >
         <Box sx={{ width: '100%', maxWidth: 400 }}>
           <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', gap: 1.5, mb: 3.5 }}>
-            <Image width={36} height={36} src='/images/netquix_logo.png' alt='NetQwix' style={{ objectFit: 'contain' }} />
-            <Box>
-              <Typography sx={{ fontWeight: 700, fontSize: 17 }}>{themeConfig.templateName}</Typography>
-              <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute }}>Admin</Typography>
-            </Box>
+            <Image width={132} height={32} src='/images/netquix_logo.png' alt='NetQwix' style={{ objectFit: 'contain' }} />
           </Box>
           <Typography
             sx={{

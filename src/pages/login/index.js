@@ -15,7 +15,7 @@ import InputAdornment from '@mui/material/InputAdornment'
 import Typography from '@mui/material/Typography'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Icon from 'src/@core/components/icon'
-import { showAdminMfaNotice } from 'src/configs/adminEnv'
+import { isAdminRegisterEnabled, showAdminMfaNotice } from 'src/configs/adminEnv'
 import * as yup from 'yup'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -35,12 +35,13 @@ const defaultValues = { password: '', email: '' }
 const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
+  const [formError, setFormError] = useState('')
   const [googleError, setGoogleError] = useState('')
   const auth = useAuth()
+  const registerEnabled = isAdminRegisterEnabled()
 
   const {
     control,
-    setError,
     handleSubmit,
     formState: { errors }
   } = useForm({
@@ -50,12 +51,9 @@ const LoginPage = () => {
   })
 
   const onSubmit = data => {
-    const { email, password } = data
-    auth.login({ email, password, rememberMe }, err => {
-      setError('email', {
-        type: 'manual',
-        message: err ?? 'Email or Password is invalid'
-      })
+    setFormError('')
+    auth.login({ email: data.email, password: data.password, rememberMe }, err => {
+      setFormError(err ?? 'Email or password is invalid')
     })
   }
 
@@ -73,7 +71,7 @@ const LoginPage = () => {
     <OpsAuthShell
       eyebrow='Sign in'
       title='Administrator login'
-      subtitle='Use your NetQwix admin email, or continue with Google if your account is already provisioned.'
+      subtitle='Use your NetQwix admin email, or continue with Google if that account is already provisioned.'
     >
       <AdminGoogleSignIn onCredential={onGoogle} disabled={auth.loading} />
       {googleError ? (
@@ -87,6 +85,11 @@ const LoginPage = () => {
       </Divider>
 
       <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
+        {formError ? (
+          <Alert severity='error' sx={{ mb: 2, borderRadius: ops.radiusSm }}>
+            {formError}
+          </Alert>
+        ) : null}
         <FormControl fullWidth sx={{ mb: 3 }}>
           <Controller
             name='email'
@@ -160,18 +163,20 @@ const LoginPage = () => {
           disabled={auth.loading}
           sx={{ mb: 1.5, bgcolor: ops.ink, '&:hover': { bgcolor: '#000' }, textTransform: 'none', fontWeight: 600 }}
         >
-          Sign in
+          {auth.loading ? 'Signing in…' : 'Sign in'}
         </Button>
-        <Button
-          fullWidth
-          size='large'
-          variant='outlined'
-          component={Link}
-          href='/register'
-          sx={{ mb: 2, textTransform: 'none', borderColor: ops.hairline, color: ops.ink }}
-        >
-          Create administrator account
-        </Button>
+        {registerEnabled ? (
+          <Button
+            fullWidth
+            size='large'
+            variant='outlined'
+            component={Link}
+            href='/register'
+            sx={{ mb: 2, textTransform: 'none', borderColor: ops.hairline, color: ops.ink }}
+          >
+            Create administrator account
+          </Button>
+        ) : null}
         <Typography sx={{ fontSize: 12, color: ops.mute, lineHeight: 1.55, mb: 2 }}>
           Only existing Admin accounts can sign in. Google works when that email is already an admin on NetQwix.
         </Typography>

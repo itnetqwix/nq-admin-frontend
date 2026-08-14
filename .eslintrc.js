@@ -23,6 +23,20 @@ module.exports = {
     '@next/next/no-img-element': 'off',
     'react/no-unescaped-entities': 'off',
     'import/no-anonymous-default-export': 'off',
-
-  }
+    'max-lines': ['warn', { max: 500, skipBlankLines: true, skipComments: true }]
+  },
+  overrides: [
+    {
+      files: ['src/pages/apps/**/*.{js,jsx}', 'src/features/**/*.{js,jsx}'],
+      rules: {
+        'max-lines': ['warn', { max: 500, skipBlankLines: true, skipComments: true }]
+      }
+    },
+    {
+      files: ['src/pages/apps/**/index.{js,jsx}'],
+      rules: {
+        'max-lines': ['warn', { max: 180, skipBlankLines: true, skipComments: true }]
+      }
+    }
+  ]
 }

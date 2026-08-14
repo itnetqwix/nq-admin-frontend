@@ -49,8 +49,7 @@ const MfaChallengePage = () => {
           placeholder='123456'
           inputProps={{
             autoComplete: 'one-time-code',
-            inputMode: 'numeric',
-            'aria-label': 'Authenticator code'
+            'aria-label': 'Authenticator or recovery code'
           }}
           sx={{
             mb: 2.5,

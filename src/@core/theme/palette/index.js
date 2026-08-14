@@ -1,38 +1,37 @@
+import { tokens } from 'src/theme/tokens'
+
 /**
- * Ops Surface palette — Vercel canvas/ink + Stripe indigo primary + Sentry error.
- * Applied admin-wide so every screen inherits the same system.
+ * Match Desk palette — applied admin-wide.
  */
 const DefaultPalette = (mode, skin) => {
   const whiteColor = '#FFFFFF'
   const isLight = mode === 'light'
-
-  // Light: near-black ink. Dark: soft off-white on night canvas.
-  const ink = isLight ? '23, 23, 23' : '242, 242, 242' // #171717 / #f2f2f2
-  const mainColor = ink
+  const inkRgb = isLight ? '18, 22, 28' : '242, 242, 242'
+  const mainColor = inkRgb
 
   const defaultBgColor = () => {
     if (skin === 'bordered' && isLight) return whiteColor
-    if (skin === 'bordered' && !isLight) return '#1f1633'
-    if (isLight) return '#FAFAFA'
-    return '#150f23'
+    if (skin === 'bordered' && !isLight) return tokens.nightLift
+    if (isLight) return tokens.canvasSoft
+    return tokens.night
   }
 
   return {
     customColors: {
-      dark: ink,
+      dark: inkRgb,
       main: mainColor,
-      light: ink,
-      darkBg: '#150f23',
-      lightBg: '#FAFAFA',
-      bodyBg: isLight ? '#FAFAFA' : '#150f23',
-      trackBg: isLight ? '#F5F5F5' : '#2a2340',
-      avatarBg: isLight ? '#F5F5F5' : '#2a2340',
-      tooltipBg: isLight ? '#171717' : '#1f1633',
-      tableHeaderBg: isLight ? '#FAFAFA' : '#1f1633',
-      hairline: isLight ? '#EBEBEB' : '#362d59',
-      indigo: '#533AFD',
-      lime: '#C2EF4E',
-      mute: isLight ? '#888888' : '#bdb8c0'
+      light: inkRgb,
+      darkBg: tokens.night,
+      lightBg: tokens.canvasSoft,
+      bodyBg: isLight ? tokens.canvasSoft : tokens.night,
+      trackBg: isLight ? tokens.canvasSoft2 : '#2a3140',
+      avatarBg: isLight ? tokens.canvasSoft2 : '#2a3140',
+      tooltipBg: isLight ? tokens.ink : tokens.nightLift,
+      tableHeaderBg: isLight ? tokens.canvasSoft : tokens.nightLift,
+      hairline: isLight ? tokens.hairline : '#2E3644',
+      indigo: tokens.accent,
+      lime: tokens.live,
+      mute: isLight ? tokens.mute : '#b8bec8'
     },
     mode,
     common: {
@@ -40,75 +39,75 @@ const DefaultPalette = (mode, skin) => {
       white: whiteColor
     },
     primary: {
-      light: '#333333',
-      main: '#171717',
+      light: '#2A3340',
+      main: tokens.ink,
       dark: '#000000',
       contrastText: whiteColor
     },
     secondary: {
-      light: '#665EFD',
-      main: '#533AFD',
-      dark: '#4434D4',
+      light: '#5B82FF',
+      main: tokens.accent,
+      dark: tokens.indigoDeep,
       contrastText: whiteColor
     },
     error: {
-      light: '#F7D4D6',
-      main: '#EE0000',
-      dark: '#C50000',
+      light: tokens.errorSoft,
+      main: tokens.error,
+      dark: '#B31220',
       contrastText: whiteColor
     },
     warning: {
-      light: '#FFEFCF',
-      main: '#F5A623',
-      dark: '#AB570A',
-      contrastText: '#171717'
+      light: tokens.softAmber,
+      main: tokens.clay,
+      dark: '#8A3E16',
+      contrastText: tokens.ink
     },
     info: {
-      light: '#D3E5FF',
-      main: '#0070F3',
-      dark: '#0761D1',
+      light: tokens.softSky,
+      main: tokens.accent,
+      dark: tokens.indigoDeep,
       contrastText: whiteColor
     },
     success: {
-      light: '#AAFFEC',
-      main: '#29BC9B',
-      dark: '#1A8F76',
+      light: tokens.softMint,
+      main: tokens.live,
+      dark: '#008A50',
       contrastText: whiteColor
     },
     grey: {
-      50: '#FAFAFA',
-      100: '#F5F5F5',
-      200: '#EBEBEB',
-      300: '#E0E0E0',
-      400: '#A1A1A1',
-      500: '#888888',
-      600: '#666666',
-      700: '#4D4D4D',
-      800: '#333333',
-      900: '#171717',
-      A100: '#F5F5F5',
-      A200: '#EBEBEB',
-      A400: '#A1A1A1',
-      A700: '#4D4D4D'
+      50: tokens.canvasSoft,
+      100: tokens.canvasSoft2,
+      200: tokens.hairline,
+      300: '#C8CDD6',
+      400: '#A1A8B4',
+      500: tokens.mute,
+      600: '#5C6470',
+      700: tokens.body,
+      800: '#2A3340',
+      900: tokens.ink,
+      A100: tokens.canvasSoft2,
+      A200: tokens.hairline,
+      A400: '#A1A8B4',
+      A700: tokens.body
     },
     text: {
-      primary: isLight ? '#171717' : '#F2F2F2',
-      secondary: isLight ? '#4D4D4D' : 'rgba(255,255,255,0.72)',
-      disabled: isLight ? '#888888' : 'rgba(255,255,255,0.38)'
+      primary: isLight ? tokens.ink : '#F2F2F2',
+      secondary: isLight ? tokens.body : 'rgba(255,255,255,0.72)',
+      disabled: isLight ? tokens.mute : 'rgba(255,255,255,0.38)'
     },
-    divider: isLight ? '#EBEBEB' : '#362d59',
+    divider: isLight ? tokens.hairline : '#2E3644',
     background: {
-      paper: isLight ? whiteColor : '#1f1633',
+      paper: isLight ? whiteColor : tokens.nightLift,
       default: defaultBgColor()
     },
     action: {
-      active: isLight ? 'rgba(23, 23, 23, 0.54)' : 'rgba(242, 242, 242, 0.54)',
-      hover: isLight ? 'rgba(23, 23, 23, 0.04)' : 'rgba(255, 255, 255, 0.06)',
+      active: isLight ? 'rgba(18, 22, 28, 0.54)' : 'rgba(242, 242, 242, 0.54)',
+      hover: isLight ? 'rgba(18, 22, 28, 0.04)' : 'rgba(255, 255, 255, 0.06)',
       hoverOpacity: 0.04,
-      selected: isLight ? 'rgba(23, 23, 23, 0.06)' : 'rgba(83, 58, 253, 0.2)',
-      disabled: isLight ? 'rgba(23, 23, 23, 0.26)' : 'rgba(255, 255, 255, 0.3)',
-      disabledBackground: isLight ? 'rgba(23, 23, 23, 0.08)' : 'rgba(255, 255, 255, 0.12)',
-      focus: isLight ? 'rgba(23, 23, 23, 0.12)' : 'rgba(83, 58, 253, 0.28)'
+      selected: isLight ? 'rgba(18, 22, 28, 0.06)' : 'rgba(43, 95, 255, 0.2)',
+      disabled: isLight ? 'rgba(18, 22, 28, 0.26)' : 'rgba(255, 255, 255, 0.3)',
+      disabledBackground: isLight ? 'rgba(18, 22, 28, 0.08)' : 'rgba(255, 255, 255, 0.12)',
+      focus: isLight ? 'rgba(18, 22, 28, 0.12)' : 'rgba(43, 95, 255, 0.28)'
     }
   }
 }

@@ -1,8 +1,5 @@
-// ** React Imports
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { io } from 'socket.io-client'
-
-// ** Config
 import authConfig from 'src/configs/auth'
 import { useAuth } from 'src/hooks/useAuth'
 import { useAppDispatch, useAppSelector } from 'src/store/hooks'
@@ -12,11 +9,7 @@ import {
   setOnlineUsers as setStoreOnlineUsers,
   setSocketConnected as setStoreSocketConnected
 } from 'src/store/slices/dashboardSlice'
-import {
-  fetchDashboardMetrics,
-  fetchOnlineUsers,
-  unwrapAdminResult
-} from 'src/services/adminDashboardApi'
+import { fetchDashboardMetrics, fetchOnlineUsers, unwrapAdminResult } from 'src/services/adminDashboardApi'
 
 const METRICS_POLL_MS = 30000
 
@@ -25,23 +18,21 @@ const defaultValue = {
   metrics: null,
   metricsLoading: true,
   socketConnected: false,
+  socket: null,
+  lastEvent: null,
   refreshMetrics: async () => {},
   refreshOnlineUsers: async () => {}
 }
 
 const AdminRealtimeContext = createContext(defaultValue)
 
-const isAdminRole = accountType => {
-  if (!accountType) return false
-  return String(accountType).trim().toLowerCase() === 'admin'
-}
+const isAdminRole = accountType => String(accountType || '').trim().toLowerCase() === 'admin'
 
 const readStoredAdmin = () => {
   try {
     const raw = window.localStorage.getItem('userData')
     if (!raw) return false
-    const u = JSON.parse(raw)
-    return isAdminRole(u?.account_type)
+    return isAdminRole(JSON.parse(raw)?.account_type)
   } catch {
     return false
   }
@@ -50,19 +41,18 @@ const readStoredAdmin = () => {
 const normalizeMetrics = payload => {
   if (!payload || typeof payload !== 'object') return null
   const data = unwrapAdminResult(payload)
-  if (!data || typeof data !== 'object') return null
-  return data
+  return data && typeof data === 'object' ? data : null
 }
 
-/**
- * Socket + poll for live admin metrics.
- * Mirrors into Redux `dashboard` so pages can use either context or selectors.
- */
 export const AdminRealtimeProvider = ({ children }) => {
   const { user } = useAuth()
   const dispatch = useAppDispatch()
   const dash = useAppSelector(selectDashboard)
   const [metricsLoading, setMetricsLoading] = useState(true)
+  const [socket, setSocket] = useState(null)
+  const [lastEvent, setLastEvent] = useState(null)
+  const socketConnected = dash.socketConnected
+  const pollRef = useRef(null)
 
   const isAdmin = useMemo(() => {
     if (user && user.account_type != null) return isAdminRole(user.account_type)
@@ -90,8 +80,7 @@ export const AdminRealtimeProvider = ({ children }) => {
     const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
     if (!token || !isAdmin) return
     try {
-      const users = await fetchOnlineUsers()
-      dispatch(setStoreOnlineUsers(users))
+      dispatch(setStoreOnlineUsers(await fetchOnlineUsers()))
     } catch (e) {
       console.error('refreshOnlineUsers', e)
     }
@@ -108,17 +97,30 @@ export const AdminRealtimeProvider = ({ children }) => {
     setMetricsLoading(true)
     void refreshMetrics()
     void refreshOnlineUsers()
-    const timer = setInterval(() => {
+    return undefined
+  }, [isAdmin, refreshMetrics, refreshOnlineUsers, dispatch])
+
+  // HTTP poll only while the socket is down.
+  useEffect(() => {
+    if (!isAdmin || socketConnected) {
+      if (pollRef.current) clearInterval(pollRef.current)
+      pollRef.current = null
+      return undefined
+    }
+    pollRef.current = setInterval(() => {
       void refreshMetrics()
       void refreshOnlineUsers()
     }, METRICS_POLL_MS)
-    return () => clearInterval(timer)
-  }, [isAdmin, refreshMetrics, refreshOnlineUsers, dispatch])
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current)
+    }
+  }, [isAdmin, socketConnected, refreshMetrics, refreshOnlineUsers])
 
   useEffect(() => {
     if (!isAdmin) {
       dispatch(setStoreOnlineUsers([]))
       dispatch(setStoreSocketConnected(false))
+      setSocket(null)
       return undefined
     }
 
@@ -126,41 +128,44 @@ export const AdminRealtimeProvider = ({ children }) => {
     if (!token) return undefined
 
     const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '')
-    // Stay on HTTP long-polling — websocket upgrade returns 400 behind Cloudflare/LB.
-    const socket = io(baseUrl, {
+    const next = io(baseUrl, {
       auth: { authorization: token, token },
-      transports: ['polling'],
-      upgrade: false,
+      transports: ['websocket', 'polling'],
+      upgrade: true,
       reconnection: true,
       reconnectionAttempts: 10
     })
+    setSocket(next)
 
-    socket.on('connect', () => {
+    next.on('connect', () => {
       dispatch(setStoreSocketConnected(true))
       void refreshMetrics()
       void refreshOnlineUsers()
     })
-    socket.on('connect_error', err => {
-      // Quiet in production — metrics still poll every 30s without the socket.
+    next.on('connect_error', err => {
       if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
         console.warn('[AdminRealtime] socket connect_error', err?.message || err)
       }
     })
-    socket.on('disconnect', () => dispatch(setStoreSocketConnected(false)))
-    socket.on('ADMIN_ONLINE_USERS', payload => {
+    next.on('disconnect', () => dispatch(setStoreSocketConnected(false)))
+    next.on('ADMIN_ONLINE_USERS', payload => {
       dispatch(setStoreOnlineUsers(Array.isArray(payload?.users) ? payload.users : []))
     })
-    socket.on('ADMIN_DASHBOARD_METRICS', payload => {
-      const next = normalizeMetrics(payload?.metrics)
-      if (next) {
-        dispatch(setLiveMetrics(next))
+    next.on('ADMIN_DASHBOARD_METRICS', payload => {
+      const metrics = normalizeMetrics(payload?.metrics)
+      if (metrics) {
+        dispatch(setLiveMetrics(metrics))
         setMetricsLoading(false)
       }
     })
+    const remember = (event, payload) => setLastEvent({ event, payload, at: Date.now() })
+    next.on('ADMIN_LIVE_LESSON_CHANGED', payload => remember('ADMIN_LIVE_LESSON_CHANGED', payload))
+    next.on('ADMIN_LOG_INGESTED', payload => remember('ADMIN_LOG_INGESTED', payload))
+    next.on('ADMIN_OPS_EVENT_CREATED', payload => remember('ADMIN_OPS_EVENT_CREATED', payload))
 
     return () => {
-      socket.disconnect()
+      next.disconnect()
+      setSocket(null)
       dispatch(setStoreSocketConnected(false))
     }
   }, [isAdmin, refreshMetrics, refreshOnlineUsers, dispatch])
@@ -171,10 +176,21 @@ export const AdminRealtimeProvider = ({ children }) => {
       metrics: dash.metrics,
       metricsLoading,
       socketConnected: dash.socketConnected,
+      socket,
+      lastEvent,
       refreshMetrics,
       refreshOnlineUsers
     }),
-    [dash.onlineUsers, dash.metrics, dash.socketConnected, metricsLoading, refreshMetrics, refreshOnlineUsers]
+    [
+      dash.onlineUsers,
+      dash.metrics,
+      dash.socketConnected,
+      metricsLoading,
+      socket,
+      lastEvent,
+      refreshMetrics,
+      refreshOnlineUsers
+    ]
   )
 
   return <AdminRealtimeContext.Provider value={value}>{children}</AdminRealtimeContext.Provider>

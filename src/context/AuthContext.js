@@ -1,15 +1,20 @@
-// ** React Imports
 import { createContext, useCallback, useEffect, useState } from 'react'
-
-// ** Next Import
 import { useRouter } from 'next/router'
-
-// ** Config
 import authConfig from 'src/configs/auth'
 import toast from 'react-hot-toast'
+import {
+  clearAuthStorage,
+  persistSession,
+  purgeIfEphemeralSessionEnded,
+  readStoredRefreshToken,
+  readStoredToken
+} from 'src/utils/authStorage'
+import { installApiAuthHandler } from 'src/utils/installApiAuthHandler'
+import { registerSessionExpiredCallback } from 'src/utils/sessionExpired'
 
 const MFA_ENROLL_PATH = '/pages/mfa-enroll'
 const LOGIN_PATHS = ['/login', '/login/mfa', '/forgot-password', '/register', '/pages/reset-password']
+const CHALLENGE_KEY = 'nq_admin_mfa_challenge'
 
 const defaultProvider = {
   user: null,
@@ -28,13 +33,32 @@ const defaultProvider = {
 const AuthContext = createContext(defaultProvider)
 
 function isAdminAccount(accountType) {
-  return String(accountType || '')
-    .trim()
-    .toLowerCase() === 'admin'
+  return String(accountType || '').trim().toLowerCase() === 'admin'
 }
 
 function isLoginRoute(path) {
   return LOGIN_PATHS.some(p => path === p || path.startsWith(`${p}/`))
+}
+
+function readChallenge() {
+  try {
+    return window.sessionStorage.getItem(CHALLENGE_KEY)
+  } catch {
+    return null
+  }
+}
+
+function writeChallenge(token) {
+  try {
+    if (token) window.sessionStorage.setItem(CHALLENGE_KEY, token)
+    else window.sessionStorage.removeItem(CHALLENGE_KEY)
+  } catch {
+    /* ignore */
+  }
+}
+
+function pickTokens(response) {
+  return response?.result?.data ?? response?.data?.data ?? response?.data ?? {}
 }
 
 const AuthProvider = ({ children }) => {
@@ -70,35 +94,28 @@ const AuthProvider = ({ children }) => {
       const userInfo = response?.userInfo
       if (!userInfo) return false
 
-      // Prefer live API flag. Sticky localStorage alone must not override a clear API "not required".
       const apiRequires = !!(
         response?.mfa_enrollment_required === true ||
         response?.result?.mfa_enrollment_required === true
       )
       const force = opts.forceEnroll === true
-      // Sticky flag only extends require when API also agrees OR we just got force from login.
       const sticky =
-        typeof window !== 'undefined' &&
-        window.localStorage.getItem('nq:admin_mfa_enroll') === '1'
+        typeof window !== 'undefined' && window.localStorage.getItem('nq:admin_mfa_enroll') === '1'
       const enroll = force || apiRequires || (sticky && apiRequires)
 
-      // If API says MFA not required, always clear stale sticky flag.
-      if (!apiRequires && !force) {
-        markMfaEnrollment(false)
-      } else {
-        markMfaEnrollment(enroll)
-      }
+      if (!apiRequires && !force) markMfaEnrollment(false)
+      else markMfaEnrollment(enroll)
 
-      window.localStorage.setItem(authConfig.storageTokenKeyName, opts.token)
-      window.localStorage.setItem('userData', JSON.stringify(userInfo))
+      persistSession(opts.token, userInfo, {
+        rememberMe: opts.rememberMe,
+        refreshToken: opts.refreshToken
+      })
       setUser({ ...userInfo })
 
-      const needEnroll = force || apiRequires
-      if (needEnroll) {
+      if (force || apiRequires) {
         if (!router.pathname.startsWith(MFA_ENROLL_PATH)) {
           void router.replace(MFA_ENROLL_PATH)
         }
-        return true
       }
       return true
     },
@@ -123,21 +140,23 @@ const AuthProvider = ({ children }) => {
         if (!res.ok || !response?.userInfo) {
           throw new Error(response?.error || 'session')
         }
-        applyMeResponse(response, { token: storedToken, forceEnroll: opts.forceEnroll })
+        applyMeResponse(response, {
+          token: storedToken,
+          forceEnroll: opts.forceEnroll,
+          rememberMe: opts.rememberMe,
+          refreshToken: opts.refreshToken
+        })
 
-        // Only hard-navigate to app home after explicit login/2fa — not every cold /me.
         if (opts.redirectHome && !opts.forceEnroll && !response.mfa_enrollment_required) {
           const returnUrl = router.query.returnUrl
-          const redirectURL =
-            returnUrl && returnUrl !== '/' ? String(returnUrl) : '/home'
+          const redirectURL = returnUrl && returnUrl !== '/' ? String(returnUrl) : '/home'
           if (!router.pathname.startsWith('/home') && router.pathname !== redirectURL) {
             void router.replace(redirectURL)
           }
         }
       } catch {
         try {
-          localStorage.removeItem('userData')
-          localStorage.removeItem(authConfig.storageTokenKeyName)
+          clearAuthStorage()
         } catch {
           /* ignore */
         }
@@ -160,13 +179,18 @@ const AuthProvider = ({ children }) => {
   )
 
   useEffect(() => {
-    const storedToken =
-      typeof window !== 'undefined'
-        ? window.localStorage.getItem(authConfig.storageTokenKeyName)
-        : null
+    installApiAuthHandler()
+    registerSessionExpiredCallback(() => {
+      setUser(null)
+      setPendingChallengeToken(null)
+      writeChallenge(null)
+    })
+    purgeIfEphemeralSessionEnded()
+    const storedToken = readStoredToken()
     if (storedToken) {
       void getUserDetails(storedToken, { redirectHome: false })
     } else {
+      setPendingChallengeToken(readChallenge())
       setLoading(false)
       setBootstrapped(true)
     }
@@ -175,15 +199,32 @@ const AuthProvider = ({ children }) => {
 
   const finishWithToken = (accessToken, extras = {}) => {
     markMfaEnrollment(!!extras.mfa_enrollment_required)
+    persistSession(accessToken, null, {
+      rememberMe: extras.rememberMe,
+      refreshToken: extras.refreshToken ?? null
+    })
     void getUserDetails(accessToken, {
       forceEnroll: !!extras.mfa_enrollment_required,
-      redirectHome: true
+      redirectHome: true,
+      rememberMe: extras.rememberMe,
+      refreshToken: extras.refreshToken
     })
+  }
+
+  const goMfa = (challengeToken, rememberMe) => {
+    setPendingChallengeToken(challengeToken)
+    writeChallenge(challengeToken)
+    const returnUrl = router.query.returnUrl
+    const q = new URLSearchParams()
+    if (returnUrl) q.set('returnUrl', String(returnUrl))
+    if (rememberMe === false) q.set('remember', '0')
+    const qs = q.toString()
+    void router.push(qs ? `/login/mfa?${qs}` : '/login/mfa')
   }
 
   const handleLogin = (params, errorCallback) => {
     setLoading(true)
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${authConfig.loginEndpoint}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params)
@@ -197,12 +238,11 @@ const AuthProvider = ({ children }) => {
           return
         }
 
-        const payload = response?.result?.data ?? response?.data ?? {}
+        const payload = pickTokens(response)
         if (payload.two_factor_required && payload.challenge_token) {
-          setPendingChallengeToken(payload.challenge_token)
           setLoading(false)
           setBootstrapped(true)
-          void router.push('/login/mfa')
+          goMfa(payload.challenge_token, params.rememberMe)
           return
         }
 
@@ -221,7 +261,9 @@ const AuthProvider = ({ children }) => {
           return
         }
         finishWithToken(accessToken, {
-          mfa_enrollment_required: !!payload.mfa_enrollment_required
+          mfa_enrollment_required: !!payload.mfa_enrollment_required,
+          rememberMe: params.rememberMe,
+          refreshToken: payload.refresh_token || null
         })
       })
       .catch(e => {
@@ -236,15 +278,14 @@ const AuthProvider = ({ children }) => {
     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/verify-google-login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: payload?.email, id_token: payload?.id_token })
+      body: JSON.stringify({ email: payload?.email, id_token: payload?.id_token, rememberMe: payload?.rememberMe })
     })
       .then(r => r.json())
       .then(response => {
         if (response?.data?.isRegistered === false) {
           setLoading(false)
           setBootstrapped(true)
-          if (errorCallback)
-            errorCallback('No NetQwix admin account for this Google email.')
+          if (errorCallback) errorCallback('No NetQwix admin account for this Google email.')
           return
         }
         if (!response || response?.status === 'fail' || response?.status === 'FAIL') {
@@ -253,9 +294,7 @@ const AuthProvider = ({ children }) => {
           if (errorCallback) errorCallback(response?.error || response?.msg || 'Google sign-in failed')
           return
         }
-        const tokens =
-          response?.result?.data || response?.data?.data || response?.data || {}
-        const body = tokens?.data || tokens
+        const body = pickTokens(response)
         const accessToken = body?.access_token
         const accountType = body?.account_type
         if (!accessToken) {
@@ -271,7 +310,9 @@ const AuthProvider = ({ children }) => {
           return
         }
         finishWithToken(accessToken, {
-          mfa_enrollment_required: !!body?.mfa_enrollment_required
+          mfa_enrollment_required: !!body?.mfa_enrollment_required,
+          rememberMe: payload?.rememberMe,
+          refreshToken: body.refresh_token || null
         })
       })
       .catch(e => {
@@ -282,7 +323,8 @@ const AuthProvider = ({ children }) => {
   }
 
   const completeTwoFactor = (code, errorCallback) => {
-    if (!pendingChallengeToken) {
+    const challenge = pendingChallengeToken || readChallenge()
+    if (!challenge) {
       if (errorCallback) errorCallback('No pending MFA challenge. Sign in again.')
       return
     }
@@ -290,7 +332,7 @@ const AuthProvider = ({ children }) => {
     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/2fa/challenge`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ challenge_token: pendingChallengeToken, code })
+      body: JSON.stringify({ challenge_token: challenge, code })
     })
       .then(r => r.json())
       .then(response => {
@@ -299,7 +341,7 @@ const AuthProvider = ({ children }) => {
           if (errorCallback) errorCallback(response?.error || 'Invalid code')
           return
         }
-        const payload = response?.result?.data ?? response?.data ?? {}
+        const payload = pickTokens(response)
         const accessToken = payload?.access_token
         const accountType = payload?.account_type
         if (!accessToken || !isAdminAccount(accountType)) {
@@ -308,8 +350,12 @@ const AuthProvider = ({ children }) => {
           return
         }
         setPendingChallengeToken(null)
+        writeChallenge(null)
+        const rememberMe = router.query.remember !== '0'
         finishWithToken(accessToken, {
-          mfa_enrollment_required: !!payload.mfa_enrollment_required
+          mfa_enrollment_required: !!payload.mfa_enrollment_required,
+          rememberMe,
+          refreshToken: payload.refresh_token || null
         })
       })
       .catch(e => {
@@ -319,12 +365,21 @@ const AuthProvider = ({ children }) => {
   }
 
   const handleLogout = () => {
+    const refresh = readStoredRefreshToken()
+    const base = process.env.NEXT_PUBLIC_API_BASE_URL
+    if (refresh && base) {
+      void fetch(`${base}${authConfig.logoutEndpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: refresh })
+      }).catch(() => {})
+    }
     setUser(null)
     setPendingChallengeToken(null)
+    writeChallenge(null)
     markMfaEnrollment(false)
     try {
-      window.localStorage.removeItem('userData')
-      window.localStorage.removeItem(authConfig.storageTokenKeyName)
+      clearAuthStorage()
       window.localStorage.removeItem('nq:admin_mfa_enroll')
     } catch {
       /* ignore */

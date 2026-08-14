@@ -59,6 +59,9 @@ export default function AuditLogsPage() {
           adminLabel: r.admin_id?.fullname || r.admin_id?.email || '—',
           targetId: r.target_user_id?._id || r.target_user_id || null,
           targetLabel: r.target_user_id?.fullname || r.target_user_id?.email || '—',
+          ip: r.meta?.ip || '—',
+          device: r.meta?.device_label || r.meta?.browser || '—',
+          where: [r.meta?.city, r.meta?.region, r.meta?.country].filter(Boolean).join(', ') || '—',
           at: r.createdAt || r.updatedAt
         }))
       )
@@ -146,6 +149,9 @@ export default function AuditLogsPage() {
           params.value
         )
     },
+    { field: 'ip', headerName: 'IP', width: 120 },
+    { field: 'device', headerName: 'Device', width: 140 },
+    { field: 'where', headerName: 'Where', width: 140 },
     { field: 'reason', headerName: 'Reason', flex: 1, minWidth: 140 }
   ]
 

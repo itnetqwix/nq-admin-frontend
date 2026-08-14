@@ -18,11 +18,6 @@ import { CacheProvider } from '@emotion/react'
 import { defaultACLObj } from 'src/configs/acl'
 import themeConfig from 'src/configs/themeConfig'
 
-// ** Fake-DB — axios-mock passThrough helpers; never load in production builds
-if (process.env.NODE_ENV === 'development') {
-  require('src/@fake-db')
-}
-
 // ** Third Party Import
 import { Toaster } from 'react-hot-toast'
 

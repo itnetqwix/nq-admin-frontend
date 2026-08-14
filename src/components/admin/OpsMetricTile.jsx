@@ -11,15 +11,16 @@ export default function OpsMetricTile({
   value,
   hint,
   onClick,
-  tone = 'default', // default | warn | danger | accent | success
+  tone = 'default', // default | warn | danger | accent | success | live
   icon
 }) {
   const tones = {
     default: { value: ops.ink, hint: ops.mute, soft: ops.canvasSoft2, icon: ops.body },
-    warn: { value: '#ab570a', hint: ops.mute, soft: '#ffefcf', icon: '#ab570a' },
+    warn: { value: ops.clay, hint: ops.mute, soft: ops.softAmber, icon: ops.clay },
     danger: { value: ops.error, hint: ops.mute, soft: ops.errorSoft, icon: ops.error },
-    accent: { value: ops.indigoDeep, hint: ops.mute, soft: '#ebe6ff', icon: ops.indigo },
-    success: { value: '#1A8F76', hint: ops.mute, soft: '#AAFFEC', icon: '#29bc9b' }
+    accent: { value: ops.indigoDeep, hint: ops.mute, soft: ops.softIndigo, icon: ops.indigo },
+    success: { value: ops.live, hint: ops.mute, soft: ops.softMint, icon: ops.live },
+    live: { value: ops.live, hint: ops.mute, soft: ops.softMint, icon: ops.live }
   }
   const t = tones[tone] || tones.default
 
@@ -78,12 +79,13 @@ export default function OpsMetricTile({
       </Box>
       <Typography
         sx={{
-          fontSize: { xs: 22, md: 26 },
+          fontFamily: ops.scoreboard,
+          fontSize: { xs: 28, md: 34 },
           fontWeight: 600,
-          letterSpacing: '-0.96px',
+          letterSpacing: '-0.4px',
           color: t.value,
           fontVariantNumeric: 'tabular-nums',
-          lineHeight: 1.15
+          lineHeight: 1.05
         }}
       >
         {value}
