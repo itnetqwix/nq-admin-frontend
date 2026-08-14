@@ -1,530 +1,419 @@
-import { Box, InputLabel, TextField } from "@mui/material";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/router'
+import { Box, Button, Chip, Link as MuiLink, Stack, Tooltip, Typography } from '@mui/material'
+import Link from 'next/link'
+import toast from 'react-hot-toast'
 import { AbilityContext } from 'src/layouts/components/acl/Can'
+import {
+  AdminDataGrid,
+  AdminFilterBar,
+  AdminGridContainer,
+  OpsMetricTile,
+  OpsSurfaceCard,
+  useAdminConfirm
+} from 'src/components/admin'
+import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import { useCommon } from 'src/hooks/useCommon'
+import RefundPopups from 'src/pages/components/modal/RefundPopups'
+import BookingDetailDrawer from 'src/pages/components/modal/BookingDetailDrawer'
+import { FilterChip } from 'src/features/users/chips'
+import {
+  isRefundTerminal,
+  personDisplayName,
+  refundReasonLabel,
+  refundStatusLabel
+} from 'src/features/bookings/refundLabels'
+import { cancelAdminBooking, createAdminRefund, getPaymentIntentDetails } from 'src/services/bookingApi'
+import { refundWalletSession } from 'src/services/financeApi'
+import { formatOpsDateTime } from 'src/utils/opsDateTime'
+import { BookedSession, isCurrentDateBefore } from 'src/utils/utils'
+import { ops } from 'src/styles/opsSurface'
 
-import styles from "styles/common.module.css";
+void refundWalletSession
 
-import { DataGrid } from '@mui/x-data-grid';
-import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell';
-import SaveAsIcon from '@mui/icons-material/SaveAs';
-import Link from "next/link";
-import MenuIcon from '@mui/icons-material/Menu';
-import { CustomButton } from "src/pages/components/common";
-import { useCommon } from "src/hooks/useCommon";
-import moment from "moment";
-import RefundPopups from "src/pages/components/modal/RefundPopups";
-import toast from "react-hot-toast";
-import authConfig from 'src/configs/auth'
-import { BookedSession, debouncedSearchMedicine, isCurrentDateBefore } from "src/utils/utils";
-import CancelSessionPopups from "src/pages/components/modal/CancelSessionPopups";
+const STATUS_CHIPS = [
+  { value: '', label: 'All' },
+  { value: 'booked', label: 'Pending' },
+  { value: 'confirmed', label: 'Confirmed' },
+  { value: 'completed', label: 'Completed' },
+  { value: 'canceled', label: 'Canceled' },
+  { value: 'refund', label: 'Refunds' }
+]
 
-const booking_status = {
-  canceled: "red",
-  booked: "blue",
-  confirmed: "green",
-  completed: "orange"
-};
-
-/** Human labels for booking.refund_reason (support triage). */
-const refundReasonLabel = (reason) => {
-  if (!reason) return '—'
-  const key = String(reason).trim().toLowerCase()
-  const map = {
-    accept_expired: 'Accept window expired',
-    join_expired: 'Join window missed',
-    declined: 'Declined by coach',
-    no_show: 'No-show',
-    scheduled_trainer_no_show: 'No-show',
-    trainer_cancelled: 'Coach cancelled',
-    trainer_cancelled_scheduled: 'Coach cancelled',
-    trainee_cancelled: 'Enthusiast cancelled',
-    trainee_cancelled_scheduled: 'Cancelled before confirmation',
-    scheduled_unconfirmed_expired: 'Unconfirmed — expired at start',
-    scheduled_overlap_superseded: 'Overlap — another session confirmed first'
-  }
-  return map[key] || String(reason)
+const STATUS_TONE = {
+  booked: { bg: ops.softIndigo, color: ops.indigoDeep },
+  confirmed: { bg: ops.softMint, color: '#0B7A4B' },
+  completed: { bg: ops.canvasSoft2, color: ops.body },
+  canceled: { bg: ops.errorSoft, color: ops.error }
 }
 
-/** Auto-refunds set `completed`; legacy/manual may set `refunded`. */
-const isRefundTerminal = (status) => {
-  const s = String(status || '').trim().toLowerCase()
-  return s === 'refunded' || s === 'completed' || s === 'processing'
+function matchesSearch(row, q) {
+  const s = String(q || '')
+    .trim()
+    .toLowerCase()
+  if (!s) return true
+  const blobs = [
+    row._id,
+    row.status,
+    row.refund_status,
+    row.refund_reason,
+    row.payment_intent_id,
+    row.trainer_info?.fullName,
+    row.trainer_info?.email,
+    row.trainee_info?.fullName,
+    row.trainee_info?.email
+  ]
+  return blobs.some(v => String(v || '').toLowerCase().includes(s))
 }
 
-const refundStatusLabel = (status) => {
-  const s = String(status || '').trim().toLowerCase()
-  if (s === 'completed' || s === 'refunded') return 'refunded'
-  if (s === 'processing') return 'processing'
-  if (s === 'failed') return 'failed'
-  return status || '—'
+function StatusChip({ status }) {
+  const tone = STATUS_TONE[status] || STATUS_TONE.completed
+  return (
+    <Chip
+      size='small'
+      label={status || '—'}
+      sx={{ height: 22, fontSize: 11, fontWeight: 600, bgcolor: tone.bg, color: tone.color }}
+    />
+  )
+}
+
+function PersonCell({ info, id }) {
+  const name = personDisplayName(info, id)
+  const email = info?.email
+  if (!id && name === '—') return '—'
+  return (
+    <Box sx={{ lineHeight: 1.25, py: 0.5 }}>
+      {id ? (
+        <MuiLink component={Link} href={`/apps/users/${id}`} onClick={e => e.stopPropagation()} underline='hover'>
+          {name}
+        </MuiLink>
+      ) : (
+        <Typography variant='body2'>{name}</Typography>
+      )}
+      {email ? (
+        <Typography variant='caption' display='block' color='text.secondary' noWrap>
+          {email}
+        </Typography>
+      ) : null}
+    </Box>
+  )
 }
 
 export default function Booking() {
+  const router = useRouter()
   const ability = useContext(AbilityContext)
   const canRefund = ability?.can('update', 'admin-action-refund') ?? true
+  const { confirm, ConfirmDialog } = useAdminConfirm()
+  const { bookingList, getBookingList } = useCommon()
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [openRefundPopup, setOpenRefundPopup] = useState(false);
-  const [paymentIntentDetails, setPaymentIntentDetails] = useState({});
-  const [bookingId, setBookingId] = useState(null);
-  const [refundRow, setRefundRow] = useState(null);
-  const [openClosePopup, setOpenClosePopup] = useState(false);
-  const [cancelId, setCancelId] = useState(null);
-
-  const common = useCommon();
-
-  const {
-    bookingList,
-    getBookingList
-  } = common;
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [openRefundPopup, setOpenRefundPopup] = useState(false)
+  const [paymentIntentDetails, setPaymentIntentDetails] = useState({})
+  const [refundRow, setRefundRow] = useState(null)
+  const [detailId, setDetailId] = useState(null)
 
   useEffect(() => {
-    getBookingList();
+    void getBookingList()
   }, [])
 
-  const showRefundPopup = (row) => {
+  useEffect(() => {
+    if (!router.isReady) return
+    const q = router.query?.bookingId
+    if (typeof q === 'string' && q.trim()) setDetailId(q.trim())
+  }, [router.isReady, router.query?.bookingId])
+
+  const rows = useMemo(() => {
+    const list = Array.isArray(bookingList) ? bookingList : []
+    return list.filter(row => {
+      if (!matchesSearch(row, search)) return false
+      if (!statusFilter) return true
+      if (statusFilter === 'refund') return Boolean(row.refund_status)
+      return String(row.status) === statusFilter
+    })
+  }, [bookingList, search, statusFilter])
+
+  const counts = useMemo(() => {
+    const list = Array.isArray(bookingList) ? bookingList : []
+    const by = { booked: 0, confirmed: 0, completed: 0, canceled: 0, refund: 0 }
+    for (const row of list) {
+      if (by[row.status] != null) by[row.status] += 1
+      if (row.refund_status) by.refund += 1
+    }
+    return { total: list.length, ...by }
+  }, [bookingList])
+
+  const detailRow = useMemo(
+    () => (Array.isArray(bookingList) ? bookingList.find(r => String(r._id) === String(detailId)) : null),
+    [bookingList, detailId]
+  )
+
+  const openDetail = id => {
+    if (!id) return
+    setDetailId(String(id))
+    void router.replace({ pathname: '/apps/booking', query: { bookingId: String(id) } }, undefined, { shallow: true })
+  }
+
+  const closeDetail = () => {
+    setDetailId(null)
+    const q = { ...router.query }
+    delete q.bookingId
+    void router.replace({ pathname: '/apps/booking', query: q }, undefined, { shallow: true })
+  }
+
+  const showRefundPopup = row => {
     if (!row?._id || !canRefund) return
     if (isRefundTerminal(row.refund_status)) {
       toast.error('Refund already completed or in progress for this booking')
       return
     }
     setRefundRow(row)
-    setOpenRefundPopup(true);
-    setBookingId(row._id)
+    setOpenRefundPopup(true)
     setPaymentIntentDetails({})
     if (row.payment_intent_id) {
-      getPaymentIntentDetails({ payment_intent_id: row.payment_intent_id })
+      void getPaymentIntentDetails(row.payment_intent_id).then(setPaymentIntentDetails).catch(() => setPaymentIntentDetails({}))
+    }
+  }
+
+  const requestCancel = async id => {
+    const ok = await confirm({
+      title: 'Cancel this session?',
+      message:
+        'Cancels the booking and starts a refund to the enthusiast. Wallet credits are usually instant; card refunds take 5–10 business days. The coach cannot take this slot afterward.',
+      detail: `Booking: ${id}`,
+      confirmLabel: 'Cancel and refund',
+      variant: 'danger',
+      reasonRequired: true,
+      reasonLabel: 'Why is ops canceling?'
+    })
+    if (!ok) return
+    try {
+      const result = await cancelAdminBooking(id, ok.reason)
+      if (result?.refunded) toast.success('Session canceled and refund started')
+      else toast.success(result?.refundError ? `Canceled. Refund: ${result.refundError}` : 'Session canceled')
+      void getBookingList()
+    } catch (e) {
+      toast.error(e?.message || 'Cancel failed')
+    }
+  }
+
+  const onConformRefund = async (paymentIntentId, reason) => {
+    if (!refundRow?._id) return
+    try {
+      await createAdminRefund({
+        bookingId: refundRow._id,
+        paymentIntentId,
+        reason
+      })
+      toast.success('Refund submitted. Wallet is instant; cards take 5–10 business days.')
+      setOpenRefundPopup(false)
+      setRefundRow(null)
+      void getBookingList()
+    } catch (e) {
+      toast.error(e?.message || 'Refund was not completed')
     }
   }
 
   const columns = [
-    { field: '_id', headerName: 'Booking Id', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 220 },
-    {
-      field: 'is_instant',
-      headerName: 'Type',
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
-      width: 130,
-      renderCell: params => {
-        const instant = !!params.row.is_instant
-        const phase = params.row.instant_phase
-          ? String(params.row.instant_phase)
-          : ''
-        return (
-          <div style={{ fontSize: 13, lineHeight: 1.3 }} title={phase || undefined}>
-            {instant ? (phase ? `Instant · ${phase}` : 'Instant') : 'Scheduled'}
-          </div>
+      {
+        field: '_id',
+        headerName: 'Booking',
+        width: 128,
+        renderCell: p => (
+          <Typography sx={{ fontFamily: ops.mono, fontSize: 12 }}>{String(p.row._id).slice(-8)}</Typography>
         )
-      }
-    },
-    {
-      field: 'booked_date',
-      headerName: 'Booking Date',
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
-      width: 130,
-      renderCell: params => (
-        <div>
-          {moment(params.row.booked_date).format('MM-DD-YY')}
-        </div>
-      )
-
-    },
-    { field: 'session_start_time', headerName: 'Start Time', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 120 },
-    { field: 'session_end_time', headerName: 'End Time', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 120 },
-    {
-      field: 'trainer_info',
-      headerName: 'Trainer Name',
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
-      width: 180,
-      renderCell: params => (
-        <div >
-          {params?.row?.trainer_info?.fullName}
-        </div>
-      )
-    },
-    {
-      field: 'trainee_info',
-      headerName: 'Trainee Name',
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
-      width: 180,
-      renderCell: params => (
-        <div >
-          {params?.row?.trainee_info?.fullName}
-        </div>
-      )
-    },
-    {
-      field: 'refund_status',
-      headerName: 'Refund',
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
-      width: 110,
-      renderCell: params => (
-        <div style={{ fontSize: 13 }}>
-          {refundStatusLabel(params.row.refund_status)}
-        </div>
-      )
-    },
-    {
-      field: 'refund_reason',
-      headerName: 'Reason',
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
-      width: 200,
-      renderCell: params => {
-        const label = refundReasonLabel(params.row.refund_reason)
-        return (
-          <div title={params.row.refund_reason || ''} style={{ fontSize: 13, lineHeight: 1.3 }}>
-            {label}
-          </div>
+      },
+      {
+        field: 'is_instant',
+        headerName: 'Type',
+        width: 120,
+        renderCell: p => (
+          <Typography variant='body2'>{p.row.is_instant ? (p.row.instant_phase ? `Instant · ${p.row.instant_phase}` : 'Instant') : 'Scheduled'}</Typography>
         )
-      }
-    },
-    {
-      field: 'status',
-      headerName: 'Actions',
-      headerClassName: styles['header-class-last'],
-      cellClassName: styles['cell-class-last'],
-      width: 350,
-      renderCell: params => {
-        const refundDone = isRefundTerminal(params.row.refund_status)
-        const refundFailed =
-          String(params.row.refund_status || '').toLowerCase() === 'failed'
-
-        return (
-        <>
-          <div className={styles["status-booking"]} style={{ backgroundColor: booking_status[params.row.status], cursor: "not-allowed" }}>
-            {params.row.status}
-          </div>
-          {
-            params.row.status === "canceled" ? (
-              refundDone ? (
-              <div className={styles["status-booking"]} style={{ backgroundColor: "gray", marginLeft: "10px", cursor: "not-allowed" }}>
-                {refundStatusLabel(params.row.refund_status)}
-              </div>
-              ) : refundFailed && canRefund ? (
-              <div onClick={() => showRefundPopup(params.row)} className={styles["status-booking"]} style={{ backgroundColor: "#8b4513", marginLeft: "10px", cursor: "pointer" }} title="Previous refund failed — retry">
-                Retry Refund
-              </div>
-              ) : canRefund ? (
-              <div onClick={() => showRefundPopup(params.row)} className={styles["status-booking"]} style={{ backgroundColor: "#2d2d3f", marginLeft: "10px", cursor: "pointer", }}>
-                Start Refund
-              </div>
-              ) : (
-              <div className={styles["status-booking"]} style={{ backgroundColor: "#555", marginLeft: "10px", cursor: "not-allowed" }} title="No refund permission">
-                Refund (restricted)
-              </div>
-              )
-            ) : null
-          }
-
-          {
-            params.row.status === BookedSession.booked ?
-              isCurrentDateBefore(params.row.start_time) ?
-                <React.Fragment>
-                  <button
-                    className={styles["status-booking"]}
-                    type="button"
-                    style={{
-                      cursor: "pointer",
-                      backgroundColor: "#000080",
-                      marginLeft: "10px"
-                    }}
-                    disabled={params.row.status !== BookedSession.booked}
-                    onClick={() => onConfirmBooking(params.row._id)}
-                  >
-                    {BookedSession.confirm}
-                  </button>
-                  <button
-                    className={styles["status-booking"]}
-                    type="button"
-                    style={{
-                      cursor: "pointer",
-                      backgroundColor: "#ff4e2b",
-                      marginLeft: "10px"
-                    }}
-                    onClick={() => {
-                      setOpenClosePopup(true);
-                      setCancelId(params.row._id)
-                    }}
-                  >
-                    Cancel
-                  </button>
-                </React.Fragment> :
-                <React.Fragment>
-                  <div className={styles["status-booking"]} style={{ backgroundColor: booking_status["canceled"], marginLeft: "10px", cursor: "not-allowed" }}>
-                    Not Accpted
-                  </div>
-
-                  {
-                    refundDone ?
-                      <div className={styles["status-booking"]} style={{ backgroundColor: "gray", marginLeft: "10px" }}>
-                        {refundStatusLabel(params.row.refund_status)}
-                      </div> :
-                      refundFailed && canRefund ? (
-                      <div onClick={() => showRefundPopup(params.row)} className={styles["status-booking"]} style={{ backgroundColor: "#8b4513", marginLeft: "10px", cursor: "pointer" }}>
-                        Retry Refund
-                      </div>
-                      ) : canRefund ? (
-                      <div onClick={() => showRefundPopup(params.row)} className={styles["status-booking"]} style={{ backgroundColor: "#2d2d3f", marginLeft: "10px", cursor: "pointer", }}>
-                        Start Refund
-                      </div>
-                      ) : (
-                      <div className={styles["status-booking"]} style={{ backgroundColor: "#555", marginLeft: "10px", cursor: "not-allowed" }}>
-                        Refund (restricted)
-                      </div>
-                      )
-                  }
-                </React.Fragment>
-              : null
-          }
-
-          {
-            params.row.status === BookedSession.confirmed &&
-            <React.Fragment>
-              <button
-                className={styles["status-booking"]}
-                type="button"
-                style={{
-                  cursor: "pointer",
-                  backgroundColor: "#ff4e2b",
-                  marginLeft: "10px"
-                }}
-                onClick={() => {
-                  setOpenClosePopup(true);
-                  setCancelId(params.row._id)
-                }}
-              >
-                Cancel
-              </button>
-            </React.Fragment>
-          }
-
-        </>
+      },
+      {
+        field: 'start_time',
+        headerName: 'When',
+        width: 168,
+        renderCell: p => (
+          <Box>
+            <Typography variant='body2'>{formatOpsDateTime(p.row.start_time || p.row.booked_date, { withSeconds: false })}</Typography>
+            <Typography variant='caption' color='text.secondary'>
+              {p.row.session_start_time || ''}
+              {p.row.session_end_time ? `–${p.row.session_end_time}` : ''}
+            </Typography>
+          </Box>
         )
+      },
+      {
+        field: 'trainer_info',
+        headerName: 'Coach',
+        flex: 1,
+        minWidth: 150,
+        renderCell: p => <PersonCell info={p.row.trainer_info} id={p.row.trainer_id} />
+      },
+      {
+        field: 'trainee_info',
+        headerName: 'Enthusiast',
+        flex: 1,
+        minWidth: 150,
+        renderCell: p => <PersonCell info={p.row.trainee_info} id={p.row.trainee_id} />
+      },
+      {
+        field: 'amount',
+        headerName: 'Amount',
+        width: 90,
+        renderCell: p => (p.row.amount != null ? `$${Number(p.row.amount).toFixed(2)}` : '—')
+      },
+      {
+        field: 'status',
+        headerName: 'Status',
+        width: 110,
+        renderCell: p => <StatusChip status={p.row.status} />
+      },
+      {
+        field: 'refund_status',
+        headerName: 'Refund',
+        width: 200,
+        renderCell: p => {
+          if (!p.row.refund_status && !p.row.refund_reason) return '—'
+          return (
+            <Box sx={{ py: 0.5 }}>
+              <Typography variant='body2'>{refundStatusLabel(p.row.refund_status)}</Typography>
+              <Tooltip title={p.row.refund_reason || ''}>
+                <Typography variant='caption' color='text.secondary' noWrap display='block'>
+                  {refundReasonLabel(p.row.refund_reason)}
+                </Typography>
+              </Tooltip>
+            </Box>
+          )
+        }
+      },
+      {
+        field: 'actions',
+        headerName: '',
+        width: 210,
+        sortable: false,
+        renderCell: p => {
+          const refundDone = isRefundTerminal(p.row.refund_status)
+          const refundFailed = String(p.row.refund_status || '').toLowerCase() === 'failed'
+          const canCancelRow =
+            p.row.status === BookedSession.booked || p.row.status === BookedSession.confirmed
+          const showRefund =
+            canRefund &&
+            !refundDone &&
+            (p.row.status === BookedSession.canceled ||
+              refundFailed ||
+              (p.row.status === BookedSession.booked && !isCurrentDateBefore(p.row.start_time)))
+          return (
+            <Stack direction='row' spacing={0.5} onClick={e => e.stopPropagation()}>
+              <Button size='small' onClick={() => openDetail(p.row._id)}>
+                View
+              </Button>
+              {canCancelRow ? (
+                <Button size='small' color='error' onClick={() => void requestCancel(p.row._id)}>
+                  Cancel
+                </Button>
+              ) : null}
+              {showRefund ? (
+                <Button size='small' color='warning' onClick={() => showRefundPopup(p.row)}>
+                  {refundFailed ? 'Retry' : 'Refund'}
+                </Button>
+              ) : null}
+            </Stack>
+          )
+        }
       }
-    }
-
-  ];
-
-  const handleCloseRefundPopup = () => {
-    setOpenRefundPopup(false);
-    setRefundRow(null);
-  }
-
-  const handleCloseCancelPopup = () => {
-    setOpenClosePopup(false);
-    setCancelId(null)
-  }
-
-  const onConformRefund = (paymentIntentId, reason) => {
-    startRefund({
-      payment_intent_id: paymentIntentId || undefined,
-      booking_id: bookingId,
-      reason
-    })
-  }
-
-  const onConformCancel = (id) => {
-    // startRefund({ payment_intent_id: id })
-    onCancelBooking(cancelId)
-  }
-
-  const getRowClassName = (params) => {
-    return params.indexRelativeToCurrentPage % 2 === 0 ? `${styles['even-row']} ${styles['row-class']} ` : `${styles['odd-row']} ${styles['row-class']} `;
-  };
-
-  const getRowHeight = () => 50
-
-  const getPaymentIntentDetails = (params) => {
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(storedToken ? { 'Authorization': `Bearer ${storedToken}` } : {}),
-      },
-      body: JSON.stringify(params),
-    };
-    fetch(process.env.NEXT_PUBLIC_API_BASE_URL + '/transaction/get-payment-intent', options)
-      .then(data => {
-        return data.json();
-      }).then(response => {
-        if (response.code === 400) {
-          // setLoading(false)
-          return;
-        }
-        // console.log("========>", response)
-        setPaymentIntentDetails(response?.data ?? {})
-      }).catch(e => {
-        // setLoading(false)
-      });
-
-  }
-
-  function onConfirmBooking(id) {
-    const payload = {
-      booked_status: "confirmed",
-      id: id
-    }
-    updateBooking(payload)
-  }
-
-  function onCancelBooking(id) {
-    // console.log("====>", id)
-    const payload = {
-      booked_status: "canceled",
-      id: id
-    }
-    updateBooking(payload)
-  }
-
-  const updateBooking = (params) => {
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-    const options = {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${storedToken}`
-      },
-      body: JSON.stringify(params),
-    };
-    fetch(process.env.NEXT_PUBLIC_API_BASE_URL + `/user/update-booked-session/${params.id}`, options)
-      .then(data => {
-        return data.json();
-      }).then(response => {
-        getBookingList();
-        handleCloseCancelPopup()
-      }).catch(e => {
-      });
-
-  }
-
-  const startRefund = (params) => {
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-    if (!storedToken) {
-      toast.error('Sign in required to process refunds')
-      return
-    }
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${storedToken}`
-      },
-      body: JSON.stringify(params),
-    };
-    fetch(process.env.NEXT_PUBLIC_API_BASE_URL + '/transaction/create-refund', options)
-      .then(data => {
-        return data.json();
-      }).then(response => {
-        if (response.code === 400 || response.code === 403 || String(response?.status).toLowerCase() === 'fail') {
-          toast.error(response?.error || 'Refund was not completed')
-          return;
-        }
-        toast.success('Refund completed; amount returns to the trainee funding source.', {
-          duration: 2000
-        })
-        updateRefundStatus({
-          "booking_id": bookingId,
-          "refund_status": "refunded"
-        })
-      }).catch(e => {
-        toast.error(e?.message || 'Refund request failed')
-      });
-
-  }
-
-  const updateRefundStatus = (params) => {
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-    if (!storedToken) {
-      return
-    }
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${storedToken}`
-      },
-      body: JSON.stringify(params),
-    };
-    fetch(process.env.NEXT_PUBLIC_API_BASE_URL + '/user/update-refund-status', options)
-      .then(data => {
-        return data.json();
-      }).then(response => {
-        if (response.code === 400) {
-          return;
-        }
-        getBookingList();
-        setBookingId(null)
-        setPaymentIntentDetails({})
-        setOpenRefundPopup(false)
-      }).catch(e => {
-      });
-
-  }
-
-  const [tableData, setTableData] = useState([]);
-
-  useEffect(() => {
-    if (bookingList) {
-      setTableData(bookingList)
-    }
-  }, [bookingList])
-
-  async function getSearchValue(searchText) {
-    const searchResults = await debouncedSearchMedicine(searchText, bookingList, "_id")
-    setTableData(searchResults)
-  }
-
+    ]
 
   return (
     <>
-      <form noValidate autoComplete='off'>
-        <AdminPageShell
-          title='Bookings'
-          subtitle='Sessions, confirmations, cancellations, and refunds. Search by booking id.'
-          actions={
-            <CustomButton component={Link} variant='contained' href='/apps/booking' startIcon={<MenuIcon />}>
-              Settings
-            </CustomButton>
-          }
-          contentSx={{ p: 0 }}
-        >
+      <AdminPageShell
+        bare
+        icon='mdi:calendar-clock-outline'
+        eyebrow='Operations · bookings'
+        title='Bookings'
+        subtitle='Open a row for the full case: people, payment path, refund reason, and timeline. Finance deep-links land here.'
+        actions={
+          <Stack direction='row' spacing={1}>
+            <Chip component={Link} href='/apps/finance?tab=refunds' label='Refund queue' clickable variant='outlined' size='small' />
+            <Chip component={Link} href='/apps/finance?tab=escrow' label='Escrow' clickable variant='outlined' size='small' />
+          </Stack>
+        }
+      >
+        <Stack direction='row' spacing={1.5} useFlexGap flexWrap='wrap' sx={{ mb: 2 }}>
+          <Box sx={{ flex: '1 1 140px', minWidth: 120 }}>
+            <OpsMetricTile label='Sessions' value={String(counts.total)} hint='Loaded' />
+          </Box>
+          <Box sx={{ flex: '1 1 140px', minWidth: 120 }}>
+            <OpsMetricTile label='Pending' value={String(counts.booked)} hint='Awaiting coach' tone='warn' onClick={() => setStatusFilter('booked')} />
+          </Box>
+          <Box sx={{ flex: '1 1 140px', minWidth: 120 }}>
+            <OpsMetricTile label='Canceled' value={String(counts.canceled)} hint='Need refund check' />
+          </Box>
+          <Box sx={{ flex: '1 1 140px', minWidth: 120 }}>
+            <OpsMetricTile label='Refunds' value={String(counts.refund)} hint='Any refund status' tone='accent' onClick={() => setStatusFilter('refund')} />
+          </Box>
+        </Stack>
+
+        <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
           <AdminPageSection>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-              <InputLabel sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>Search</InputLabel>
-              <TextField size='small' placeholder='Booking id…' onChange={e => getSearchValue(e.target.value)} />
-            </Box>
-            <div className='admin-data-grid' style={{ height: '71vh', width: '100%' }}>
-              <DataGrid
-                rows={tableData ?? []}
+            <AdminFilterBar
+              searchPlaceholder='Booking id, name, email, PI…'
+              searchValue={search}
+              onSearchChange={e => setSearch(e.target.value)}
+              onRefresh={() => void getBookingList()}
+              resultCount={rows.length}
+              helperText='Click a row for the case drawer. Cancel requires a reason and starts the refund. Coaches confirm from the app.'
+            >
+              {STATUS_CHIPS.map(s => (
+                <FilterChip
+                  key={s.value || 'all'}
+                  active={statusFilter === s.value}
+                  label={s.label}
+                  count={s.value ? counts[s.value] : counts.total}
+                  onClick={() => setStatusFilter(s.value)}
+                />
+              ))}
+            </AdminFilterBar>
+            <AdminGridContainer>
+              <AdminDataGrid
+                autoHeight={false}
+                rows={rows}
                 columns={columns}
-                headerClassName={styles['header-class']}
-                getRowClassName={getRowClassName}
-                initialState={{
-                  pagination: {
-                    paginationModel: { page: 0, pageSize: 25 }
-                  }
-                }}
-                pageSizeOptions={[25, 50]}
-                getRowHeight={getRowHeight}
-                columnHeaderHeight={50}
+                getRowId={r => r._id || r.id}
+                getRowHeight={() => 64}
+                onRowClick={p => openDetail(p.row._id)}
+                emptyMessage='No bookings match'
+                emptyDescription='Clear filters or search by booking id, name, or email.'
               />
-            </div>
+            </AdminGridContainer>
           </AdminPageSection>
-        </AdminPageShell>
-      </form>
+        </OpsSurfaceCard>
+      </AdminPageShell>
 
-      <RefundPopups paymentIntentDetails={paymentIntentDetails} bookingPreview={refundRow} handleClose={handleCloseRefundPopup} open={openRefundPopup} onConform={onConformRefund} />
+      <BookingDetailDrawer
+        open={Boolean(detailId)}
+        bookingId={detailId}
+        listRow={detailRow}
+        canRefund={canRefund}
+        onClose={closeDetail}
+        onRequestCancel={requestCancel}
+        onRequestRefund={showRefundPopup}
+        onActionComplete={() => void getBookingList()}
+      />
 
-      <CancelSessionPopups handleClose={handleCloseCancelPopup} open={openClosePopup} onConform={onConformCancel} />
+      <RefundPopups
+        paymentIntentDetails={paymentIntentDetails}
+        bookingPreview={refundRow}
+        handleClose={() => {
+          setOpenRefundPopup(false)
+          setRefundRow(null)
+        }}
+        open={openRefundPopup}
+        onConform={onConformRefund}
+      />
+      {ConfirmDialog}
     </>
   )
 }
-
-
-

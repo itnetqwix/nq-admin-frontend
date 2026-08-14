@@ -26,7 +26,7 @@ const TAB_GUIDES = {
   4: {
     title: 'Refunds',
     body:
-      'Refund queue and status — pending, processing, completed, or failed. Pair with Transactions when a refund looks stuck.'
+      'Every refund case: who was paid, who received the money back, when it happened, the human reason, and wallet vs card vs bank ETA. Open the session for the full timeline. Failed rows need a retry from Bookings after you read the failure reason.'
   },
   5: {
     title: 'Payouts',

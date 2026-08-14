@@ -15,7 +15,7 @@ import InputAdornment from '@mui/material/InputAdornment'
 import Typography from '@mui/material/Typography'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Icon from 'src/@core/components/icon'
-import { isAdminRegisterEnabled, showAdminMfaNotice } from 'src/configs/adminEnv'
+import { showAdminMfaNotice } from 'src/configs/adminEnv'
 import * as yup from 'yup'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -32,13 +32,22 @@ const schema = yup.object().shape({
 
 const defaultValues = { password: '', email: '' }
 
+const fieldSx = {
+  bgcolor: ops.canvas,
+  '& input:-webkit-autofill, & input:-webkit-autofill:hover, & input:-webkit-autofill:focus': {
+    WebkitBoxShadow: `0 0 0 1000px ${ops.canvas} inset`,
+    WebkitTextFillColor: ops.ink,
+    caretColor: ops.ink,
+    transition: 'background-color 9999s ease-out 0s'
+  }
+}
+
 const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
   const [formError, setFormError] = useState('')
   const [googleError, setGoogleError] = useState('')
   const auth = useAuth()
-  const registerEnabled = isAdminRegisterEnabled()
 
   const {
     control,
@@ -71,7 +80,7 @@ const LoginPage = () => {
     <OpsAuthShell
       eyebrow='Sign in'
       title='Administrator login'
-      subtitle='Use your NetQwix admin email, or continue with Google if that account is already provisioned.'
+      subtitle='Continue with Google or your invited admin email. Access is granted by a Super Admin — you cannot create an account here.'
     >
       <AdminGoogleSignIn onCredential={onGoogle} disabled={auth.loading} />
       {googleError ? (
@@ -84,7 +93,7 @@ const LoginPage = () => {
         <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute }}>or email</Typography>
       </Divider>
 
-      <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
+      <form noValidate autoComplete='on' onSubmit={handleSubmit(onSubmit)}>
         {formError ? (
           <Alert severity='error' sx={{ mb: 2, borderRadius: ops.radiusSm }}>
             {formError}
@@ -104,6 +113,8 @@ const LoginPage = () => {
                 onChange={onChange}
                 error={Boolean(errors.email)}
                 placeholder='admin@netqwix.com'
+                autoComplete='username'
+                sx={fieldSx}
               />
             )}
           />
@@ -126,6 +137,8 @@ const LoginPage = () => {
                 id='auth-login-password'
                 error={Boolean(errors.password)}
                 type={showPassword ? 'text' : 'password'}
+                autoComplete='current-password'
+                sx={fieldSx}
                 endAdornment={
                   <InputAdornment position='end'>
                     <IconButton edge='end' onMouseDown={e => e.preventDefault()} onClick={() => setShowPassword(v => !v)}>
@@ -161,30 +174,18 @@ const LoginPage = () => {
           type='submit'
           variant='contained'
           disabled={auth.loading}
-          sx={{ mb: 1.5, bgcolor: ops.ink, '&:hover': { bgcolor: '#000' }, textTransform: 'none', fontWeight: 600 }}
+          sx={{ mb: 2, bgcolor: ops.ink, '&:hover': { bgcolor: '#000' }, textTransform: 'none', fontWeight: 600 }}
         >
           {auth.loading ? 'Signing in…' : 'Sign in'}
         </Button>
-        {registerEnabled ? (
-          <Button
-            fullWidth
-            size='large'
-            variant='outlined'
-            component={Link}
-            href='/register'
-            sx={{ mb: 2, textTransform: 'none', borderColor: ops.hairline, color: ops.ink }}
-          >
-            Create administrator account
-          </Button>
-        ) : null}
         <Typography sx={{ fontSize: 12, color: ops.mute, lineHeight: 1.55, mb: 2 }}>
-          Only existing administrators can sign in — including trainers or trainees who were granted
-          panel access on the same email. Google works when that email already has admin access.
+          Need access? Ask a Super Admin to invite this email from Roles. Google works on the same
+          invited address — including trainers or trainees who were granted panel access.
         </Typography>
         {showAdminMfaNotice() ? (
           <Alert severity='info' sx={{ borderRadius: ops.radiusSm }}>
             Your organization requires authenticator MFA for the main SuperAdmin only. Invited
-            sub-admins sign in with email and password.
+            sub-admins sign in with email and password or Google.
           </Alert>
         ) : null}
       </form>

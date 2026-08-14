@@ -1,87 +1,145 @@
 import * as React from 'react'
 import {
+  Alert,
   Box,
   Button,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Grid,
+  Stack,
   TextField,
   Typography
 } from '@mui/material'
+import {
+  REFUND_REASON_PRESETS,
+  personDisplayName,
+  refundDestinationCopy
+} from 'src/features/bookings/refundLabels'
 
 export default function RefundPopups({ paymentIntentDetails, bookingPreview, handleClose, open, onConform }) {
-  const [reason, setReason] = React.useState('')
+  const [preset, setPreset] = React.useState('')
+  const [notes, setNotes] = React.useState('')
 
   React.useEffect(() => {
-    if (!open) setReason('')
+    if (!open) {
+      setPreset('')
+      setNotes('')
+    }
   }, [open])
 
-  const amountUsd = paymentIntentDetails?.amount_received ? paymentIntentDetails.amount_received / 100 : 0
+  const amountUsd = paymentIntentDetails?.amount_received
+    ? paymentIntentDetails.amount_received / 100
+    : bookingPreview?.amount != null
+      ? Number(bookingPreview.amount)
+      : 0
   const feeUsd = paymentIntentDetails?.application_fee_amount ? paymentIntentDetails.application_fee_amount / 100 : 0
-  const hasStripe = Boolean(paymentIntentDetails?.id)
+  const hasStripe = Boolean(paymentIntentDetails?.id || bookingPreview?.payment_intent_id)
+  const destination =
+    bookingPreview?.refund_transfer?.destination || (hasStripe ? 'card' : 'wallet')
+  const traineeName = personDisplayName(bookingPreview?.trainee_info, bookingPreview?.trainee_id)
+  const trainerName = personDisplayName(bookingPreview?.trainer_info, bookingPreview?.trainer_id)
+  const traineeEmail = bookingPreview?.trainee_info?.email
+  const trainerEmail = bookingPreview?.trainer_info?.email
+
+  const reason =
+    preset && preset !== 'other'
+      ? notes.trim()
+        ? `${preset}: ${notes.trim()}`
+        : preset
+      : notes.trim()
 
   const handleRefund = () => {
-    const r = reason.trim()
-    if (r.length < 3) return
-    onConform?.(paymentIntentDetails?.id || null, r)
+    if (reason.length < 3) return
+    onConform?.(paymentIntentDetails?.id || bookingPreview?.payment_intent_id || null, reason)
   }
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth='sm' fullWidth>
-      <DialogTitle>Confirm refund</DialogTitle>
+      <DialogTitle>Refund this session</DialogTitle>
       <DialogContent dividers>
-        <Grid container spacing={2}>
+        <Stack spacing={2}>
           {bookingPreview ? (
-            <Grid item xs={12}>
-              <Typography variant='subtitle2' color='text.secondary'>
-                Booking
+            <Box sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+              <Typography variant='caption' color='text.secondary'>
+                Case
               </Typography>
-              <Typography variant='body2'>ID: {bookingPreview._id}</Typography>
-              {bookingPreview.trainer_info?.fullName ? (
-                <Typography variant='body2'>Trainer: {bookingPreview.trainer_info.fullName}</Typography>
+              <Typography variant='body2' sx={{ fontFamily: 'ui-monospace, monospace', mb: 1 }}>
+                {bookingPreview._id}
+              </Typography>
+              <Typography variant='body2'>
+                Enthusiast: {traineeName}
+                {traineeEmail ? ` · ${traineeEmail}` : ''}
+              </Typography>
+              <Typography variant='body2'>
+                Coach: {trainerName}
+                {trainerEmail ? ` · ${trainerEmail}` : ''}
+              </Typography>
+              {bookingPreview.status ? (
+                <Typography variant='body2'>Booking status: {bookingPreview.status}</Typography>
               ) : null}
-              {bookingPreview.trainee_info?.fullName ? (
-                <Typography variant='body2'>Trainee: {bookingPreview.trainee_info.fullName}</Typography>
-              ) : null}
-              {bookingPreview.status ? <Typography variant='body2'>Status: {bookingPreview.status}</Typography> : null}
-            </Grid>
+            </Box>
           ) : null}
-          <Grid item xs={12}>
-            <Typography>Total session cost: {hasStripe ? `$${amountUsd.toFixed(2)}` : 'Wallet / escrow'}</Typography>
-            {hasStripe ? <Typography>NetQwix fee: ${feeUsd.toFixed(2)}</Typography> : null}
-            <Typography>
-              Payment method:{' '}
-              {hasStripe
-                ? paymentIntentDetails?.payment_method_types?.[0]
-                : 'Wallet or escrow (no card intent on this booking)'}
+
+          <Box>
+            <Typography variant='subtitle2'>Amount</Typography>
+            <Typography variant='body2'>
+              {amountUsd ? `$${Number(amountUsd).toFixed(2)}` : 'Wallet / escrow hold'}
+              {hasStripe && feeUsd ? ` · platform fee $${feeUsd.toFixed(2)}` : ''}
             </Typography>
-            <Typography variant='caption' display='block' sx={{ mt: 1 }} color='text.secondary'>
-              {hasStripe
-                ? 'Card refunds go through Stripe or escrow. Duplicate refunds are blocked.'
-                : 'This refunds the wallet/escrow hold for the session. Duplicate refunds are blocked.'}
+            <Typography variant='body2' color='text.secondary'>
+              {refundDestinationCopy(destination)}
             </Typography>
-          </Grid>
-          <Grid item xs={12}>
+          </Box>
+
+          <Alert severity='info' icon={false}>
+            <Typography variant='subtitle2' sx={{ mb: 0.5 }}>
+              What happens next
+            </Typography>
+            <Typography variant='body2'>1. Reason is stored on the booking and the finance audit log.</Typography>
+            <Typography variant='body2'>
+              2. Held escrow is reversed, or Stripe refunds the original charge if there is no hold.
+            </Typography>
+            <Typography variant='body2'>
+              3. Wallet credits land immediately. Card refunds take 5–10 business days. Duplicate refunds are blocked.
+            </Typography>
+          </Alert>
+
+          <Box>
+            <Typography variant='subtitle2' sx={{ mb: 1 }}>
+              Reason
+            </Typography>
+            <Stack direction='row' spacing={0.75} flexWrap='wrap' useFlexGap sx={{ mb: 1.5 }}>
+              {REFUND_REASON_PRESETS.map(p => (
+                <Chip
+                  key={p.key}
+                  size='small'
+                  label={p.label}
+                  clickable
+                  color={preset === p.key ? 'primary' : 'default'}
+                  variant={preset === p.key ? 'filled' : 'outlined'}
+                  onClick={() => setPreset(p.key)}
+                />
+              ))}
+            </Stack>
             <TextField
               fullWidth
-              required
-              label='Refund reason (required)'
-              placeholder='e.g. Trainee no-show per policy #4'
-              value={reason}
-              onChange={e => setReason(e.target.value)}
-              inputProps={{ minLength: 3 }}
-              helperText='Minimum 3 characters. Shown in audit history.'
+              required={preset === 'other' || !preset}
+              label={preset && preset !== 'other' ? 'Notes (optional)' : 'Refund reason (required)'}
+              placeholder='Add context for audit — ticket #, policy, what support told the user'
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              helperText='Minimum 3 characters total. The enthusiast and coach see the outcome; this text stays in admin audit.'
             />
-          </Grid>
-        </Grid>
+          </Box>
+        </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, py: 2 }}>
         <Button onClick={handleClose} color='inherit'>
-          Cancel
+          Back
         </Button>
-        <Button variant='contained' color='warning' onClick={handleRefund} disabled={reason.trim().length < 3}>
+        <Button variant='contained' color='warning' onClick={handleRefund} disabled={reason.length < 3}>
           Process refund
         </Button>
       </DialogActions>

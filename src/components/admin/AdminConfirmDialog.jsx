@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined'
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
@@ -9,6 +10,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import Stack from '@mui/material/Stack'
+import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
 const VARIANT_META = {
@@ -29,14 +31,25 @@ export default function AdminConfirmDialog({
   cancelLabel = 'Cancel',
   variant = 'default',
   loading = false,
+  reasonRequired = false,
+  reasonLabel = 'Reason',
+  reasonPlaceholder = 'What happened, and why this action?',
+  reasonMinLength = 3,
   onConfirm,
   onClose
 }) {
   const meta = VARIANT_META[variant] ?? VARIANT_META.default
   const Icon = meta.Icon
+  const [reason, setReason] = useState('')
+
+  useEffect(() => {
+    if (open) setReason('')
+  }, [open])
+
+  const reasonOk = !reasonRequired || reason.trim().length >= reasonMinLength
 
   return (
-    <Dialog open={open} onClose={loading ? undefined : onClose} maxWidth='xs' fullWidth>
+    <Dialog open={open} onClose={loading ? undefined : onClose} maxWidth={reasonRequired ? 'sm' : 'xs'} fullWidth>
       <DialogTitle sx={{ pb: 1 }}>
         <Stack direction='row' spacing={1.5} alignItems='flex-start'>
           <Box
@@ -76,6 +89,20 @@ export default function AdminConfirmDialog({
             {detail}
           </Typography>
         ) : null}
+        {reasonRequired ? (
+          <TextField
+            autoFocus
+            fullWidth
+            required
+            size='small'
+            label={reasonLabel}
+            placeholder={reasonPlaceholder}
+            value={reason}
+            onChange={e => setReason(e.target.value)}
+            helperText={`Minimum ${reasonMinLength} characters. Stored on the audit log.`}
+            sx={{ mt: 2 }}
+          />
+        ) : null}
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2.5, pt: 1 }}>
         <Button onClick={onClose} disabled={loading} color='inherit'>
@@ -84,8 +111,8 @@ export default function AdminConfirmDialog({
         <Button
           variant='contained'
           color={meta.color}
-          onClick={onConfirm}
-          disabled={loading}
+          onClick={() => onConfirm?.(reasonRequired ? reason.trim() : undefined)}
+          disabled={loading || !reasonOk}
           startIcon={loading ? <CircularProgress size={16} color='inherit' /> : null}
         >
           {loading ? 'Working…' : confirmLabel}

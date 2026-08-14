@@ -280,6 +280,7 @@ export default function FinancePanel(p) {
             rows={rows.map((r, i) => ({ id: r._id ?? r.entry_id ?? r.id ?? i, ...r }))}
             columns={cols}
             loading={loading}
+            getRowHeight={() => 64}
           />
         </AdminGridContainer>
         )}

@@ -62,6 +62,12 @@ const input = () => {
           },
           '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
             borderColor: theme.palette.text.disabled
+          },
+          '& input:-webkit-autofill, & input:-webkit-autofill:hover, & input:-webkit-autofill:focus': {
+            WebkitBoxShadow: `0 0 0 1000px ${theme.palette.background.paper} inset`,
+            WebkitTextFillColor: theme.palette.text.primary,
+            caretColor: theme.palette.text.primary,
+            transition: 'background-color 9999s ease-out 0s'
           }
         })
       }

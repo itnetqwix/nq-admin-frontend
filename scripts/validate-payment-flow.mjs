@@ -15,14 +15,12 @@ const CHECKS = [
     includes: ["/apps/finance?sessionId=", "releaseEscrowHold", "refundEscrowHold"],
   },
   {
-    file: "src/pages/apps/finance/index.js",
-    includes: [
-      "migrateLegacyBalances",
-      "ledgerReferenceType",
-      "escrowStatus",
-      "canRefund",
-      "refundWalletSession",
-    ],
+    file: "src/features/finance/FinancePage.js",
+    includes: ["ledgerReferenceType", "escrowStatus", "canRefund"],
+  },
+  {
+    file: "src/features/finance/FinanceDialogs.jsx",
+    includes: ["migrateLegacyBalances", "refundWalletSession"],
   },
   {
     file: "src/services/financeApi.js",

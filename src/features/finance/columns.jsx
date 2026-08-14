@@ -1,6 +1,9 @@
 import Button from '@mui/material/Button'
+import Chip from '@mui/material/Chip'
 import Link from 'next/link'
 import Stack from '@mui/material/Stack'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 import toast from 'react-hot-toast'
 import {
   approvePayout,
@@ -10,6 +13,38 @@ import {
   resolveDisputeEscrow
 } from 'src/services/financeApi'
 import { formatMinor, TAB } from './constants'
+import { formatOpsDateTime } from 'src/utils/opsDateTime'
+import { refundDestinationCopy, refundReasonLabel, refundStatusLabel } from 'src/features/bookings/refundLabels'
+
+function PersonCell({ person, fallbackId }) {
+  const id = person?.id || fallbackId
+  const name = person?.name || (id ? String(id).slice(-6) : '—')
+  const email = person?.email
+  if (!id && !person?.name) return '—'
+  return (
+    <Box sx={{ lineHeight: 1.25, py: 0.5, minWidth: 0 }}>
+      {id ? (
+        <Button size='small' component={Link} href={`/apps/users/${id}`} onClick={e => e.stopPropagation()} sx={{ px: 0, minWidth: 0, textTransform: 'none' }}>
+          {name}
+        </Button>
+      ) : (
+        <Typography variant='body2'>{name}</Typography>
+      )}
+      {email ? (
+        <Typography variant='caption' display='block' color='text.secondary' noWrap>
+          {email}
+        </Typography>
+      ) : null}
+    </Box>
+  )
+}
+
+function StatusChip({ status }) {
+  const s = String(status || '').toLowerCase()
+  const color =
+    s === 'failed' || s === 'disputed' ? 'error' : s === 'processing' || s === 'pending' || s === 'releasing' ? 'warning' : s === 'completed' || s === 'refunded' || s === 'released' ? 'success' : 'default'
+  return <Chip size='small' label={refundStatusLabel(status)} color={color} variant='outlined' />
+}
 
 export function buildFinanceColumns({ allowRefund, allowPayout, confirm, load, tab }) {
   const escrowCols = [
@@ -113,11 +148,13 @@ export function buildFinanceColumns({ allowRefund, allowPayout, confirm, load, t
                     message: 'Resolve dispute in favor of the trainer and release escrow.',
                     detail: `Hold ID: ${params.row._id}`,
                     confirmLabel: 'Release trainer',
-                    variant: 'warning'
+                    variant: 'warning',
+                    reasonRequired: true,
+                    reasonLabel: 'Resolution note'
                   })
                   if (!ok) return
                   try {
-                    await resolveDisputeEscrow(params.row._id, 'release_trainer', 'admin_dispute_release')
+                    await resolveDisputeEscrow(params.row._id, 'release_trainer', ok.reason)
                     toast.success('Dispute resolved — released to trainer')
                     load()
                   } catch (e) {
@@ -136,11 +173,13 @@ export function buildFinanceColumns({ allowRefund, allowPayout, confirm, load, t
                     message: 'Resolve dispute in favor of the trainee and refund escrow.',
                     detail: `Hold ID: ${params.row._id}`,
                     confirmLabel: 'Refund trainee',
-                    variant: 'danger'
+                    variant: 'danger',
+                    reasonRequired: true,
+                    reasonLabel: 'Resolution note'
                   })
                   if (!ok) return
                   try {
-                    await resolveDisputeEscrow(params.row._id, 'refund_trainee', 'admin_dispute_refund')
+                    await resolveDisputeEscrow(params.row._id, 'refund_trainee', ok.reason)
                     toast.success('Dispute resolved — refunded trainee')
                     load()
                   } catch (e) {
@@ -159,11 +198,13 @@ export function buildFinanceColumns({ allowRefund, allowPayout, confirm, load, t
                     message: 'Return this hold to normal held status (dispute cleared).',
                     detail: `Hold ID: ${params.row._id}`,
                     confirmLabel: 'Reinstate',
-                    variant: 'default'
+                    variant: 'default',
+                    reasonRequired: true,
+                    reasonLabel: 'Why reinstate?'
                   })
                   if (!ok) return
                   try {
-                    await resolveDisputeEscrow(params.row._id, 'reinstate_held', 'admin_dispute_reinstate')
+                    await resolveDisputeEscrow(params.row._id, 'reinstate_held', ok.reason)
                     toast.success('Hold reinstated')
                     load()
                   } catch (e) {
@@ -187,11 +228,13 @@ export function buildFinanceColumns({ allowRefund, allowPayout, confirm, load, t
                   message: 'Held funds will be released from escrow for this session.',
                   detail: `Hold ID: ${params.row._id}`,
                   confirmLabel: 'Release',
-                  variant: 'warning'
+                  variant: 'warning',
+                  reasonRequired: true,
+                  reasonLabel: 'Why release now?'
                 })
                 if (!ok) return
                 try {
-                  await releaseEscrowHold(params.row._id, 'admin_release')
+                  await releaseEscrowHold(params.row._id, ok.reason)
                   toast.success('Escrow released')
                   load()
                 } catch (e) {
@@ -207,14 +250,16 @@ export function buildFinanceColumns({ allowRefund, allowPayout, confirm, load, t
               onClick={async () => {
                 const ok = await confirm({
                   title: 'Refund escrow to trainee?',
-                  message: 'This starts a refund from held escrow back to the trainee wallet or card.',
+                  message: 'This starts a refund from held escrow back to the trainee wallet or card. Wallet is usually instant; cards take 5–10 business days.',
                   detail: `Hold ID: ${params.row._id}`,
                   confirmLabel: 'Refund',
-                  variant: 'danger'
+                  variant: 'danger',
+                  reasonRequired: true,
+                  reasonLabel: 'Refund reason'
                 })
                 if (!ok) return
                 try {
-                  await refundEscrowHold(params.row._id, 'admin_refund')
+                  await refundEscrowHold(params.row._id, ok.reason)
                   toast.success('Escrow refund started')
                   load()
                 } catch (e) {
@@ -233,11 +278,13 @@ export function buildFinanceColumns({ allowRefund, allowPayout, confirm, load, t
                   message: 'Freezes the hold for manual review. No automatic release until resolved.',
                   detail: `Hold ID: ${params.row._id}`,
                   confirmLabel: 'Mark disputed',
-                  variant: 'danger'
+                  variant: 'danger',
+                  reasonRequired: true,
+                  reasonLabel: 'Dispute reason'
                 })
                 if (!ok) return
                 try {
-                  await disputeEscrowHold(params.row._id, 'admin_dispute')
+                  await disputeEscrowHold(params.row._id, ok.reason)
                   toast.success('Hold marked disputed')
                   load()
                 } catch (e) {
@@ -283,7 +330,7 @@ export function buildFinanceColumns({ allowRefund, allowPayout, confirm, load, t
       width: 100,
       valueGetter: p => formatMinor(p.row.amount_minor)
     },
-    { field: 'createdAt', headerName: 'When', width: 180 }
+    { field: 'createdAt', headerName: 'When', width: 160, valueGetter: p => formatOpsDateTime(p.row.createdAt) }
   ]
 
   const transactionCols = [
@@ -312,23 +359,93 @@ export function buildFinanceColumns({ allowRefund, allowPayout, confirm, load, t
       width: 100,
       valueGetter: p => formatMinor(p.row.amount_minor)
     },
-    { field: 'createdAt', headerName: 'When', width: 180 }
+    { field: 'createdAt', headerName: 'When', width: 160, valueGetter: p => formatOpsDateTime(p.row.createdAt) }
   ]
 
   const refundCols = [
-    { field: 'source', headerName: 'Source', width: 100 },
-    { field: 'status', headerName: 'Status', width: 120 },
-    { field: 'path', headerName: 'Path', width: 100 },
-    { field: 'session_id', headerName: 'Session', flex: 1 },
-    { field: 'payment_intent_id', headerName: 'PI', flex: 1 },
+    {
+      field: 'createdAt',
+      headerName: 'When',
+      width: 160,
+      valueGetter: p => formatOpsDateTime(p.row.createdAt)
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 130,
+      renderCell: p => <StatusChip status={p.row.status} />
+    },
     {
       field: 'amount_minor',
       headerName: 'Amount',
       width: 100,
       valueGetter: p => formatMinor(p.row.amount_minor)
     },
-    { field: 'reason', headerName: 'Reason', flex: 1 },
-    { field: 'createdAt', headerName: 'When', width: 180 }
+    {
+      field: 'trainee',
+      headerName: 'Enthusiast',
+      flex: 1,
+      minWidth: 150,
+      renderCell: p => <PersonCell person={p.row.trainee} fallbackId={p.row.user_id} />
+    },
+    {
+      field: 'trainer',
+      headerName: 'Coach',
+      flex: 1,
+      minWidth: 140,
+      renderCell: p => <PersonCell person={p.row.trainer} />
+    },
+    {
+      field: 'reason',
+      headerName: 'Reason',
+      flex: 1.2,
+      minWidth: 180,
+      renderCell: p => (
+        <Box sx={{ py: 0.5, minWidth: 0 }}>
+          <Typography variant='body2' noWrap title={p.row.reason || ''}>
+            {refundReasonLabel(p.row.reason)}
+          </Typography>
+          {p.row.actor?.name ? (
+            <Typography variant='caption' color='text.secondary' noWrap>
+              by {p.row.actor.name}
+            </Typography>
+          ) : null}
+        </Box>
+      )
+    },
+    {
+      field: 'path',
+      headerName: 'Destination',
+      width: 170,
+      renderCell: p => (
+        <Box sx={{ py: 0.5 }}>
+          <Typography variant='body2'>{refundDestinationCopy(p.row.destination || p.row.path)}</Typography>
+          {p.row.expected_by ? (
+            <Typography variant='caption' color='text.secondary'>
+              ETA {formatOpsDateTime(p.row.expected_by, { withSeconds: false })}
+            </Typography>
+          ) : p.row.transfer_status ? (
+            <Typography variant='caption' color='text.secondary'>
+              {p.row.transfer_status}
+            </Typography>
+          ) : null}
+        </Box>
+      )
+    },
+    {
+      field: 'session_id',
+      headerName: 'Session',
+      width: 110,
+      renderCell: params =>
+        params.row.session_id ? (
+          <Button size='small' component={Link} href={`/apps/booking?bookingId=${params.row.session_id}`}>
+            Open
+          </Button>
+        ) : (
+          '—'
+        )
+    },
+    { field: 'source', headerName: 'Source', width: 90 }
   ]
 
   const payoutCols = [
@@ -409,15 +526,20 @@ export function buildFinanceColumns({ allowRefund, allowPayout, confirm, load, t
       valueGetter: p => formatMinor(p.row.amount_minor)
     },
     { field: 'stripe_payment_intent_id', headerName: 'PI', flex: 1 },
-    { field: 'createdAt', headerName: 'Created', width: 180 }
+    { field: 'createdAt', headerName: 'Created', width: 160, valueGetter: p => formatOpsDateTime(p.row.createdAt) }
   ]
 
   const auditCols = [
     { field: 'action', headerName: 'Action', flex: 1 },
     { field: 'entity_type', headerName: 'Entity', width: 140 },
     { field: 'entity_id', headerName: 'Entity ID', flex: 1 },
-    { field: 'reason', headerName: 'Reason', flex: 1 },
-    { field: 'createdAt', headerName: 'When', width: 180 }
+    {
+      field: 'reason',
+      headerName: 'Reason',
+      flex: 1,
+      renderCell: p => refundReasonLabel(p.row.reason)
+    },
+    { field: 'createdAt', headerName: 'When', width: 160, valueGetter: p => formatOpsDateTime(p.row.createdAt) }
   ]
 
   if (tab === TAB.LEDGER) return ledgerCols

@@ -86,7 +86,7 @@ const FinancePage = () => {
     sessionId: '',
     traineeId: '',
     kind: 'booking',
-    reason: 'admin_wallet_refund'
+    reason: ''
   })
 
   useEffect(() => {

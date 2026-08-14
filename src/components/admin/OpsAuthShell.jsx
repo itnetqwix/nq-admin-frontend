@@ -16,7 +16,7 @@ export default function OpsAuthShell({
   title,
   subtitle,
   children,
-  footerNote = 'Restricted · staff only'
+  footerNote = 'Restricted · invite only'
 }) {
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', bgcolor: ops.canvasSoft }}>
@@ -26,7 +26,7 @@ export default function OpsAuthShell({
           flex: 1,
           flexDirection: 'column',
           justifyContent: 'space-between',
-          p: 5,
+          p: { md: 5, lg: 6.5 },
           position: 'relative',
           overflow: 'hidden',
           bgcolor: ops.night,
@@ -35,24 +35,20 @@ export default function OpsAuthShell({
         }}
       >
         <Box sx={{ position: 'absolute', inset: 0, bgcolor: 'rgba(14,18,24,0.55)', pointerEvents: 'none' }} />
-        <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 1.75 }}>
-          <Box
-            sx={{
-              height: 40,
-              px: 1.25,
-              borderRadius: ops.radiusMd,
-              bgcolor: 'rgba(255,255,255,0.08)',
-              display: 'flex',
-              alignItems: 'center',
-              border: '1px solid rgba(255,255,255,0.12)'
-            }}
-          >
-            <Image width={120} height={28} src='/images/netquix_logo.png' alt='NetQwix' style={{ objectFit: 'contain' }} />
-          </Box>
-          <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.onNightMuted }}>Match desk</Typography>
+        <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Image
+            width={148}
+            height={36}
+            src='/images/netquix_logo.png'
+            alt='NetQwix'
+            style={{ objectFit: 'contain', objectPosition: 'left center' }}
+          />
+          <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.onNightMuted, letterSpacing: '0.06em' }}>
+            Match desk
+          </Typography>
         </Box>
 
-        <Box sx={{ position: 'relative', maxWidth: 400 }}>
+        <Box sx={{ position: 'relative', maxWidth: 440 }}>
           <Typography
             sx={{
               fontFamily: ops.mono,
@@ -65,19 +61,30 @@ export default function OpsAuthShell({
           >
             {eyebrow}
           </Typography>
-          <Typography sx={{ fontWeight: 600, fontSize: 28, letterSpacing: '-0.8px', lineHeight: 1.25, mb: 1.5 }}>
+          <Typography
+            sx={{
+              fontFamily: ops.scoreboard,
+              fontWeight: 600,
+              fontSize: { md: 36, lg: 42 },
+              letterSpacing: '-0.5px',
+              lineHeight: 1.1,
+              mb: 1.75
+            }}
+          >
             {themeConfig.templateName} operations
           </Typography>
-          <Typography sx={{ fontSize: 14, color: ops.onNightMuted, lineHeight: 1.65, mb: 3 }}>
-            Sign in with your administrator email. Sessions are logged.
+          <Typography sx={{ fontSize: 15, color: ops.onNightMuted, lineHeight: 1.65, mb: 3.5, maxWidth: 380 }}>
+            Sign in with an invited administrator email. Sessions are logged. New staff cannot self-register.
           </Typography>
-          <Stack spacing={1.75}>
+          <Stack spacing={2}>
             {HIGHLIGHTS.map(h => (
               <Box key={h.title} sx={{ display: 'flex', gap: 1.5 }}>
-                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: ops.live, mt: 0.75, flexShrink: 0 }} />
+                <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: ops.live, mt: 0.7, flexShrink: 0 }} />
                 <Box>
-                  <Typography sx={{ fontSize: 13, fontWeight: 600, mb: 0.25 }}>{h.title}</Typography>
-                  <Typography sx={{ fontSize: 12, color: ops.onNightMuted, lineHeight: 1.5 }}>{h.body}</Typography>
+                  <Typography sx={{ fontSize: 14, fontWeight: 700, mb: 0.25, letterSpacing: '-0.2px' }}>
+                    {h.title}
+                  </Typography>
+                  <Typography sx={{ fontSize: 13, color: ops.onNightMuted, lineHeight: 1.5 }}>{h.body}</Typography>
                 </Box>
               </Box>
             ))}
@@ -91,7 +98,7 @@ export default function OpsAuthShell({
 
       <Box
         sx={{
-          width: { xs: '100%', md: 460, lg: 500 },
+          width: { xs: '100%', md: 480, lg: 520 },
           flexShrink: 0,
           display: 'flex',
           alignItems: 'center',
@@ -103,7 +110,13 @@ export default function OpsAuthShell({
       >
         <Box sx={{ width: '100%', maxWidth: 400 }}>
           <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', gap: 1.5, mb: 3.5 }}>
-            <Image width={132} height={32} src='/images/netquix_logo.png' alt='NetQwix' style={{ objectFit: 'contain' }} />
+            <Image
+              width={148}
+              height={36}
+              src='/images/netquix_logo.png'
+              alt='NetQwix'
+              style={{ objectFit: 'contain', objectPosition: 'left center' }}
+            />
           </Box>
           <Typography
             sx={{
@@ -117,7 +130,7 @@ export default function OpsAuthShell({
           >
             {eyebrow}
           </Typography>
-          <Typography sx={{ fontWeight: 600, fontSize: 22, letterSpacing: '-0.6px', color: ops.ink, mb: 0.75 }}>
+          <Typography sx={{ fontWeight: 600, fontSize: 24, letterSpacing: '-0.6px', color: ops.ink, mb: 0.75 }}>
             {title}
           </Typography>
           {subtitle ? (

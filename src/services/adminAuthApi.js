@@ -2,8 +2,7 @@ const apiBase = () => process.env.NEXT_PUBLIC_API_BASE_URL || ''
 
 /**
  * Bootstrap administrator account (account_type = Admin).
- * Requires NEXT_PUBLIC_ADMIN_REGISTER_ENABLED on the admin app and
- * ADMIN_PUBLIC_SIGNUP_ENABLED=true on the API.
+ * Disabled in UI — admins are invited. Kept for emergency API use only.
  */
 export async function registerAdminAccount({ fullname, email, mobile_no, password, accepted_terms_and_privacy }) {
   const res = await fetch(`${apiBase()}/auth/signup`, {
@@ -24,11 +23,23 @@ export async function registerAdminAccount({ fullname, email, mobile_no, passwor
     const message =
       data?.error ||
       data?.message ||
-      (res.status === 403
-        ? 'Admin registration is disabled on the API (ADMIN_PUBLIC_SIGNUP_ENABLED=false). Deploy the latest API or set that env var to true on the server.'
-        : 'Unable to create administrator account.')
+      'Unable to create administrator account.'
     throw new Error(message)
   }
 
   return data
+}
+
+/** Google SSO for an already-invited admin (never creates an account). */
+export async function verifyGoogleAdminLogin({ email, id_token, access_token, rememberMe }) {
+  const body = { email: String(email || '').trim().toLowerCase(), rememberMe: Boolean(rememberMe) }
+  if (id_token) body.id_token = id_token
+  if (access_token) body.access_token = access_token
+  const res = await fetch(`${apiBase()}/auth/verify-google-login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Nq-Admin': '1' },
+    body: JSON.stringify(body)
+  })
+  const data = await res.json().catch(() => ({}))
+  return { ok: res.ok, data }
 }

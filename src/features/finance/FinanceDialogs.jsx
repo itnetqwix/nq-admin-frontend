@@ -50,6 +50,7 @@ export default function FinanceDialogs(p) {
               label='Reason'
               value={adjustForm.reason}
               onChange={e => setAdjustForm(f => ({ ...f, reason: e.target.value }))}
+              helperText='Required. Stored on the finance audit log.'
               fullWidth
             />
           </Stack>
@@ -58,6 +59,7 @@ export default function FinanceDialogs(p) {
           <Button onClick={() => setAdjustOpen(false)}>Cancel</Button>
           <Button
             variant='contained'
+            disabled={String(adjustForm.reason || '').trim().length < 3}
             onClick={async () => {
               try {
                 await adjustWallet({
@@ -80,8 +82,11 @@ export default function FinanceDialogs(p) {
       </Dialog>
 
       <Dialog open={walletRefundOpen} onClose={() => setWalletRefundOpen(false)} maxWidth='sm' fullWidth>
-        <DialogTitle>Wallet refund (no PI)</DialogTitle>
+        <DialogTitle>Wallet refund (no card intent)</DialogTitle>
         <DialogContent>
+          <Typography variant='body2' color='text.secondary' sx={{ mt: 1, mb: 1 }}>
+            Credits the enthusiast wallet for a session with no Stripe PaymentIntent. Instant. Duplicate refunds for the same session+kind are blocked.
+          </Typography>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
               label='Session ID'
@@ -109,6 +114,7 @@ export default function FinanceDialogs(p) {
               label='Reason'
               value={walletRefundForm.reason}
               onChange={e => setWalletRefundForm(f => ({ ...f, reason: e.target.value }))}
+              helperText='Required. Stored on the finance audit log.'
               fullWidth
             />
           </Stack>
@@ -118,6 +124,11 @@ export default function FinanceDialogs(p) {
           <Button
             variant='contained'
             color='warning'
+            disabled={
+              !walletRefundForm.sessionId ||
+              !walletRefundForm.traineeId ||
+              String(walletRefundForm.reason || '').trim().length < 3
+            }
             onClick={async () => {
               try {
                 await refundWalletSession(walletRefundForm)

@@ -9,7 +9,11 @@ const INITIAL = {
   confirmLabel: 'Confirm',
   cancelLabel: 'Cancel',
   variant: 'default',
-  loading: false
+  loading: false,
+  reasonRequired: false,
+  reasonLabel: 'Reason',
+  reasonPlaceholder: 'What happened, and why this action?',
+  reasonMinLength: 3
 }
 
 /**
@@ -40,7 +44,7 @@ export function useAdminConfirm() {
     <AdminConfirmDialog
       {...state}
       onClose={() => close(false)}
-      onConfirm={() => close(true)}
+      onConfirm={reasonText => close({ confirmed: true, reason: reasonText || undefined })}
     />
   )
 

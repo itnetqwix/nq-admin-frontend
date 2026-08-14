@@ -9,10 +9,10 @@ export const CLARITY_PROJECT_ID = String(
   process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID ?? ''
 ).trim()
 
-/** Enabled unless explicitly set to "false" (avoids missing env after .env edits without restart). */
+/** Enabled only when explicitly set to "true". Default off — admins are invited. */
 export const isAdminRegisterEnabled = () => {
-  const raw = String(process.env.NEXT_PUBLIC_ADMIN_REGISTER_ENABLED ?? 'true').trim().toLowerCase()
-  return raw !== 'false'
+  const raw = String(process.env.NEXT_PUBLIC_ADMIN_REGISTER_ENABLED ?? 'false').trim().toLowerCase()
+  return raw === 'true'
 }
 
 /** Hint shown when bootstrap registration is enabled (API must allow it too). */

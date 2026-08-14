@@ -30,3 +30,49 @@ export async function getAdminSessionTimeline(bookingId) {
   }
   return data?.data ?? data
 }
+
+async function parseJson(res) {
+  const data = await res.json().catch(() => ({}))
+  const failed =
+    !res.ok ||
+    data?.code === 400 ||
+    data?.code === 403 ||
+    String(data?.status || '').toLowerCase() === 'fail'
+  if (failed) {
+    throw new Error(data?.error || data?.msg || 'Request failed')
+  }
+  return data?.data ?? data
+}
+
+export async function createAdminRefund({ bookingId, paymentIntentId, reason }) {
+  const res = await fetch(apiUrl('/transaction/create-refund'), {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({
+      booking_id: bookingId,
+      payment_intent_id: paymentIntentId || undefined,
+      reason
+    })
+  })
+  return parseJson(res)
+}
+
+export async function cancelAdminBooking(bookingId, reason) {
+  const res = await fetch(apiUrl(`/admin/booking/${bookingId}/cancel`), {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ reason })
+  })
+  return parseJson(res)
+}
+
+export async function getPaymentIntentDetails(paymentIntentId) {
+  const res = await fetch(apiUrl('/transaction/get-payment-intent'), {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ payment_intent_id: paymentIntentId })
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || data?.code === 400) return {}
+  return data?.data ?? data ?? {}
+}

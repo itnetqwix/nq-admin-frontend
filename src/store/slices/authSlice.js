@@ -15,6 +15,7 @@ import { clearLogRocketUser, identifyLogRocketUser } from 'src/lib/logrocket'
 import { identifyClarityUser } from 'src/lib/clarity'
 
 import { isAdminAccount } from 'src/auth'
+import { verifyGoogleAdminLogin } from 'src/services/adminAuthApi'
 
 const apiBase = () => process.env.NEXT_PUBLIC_API_BASE_URL || ''
 
@@ -113,21 +114,21 @@ export const loginPassword = createAsyncThunk(
 /** Google GIS → verify-google-login (existing Admin only) */
 export const loginGoogle = createAsyncThunk(
   'auth/loginGoogle',
-  async ({ email, id_token, rememberMe = true }, { rejectWithValue }) => {
+  async ({ email, id_token, access_token, rememberMe = true }, { rejectWithValue }) => {
     try {
-      const res = await fetch(`${apiBase()}/auth/verify-google-login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, id_token })
+      const { ok, data: response } = await verifyGoogleAdminLogin({
+        email,
+        id_token,
+        access_token,
+        rememberMe
       })
-      const response = await res.json()
 
       if (response?.data?.isRegistered === false) {
         return rejectWithValue(
-          'No NetQwix admin account for this Google email. Ask a Super Admin to create one.'
+          'No admin account for this Google email. Ask a Super Admin to invite you.'
         )
       }
-      if (!res.ok || response?.status === 'fail' || response?.status === 'FAIL') {
+      if (!ok || response?.status === 'fail' || response?.status === 'FAIL') {
         return rejectWithValue(response?.error || response?.msg || 'Google sign-in failed')
       }
 

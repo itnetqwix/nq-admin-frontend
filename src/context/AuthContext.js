@@ -12,6 +12,7 @@ import {
 import { installApiAuthHandler } from 'src/utils/installApiAuthHandler'
 import { registerSessionExpiredCallback } from 'src/utils/sessionExpired'
 import { isAdminAccount } from 'src/auth'
+import { verifyGoogleAdminLogin } from 'src/services/adminAuthApi'
 
 const MFA_ENROLL_PATH = '/pages/mfa-enroll'
 const LOGIN_PATHS = ['/login', '/login/mfa', '/forgot-password', '/register', '/pages/reset-password']
@@ -272,20 +273,20 @@ const AuthProvider = ({ children }) => {
 
   const handleLoginWithGoogle = (payload, errorCallback) => {
     setLoading(true)
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/verify-google-login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: payload?.email, id_token: payload?.id_token, rememberMe: payload?.rememberMe })
+    verifyGoogleAdminLogin({
+      email: payload?.email,
+      id_token: payload?.id_token,
+      access_token: payload?.access_token,
+      rememberMe: payload?.rememberMe
     })
-      .then(r => r.json())
-      .then(response => {
+      .then(({ ok, data: response }) => {
         if (response?.data?.isRegistered === false) {
           setLoading(false)
           setBootstrapped(true)
-          if (errorCallback) errorCallback('No NetQwix admin account for this Google email.')
+          if (errorCallback) errorCallback('No admin account for this Google email. Ask a Super Admin to invite you.')
           return
         }
-        if (!response || response?.status === 'fail' || response?.status === 'FAIL') {
+        if (!ok || !response || response?.status === 'fail' || response?.status === 'FAIL') {
           setLoading(false)
           setBootstrapped(true)
           if (errorCallback) errorCallback(response?.error || response?.msg || 'Google sign-in failed')

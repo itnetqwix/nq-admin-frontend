@@ -14,6 +14,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close'
 import moment from 'moment'
 import toast from 'react-hot-toast'
+import Link from 'next/link'
 import { useAdminConfirm } from 'src/components/admin'
 import { getAdminBookingDetail } from 'src/services/bookingApi'
 import { releaseEscrowHold, refundEscrowHold, refundWalletSession } from 'src/services/financeApi'
@@ -119,10 +120,12 @@ export default function BookingDetailDrawer({
     if (!s?._id || !traineeFinanceId) return
     const ok = await confirm({
       title: 'Refund extension to trainee wallet?',
-      message: `Refund +${ext.minutes} min ($${Number(ext.amount).toFixed(2)}) via wallet refund path.`,
+      message: `Refund +${ext.minutes} min ($${Number(ext.amount).toFixed(2)}) via wallet refund path. Instant if the original charge was wallet.`,
       detail: `Session: ${s._id}`,
       confirmLabel: 'Refund extension',
-      variant: 'danger'
+      variant: 'danger',
+      reasonRequired: true,
+      reasonLabel: 'Why refund this extension?'
     })
     if (!ok) return
     setExtensionRefundBusy(true)
@@ -131,7 +134,7 @@ export default function BookingDetailDrawer({
         sessionId: String(s._id),
         traineeId: String(traineeFinanceId),
         kind: 'extension',
-        reason: 'admin_booking_extension_refund'
+        reason: ok.reason
       })
       toast.success('Extension wallet refund submitted')
       loadDetail()
@@ -143,26 +146,28 @@ export default function BookingDetailDrawer({
     }
   }
 
-  const runEscrowAction = async (action, reason) => {
+  const runEscrowAction = async action => {
     if (!escrowHoldId) return
     const ok = await confirm({
       title: action === 'release' ? 'Release escrow to trainer?' : 'Refund escrow to trainee?',
       message:
         action === 'release'
           ? 'Held funds will be released from escrow for this session.'
-          : 'This starts a refund from held escrow back to the trainee wallet or card.',
+          : 'This starts a refund from held escrow back to the trainee wallet or card. Wallet is usually instant; cards take 5–10 business days.',
       detail: `Hold ID: ${escrowHoldId}`,
       confirmLabel: action === 'release' ? 'Release' : 'Refund',
-      variant: action === 'release' ? 'warning' : 'danger'
+      variant: action === 'release' ? 'warning' : 'danger',
+      reasonRequired: true,
+      reasonLabel: action === 'release' ? 'Why release now?' : 'Refund reason'
     })
     if (!ok) return
     setEscrowBusy(true)
     try {
       if (action === 'release') {
-        await releaseEscrowHold(escrowHoldId, reason)
+        await releaseEscrowHold(escrowHoldId, ok.reason)
         toast.success('Escrow released')
       } else {
-        await refundEscrowHold(escrowHoldId, reason)
+        await refundEscrowHold(escrowHoldId, ok.reason)
         toast.success('Escrow refund started')
       }
       loadDetail()
@@ -257,6 +262,10 @@ export default function BookingDetailDrawer({
             <DetailRow
               label='Refund transfer'
               value={refundTransferLabel(detail?.refund?.transfer)}
+            />
+            <DetailRow
+              label='Transfer failure'
+              value={detail?.refund?.transfer?.failure_reason}
             />
             <DetailRow label='Requested' value={fmt(s.requested_at)} />
             <DetailRow label='Accept deadline' value={fmt(s.accept_deadline_at)} />
@@ -407,6 +416,13 @@ export default function BookingDetailDrawer({
             <Typography variant='subtitle2' sx={{ mb: 1 }}>
               Trainer
             </Typography>
+            <Stack direction='row' spacing={1} sx={{ mb: 1 }}>
+              {detail?.trainer?._id ? (
+                <Button size='small' variant='outlined' component={Link} href={`/apps/users/${detail.trainer._id}`}>
+                  User 360
+                </Button>
+              ) : null}
+            </Stack>
             <DetailRow label='Name' value={detail?.trainer?.fullname} />
             <DetailRow label='Email' value={detail?.trainer?.email} />
             <DetailRow label='Timezone' value={detail?.trainer?.time_zone} />
@@ -415,6 +431,13 @@ export default function BookingDetailDrawer({
             <Typography variant='subtitle2' sx={{ mb: 1 }}>
               Trainee
             </Typography>
+            <Stack direction='row' spacing={1} sx={{ mb: 1 }}>
+              {detail?.trainee?._id ? (
+                <Button size='small' variant='outlined' component={Link} href={`/apps/users/${detail.trainee._id}`}>
+                  User 360
+                </Button>
+              ) : null}
+            </Stack>
             <DetailRow label='Name' value={detail?.trainee?.fullname} />
             <DetailRow label='Email' value={detail?.trainee?.email} />
 
@@ -439,7 +462,7 @@ export default function BookingDetailDrawer({
                         size='small'
                         variant='contained'
                         disabled={escrowBusy}
-                        onClick={() => runEscrowAction('release', 'admin_booking_release')}
+                        onClick={() => runEscrowAction('release')}
                       >
                         Release hold
                       </Button>
@@ -448,7 +471,7 @@ export default function BookingDetailDrawer({
                         variant='outlined'
                         color='warning'
                         disabled={escrowBusy}
-                        onClick={() => runEscrowAction('refund', 'admin_booking_refund')}
+                        onClick={() => runEscrowAction('refund')}
                       >
                         Refund hold
                       </Button>
