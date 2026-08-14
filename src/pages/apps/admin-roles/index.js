@@ -32,6 +32,7 @@ import {
   createCustomRole,
   deleteCustomRole,
   getRolesMatrix,
+  inviteAdmin,
   listAdminRoles,
   updateAdminPermissions,
   updateCustomRole
@@ -79,6 +80,11 @@ export default function AdminRolesPage() {
   const [editTemplateOpen, setEditTemplateOpen] = useState(false)
   const [devicesUser, setDevicesUser] = useState(null)
   const [revokingSessionId, setRevokingSessionId] = useState(null)
+  const [inviteOpen, setInviteOpen] = useState(false)
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteName, setInviteName] = useState('')
+  const [inviteRole, setInviteRole] = useState('Admin')
+  const [inviting, setInviting] = useState(false)
   const [adminSearch, setAdminSearch] = useState('')
 
   const load = useCallback(async () => {
@@ -104,6 +110,31 @@ export default function AdminRolesPage() {
   useEffect(() => {
     void load()
   }, [load])
+
+  const onInvite = async () => {
+    if (!canAssign) return
+    const email = inviteEmail.trim().toLowerCase()
+    if (!email || !email.includes('@')) {
+      toast.error('Enter a valid email')
+      return
+    }
+    setInviting(true)
+    try {
+      await inviteAdmin({ email, fullname: inviteName.trim(), admin_role: inviteRole })
+      toast.success(`Invite sent to ${email}`)
+      setInviteOpen(false)
+      setInviteEmail('')
+      setInviteName('')
+      setInviteRole('Admin')
+      await load()
+    } catch (e) {
+      toast.error(e?.message || 'Invite failed')
+    } finally {
+      setInviting(false)
+    }
+  }
+
+  const inviteRoles = roleList.filter(r => r !== 'SuperAdmin')
 
   const onAssign = async (userId, admin_role) => {
     if (!canAssign) {
@@ -337,14 +368,24 @@ export default function AdminRolesPage() {
       actions={
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
           {canAssign ? (
-            <Button
-              size='small'
-              variant='contained'
-              onClick={openCreateRole}
-              sx={{ textTransform: 'none', bgcolor: ops.ink, '&:hover': { bgcolor: '#000' } }}
-            >
-              New role
-            </Button>
+            <>
+              <Button
+                size='small'
+                variant='contained'
+                onClick={() => setInviteOpen(true)}
+                sx={{ textTransform: 'none', bgcolor: ops.ink, '&:hover': { bgcolor: '#000' } }}
+              >
+                Invite sub-admin
+              </Button>
+              <Button
+                size='small'
+                variant='outlined'
+                onClick={openCreateRole}
+                sx={{ textTransform: 'none' }}
+              >
+                New role
+              </Button>
+            </>
           ) : null}
           <Chip
             component={Link}
@@ -413,7 +454,7 @@ export default function AdminRolesPage() {
         </Stack>
       ) : null}
 
-      <AdminPageSection title='Administrators' subtitle='Assign a role or edit per-user permission overrides.'>
+      <AdminPageSection title='Administrators' subtitle='Invite by email, assign a role, or edit per-user permission overrides. Sub-admins skip MFA.'>
         <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
           <Box sx={{ p: { xs: 2, sm: 2.5 }, borderBottom: `1px solid ${ops.hairline}` }}>
             <AdminFilterBar
@@ -519,6 +560,59 @@ export default function AdminRolesPage() {
           </Table>
         </OpsSurfaceCard>
       </AdminPageSection>
+
+      <Dialog open={inviteOpen} onClose={() => setInviteOpen(false)} maxWidth='sm' fullWidth>
+        <DialogTitle>Invite sub-admin</DialogTitle>
+        <DialogContent dividers>
+          <Typography sx={{ mb: 2, fontSize: 13, color: ops.mute }}>
+            We’ll email a set-password link. They can sign in without MFA — only the main SuperAdmin
+            must use an authenticator.
+          </Typography>
+          <Stack spacing={2}>
+            <TextField
+              autoFocus
+              size='small'
+              type='email'
+              label='Email'
+              placeholder='name@company.com'
+              value={inviteEmail}
+              onChange={e => setInviteEmail(e.target.value)}
+            />
+            <TextField
+              size='small'
+              label='Name (optional)'
+              value={inviteName}
+              onChange={e => setInviteName(e.target.value)}
+            />
+            <TextField
+              select
+              size='small'
+              label='Role'
+              value={inviteRoles.includes(inviteRole) ? inviteRole : inviteRoles[0] || 'Admin'}
+              onChange={e => setInviteRole(e.target.value)}
+            >
+              {inviteRoles.map(r => (
+                <MenuItem key={r} value={r}>
+                  {r}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setInviteOpen(false)} sx={{ textTransform: 'none' }}>
+            Cancel
+          </Button>
+          <Button
+            variant='contained'
+            disabled={inviting}
+            onClick={() => void onInvite()}
+            sx={{ textTransform: 'none', bgcolor: ops.ink }}
+          >
+            {inviting ? 'Sending…' : 'Send invite'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Dialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth='md' fullWidth>
         <DialogTitle>Create custom role</DialogTitle>

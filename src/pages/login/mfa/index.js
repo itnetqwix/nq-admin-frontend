@@ -1,8 +1,13 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 import BlankLayout from 'src/@core/layouts/BlankLayout'
 import { useAuth } from 'src/hooks/useAuth'
 import toast from 'react-hot-toast'
+import { OpsAuthShell } from 'src/components/admin'
+import { ops } from 'src/styles/opsSurface'
 
 const MfaChallengePage = () => {
   const auth = useAuth()
@@ -10,71 +15,83 @@ const MfaChallengePage = () => {
   const [code, setCode] = useState('')
   const [busy, setBusy] = useState(false)
 
-  const submit = e => {
-    e.preventDefault()
+  const submit = (value = code) => {
+    const trimmed = String(value || '').trim()
+    if (busy || trimmed.length < 6) return
     setBusy(true)
-    auth.completeTwoFactor(code.trim(), err => {
+    auth.completeTwoFactor(trimmed, err => {
       setBusy(false)
       toast.error(err || 'Invalid code')
     })
   }
 
   return (
-    <div style={{ maxWidth: 420, margin: '80px auto', padding: 24 }}>
-      <h1 style={{ fontSize: 22, fontWeight: 700 }}>Admin verification</h1>
-      <p style={{ marginTop: 8, color: '#555' }}>
-        Enter the 6-digit code from your authenticator app (or a recovery code).
-      </p>
-      <form onSubmit={submit} style={{ marginTop: 24 }}>
-        <input
+    <OpsAuthShell
+      eyebrow='Verification'
+      title='Authenticator code'
+      subtitle='Enter the 6-digit code from your authenticator app, or a recovery code.'
+    >
+      <form
+        onSubmit={e => {
+          e.preventDefault()
+          submit()
+        }}
+      >
+        <TextField
           autoFocus
+          fullWidth
           value={code}
-          onChange={e => setCode(e.target.value)}
-          placeholder="123456"
-          style={{
-            width: '100%',
-            padding: '12px 14px',
-            border: '1px solid #ccc',
-            borderRadius: 8,
-            fontSize: 16
+          onChange={e => {
+            const next = e.target.value.replace(/\s/g, '')
+            setCode(next)
+            if (/^\d{6}$/.test(next)) submit(next)
+          }}
+          placeholder='123456'
+          inputProps={{
+            autoComplete: 'one-time-code',
+            inputMode: 'numeric',
+            'aria-label': 'Authenticator code'
+          }}
+          sx={{
+            mb: 2.5,
+            '& input': {
+              textAlign: 'center',
+              letterSpacing: '0.42em',
+              fontFamily: ops.mono,
+              fontSize: 22,
+              fontWeight: 700,
+              py: 1.75
+            }
           }}
         />
-        <button
-          type="submit"
+        <Button
+          fullWidth
+          size='large'
+          type='submit'
+          variant='contained'
           disabled={busy || code.trim().length < 6}
-          style={{
-            marginTop: 16,
-            width: '100%',
-            padding: 12,
-            background: '#000080',
-            color: '#fff',
-            border: 0,
-            borderRadius: 8,
-            fontWeight: 600,
-            opacity: busy ? 0.6 : 1
-          }}
+          sx={{ mb: 1.5, bgcolor: ops.ink, '&:hover': { bgcolor: '#000' }, textTransform: 'none', fontWeight: 600 }}
         >
           {busy ? 'Verifying…' : 'Verify'}
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          fullWidth
+          size='large'
+          variant='outlined'
           onClick={() => {
             auth.logout()
             router.push('/login')
           }}
-          style={{
-            marginTop: 12,
-            width: '100%',
-            padding: 10,
-            background: 'transparent',
-            border: '1px solid #ddd',
-            borderRadius: 8
-          }}
+          sx={{ textTransform: 'none', borderColor: ops.hairline, color: ops.ink }}
         >
           Back to login
-        </button>
+        </Button>
+        <Typography sx={{ mt: 2, fontSize: 12, color: ops.mute, lineHeight: 1.55 }}>
+          Only the main SuperAdmin is required to complete this step. Sub-admins sign in with email
+          and password only.
+        </Typography>
       </form>
-    </div>
+    </OpsAuthShell>
   )
 }
 

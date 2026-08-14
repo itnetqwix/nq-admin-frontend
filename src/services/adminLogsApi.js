@@ -103,6 +103,19 @@ export async function listAdminRoles() {
   return parse(res)
 }
 
+export async function inviteAdmin({ email, fullname, admin_role }) {
+  const res = await fetch(apiUrl('/admin/roles/invite'), {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({
+      email: String(email || '').trim().toLowerCase(),
+      fullname: String(fullname || '').trim() || undefined,
+      admin_role: admin_role || 'Admin'
+    })
+  })
+  return parse(res)
+}
+
 export async function assignAdminRole(userId, admin_role) {
   const res = await fetch(apiUrl(`/admin/roles/admins/${userId}`), {
     method: 'POST',

@@ -177,7 +177,8 @@ const LoginPage = () => {
         </Typography>
         {showAdminMfaNotice() ? (
           <Alert severity='info' sx={{ borderRadius: ops.radiusSm }}>
-            Your organization may enable multi-factor authentication for admin accounts.
+            Your organization requires authenticator MFA for the main SuperAdmin only. Invited
+            sub-admins sign in with email and password.
           </Alert>
         ) : null}
       </form>

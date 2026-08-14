@@ -9,7 +9,7 @@ import authConfig from 'src/configs/auth'
 import toast from 'react-hot-toast'
 
 const MFA_ENROLL_PATH = '/pages/mfa-enroll'
-const LOGIN_PATHS = ['/login', '/login/mfa', '/forgot-password', '/register']
+const LOGIN_PATHS = ['/login', '/login/mfa', '/forgot-password', '/register', '/pages/reset-password']
 
 const defaultProvider = {
   user: null,

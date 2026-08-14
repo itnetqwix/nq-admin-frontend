@@ -1,9 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
+import Alert from '@mui/material/Alert'
 import BlankLayout from 'src/@core/layouts/BlankLayout'
 import { useAuth } from 'src/hooks/useAuth'
 import authConfig from 'src/configs/auth'
 import toast from 'react-hot-toast'
+import { OpsAuthShell } from 'src/components/admin'
+import { ops } from 'src/styles/opsSurface'
 
 const api = process.env.NEXT_PUBLIC_API_BASE_URL
 
@@ -18,9 +25,7 @@ const MfaEnrollPage = () => {
   const [setupError, setSetupError] = useState('')
 
   const token =
-    typeof window !== 'undefined'
-      ? window.localStorage.getItem(authConfig.storageTokenKeyName)
-      : null
+    typeof window !== 'undefined' ? window.localStorage.getItem(authConfig.storageTokenKeyName) : null
 
   useEffect(() => {
     if (!auth.bootstrapped) return
@@ -76,106 +81,103 @@ const MfaEnrollPage = () => {
   }
 
   return (
-    <div style={{ maxWidth: 480, margin: '60px auto', padding: 24 }}>
-      <h1 style={{ fontSize: 22, fontWeight: 700 }}>Enable admin MFA</h1>
-      <p style={{ marginTop: 8, color: '#555' }}>
-        Production admin accounts must enroll an authenticator app before using the
-        dashboard. Scan the otpauth URI or enter the secret, then confirm with a code.
-      </p>
-
+    <OpsAuthShell
+      eyebrow='Security'
+      title='Enable authenticator MFA'
+      subtitle='Required only for the main SuperAdmin. Scan the QR or enter the secret, then confirm with a code.'
+    >
       {recoveryCodes ? (
-        <div style={{ marginTop: 24 }}>
-          <p style={{ fontWeight: 600 }}>Recovery codes (store offline — shown once):</p>
-          <ul style={{ fontFamily: 'monospace', fontSize: 13 }}>
+        <Box>
+          <Alert severity='success' sx={{ mb: 2, borderRadius: ops.radiusSm }}>
+            Store these recovery codes offline. They are shown once.
+          </Alert>
+          <Box
+            component='ul'
+            sx={{ fontFamily: ops.mono, fontSize: 13, pl: 2.5, mb: 2.5, color: ops.ink }}
+          >
             {(recoveryCodes.length ? recoveryCodes : ['(none returned)']).map(c => (
               <li key={c}>{c}</li>
             ))}
-          </ul>
-          <button
-            type='button'
+          </Box>
+          <Button
+            fullWidth
+            size='large'
+            variant='contained'
             onClick={() => {
               auth.clearMfaEnrollment?.()
               void router.replace('/home')
             }}
-            style={{
-              marginTop: 16,
-              width: '100%',
-              padding: 12,
-              background: '#000080',
-              color: '#fff',
-              border: 0,
-              borderRadius: 8,
-              fontWeight: 600
-            }}
+            sx={{ bgcolor: ops.ink, '&:hover': { bgcolor: '#000' }, textTransform: 'none', fontWeight: 600 }}
           >
             Continue to admin
-          </button>
-        </div>
+          </Button>
+        </Box>
       ) : (
-        <form onSubmit={confirm} style={{ marginTop: 24 }}>
+        <form onSubmit={confirm}>
           {setupError ? (
-            <p style={{ color: '#b91c1c', fontSize: 14, marginBottom: 12 }}>{setupError}</p>
+            <Alert severity='error' sx={{ mb: 2, borderRadius: ops.radiusSm }}>
+              {setupError}
+            </Alert>
           ) : null}
           {otpauthUrl ? (
-            <p style={{ fontSize: 12, wordBreak: 'break-all', color: '#333' }}>{otpauthUrl}</p>
+            <Box sx={{ textAlign: 'center', mb: 2 }}>
+              {/* ponytail: public QR endpoint, no extra npm */}
+              <Box
+                component='img'
+                alt='Authenticator QR'
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(otpauthUrl)}`}
+                sx={{ width: 180, height: 180, borderRadius: 1, border: `1px solid ${ops.hairline}` }}
+              />
+            </Box>
           ) : null}
           {secret ? (
-            <p style={{ marginTop: 8, fontFamily: 'monospace' }}>Secret: {secret}</p>
+            <Typography sx={{ mb: 2, fontFamily: ops.mono, fontSize: 12, color: ops.body, wordBreak: 'break-all' }}>
+              Secret: {secret}
+            </Typography>
           ) : null}
           {busy && !secret && !setupError ? (
-            <p style={{ color: '#555' }}>Starting authenticator setup…</p>
+            <Typography sx={{ mb: 2, color: ops.mute, fontSize: 13 }}>Starting authenticator setup…</Typography>
           ) : null}
-          <input
+          <TextField
+            fullWidth
             value={code}
-            onChange={e => setCode(e.target.value)}
-            placeholder='Authenticator code'
-            autoComplete='one-time-code'
-            style={{
-              marginTop: 16,
-              width: '100%',
-              padding: '12px 14px',
-              border: '1px solid #ccc',
-              borderRadius: 8
+            onChange={e => setCode(e.target.value.replace(/\s/g, ''))}
+            placeholder='123456'
+            inputProps={{ autoComplete: 'one-time-code', inputMode: 'numeric' }}
+            sx={{
+              mb: 2.5,
+              '& input': {
+                textAlign: 'center',
+                letterSpacing: '0.42em',
+                fontFamily: ops.mono,
+                fontSize: 22,
+                fontWeight: 700,
+                py: 1.75
+              }
             }}
           />
-          <button
+          <Button
+            fullWidth
+            size='large'
             type='submit'
+            variant='contained'
             disabled={busy || code.trim().length < 6 || !secret}
-            style={{
-              marginTop: 16,
-              width: '100%',
-              padding: 12,
-              background: '#000080',
-              color: '#fff',
-              border: 0,
-              borderRadius: 8,
-              fontWeight: 600,
-              opacity: busy ? 0.6 : 1
-            }}
+            sx={{ mb: 1.5, bgcolor: ops.ink, '&:hover': { bgcolor: '#000' }, textTransform: 'none', fontWeight: 600 }}
           >
             {busy ? 'Working…' : 'Confirm and enable'}
-          </button>
+          </Button>
         </form>
       )}
-
-      <button
-        type='button'
+      <Button
+        fullWidth
+        size='large'
+        variant='outlined'
         onClick={() => auth.logout?.()}
-        style={{
-          marginTop: 20,
-          width: '100%',
-          padding: 12,
-          background: 'transparent',
-          color: '#333',
-          border: '1px solid #ccc',
-          borderRadius: 8,
-          fontWeight: 600,
-          cursor: 'pointer'
-        }}
+        sx={{ mt: 1, textTransform: 'none', borderColor: ops.hairline, color: ops.ink }}
       >
-        Sign out and return to login
-      </button>
-    </div>
+        Sign out
+      </Button>
+    </OpsAuthShell>
   )
 }
 
