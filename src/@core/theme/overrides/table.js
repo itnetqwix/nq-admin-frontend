@@ -4,7 +4,9 @@ const Table = () => {
       styleOverrides: {
         root: ({ theme }) => ({
           boxShadow: theme.shadows[0],
-          borderTopColor: theme.palette.divider
+          borderTopColor: theme.palette.divider,
+          overflowX: 'auto',
+          WebkitOverflowScrolling: 'touch'
         })
       }
     },

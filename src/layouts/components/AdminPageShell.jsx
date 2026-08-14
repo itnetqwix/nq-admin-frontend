@@ -101,7 +101,8 @@ export default function AdminPageShell({
             gap: 1,
             alignItems: 'center',
             justifyContent: { xs: 'flex-start', sm: 'flex-end' },
-            maxWidth: { sm: '58%', md: '52%' }
+            width: { xs: '100%', sm: 'auto' },
+            maxWidth: { xs: '100%', sm: '58%', md: '52%' }
           }}
         >
           {headerActions}
@@ -127,7 +128,8 @@ export default function AdminPageShell({
         sx={{
           borderRadius: `${ops.radiusLg}`,
           border: 'none',
-          overflow: 'hidden',
+          overflowX: 'auto',
+          overflowY: 'visible',
           bgcolor: 'background.paper',
           boxShadow: ops.shadowCard,
           ...contentSx
@@ -146,8 +148,14 @@ export function AdminPageSection({ title, subtitle, description, children, withD
       {withDivider ? <Divider /> : null}
       <Box sx={{ p: { xs: 2, sm: 3 } }}>
         {title ? (
-          <Stack direction='row' alignItems='flex-start' justifyContent='space-between' sx={{ mb: desc ? 1 : 2 }}>
-            <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'flex-start' }}>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            alignItems={{ xs: 'stretch', sm: 'flex-start' }}
+            justifyContent='space-between'
+            spacing={1.5}
+            sx={{ mb: desc ? 1 : 2 }}
+          >
+            <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'flex-start', minWidth: 0 }}>
               {icon ? (
                 <Box
                   sx={{
@@ -176,7 +184,9 @@ export function AdminPageSection({ title, subtitle, description, children, withD
                 ) : null}
               </Box>
             </Box>
-            {action}
+            {action ? (
+              <Box sx={{ flexShrink: 0, alignSelf: { xs: 'stretch', sm: 'flex-start' } }}>{action}</Box>
+            ) : null}
           </Stack>
         ) : null}
         {children}

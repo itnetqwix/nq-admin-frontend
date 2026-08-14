@@ -11,6 +11,7 @@ import {
   IconButton,
   Stack,
   Typography,
+  useMediaQuery,
   useTheme
 } from '@mui/material'
 import { useContext, useEffect, useState } from 'react'
@@ -396,6 +397,8 @@ export const ExtraInfoTree = ({ data, depth = 0 }) => {
 }
 
 export function ClipPlayDialog({ clipId, open, onClose }) {
+  const theme = useTheme()
+  const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const [url, setUrl] = useState('')
   const [poster, setPoster] = useState('')
   const [loading, setLoading] = useState(false)
@@ -427,7 +430,14 @@ export function ClipPlayDialog({ clipId, open, onClose }) {
   }, [open, clipId])
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth PaperProps={{ sx: { borderRadius: ops.radiusLg, boxShadow: ops.shadowDrawer } }}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth='md'
+      fullWidth
+      fullScreen={isPhone}
+      PaperProps={{ sx: { borderRadius: isPhone ? 0 : ops.radiusLg, boxShadow: ops.shadowDrawer } }}
+    >
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pr: 1 }}>
         Preview clip
         <IconButton aria-label='close' onClick={onClose} size='small'>
@@ -443,7 +453,7 @@ export function ClipPlayDialog({ clipId, open, onClose }) {
           <video
             controls
             playsInline
-            style={{ width: '100%', maxHeight: '70vh', background: '#000', borderRadius: 8 }}
+            style={{ width: '100%', maxHeight: isPhone ? 'calc(100vh - 120px)' : '70vh', background: '#000', borderRadius: 8 }}
             src={url}
             poster={poster || undefined}
           />

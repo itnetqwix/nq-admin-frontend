@@ -9,6 +9,7 @@ import ModeToggler from 'src/@core/layouts/components/shared-components/ModeTogg
 import NotificationDropdown from 'src/@core/layouts/components/shared-components/NotificationDropdown'
 import UserDropdown from 'src/@core/layouts/components/shared-components/UserDropdown'
 import AdminCommandPalette from 'src/layouts/components/AdminCommandPalette'
+import AdminEnvBanner from 'src/layouts/components/AdminEnvBanner'
 
 const AppBarContent = props => {
   // ** Props
@@ -34,6 +35,7 @@ const AppBarContent = props => {
       <AdminCommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
       <ModeToggler settings={settings} saveSettings={saveSettings} />
       <NotificationDropdown settings={settings} />
+      <AdminEnvBanner />
       <UserDropdown settings={settings} />
     </Box>
   )

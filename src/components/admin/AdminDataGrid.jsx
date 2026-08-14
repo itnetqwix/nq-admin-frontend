@@ -81,6 +81,15 @@ export default function AdminDataGrid({
 }) {
   const rowClickable = clickableRows || Boolean(props.onRowClick)
   return (
+    <Box
+      sx={{
+        width: '100%',
+        minWidth: 0,
+        overflowX: 'auto',
+        WebkitOverflowScrolling: 'touch',
+        ...(autoHeight ? {} : { height: '100%' })
+      }}
+    >
     <DataGrid
       autoHeight={autoHeight}
       density={density}
@@ -103,10 +112,13 @@ export default function AdminDataGrid({
       slotProps={{ ...slotProps }}
       sx={{
         ...defaultSx,
+        minWidth: { xs: 560, sm: 0 },
+        ...(autoHeight ? {} : { height: '100%' }),
         ...(rowClickable ? { '& .MuiDataGrid-row': { cursor: 'pointer' } } : {}),
         ...sx
       }}
       {...props}
     />
+    </Box>
   )
 }

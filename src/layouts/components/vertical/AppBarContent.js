@@ -10,6 +10,7 @@ import Icon from 'src/@core/components/icon'
 import ModeToggler from 'src/@core/layouts/components/shared-components/ModeToggler'
 import UserDropdown from 'src/@core/layouts/components/shared-components/UserDropdown'
 import AdminCommandPalette from 'src/layouts/components/AdminCommandPalette'
+import AdminEnvBanner from 'src/layouts/components/AdminEnvBanner'
 
 const AppBarContent = props => {
   // ** Props
@@ -43,7 +44,8 @@ const AppBarContent = props => {
 
         <ModeToggler settings={settings} saveSettings={saveSettings} />
       </Box>
-      <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center' }}>
+      <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+        <AdminEnvBanner />
         <UserDropdown settings={settings} />
       </Box>
     </Box>

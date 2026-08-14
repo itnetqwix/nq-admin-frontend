@@ -19,7 +19,7 @@ export default function OpsSurfaceCard({ children, sx, onClick, ...rest }) {
           : undefined
       }
       sx={{
-        p: 2.5,
+        p: { xs: 1.5, sm: 2.5 },
         height: '100%',
         bgcolor: ops.canvas,
         borderRadius: ops.radiusLg,

@@ -1,409 +1,452 @@
-import { Autocomplete, Avatar, Badge, Box, Button, CircularProgress, FormControl, FormControlLabel, FormHelperText, Grid, IconButton, InputLabel, MenuItem, Radio, RadioGroup, TextField, Typography, useMediaQuery } from "@mui/material";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/router";
-import AddIcon from '@mui/icons-material/Add';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useRouter } from 'next/router'
+import {
+  Avatar,
+  Box,
+  Chip,
+  Grid,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography
+} from '@mui/material'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import SaveAsIcon from '@mui/icons-material/SaveAs'
+import Link from 'next/link'
+import toast from 'react-hot-toast'
+import moment from 'moment'
 
-import styles from "styles/common.module.css";
-
-import Pagination from '@mui/material/Pagination';
-import Stack from '@mui/material/Stack';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
-import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
-import SaveAsIcon from '@mui/icons-material/SaveAs';
-import Link from "next/link";
-import MenuIcon from '@mui/icons-material/Menu';
-import { CustomButton } from "src/pages/components/common";
-import DeletePopup from "src/pages/components/modal/DeletePopup";
-import MModal from "src/pages/components/modal/Modal";
-import AddEditCommision from "src/pages/components/add-edit-commision";
-import { useAuth } from "src/hooks/useAuth";
-import { useCommon } from "src/hooks/useCommon";
-import authConfig from 'src/configs/auth'
-import { getImageUrl } from "src/utils/utils";
-import TicketStatusComponent from "src/pages/components/ticket-status";
-import TrainerStatus from "src/pages/components/trainer-status";
-import toast from "react-hot-toast";
-import UserQuickPreviewModal from "src/components/user360/UserQuickPreviewModal";
-import { getUser360 } from "src/services/user360Api";
-import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell';
-
-function CustomPagination() {
-
-  const handlePageChange = (event, newPage) => {
-
-    if (newPage !== currentPage) {
-
-      setCurrentPage(newPage)
-    }
-
-  }
-
-  return (
-    <Stack>
-      <Pagination
-        count={Math.ceil(count / limit)}
-        page={currentPage}
-        onChange={handlePageChange}
-        shape='rounded'
-        sx={{
-          '& button.Mui-selected': {
-            backgroundColor: 'green', // Change this color to the desired green color
-            color: 'white',
-            '&:hover': {
-              backgroundColor: 'darkgreen', // Change this color for hover effect
-            },
-          },
-        }}
-      />
-    </Stack>
-  );
-}
+import {
+  AdminDataGrid,
+  AdminFilterBar,
+  AdminGridContainer,
+  useAdminConfirm
+} from 'src/components/admin'
+import OpsMetricTile from 'src/components/admin/OpsMetricTile'
+import OpsSurfaceCard from 'src/components/admin/OpsSurfaceCard'
+import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import UserQuickPreviewModal from 'src/components/user360/UserQuickPreviewModal'
+import TrainerStatus from 'src/pages/components/trainer-status'
+import MModal from 'src/pages/components/modal/Modal'
+import AddEditCommision from 'src/pages/components/add-edit-commision'
+import { getUser360 } from 'src/services/user360Api'
+import { deleteUser, listUsers } from 'src/services/userAdminApi'
+import { getImageUrl } from 'src/utils/utils'
+import { formatOpsDateTime } from 'src/utils/opsDateTime'
+import { ops } from 'src/styles/opsSurface'
+import { FilterChip, fmtInt, STATUS_CHIPS } from 'src/features/users/chips'
 
 export default function ManageTrainer() {
-  const router = useRouter();
-  const searchTimerRef = useRef(null);
-
-  const auth = useAuth();
-  const common = useCommon();
-
-  const {
-    trainerList,
-    setTrainerList,
-    traineeList,
-    setTraineeList,
-    getTrainersList,
-  } = common;
-
+  const router = useRouter()
+  const searchTimerRef = useRef(null)
+  const { confirm, ConfirmDialog } = useAdminConfirm()
 
   const kycQuery = router.isReady ? String(router.query?.kyc || '') : ''
-  const kycOpts = kycQuery === 'incomplete' || kycQuery === '0' ? { kyc: 'incomplete' } : {}
+  const kycFilter = kycQuery === 'incomplete' || kycQuery === '0' ? 'incomplete' : ''
 
-  useEffect(() => {
-    if (!router.isReady) return
-    getTrainersList('', kycOpts)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.isReady, kycQuery])
+  const [rows, setRows] = useState([])
+  const [total, setTotal] = useState(0)
+  const [counts, setCounts] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [searchInput, setSearchInput] = useState('')
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(25)
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [openDeletePopup, setOpenDeletePopup] = useState(false);
-  const [openCommisionModal, setOpenCommisionModal] = useState(false);
-  const [SelectedId, setSelectedId] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const [isQuickPreviewOpen, setIsQuickPreviewOpen] = useState(false)
-  const [selectedStudentData, setSelectedStudentData] = useState({})
-  const [isQuickPreviewLoading, setIsQuickPreviewLoading] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
+  const [previewLoading, setPreviewLoading] = useState(false)
+  const [previewData, setPreviewData] = useState({})
   const [previewUserId, setPreviewUserId] = useState(null)
+  const [commissionId, setCommissionId] = useState(null)
 
-  const handleCourseClick = async (id) => {
-    if (id == null || id === "undefined") return
-    setPreviewUserId(String(id))
-    setIsQuickPreviewOpen(true)
-    setIsQuickPreviewLoading(true)
+  const load = useCallback(async () => {
+    if (!router.isReady) return
+    setLoading(true)
     try {
-      const data = await getUser360(id)
-      setSelectedStudentData(data || {})
-    } catch (error) {
-      toast.error(error?.message || "Unable to load user preview")
-      setSelectedStudentData({})
+      const data = await listUsers({
+        page,
+        limit: pageSize,
+        search,
+        account_type: 'trainer',
+        status: statusFilter,
+        kyc: kycFilter
+      })
+      setRows(data.items)
+      setTotal(data.total)
+      setCounts(data.counts)
+    } catch (e) {
+      toast.error(e?.message || 'Failed to load trainers')
+      setRows([])
+      setTotal(0)
     } finally {
-      setIsQuickPreviewLoading(false)
+      setLoading(false)
     }
-  };
-
-  const getRowClassName = (params) => {
-    return params.indexRelativeToCurrentPage % 2 === 0 ? `${styles['even-row']} ${styles['row-class']} ` : `${styles['odd-row']} ${styles['row-class']} `;
-  };
-
-  const getRowHeight = () => 100;
-
-  const handleOpen = (id) => {
-    setOpenDeletePopup(true);
-    setSelectedId(id)
-  }
-
-  const handleCloseDeletePopup = () => {
-    setOpenDeletePopup(false);
-    setSelectedId(null)
-  }
-
-  const onConformDelete = async () => {
-    if (!SelectedId || isDeleting) return;
-
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName);
-    if (!storedToken) {
-      toast.error("Session expired. Please login again.");
-      return;
-    }
-
-    setIsDeleting(true);
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/delete-user/${SelectedId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${storedToken}`,
-          },
-        }
-      );
-
-      const responseData = await response.json();
-      if (!response.ok || responseData?.status === "fail") {
-        throw new Error(responseData?.error || "Unable to delete user.");
-      }
-
-      setTableData((prev) => prev.filter((item) => item?.id !== SelectedId));
-      setTrainerList((prev) => prev.filter((item) => item?.id !== SelectedId));
-      toast.success("User deleted successfully.");
-      handleCloseDeletePopup();
-    } catch (error) {
-      toast.error(error?.message || "Unable to delete user.");
-    } finally {
-      setIsDeleting(false);
-    }
-  }
-
-  const handleOpenCommisionModal = (id) => {
-    setOpenCommisionModal(true);
-    setSelectedId(id)
-  }
-
-  const handleCloseCommisionModal = () => {
-    setOpenCommisionModal(false);
-    setSelectedId(null)
-  }
-
-  const columns = [
-    {
-      field: 'image',
-      headerName: 'Image',
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
-      width: 120,
-      renderCell: params => (
-        <Badge
-          overlap='circular'
-          sx={{ ml: 2, cursor: 'pointer' }}
-        // anchorOrigin={{
-        //   vertical: 'bottom',
-        //   horizontal: 'right'
-        // }}
-        >
-          <Avatar
-            alt='Alam'
-            sx={{ width: 80, height: 80 }}
-            src={getImageUrl(params?.row?.profile_picture) ?? 'https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png'}
-          />
-        </Badge>
-      )
-    },
-    { field: 'fullname', headerName: 'Trainer Name', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 180 },
-    { field: 'email', headerName: 'Trainer Email', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 200 },
-    { field: 'mobile_no', headerName: 'Mobile Number', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
-    {
-      field: 'status',
-      headerName: 'Status',
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
-      width: 200,
-      renderCell: params => (
-        <div className={styles["status-booking"]} >
-          <TrainerStatus params={params} />
-        </div>
-      )
-    }, { field: 'category', headerName: 'Category', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 100 },
-    { field: 'wallet_amount', headerName: 'Wallet Amount', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
-    {
-      field: 'view',
-      headerName: 'Trainer Clips',
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
-      width: 150,
-      renderCell: params => (
-        <div>
-          <IconButton
-            onClick={() => {
-              handleCourseClick(params.row.id)
-            }}
-            aria-label='Edit'>
-            <VisibilityIcon className={styles['view-icon']} />
-          </IconButton>
-        </div>
-      )
-    },
-    {
-      field: 'commission',
-      headerName: 'Commission',
-      headerClassName: styles['header-class'],
-      cellClassName: styles['cell-class'],
-      width: 150,
-      renderCell: params => {
-        // console.log(params.row)
-        return (
-          <div style={{ display: "flex", justifyContent: "space-between", width: "-webkit-fill-available", alignItems: "center" }}>
-            <label>{params.row.commission}%</label>
-            <IconButton
-              onClick={() => handleOpenCommisionModal(params.row.id)}
-              aria-label='Edit'>
-              <SaveAsIcon className={styles['edit-icon']} />
-            </IconButton>
-          </div>
-        )
-      }
-    },
-    { field: 'login_type', headerName: 'Login Type', headerClassName: styles['header-class'], cellClassName: styles['cell-class'], width: 150 },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      headerClassName: styles['header-class-last'],
-      cellClassName: styles['cell-class-last'],
-      width: 100,
-      renderCell: params => (
-        <div>
-          <IconButton
-            // onClick={() => handleEdit(params.row.id)}
-            aria-label='Edit'>
-            <SaveAsIcon className={styles['edit-icon']} />
-          </IconButton>
-
-          <IconButton
-            onClick={() => handleOpen(params.row.id)}
-            aria-label='Delete'>
-            <DeleteOutlineIcon className={styles['delete-icon']} />
-          </IconButton>
-        </div>
-      )
-    }
-
-  ];
-
-  const [tableData, setTableData] = useState([]);
+  }, [router.isReady, page, pageSize, search, statusFilter, kycFilter])
 
   useEffect(() => {
-    if (trainerList) {
-      setTableData(trainerList)
-    }
-  }, [trainerList])
+    void load()
+  }, [load])
 
-  function scheduleTrainerSearch(searchText) {
+  const scheduleSearch = value => {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
     searchTimerRef.current = setTimeout(() => {
-      getTrainersList(searchText || '', kycOpts)
+      setSearch(value)
+      setPage(1)
     }, 400)
   }
 
+  const setKyc = incomplete => {
+    const query = { ...router.query }
+    if (incomplete) query.kyc = 'incomplete'
+    else delete query.kyc
+    void router.push({ pathname: router.pathname, query }, undefined, { shallow: true })
+    setPage(1)
+  }
+
+  const openPreview = async (e, id) => {
+    e?.stopPropagation?.()
+    if (!id) return
+    setPreviewUserId(String(id))
+    setPreviewOpen(true)
+    setPreviewLoading(true)
+    try {
+      setPreviewData((await getUser360(id)) || {})
+    } catch (err) {
+      toast.error(err?.message || 'Preview failed')
+      setPreviewData({})
+    } finally {
+      setPreviewLoading(false)
+    }
+  }
+
+  const requestDelete = async (e, id, name) => {
+    e?.stopPropagation?.()
+    const ok = await confirm({
+      title: 'Delete trainer account?',
+      message: 'This permanently removes the user and cannot be undone.',
+      detail: name || id,
+      confirmLabel: 'Delete',
+      variant: 'danger'
+    })
+    if (!ok) return
+    try {
+      await deleteUser(id)
+      toast.success('Trainer deleted')
+      void load()
+    } catch (err) {
+      toast.error(err?.message || 'Delete failed')
+    }
+  }
+
+  const columns = useMemo(
+    () => [
+      {
+        field: 'identity',
+        headerName: 'Trainer',
+        flex: 1.4,
+        minWidth: 240,
+        sortable: false,
+        renderCell: p => (
+          <Stack direction='row' spacing={1.5} alignItems='center' sx={{ minWidth: 0, py: 0.5 }}>
+            <Avatar
+              alt={p.row.fullname || 'Trainer'}
+              src={getImageUrl(p.row.profile_picture)}
+              sx={{ width: 40, height: 40, flexShrink: 0 }}
+            />
+            <Box sx={{ minWidth: 0 }}>
+              <Typography sx={{ fontSize: 13, fontWeight: 600 }} noWrap>
+                {p.row.fullname || '—'}
+              </Typography>
+              <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute }} noWrap>
+                {p.row.email || '—'}
+              </Typography>
+              {p.row.mobile_no ? (
+                <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute }} noWrap>
+                  {p.row.mobile_no}
+                </Typography>
+              ) : null}
+            </Box>
+          </Stack>
+        )
+      },
+      {
+        field: 'status',
+        headerName: 'Status',
+        width: 150,
+        sortable: false,
+        renderCell: p => (
+          <Box onClick={e => e.stopPropagation()}>
+            <TrainerStatus params={p} cb={() => void load()} />
+          </Box>
+        )
+      },
+      {
+        field: 'kyc',
+        headerName: 'KYC',
+        width: 110,
+        sortable: false,
+        renderCell: p => (
+          <Chip
+            size='small'
+            label={p.row.is_kyc_completed ? 'Complete' : 'Incomplete'}
+            sx={{
+              height: 22,
+              fontFamily: ops.mono,
+              fontSize: 10,
+              fontWeight: 600,
+              bgcolor: p.row.is_kyc_completed ? ops.softMint : ops.errorSoft,
+              color: p.row.is_kyc_completed ? ops.live : ops.error
+            }}
+          />
+        )
+      },
+      {
+        field: 'category',
+        headerName: 'Category',
+        width: 120,
+        renderCell: p => (
+          <Typography sx={{ fontSize: 12 }} noWrap>
+            {p.row.category || '—'}
+          </Typography>
+        )
+      },
+      {
+        field: 'session_count',
+        headerName: 'Sessions',
+        width: 90,
+        renderCell: p => (
+          <Typography sx={{ fontFamily: ops.mono, fontSize: 12 }}>{fmtInt(p.row.session_count ?? 0)}</Typography>
+        )
+      },
+      {
+        field: 'wallet_amount',
+        headerName: 'Wallet',
+        width: 90,
+        valueGetter: p => (p.row.wallet_amount != null ? `$${Number(p.row.wallet_amount).toFixed(0)}` : '—')
+      },
+      {
+        field: 'commission',
+        headerName: 'Commission',
+        width: 120,
+        sortable: false,
+        renderCell: p => (
+          <Stack direction='row' spacing={0.5} alignItems='center' onClick={e => e.stopPropagation()}>
+            <Typography sx={{ fontFamily: ops.mono, fontSize: 12 }}>
+              {p.row.commission != null ? `${p.row.commission}%` : '—'}
+            </Typography>
+            <Tooltip title='Edit commission'>
+              <IconButton size='small' onClick={() => setCommissionId(p.row.id)}>
+                <SaveAsIcon fontSize='small' />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        )
+      },
+      {
+        field: 'login_type',
+        headerName: 'Login',
+        width: 90,
+        renderCell: p => (
+          <Typography sx={{ fontSize: 12, textTransform: 'capitalize' }} noWrap>
+            {p.row.login_type || '—'}
+          </Typography>
+        )
+      },
+      {
+        field: 'createdAt',
+        headerName: 'Joined',
+        width: 130,
+        renderCell: p => (
+          <Box>
+            <Typography sx={{ fontSize: 12 }}>
+              {p.row.createdAt ? formatOpsDateTime(p.row.createdAt, { withSeconds: false }) : '—'}
+            </Typography>
+            <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute }}>
+              {p.row.lastSeen ? `seen ${moment(p.row.lastSeen).fromNow()}` : ''}
+            </Typography>
+          </Box>
+        )
+      },
+      {
+        field: 'actions',
+        headerName: '',
+        width: 96,
+        sortable: false,
+        renderCell: p => (
+          <Stack direction='row' spacing={0.25}>
+            <Tooltip title='Preview'>
+              <IconButton size='small' onClick={e => void openPreview(e, p.row.id)}>
+                <VisibilityIcon fontSize='small' />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Delete'>
+              <IconButton size='small' color='error' onClick={e => void requestDelete(e, p.row.id, p.row.fullname)}>
+                <DeleteOutlineIcon fontSize='small' />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        )
+      }
+    ],
+    [load]
+  )
+
+  const kycSubtitle =
+    kycFilter === 'incomplete'
+      ? 'Filtered: pending KYC (from ops home). Clear the KYC chip to see all trainers.'
+      : 'All trainer accounts. Search, filter status/KYC, click a row for User 360.'
+
   return (
-    <React.Fragment>
+    <>
       <UserQuickPreviewModal
-        open={isQuickPreviewOpen}
+        open={previewOpen}
         handleClose={() => {
-          setIsQuickPreviewOpen(false)
+          setPreviewOpen(false)
           setPreviewUserId(null)
         }}
-        loading={isQuickPreviewLoading}
-        user360Data={selectedStudentData}
-        userId={previewUserId || selectedStudentData?.user?._id || selectedStudentData?.user?.id}
+        loading={previewLoading}
+        user360Data={previewData}
+        userId={previewUserId || previewData?.user?._id}
       />
-      <form noValidate autoComplete='off'>
-        <AdminPageShell
-          title='Trainers'
-          subtitle={
-            String(router.query?.kyc || '') === 'incomplete'
-              ? 'Filtered: pending KYC (from ops home). Clear ?kyc= to see all trainers.'
-              : 'All trainer accounts, including pending and incomplete KYC. Search and click a row to open User 360.'
-          }
-          actions={
-            <CustomButton component={Link} variant='contained' href='/apps/manage-trainer' startIcon={<MenuIcon />}>
-              Settings
-            </CustomButton>
-          }
-          contentSx={{ p: 0 }}
-        >
+
+      <AdminPageShell
+        bare
+        icon='mdi:account-tie-outline'
+        eyebrow='People'
+        title='Trainers'
+        subtitle={kycSubtitle}
+        actions={
+          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+            <Chip component={Link} href='/apps/users' label='All users' clickable variant='outlined' size='small' />
+            <Chip
+              component={Link}
+              href='/apps/trainer-verifications'
+              label='Verifications'
+              clickable
+              variant='outlined'
+              size='small'
+            />
+            <Chip component={Link} href='/apps/manage-trainee' label='Trainees' clickable variant='outlined' size='small' />
+          </Stack>
+        }
+      >
+        <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:account-tie-outline'
+              label='Trainers'
+              value={counts ? fmtInt(counts.trainers) : '—'}
+              hint='All time'
+              tone='accent'
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:account-clock-outline'
+              label='Pending'
+              value={counts ? fmtInt(counts.pending) : '—'}
+              hint='Needs review'
+              tone='warn'
+              onClick={() => {
+                setStatusFilter('pending')
+                setPage(1)
+              }}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:shield-alert-outline'
+              label='KYC filter'
+              value={kycFilter === 'incomplete' ? 'On' : 'Off'}
+              hint='Incomplete Stripe/KYC'
+              tone={kycFilter === 'incomplete' ? 'warn' : 'success'}
+              onClick={() => setKyc(kycFilter !== 'incomplete')}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <OpsMetricTile
+              icon='mdi:filter-variant'
+              label='Showing'
+              value={fmtInt(total)}
+              hint='This list'
+            />
+          </Grid>
+        </Grid>
+
+        <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
           <AdminPageSection>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-              <InputLabel sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>Search</InputLabel>
-              <TextField size='small' placeholder='Name or email…' onChange={e => scheduleTrainerSearch(e.target.value)} />
-            </Box>
-            <div className='admin-data-grid' style={{ height: '71vh', width: '100%' }}>
-                    <DataGrid
-                      disableSelectionOnClick
-                      onRowClick={(params) => {
-                        const rid = params?.row?.id || params?.row?._id
-                        if (rid) router.push(`/apps/users/${rid}`)
-                      }}
-                      sx={{ '& .MuiDataGrid-row': { cursor: 'pointer' } }}
-                      // rows={rows}
-                      // columns={columns}
-                      // headerClassName={styles['header-class']}
-                      // getRowClassName={getRowClassName}
-                      // initialState={{
-                      //   pagination: {
-                      //     paginationModel: { page: 0, pageSize: 25 },
-                      //   },
-                      // }}
-                      // pageSizeOptions={[25, 50]}
-                      // getRowHeight={getRowHeight}
-                      //   columnHeaderHeight={40}
+            <AdminFilterBar
+              searchPlaceholder='Name, email, mobile, user ID…'
+              searchValue={searchInput}
+              onSearchChange={e => {
+                setSearchInput(e.target.value)
+                scheduleSearch(e.target.value)
+              }}
+              onRefresh={() => void load()}
+              refreshLoading={loading}
+              resultCount={total}
+              helperText='Status and commission edit inline. Row click opens User 360.'
+            >
+              {STATUS_CHIPS.map(s => (
+                <FilterChip
+                  key={s.value || 'any'}
+                  active={statusFilter === s.value && !kycFilter}
+                  label={s.label}
+                  count={s.value ? counts?.[s.value] : counts?.trainers}
+                  onClick={() => {
+                    setStatusFilter(s.value)
+                    if (kycFilter) setKyc(false)
+                    setPage(1)
+                  }}
+                />
+              ))}
+              <FilterChip
+                active={kycFilter === 'incomplete'}
+                label='KYC incomplete'
+                onClick={() => setKyc(kycFilter !== 'incomplete')}
+              />
+            </AdminFilterBar>
 
-                      // className="datagrid"
-                      // loading={isLoading}
-                      // columnVisibilityModel={{
-                      //   id: false
-                      // }}
-                      // rows={rows}
-                      // columns={columns}
-                      // headerClassName={styles['header-class']}
-                      // getRowClassName={getRowClassName}
-                      // pageSize={25}
-                      // // onSelectionModelChange={onSelectionChange}
-                      // disableSelectionOnClick
-                      // components={{
-                      //   Pagination: CustomPagination,
-                      //   NoRowsOverlay: CustomNoRowsOverlay
-                      // }}
-                      // getRowHeight={getRowHeight}
-                      // columnHeaderHeight={40}
-
-                      // onRowClick={handleOpenMDP}
-
-                      rows={tableData ?? []}
-                      columns={columns}
-                      headerClassName={styles['header-class']}
-                      getRowClassName={getRowClassName}
-                      initialState={{
-                        pagination: {
-                          paginationModel: { page: 0, pageSize: 25 },
-                        },
-                      }}
-                      pageSizeOptions={[25, 50]}
-                      getRowHeight={getRowHeight}
-                      columnHeaderHeight={80}
-                    />
-            </div>
+            <AdminGridContainer>
+              <AdminDataGrid
+                autoHeight={false}
+                rows={rows}
+                columns={columns}
+                loading={loading}
+                getRowHeight={() => 72}
+                rowCount={total}
+                paginationMode='server'
+                paginationModel={{ page: page - 1, pageSize }}
+                onPaginationModelChange={m => {
+                  setPage(m.page + 1)
+                  setPageSize(m.pageSize)
+                }}
+                onRowClick={p => {
+                  const id = p.row?.id || p.row?._id
+                  if (id) router.push(`/apps/users/${id}`)
+                }}
+                clickableRows
+                emptyMessage='No trainers match'
+                emptyDescription='Try clearing status or KYC filters.'
+              />
+            </AdminGridContainer>
           </AdminPageSection>
-        </AdminPageShell>
-      </form>
+        </OpsSurfaceCard>
+      </AdminPageShell>
 
-      <DeletePopup
-        handleClose={handleCloseDeletePopup}
-        open={openDeletePopup}
-        onConform={onConformDelete}
-        isLoading={isDeleting}
-      />
-
-      <MModal handleClose={handleCloseCommisionModal} open={openCommisionModal} maxWidth="xs">
-        <AddEditCommision handleClose={handleCloseCommisionModal} trainer_id={SelectedId} />
+      <MModal handleClose={() => setCommissionId(null)} open={Boolean(commissionId)} maxWidth='xs'>
+        <AddEditCommision
+          handleClose={() => {
+            setCommissionId(null)
+            void load()
+          }}
+          trainer_id={commissionId}
+        />
       </MModal>
 
-      {/* ******************************************* */}
-
-
-    </React.Fragment>
+      {ConfirmDialog}
+    </>
   )
 }
-
-

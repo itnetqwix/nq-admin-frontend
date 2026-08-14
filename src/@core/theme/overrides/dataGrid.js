@@ -22,6 +22,13 @@ const DataGrid = () => {
             paddingRight: theme.spacing(4),
             '&:first-of-type': {
               paddingLeft: theme.spacing(5)
+            },
+            [theme.breakpoints.down('sm')]: {
+              paddingLeft: theme.spacing(1.5),
+              paddingRight: theme.spacing(1.5),
+              '&:first-of-type': {
+                paddingLeft: theme.spacing(1.5)
+              }
             }
           },
           '&:last-of-type': {
@@ -59,6 +66,13 @@ const DataGrid = () => {
             paddingRight: theme.spacing(4),
             '&:first-of-type': {
               paddingLeft: theme.spacing(5)
+            },
+            [theme.breakpoints.down('sm')]: {
+              paddingLeft: theme.spacing(1.5),
+              paddingRight: theme.spacing(1.5),
+              '&:first-of-type': {
+                paddingLeft: theme.spacing(1.5)
+              }
             }
           },
           '&:last-of-type': {
@@ -83,7 +97,12 @@ const DataGrid = () => {
           borderTop: `1px solid ${theme.palette.divider}`,
           '& .MuiTablePagination-toolbar': {
             paddingLeft: `${theme.spacing(4)} !important`,
-            paddingRight: `${theme.spacing(4)} !important`
+            paddingRight: `${theme.spacing(4)} !important`,
+            [theme.breakpoints.down('sm')]: {
+              flexWrap: 'wrap',
+              paddingLeft: `${theme.spacing(1)} !important`,
+              paddingRight: `${theme.spacing(1)} !important`
+            }
           },
           '& .MuiTablePagination-select': {
             color: theme.palette.text.primary

@@ -34,35 +34,7 @@ import { deleteUser, listUsers } from 'src/services/userAdminApi'
 import { getImageUrl } from 'src/utils/utils'
 import { formatOpsDateTime } from 'src/utils/opsDateTime'
 import { ops } from 'src/styles/opsSurface'
-
-const STATUS_CHIPS = [
-  { value: '', label: 'Any status' },
-  { value: 'approved', label: 'Approved' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'rejected', label: 'Rejected' }
-]
-
-const fmtInt = v => new Intl.NumberFormat('en-US').format(Number(v) || 0)
-
-function FilterChip({ active, label, onClick, count }) {
-  return (
-    <Chip
-      size='small'
-      clickable
-      onClick={onClick}
-      label={count != null ? `${label} · ${fmtInt(count)}` : label}
-      sx={{
-        height: 28,
-        fontFamily: ops.mono,
-        fontSize: 11,
-        fontWeight: active ? 600 : 500,
-        bgcolor: active ? ops.softIndigo : ops.canvas,
-        color: active ? ops.indigoDeep : ops.body,
-        border: `1px solid ${active ? ops.indigo : ops.hairline}`
-      }}
-    />
-  )
-}
+import { FilterChip, fmtInt, STATUS_CHIPS, STATUS_TONE } from 'src/features/users/chips'
 
 export default function ManageTrainee() {
   const router = useRouter()
@@ -215,6 +187,11 @@ export default function ManageTrainee() {
               <Typography sx={{ fontFamily: ops.mono, fontSize: 11, color: ops.mute }} noWrap>
                 {p.row.email || '—'}
               </Typography>
+              {p.row.mobile_no ? (
+                <Typography sx={{ fontFamily: ops.mono, fontSize: 10, color: ops.mute }} noWrap>
+                  {p.row.mobile_no}
+                </Typography>
+              ) : null}
             </Box>
           </Stack>
         )
@@ -222,17 +199,30 @@ export default function ManageTrainee() {
       {
         field: 'status',
         headerName: 'Status',
-        width: 180,
+        width: 220,
         sortable: false,
-        renderCell: p => (
-          <Box onClick={e => e.stopPropagation()}>
-            <TraineeRejectActions
-              userId={p.row.id || p.row._id}
-              status={p.row.status}
-              onUpdated={() => void load()}
-            />
-          </Box>
-        )
+        renderCell: p => {
+          const t = STATUS_TONE[String(p.row.status || '').toLowerCase()] || {
+            bg: ops.canvasSoft2,
+            color: ops.body
+          }
+          return (
+            <Stack spacing={0.5} onClick={e => e.stopPropagation()} sx={{ py: 0.5 }}>
+              <Chip
+                size='small'
+                label={p.row.status || '—'}
+                sx={{ height: 22, fontFamily: ops.mono, fontSize: 10, fontWeight: 600, bgcolor: t.bg, color: t.color }}
+              />
+              {p.row.status !== 'approved' ? (
+                <TraineeRejectActions
+                  userId={p.row.id || p.row._id}
+                  status={p.row.status}
+                  onUpdated={() => void load()}
+                />
+              ) : null}
+            </Stack>
+          )
+        }
       },
       {
         field: 'location',
@@ -538,7 +528,7 @@ export default function ManageTrainee() {
                 rows={rows}
                 columns={columns}
                 loading={loading}
-                getRowHeight={() => 72}
+                getRowHeight={p => (p.model?.status && p.model.status !== 'approved' ? 96 : 72)}
                 rowCount={total}
                 paginationMode='server'
                 paginationModel={{ page: page - 1, pageSize }}

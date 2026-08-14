@@ -15,6 +15,16 @@ const GlobalStyles = theme => {
   }
 
   return {
+    html: {
+      overflowX: 'clip'
+    },
+    body: {
+      overflowX: 'clip'
+    },
+    '.layout-page-content': {
+      minWidth: 0,
+      maxWidth: '100%'
+    },
     '.demo-space-x > *': {
       marginTop: '1rem !important',
       marginRight: '1rem !important',

@@ -9,7 +9,10 @@ export default function AdminGridContainer({ children, height = ADMIN_LIST_GRID_
       sx={{
         height,
         width: '100%',
+        minWidth: 0,
         minHeight: 320,
+        overflowX: 'auto',
+        WebkitOverflowScrolling: 'touch',
         ...sx
       }}
     >

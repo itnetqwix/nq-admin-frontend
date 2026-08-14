@@ -7,9 +7,10 @@ const Dialog = skin => {
           ...(skin === 'bordered' && { border: `1px solid ${theme.palette.divider}` }),
           '&:not(.MuiDialog-paperFullScreen)': {
             [theme.breakpoints.down('sm')]: {
-              margin: theme.spacing(4),
-              width: `calc(100% - ${theme.spacing(8)})`,
-              maxWidth: `calc(100% - ${theme.spacing(8)}) !important`
+              margin: theme.spacing(1.5),
+              width: `calc(100% - ${theme.spacing(3)})`,
+              maxWidth: `calc(100% - ${theme.spacing(3)}) !important`,
+              maxHeight: `calc(100% - ${theme.spacing(3)})`
             }
           },
           '& > .MuiList-root': {
@@ -22,7 +23,10 @@ const Dialog = skin => {
     MuiDialogTitle: {
       styleOverrides: {
         root: ({ theme }) => ({
-          padding: theme.spacing(5)
+          padding: theme.spacing(5),
+          [theme.breakpoints.down('sm')]: {
+            padding: theme.spacing(2)
+          }
         })
       }
     },
@@ -30,6 +34,9 @@ const Dialog = skin => {
       styleOverrides: {
         root: ({ theme }) => ({
           padding: theme.spacing(5),
+          [theme.breakpoints.down('sm')]: {
+            padding: theme.spacing(2)
+          },
           '& + .MuiDialogContent-root': {
             paddingTop: 0
           },
@@ -43,6 +50,9 @@ const Dialog = skin => {
       styleOverrides: {
         root: ({ theme }) => ({
           padding: theme.spacing(5),
+          [theme.breakpoints.down('sm')]: {
+            padding: theme.spacing(2)
+          },
           '&.dialog-actions-dense': {
             padding: theme.spacing(2.5),
             paddingTop: 0

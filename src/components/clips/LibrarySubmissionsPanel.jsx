@@ -159,8 +159,8 @@ export default function LibrarySubmissionsPanel({ onCountsChange }) {
   }
 
   const handleApprove = async () => {
-    if (!drawer?._id || !categoryId || !subcategoryId) {
-      toast.error('Select category and subcategory for the library')
+    if (!drawer?._id || !categoryId) {
+      toast.error('Select a category for the library')
       return
     }
     const catName = taxonomy.find(c => (c.id || c._id) === categoryId)?.name
@@ -168,14 +168,14 @@ export default function LibrarySubmissionsPanel({ onCountsChange }) {
     const ok = await confirm({
       title: 'Publish to NetQwix Library?',
       message: 'This clip becomes publicly visible in the mobile app library.',
-      detail: `${drawer?.source_clip_id?.title || 'Clip'} → ${catName} › ${subName}`,
+      detail: `${drawer?.source_clip_id?.title || 'Clip'} → ${catName}${subName ? ` › ${subName}` : ' › General'}`,
       confirmLabel: 'Approve & publish',
       variant: 'warning'
     })
     if (!ok) return
     setActing(true)
     try {
-      await approveLibrarySubmission(drawer._id, categoryId, subcategoryId)
+      await approveLibrarySubmission(drawer._id, categoryId, subcategoryId || null)
       toast.success('Published to NetQwix Library')
       closeDrawer()
       void load()
@@ -326,7 +326,7 @@ export default function LibrarySubmissionsPanel({ onCountsChange }) {
       />
 
       <Drawer anchor='right' open={Boolean(drawer)} onClose={closeDrawer} PaperProps={{ sx: { width: { xs: '100%', sm: 480 } } }}>
-        <Box sx={{ p: 3, height: '100%', overflow: 'auto' }}>
+        <Box sx={{ p: { xs: 2, sm: 3 }, height: '100%', overflow: 'auto' }}>
           <Typography variant='overline' color='text.secondary'>
             Library request
           </Typography>
@@ -426,8 +426,9 @@ export default function LibrarySubmissionsPanel({ onCountsChange }) {
                 </Select>
               </FormControl>
               <FormControl fullWidth size='small' disabled={!categoryId}>
-                <InputLabel>Subcategory</InputLabel>
-                <Select label='Subcategory' value={subcategoryId} onChange={e => setSubcategoryId(e.target.value)}>
+                <InputLabel>Subcategory (optional)</InputLabel>
+                <Select label='Subcategory (optional)' value={subcategoryId} onChange={e => setSubcategoryId(e.target.value)}>
+                  <MenuItem value=''>None — General</MenuItem>
                   {subs.map(s => (
                     <MenuItem key={s.id || s._id} value={s.id || s._id}>
                       {s.name}

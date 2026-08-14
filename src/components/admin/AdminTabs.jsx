@@ -26,6 +26,8 @@ export default function AdminTabs({ value, onChange, tabs, sx }) {
           '& .MuiTabs-indicator': { bgcolor: ops.ink, height: 2 },
           '& .MuiTab-root': {
             minHeight: 44,
+            minWidth: 0,
+            px: { xs: 1.5, sm: 2 },
             textTransform: 'none',
             fontWeight: 500,
             fontSize: 13,

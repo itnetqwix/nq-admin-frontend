@@ -21,6 +21,9 @@ const Card = skin => {
       styleOverrides: {
         root: ({ theme }) => ({
           padding: theme.spacing(5),
+          [theme.breakpoints.down('sm')]: {
+            padding: theme.spacing(2)
+          },
           '& + .MuiCardContent-root, & + .MuiCardActions-root, & + .MuiCollapse-root .MuiCardContent-root': {
             paddingTop: 0
           },
@@ -48,11 +51,17 @@ const Card = skin => {
       styleOverrides: {
         root: ({ theme }) => ({
           padding: theme.spacing(5),
+          [theme.breakpoints.down('sm')]: {
+            padding: theme.spacing(2)
+          },
           '& + .MuiCardHeader-root, & + .MuiCardContent-root, & + .MuiCardActions-root': {
             paddingTop: 0
           },
           '&:last-of-type': {
-            paddingBottom: theme.spacing(5)
+            paddingBottom: theme.spacing(5),
+            [theme.breakpoints.down('sm')]: {
+              paddingBottom: theme.spacing(2)
+            }
           }
         })
       }
@@ -61,6 +70,9 @@ const Card = skin => {
       styleOverrides: {
         root: ({ theme }) => ({
           padding: theme.spacing(5),
+          [theme.breakpoints.down('sm')]: {
+            padding: theme.spacing(2)
+          },
           '& .MuiButton-text': {
             paddingLeft: theme.spacing(2.5),
             paddingRight: theme.spacing(2.5)

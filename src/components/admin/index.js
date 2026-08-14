@@ -2,6 +2,7 @@
  * Standard admin UI kit — use across all `/apps/*` pages instead of
  * raw MUI Tabs, Materio CardStatistics, `window.confirm`, and legacy modals.
  */
+export { default as AdminButton } from './AdminButton'
 export { default as AdminDataGrid } from './AdminDataGrid'
 export { default as AdminGridContainer, ADMIN_LIST_GRID_HEIGHT } from './AdminGridContainer'
 export { AdminLoadingState, AdminMasterDetailSkeleton } from './AdminLoadingState'

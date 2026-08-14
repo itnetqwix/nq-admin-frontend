@@ -19,6 +19,8 @@ import {
   Tooltip,
   Typography
 } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
@@ -45,7 +47,17 @@ import {
 } from 'src/services/clipsAdminApi'
 
 const MAX_BYTES = 50 * 1024 * 1024
+const MAX_BATCH = 5
 const fmtInt = v => new Intl.NumberFormat('en-US').format(Number(v) || 0)
+
+function fileStem(name) {
+  return String(name || '').replace(/\.[^.]+$/, '') || 'Clip'
+}
+
+function batchTitle(prefix, file, index, total) {
+  const base = String(prefix || '').trim() || fileStem(file.name)
+  return total > 1 ? `${base} (${index + 1})` : base
+}
 
 async function putPresigned(url, body, contentType) {
   const res = await fetch(url, {
@@ -97,6 +109,36 @@ function captureVideoThumbnail(file) {
       reject(new Error('Could not read video for thumbnail'))
     }
     video.src = objectUrl
+  })
+}
+
+async function publishLibraryFile(file, { title, categoryId, subcategoryId }) {
+  const presign = await presignLibraryClip({
+    fileName: file.name,
+    contentType: file.type || 'video/mp4',
+    fileSizeBytes: file.size
+  })
+  if (!presign?.videoUploadUrl || !presign?.videoKey) {
+    throw new Error('Invalid presign response from server')
+  }
+  await putPresigned(presign.videoUploadUrl, file, file.type || 'video/mp4')
+  let thumbBlob = null
+  try {
+    thumbBlob = await captureVideoThumbnail(file)
+  } catch {
+    thumbBlob = null
+  }
+  if (thumbBlob && presign.thumbnailUploadUrl) {
+    await putPresigned(presign.thumbnailUploadUrl, thumbBlob, 'image/jpeg')
+  }
+  await confirmLibraryClip({
+    title,
+    videoKey: presign.videoKey,
+    thumbnailKey: presign.thumbnailKey,
+    fileType: file.type || 'video/mp4',
+    fileSizeBytes: file.size,
+    category_id: categoryId,
+    subcategory_id: subcategoryId || null
   })
 }
 
@@ -197,6 +239,8 @@ function LibraryClipThumb({ clip, onPlay }) {
 
 export default function NetqwixLibraryPage() {
   const router = useRouter()
+  const theme = useTheme()
+  const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const { confirm, ConfirmDialog } = useAdminConfirm()
   const [groups, setGroups] = useState([])
   const [taxonomy, setTaxonomy] = useState([])
@@ -204,7 +248,7 @@ export default function NetqwixLibraryPage() {
   const [title, setTitle] = useState('')
   const [categoryId, setCategoryId] = useState('')
   const [subcategoryId, setSubcategoryId] = useState('')
-  const [file, setFile] = useState(null)
+  const [files, setFiles] = useState([])
   const [uploading, setUploading] = useState(false)
   const [uploadStep, setUploadStep] = useState('')
   const [loading, setLoading] = useState(true)
@@ -290,75 +334,72 @@ export default function NetqwixLibraryPage() {
     (n, g) => n + (g.subcategories || []).reduce((m, s) => m + (s.clips || []).length, 0),
     0
   )
-  const fileSizeMb = file ? (file.size / (1024 * 1024)).toFixed(1) : null
-  const uploadNeedsSub = subs.length > 0
+
+  const addFiles = picked => {
+    const incoming = Array.from(picked || [])
+    const kept = []
+    for (const f of incoming) {
+      if (f.size > MAX_BYTES) toast.error(`${f.name} is over 50 MB`)
+      else kept.push(f)
+    }
+    if (!kept.length) return
+    setFiles(prev => {
+      const next = [...prev, ...kept]
+      if (next.length > MAX_BATCH) {
+        toast.error(`Up to ${MAX_BATCH} videos at a time`)
+        return next.slice(0, MAX_BATCH)
+      }
+      return next
+    })
+  }
 
   const upload = async () => {
-    if (!file || !title.trim() || !categoryId || (uploadNeedsSub && !subcategoryId)) {
-      toast.error('Fill title, category' + (uploadNeedsSub ? ', subcategory' : '') + ', and choose a video')
-      return
-    }
-    if (file.size > MAX_BYTES) {
-      toast.error('Video must be 50 MB or smaller')
+    if (!files.length || !title.trim() || !categoryId) {
+      toast.error('Fill title, category, and choose at least one video')
       return
     }
 
     const catName = activeCategories.find(c => catIdOf(c) === categoryId)?.name
     const subName = subs.find(s => catIdOf(s) === subcategoryId)?.name
     const ok = await confirm({
-      title: 'Publish clip to library?',
-      message: 'This uploads and publishes the video to the public NetQwix library.',
-      detail: `"${title.trim()}" → ${catName}${subName ? ` › ${subName}` : ''}`,
+      title: files.length > 1 ? `Publish ${files.length} clips to library?` : 'Publish clip to library?',
+      message: 'This uploads and publishes to the public NetQwix library.',
+      detail: `${files.length} video${files.length > 1 ? 's' : ''} → ${catName}${subName ? ` › ${subName}` : ' › General'}`,
       confirmLabel: 'Publish',
       variant: 'warning'
     })
     if (!ok) return
 
     setUploading(true)
+    let published = 0
     try {
-      setUploadStep('Preparing upload…')
-      const presign = await presignLibraryClip({
-        fileName: file.name,
-        contentType: file.type || 'video/mp4',
-        fileSizeBytes: file.size
-      })
-      if (!presign?.videoUploadUrl || !presign?.videoKey) {
-        throw new Error('Invalid presign response from server')
+      for (let i = 0; i < files.length; i++) {
+        const f = files[i]
+        setUploadStep(`Uploading ${i + 1} of ${files.length}…`)
+        // ponytail: sequential presign/PUT/confirm; parallelize if 5-file latency hurts
+        await publishLibraryFile(f, {
+          title: batchTitle(title, f, i, files.length),
+          categoryId,
+          subcategoryId
+        })
+        published += 1
       }
-
-      setUploadStep('Uploading video…')
-      await putPresigned(presign.videoUploadUrl, file, file.type || 'video/mp4')
-
-      setUploadStep('Uploading thumbnail…')
-      let thumbBlob
-      try {
-        thumbBlob = await captureVideoThumbnail(file)
-      } catch {
-        thumbBlob = null
-      }
-      if (thumbBlob) {
-        await putPresigned(presign.thumbnailUploadUrl, thumbBlob, 'image/jpeg')
-      }
-
-      setUploadStep('Saving to library…')
-      await confirmLibraryClip({
-        title: title.trim(),
-        videoKey: presign.videoKey,
-        thumbnailKey: presign.thumbnailKey,
-        fileType: file.type || 'video/mp4',
-        fileSizeBytes: file.size,
-        category_id: categoryId,
-        subcategory_id: subcategoryId || null
-      })
-
-      toast.success('Library clip published')
+      toast.success(published === 1 ? 'Library clip published' : `${published} library clips published`)
       setTitle('')
       setCategoryId('')
       setSubcategoryId('')
-      setFile(null)
+      setFiles([])
       void load()
     } catch (e) {
-      toast.error(e?.message || 'Upload failed')
+      toast.error(
+        published
+          ? `${published} published, then failed: ${e?.message || 'Upload failed'}`
+          : e?.message || 'Upload failed'
+      )
+      if (published) {
+        setFiles(prev => prev.slice(published))
+        void load()
+      }
     } finally {
       setUploading(false)
       setUploadStep('')
@@ -376,10 +417,6 @@ export default function NetqwixLibraryPage() {
     if (!editClip?._id) return
     if (!editTitle.trim() || !editCategoryId) {
       toast.error('Title and category are required')
-      return
-    }
-    if (editSubs.length > 0 && !editSubcategoryId) {
-      toast.error('Pick a subcategory')
       return
     }
     setSavingEdit(true)
@@ -495,15 +532,17 @@ export default function NetqwixLibraryPage() {
         </Grid>
       </Grid>
 
-      <AdminPageSection title='Upload library clip'>
+      <AdminPageSection title='Upload library clips'>
         <OpsSurfaceCard sx={{ maxWidth: 720 }}>
           <Stack spacing={2.5}>
             <Typography sx={{ fontSize: 13, color: ops.body, lineHeight: 1.5 }}>
-              Upload a coaching clip to the public library. Max 50 MB. Appears under Locker → NetQwix Library.
+              Upload up to {MAX_BATCH} coaching clips at once. Max 50 MB each. Subcategory is optional (defaults to
+              General). Appears under Locker → NetQwix Library.
             </Typography>
 
             <TextField
-              label='Clip title'
+              label={files.length > 1 ? 'Title prefix' : 'Clip title'}
+              helperText={files.length > 1 ? `Saved as "${title.trim() || 'Title'} (1)", (2), …` : undefined}
               value={title}
               onChange={e => setTitle(e.target.value)}
               fullWidth
@@ -522,14 +561,14 @@ export default function NetqwixLibraryPage() {
                   ))}
                 </Select>
               </FormControl>
-              <FormControl fullWidth size='small' disabled={uploading || !categoryId || !subs.length}>
-                <InputLabel>Subcategory</InputLabel>
+              <FormControl fullWidth size='small' disabled={uploading || !categoryId}>
+                <InputLabel>Subcategory (optional)</InputLabel>
                 <Select
-                  label='Subcategory'
+                  label='Subcategory (optional)'
                   value={subcategoryId}
                   onChange={e => setSubcategoryId(e.target.value)}
                 >
-                  {!subs.length ? <MenuItem value=''>General (none)</MenuItem> : null}
+                  <MenuItem value=''>None — General</MenuItem>
                   {subs.map(s => (
                     <MenuItem key={catIdOf(s)} value={catIdOf(s)}>
                       {s.name}
@@ -547,30 +586,70 @@ export default function NetqwixLibraryPage() {
 
             <Box
               sx={{
-                border: `1px dashed ${file ? ops.indigo : ops.hairline}`,
+                border: `1px dashed ${files.length ? ops.indigo : ops.hairline}`,
                 borderRadius: ops.radiusMd,
-                p: 3,
+                p: { xs: 2, sm: 3 },
                 textAlign: 'center',
                 bgcolor: ops.canvasSoft
               }}
             >
-              <Button variant='outlined' component='label' disabled={uploading} sx={{ textTransform: 'none' }}>
-                {file ? 'Replace video' : 'Choose video file'}
+              <Button
+                variant='outlined'
+                component='label'
+                disabled={uploading || files.length >= MAX_BATCH}
+                sx={{ textTransform: 'none' }}
+              >
+                {files.length ? 'Add more videos' : 'Choose video files'}
                 <input
                   type='file'
                   hidden
+                  multiple
                   accept='video/*'
-                  onChange={e => setFile(e.target.files?.[0] || null)}
+                  onChange={e => {
+                    addFiles(e.target.files)
+                    e.target.value = ''
+                  }}
                 />
               </Button>
-              {file ? (
-                <Stack spacing={0.5} sx={{ mt: 1.5 }} alignItems='center'>
-                  <Typography sx={{ fontSize: 13, fontWeight: 600 }}>{file.name}</Typography>
-                  <Chip size='small' label={`${fileSizeMb} MB`} sx={{ fontFamily: ops.mono, fontSize: 11 }} />
+              {files.length ? (
+                <Stack spacing={1} sx={{ mt: 1.5 }} alignItems='stretch'>
+                  {files.map((f, i) => (
+                    <Stack
+                      key={`${f.name}-${f.size}-${i}`}
+                      direction='row'
+                      spacing={1}
+                      alignItems='center'
+                      justifyContent='space-between'
+                      sx={{
+                        px: 1.25,
+                        py: 0.75,
+                        borderRadius: 1,
+                        bgcolor: ops.canvas,
+                        textAlign: 'left'
+                      }}
+                    >
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography noWrap sx={{ fontSize: 13, fontWeight: 600 }}>
+                          {f.name}
+                        </Typography>
+                        <Typography sx={{ fontSize: 11, color: ops.mute, fontFamily: ops.mono }}>
+                          {(f.size / (1024 * 1024)).toFixed(1)} MB
+                        </Typography>
+                      </Box>
+                      <IconButton
+                        size='small'
+                        disabled={uploading}
+                        aria-label={`Remove ${f.name}`}
+                        onClick={() => setFiles(prev => prev.filter((_, idx) => idx !== i))}
+                      >
+                        <DeleteOutlineIcon fontSize='small' />
+                      </IconButton>
+                    </Stack>
+                  ))}
                 </Stack>
               ) : (
                 <Typography sx={{ fontSize: 12, color: ops.mute, display: 'block', mt: 1 }}>
-                  MP4, MOV, or other video formats
+                  MP4, MOV, or other video formats — select multiple
                 </Typography>
               )}
             </Box>
@@ -590,18 +669,15 @@ export default function NetqwixLibraryPage() {
 
             <Button
               variant='contained'
-              disabled={
-                uploading ||
-                !file ||
-                !title.trim() ||
-                !categoryId ||
-                (uploadNeedsSub && !subcategoryId) ||
-                !activeCategories.length
-              }
+              disabled={uploading || !files.length || !title.trim() || !categoryId || !activeCategories.length}
               onClick={() => void upload()}
               sx={{ bgcolor: ops.indigo, boxShadow: 'none', textTransform: 'none', fontWeight: 500 }}
             >
-              {uploading ? 'Uploading…' : 'Publish to library'}
+              {uploading
+                ? 'Uploading…'
+                : files.length > 1
+                  ? `Publish ${files.length} clips`
+                  : 'Publish to library'}
             </Button>
           </Stack>
         </OpsSurfaceCard>
@@ -618,7 +694,7 @@ export default function NetqwixLibraryPage() {
             onSearchChange={e => setSearch(e.target.value)}
             resultCount={showingCount}
           >
-            <FormControl size='small' sx={{ minWidth: 200 }}>
+            <FormControl size='small' sx={{ minWidth: { xs: '100%', sm: 200 } }}>
               <InputLabel>Category</InputLabel>
               <Select label='Category' value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
                 <MenuItem value=''>All categories</MenuItem>
@@ -689,14 +765,26 @@ export default function NetqwixLibraryPage() {
                                       {cat.categoryName}
                                       {sub.subcategoryName ? ` · ${sub.subcategoryName}` : ''}
                                     </Typography>
-                                    <Stack direction='row' spacing={0.5} sx={{ mt: 'auto', pt: 0.5 }} flexWrap='wrap' useFlexGap>
+                                    <Stack
+                                      direction='row'
+                                      spacing={0.5}
+                                      sx={{ mt: 'auto', pt: 0.5 }}
+                                      flexWrap='wrap'
+                                      useFlexGap
+                                      alignItems='center'
+                                    >
                                       <Button
                                         size='small'
                                         variant='contained'
                                         startIcon={<PlayArrowRoundedIcon />}
                                         disabled={busy}
                                         onClick={() => setPlayClipId(id)}
-                                        sx={{ textTransform: 'none', bgcolor: ops.indigo, boxShadow: 'none' }}
+                                        sx={{
+                                          textTransform: 'none',
+                                          bgcolor: ops.indigo,
+                                          boxShadow: 'none',
+                                          flex: { xs: 1, sm: 'none' }
+                                        }}
                                       >
                                         Play
                                       </Button>
@@ -760,7 +848,13 @@ export default function NetqwixLibraryPage() {
         onClose={() => setPlayClipId('')}
       />
 
-      <Dialog open={Boolean(editClip)} onClose={() => !savingEdit && setEditClip(null)} fullWidth maxWidth='sm'>
+      <Dialog
+        open={Boolean(editClip)}
+        onClose={() => !savingEdit && setEditClip(null)}
+        fullWidth
+        maxWidth='sm'
+        fullScreen={isPhone}
+      >
         <DialogTitle>Edit library clip</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ pt: 1 }}>
@@ -790,13 +884,13 @@ export default function NetqwixLibraryPage() {
               </Select>
             </FormControl>
             <FormControl fullWidth size='small' disabled={savingEdit || !editCategoryId}>
-              <InputLabel>Subcategory</InputLabel>
+              <InputLabel>Subcategory (optional)</InputLabel>
               <Select
-                label='Subcategory'
+                label='Subcategory (optional)'
                 value={editSubcategoryId}
                 onChange={e => setEditSubcategoryId(e.target.value)}
               >
-                <MenuItem value=''>General (none)</MenuItem>
+                <MenuItem value=''>None — General</MenuItem>
                 {editSubs.map(s => (
                   <MenuItem key={catIdOf(s)} value={catIdOf(s)}>
                     {s.name}

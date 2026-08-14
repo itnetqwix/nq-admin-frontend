@@ -31,7 +31,7 @@ export default function AdminFilterBar({
         alignItems={{ md: 'center' }}
         justifyContent='space-between'
       >
-        <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap' useFlexGap sx={{ flex: 1, minWidth: 0 }}>
+        <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap' useFlexGap sx={{ flex: 1, minWidth: 0, width: { xs: '100%', md: 'auto' }, '& .MuiFormControl-root': { minWidth: { xs: '100%', sm: 160 }, width: { xs: '100%', sm: 'auto' } } }}>
           {searchPlaceholder != null ? (
             <TextField
               size='small'
@@ -51,7 +51,7 @@ export default function AdminFilterBar({
               }}
               sx={{
                 minWidth: { xs: '100%', sm: 280 },
-                maxWidth: 420,
+                maxWidth: { xs: '100%', sm: 420 },
                 '& .MuiOutlinedInput-root': {
                   height: 40,
                   borderRadius: ops.radiusSm,
@@ -62,7 +62,7 @@ export default function AdminFilterBar({
           ) : null}
           {children}
         </Stack>
-        <Box sx={{ display: 'flex', gap: 1, flexShrink: 0, alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', gap: 1, flexShrink: 0, alignItems: 'center', flexWrap: 'wrap' }}>
           {typeof resultCount === 'number' ? (
             <Chip
               size='small'

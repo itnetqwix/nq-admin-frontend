@@ -1,60 +1,76 @@
-import { FormControl, MenuItem, Select } from "@mui/material";
-import { useState } from "react";
-import { trainerStatusColors, updateTicketBaseUrl } from "src/utils/utils";
+import { FormControl, MenuItem, Select } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { trainerStatusColors } from 'src/utils/utils'
+import { getApiBaseUrl } from 'src/utils/apiBase'
 import authConfig from 'src/configs/auth'
+import toast from 'react-hot-toast'
 
 export default function TrainerStatus({ params, cb }) {
-    const [status, setStatus] = useState(params.row.status);
+  const [status, setStatus] = useState(params.row.status)
+  const [busy, setBusy] = useState(false)
 
-    const handleChange = (event) => {
-        setStatus(event.target.value)
-        updateStatus({ trainer_id: params.row._id, status: event.target.value })
+  useEffect(() => {
+    setStatus(params.row.status)
+  }, [params.row.status])
+
+  const handleChange = event => {
+    const next = event.target.value
+    const prev = status
+    setStatus(next)
+    setBusy(true)
+    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
+    const base = getApiBaseUrl()
+    if (!storedToken || !base) {
+      setStatus(prev)
+      setBusy(false)
+      return
     }
-
-    const updateStatus = (payload) => {
-        const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-        if (!storedToken) {
-            return
+    fetch(`${base}/user/update-trainer-status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${storedToken}`
+      },
+      body: JSON.stringify({ trainer_id: params.row._id || params.row.id, status: next })
+    })
+      .then(r => r.json())
+      .then(response => {
+        if (response.code === 400 || response.status === 'fail') {
+          setStatus(prev)
+          toast.error(response?.error || response?.message || 'Could not update status')
+          return
         }
-        const options = {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${storedToken}`
-            },
-            body: JSON.stringify(payload),
-        };
-        fetch(process.env.NEXT_PUBLIC_API_BASE_URL + `/user/update-trainer-status`, options)
-            .then(data => {
-                return data.json();
-            }).then(response => {
-                if (response.code === 400) {
-                    return;
-                }
-                // cb();
-            }).catch(e => {
-            });
+        cb?.()
+      })
+      .catch(() => {
+        setStatus(prev)
+        toast.error('Could not update status')
+      })
+      .finally(() => setBusy(false))
+  }
 
-    }
-    return (
-        <FormControl required sx={{ m: 1, minWidth: 120, height: '50px' }}>
-            <Select
-                labelId="demo-simple-select-required-label"
-                id="demo-simple-select-required"
-                value={status}
-                onChange={handleChange}
-                style={{
-                    maxHeight: '40px',
-                    marginTop: "5px",
-                    color: "white",
-                    background: trainerStatusColors[status],
-                }}
-            >
-                <MenuItem value="pending" style={{ color: trainerStatusColors.open }}>Pending</MenuItem>
-                <MenuItem value="approved" style={{ color: trainerStatusColors.in_progress }}>Approved</MenuItem>
-                <MenuItem value="rejected" style={{ color: trainerStatusColors.close }}>Rejected</MenuItem>
-            </Select>
-        </FormControl>
-    );
-};
+  return (
+    <FormControl size='small' sx={{ minWidth: 118 }} onClick={e => e.stopPropagation()}>
+      <Select
+        size='small'
+        value={status || 'pending'}
+        onChange={handleChange}
+        disabled={busy}
+        sx={{
+          height: 32,
+          fontSize: 12,
+          fontWeight: 600,
+          color: '#fff',
+          bgcolor: trainerStatusColors[status] || trainerStatusColors.pending,
+          '& .MuiSelect-icon': { color: '#fff' },
+          '& fieldset': { border: 'none' }
+        }}
+      >
+        <MenuItem value='pending'>Pending</MenuItem>
+        <MenuItem value='approved'>Approved</MenuItem>
+        <MenuItem value='rejected'>Rejected</MenuItem>
+      </Select>
+    </FormControl>
+  )
+}
 

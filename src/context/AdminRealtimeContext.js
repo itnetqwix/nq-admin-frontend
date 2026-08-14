@@ -128,10 +128,13 @@ export const AdminRealtimeProvider = ({ children }) => {
     if (!token) return undefined
 
     const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '')
+    // ponytail: Cloudflare/ALB returns 400 on WS upgrade; website already uses polling-only
     const next = io(baseUrl, {
+      path: '/socket.io',
       auth: { authorization: token, token },
-      transports: ['websocket', 'polling'],
-      upgrade: true,
+      transports: ['polling'],
+      upgrade: false,
+      withCredentials: true,
       reconnection: true,
       reconnectionAttempts: 10
     })
