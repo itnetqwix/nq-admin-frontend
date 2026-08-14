@@ -1,9 +1,17 @@
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined'
 import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined'
+import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined'
+import { useContext, useState } from 'react'
+import toast from 'react-hot-toast'
 import {
   Box,
+  Button,
   Chip,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
   IconButton,
   Paper,
@@ -13,12 +21,20 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow
+  TableRow,
+  TextField
 } from '@mui/material'
 
 import { SectionShell, EmptyHint, downloadCsv, lessonStatusColor } from '../user360Shared'
 import { DeleteActions, renderParty } from '../user360Parts'
 import { QueryToolbar, PaginationBar, ToolbarRefreshExport } from '../user360Toolbars'
+import { AbilityContext } from 'src/layouts/components/acl/Can'
+import { adminFetch } from 'src/services/http'
+
+function refundDone(status) {
+  const s = String(status || '').trim().toLowerCase()
+  return s === 'completed' || s === 'refunded' || s === 'processing'
+}
 
 export default function User360LessonsTab({
   lessons = { items: [], pagination: { page: 1, limit: 20, total: 0 } },
@@ -29,12 +45,45 @@ export default function User360LessonsTab({
   hardDeletePolicy,
   onOpenTimeline
 }) {
+  const ability = useContext(AbilityContext)
+  const canRefund = ability?.can('update', 'admin-action-refund') ?? false
   const lessonsItems = lessons?.items || []
+  const [refundRow, setRefundRow] = useState(null)
+  const [reason, setReason] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  const runRefund = async () => {
+    const r = reason.trim()
+    if (!refundRow?._id || r.length < 3) return
+    setBusy(true)
+    try {
+      const res = await adminFetch('/transaction/create-refund', {
+        method: 'POST',
+        body: JSON.stringify({
+          booking_id: refundRow._id,
+          payment_intent_id: refundRow.payment_intent_id || undefined,
+          reason: r
+        })
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || String(data?.status).toLowerCase() === 'fail' || data?.code === 400) {
+        throw new Error(data?.error || 'Refund was not completed')
+      }
+      toast.success('Refund completed')
+      setRefundRow(null)
+      setReason('')
+      onRefresh?.()
+    } catch (e) {
+      toast.error(e?.message || 'Refund failed')
+    } finally {
+      setBusy(false)
+    }
+  }
 
   return (
     <SectionShell
       title='Lessons & bookings'
-      subtitle='Sessions where this user is trainer or trainee. Use filters to narrow; actions support soft/hard delete per policy.'
+      subtitle='Sessions where this user is trainer or trainee. Refund runs card, wallet, or escrow from here.'
       action={<ToolbarRefreshExport busy={loadingLessons} onRefresh={onRefresh} onExport={() => downloadCsv(lessonsItems, 'admin-lessons.csv')} />}
     >
       <QueryToolbar section='lessons' sectionQuery={query?.lessons} onQueryChange={onQueryChange} lessonSortOptions={true} />
@@ -67,6 +116,15 @@ export default function User360LessonsTab({
                   <TableCell sx={{ maxWidth: 200 }}>{renderParty(lesson?.trainee_id)}</TableCell>
                   <TableCell align='right'>
                     <Stack direction='row' spacing={0.5} justifyContent='flex-end' alignItems='center'>
+                      {canRefund && !refundDone(lesson?.refund_status) ? (
+                        <IconButton
+                          size='small'
+                          aria-label='Refund booking'
+                          onClick={() => { setReason(''); setRefundRow(lesson) }}
+                        >
+                          <UndoOutlinedIcon fontSize='small' />
+                        </IconButton>
+                      ) : null}
                       <IconButton
                         size='small'
                         aria-label='Session timeline'
@@ -87,6 +145,27 @@ export default function User360LessonsTab({
         <EmptyHint icon={EventNoteOutlinedIcon} title='No lessons in this view' hint='Clear search or status filters, or check the other user role (trainer vs trainee).' />
       ) : null}
       <PaginationBar section='lessons' pagination={lessons?.pagination} onQueryChange={onQueryChange} />
+      <Dialog open={Boolean(refundRow)} onClose={() => !busy && setRefundRow(null)} maxWidth='sm' fullWidth>
+        <DialogTitle>Refund this session</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            fullWidth
+            required
+            margin='dense'
+            label='Refund reason'
+            value={reason}
+            onChange={e => setReason(e.target.value)}
+            helperText='Card, wallet, or escrow — whichever funded the booking. Min 3 characters.'
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setRefundRow(null)} disabled={busy}>Cancel</Button>
+          <Button variant='contained' color='warning' onClick={() => void runRefund()} disabled={busy || reason.trim().length < 3}>
+            Process refund
+          </Button>
+        </DialogActions>
+      </Dialog>
     </SectionShell>
   )
 }

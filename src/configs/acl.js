@@ -9,7 +9,7 @@ export const AppAbility = Ability
 const defineRulesFor = (role, user) => {
   const { can, rules } = new AbilityBuilder(AppAbility)
 
-  if (role !== 'Admin') {
+  if (String(role).toLowerCase() !== 'admin' && !String(user?.extraInfo?.admin_role || '').trim()) {
     return rules
   }
 
@@ -79,7 +79,7 @@ const defineRulesFor = (role, user) => {
   if (ok('can_assign_admin_roles')) can('update', 'admin-nav-admin-settings')
 
   if (ok('can_manage_commission')) can('update', 'admin-action-commission')
-  if (ok('can_process_refund')) can('update', 'admin-action-refund')
+  if (ok('can_process_refund') || ok('finance_refund')) can('update', 'admin-action-refund')
   if (ok('can_hard_delete')) can('delete', 'admin-action-hard-delete')
   if (ok('can_soft_delete_entities')) can('update', 'admin-action-soft-delete')
 

@@ -11,6 +11,7 @@ import {
 } from 'src/utils/authStorage'
 import { installApiAuthHandler } from 'src/utils/installApiAuthHandler'
 import { registerSessionExpiredCallback } from 'src/utils/sessionExpired'
+import { isAdminAccount } from 'src/auth'
 
 const MFA_ENROLL_PATH = '/pages/mfa-enroll'
 const LOGIN_PATHS = ['/login', '/login/mfa', '/forgot-password', '/register', '/pages/reset-password']
@@ -31,10 +32,6 @@ const defaultProvider = {
 }
 
 const AuthContext = createContext(defaultProvider)
-
-function isAdminAccount(accountType) {
-  return String(accountType || '').trim().toLowerCase() === 'admin'
-}
 
 function isLoginRoute(path) {
   return LOGIN_PATHS.some(p => path === p || path.startsWith(`${p}/`))
@@ -254,7 +251,7 @@ const AuthProvider = ({ children }) => {
           if (errorCallback) errorCallback('Login failed: access token not found.')
           return
         }
-        if (!isAdminAccount(accountType)) {
+        if (!isAdminAccount(accountType, payload)) {
           setLoading(false)
           setBootstrapped(true)
           if (errorCallback) errorCallback('Please login with admin account')
@@ -303,7 +300,7 @@ const AuthProvider = ({ children }) => {
           if (errorCallback) errorCallback('Google sign-in failed: no access token.')
           return
         }
-        if (!isAdminAccount(accountType)) {
+        if (!isAdminAccount(accountType, body)) {
           setLoading(false)
           setBootstrapped(true)
           if (errorCallback) errorCallback('This Google account is not an administrator.')
@@ -344,7 +341,7 @@ const AuthProvider = ({ children }) => {
         const payload = pickTokens(response)
         const accessToken = payload?.access_token
         const accountType = payload?.account_type
-        if (!accessToken || !isAdminAccount(accountType)) {
+        if (!accessToken || !isAdminAccount(accountType, payload)) {
           setLoading(false)
           if (errorCallback) errorCallback('MFA succeeded but admin session missing.')
           return

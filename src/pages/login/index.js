@@ -178,7 +178,8 @@ const LoginPage = () => {
           </Button>
         ) : null}
         <Typography sx={{ fontSize: 12, color: ops.mute, lineHeight: 1.55, mb: 2 }}>
-          Only existing Admin accounts can sign in. Google works when that email is already an admin on NetQwix.
+          Only existing administrators can sign in — including trainers or trainees who were granted
+          panel access on the same email. Google works when that email already has admin access.
         </Typography>
         {showAdminMfaNotice() ? (
           <Alert severity='info' sx={{ borderRadius: ops.radiusSm }}>

@@ -83,7 +83,7 @@ export default function Booking() {
   }, [])
 
   const showRefundPopup = (row) => {
-    if (!row?.payment_intent_id || !canRefund) return
+    if (!row?._id || !canRefund) return
     if (isRefundTerminal(row.refund_status)) {
       toast.error('Refund already completed or in progress for this booking')
       return
@@ -91,7 +91,10 @@ export default function Booking() {
     setRefundRow(row)
     setOpenRefundPopup(true);
     setBookingId(row._id)
-    getPaymentIntentDetails({ payment_intent_id: row.payment_intent_id })
+    setPaymentIntentDetails({})
+    if (row.payment_intent_id) {
+      getPaymentIntentDetails({ payment_intent_id: row.payment_intent_id })
+    }
   }
 
   const columns = [
@@ -318,7 +321,11 @@ export default function Booking() {
   }
 
   const onConformRefund = (paymentIntentId, reason) => {
-    startRefund({ payment_intent_id: paymentIntentId, booking_id: bookingId, reason })
+    startRefund({
+      payment_intent_id: paymentIntentId || undefined,
+      booking_id: bookingId,
+      reason
+    })
   }
 
   const onConformCancel = (id) => {

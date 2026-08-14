@@ -20,11 +20,12 @@ export default function RefundPopups({ paymentIntentDetails, bookingPreview, han
 
   const amountUsd = paymentIntentDetails?.amount_received ? paymentIntentDetails.amount_received / 100 : 0
   const feeUsd = paymentIntentDetails?.application_fee_amount ? paymentIntentDetails.application_fee_amount / 100 : 0
+  const hasStripe = Boolean(paymentIntentDetails?.id)
 
   const handleRefund = () => {
     const r = reason.trim()
     if (r.length < 3) return
-    onConform?.(paymentIntentDetails?.id, r)
+    onConform?.(paymentIntentDetails?.id || null, r)
   }
 
   return (
@@ -48,14 +49,18 @@ export default function RefundPopups({ paymentIntentDetails, bookingPreview, han
             </Grid>
           ) : null}
           <Grid item xs={12}>
-            <Typography>Total session cost: ${amountUsd.toFixed(2)}</Typography>
-            <Typography>NetQwix fee: ${feeUsd.toFixed(2)}</Typography>
+            <Typography>Total session cost: {hasStripe ? `$${amountUsd.toFixed(2)}` : 'Wallet / escrow'}</Typography>
+            {hasStripe ? <Typography>NetQwix fee: ${feeUsd.toFixed(2)}</Typography> : null}
             <Typography>
               Payment method:{' '}
-              {paymentIntentDetails?.payment_method_types ? paymentIntentDetails.payment_method_types[0] : '—'}
+              {hasStripe
+                ? paymentIntentDetails?.payment_method_types?.[0]
+                : 'Wallet or escrow (no card intent on this booking)'}
             </Typography>
             <Typography variant='caption' display='block' sx={{ mt: 1 }} color='text.secondary'>
-              This creates a Stripe refund and is recorded in the admin audit log. Duplicate refunds are blocked.
+              {hasStripe
+                ? 'Card refunds go through Stripe or escrow. Duplicate refunds are blocked.'
+                : 'This refunds the wallet/escrow hold for the session. Duplicate refunds are blocked.'}
             </Typography>
           </Grid>
           <Grid item xs={12}>

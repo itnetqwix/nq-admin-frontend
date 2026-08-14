@@ -109,8 +109,12 @@ export default function AdminRolesPage() {
     }
     setInviting(true)
     try {
-      await inviteAdmin({ email, fullname: inviteName.trim(), admin_role: inviteRole })
-      toast.success(`Invite sent to ${email}`)
+      const data = await inviteAdmin({ email, fullname: inviteName.trim(), admin_role: inviteRole })
+      toast.success(
+        data?.granted
+          ? `Admin access granted to ${email}. They can sign in with their existing password.`
+          : `Invite sent to ${email}`
+      )
       setInviteOpen(false)
       setInviteEmail('')
       setInviteName('')
@@ -245,7 +249,7 @@ export default function AdminRolesPage() {
     const q = adminSearch.trim().toLowerCase()
     if (!q) return items
     return items.filter(a =>
-      [a.fullname, a.email, a.admin_role, a.id]
+      [a.fullname, a.email, a.admin_role, a.account_type, a.invite_status, a.id]
         .filter(Boolean)
         .join(' ')
         .toLowerCase()
@@ -266,7 +270,7 @@ export default function AdminRolesPage() {
       eyebrow='Admin access · RBAC'
       icon='mdi:shield-account-outline'
       title='Admin roles.'
-      subtitle='Page access + CRUD actions. Deny-by-default when restricted. Changes write to the audit trail.'
+      subtitle='Invite by email (new admin or existing trainer/trainee), assign a role, then open the person to see what they are doing.'
       actions={
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
           {canAssign ? (
@@ -322,6 +326,14 @@ export default function AdminRolesPage() {
           <OpsMetricTile icon='mdi:account-group' label='Admins' value={String(items.length)} tone='accent' />
         </Grid>
         <Grid item xs={6} sm={3}>
+          <OpsMetricTile
+            icon='mdi:email-fast-outline'
+            label='Invited'
+            value={String(items.filter(a => a.invite_status === 'invited').length)}
+            tone='warn'
+          />
+        </Grid>
+        <Grid item xs={6} sm={3}>
           <OpsMetricTile icon='mdi:shield-key' label='SuperAdmins' value={String(roleCounts.SuperAdmin || 0)} />
         </Grid>
         <Grid item xs={6} sm={3}>
@@ -364,7 +376,7 @@ export default function AdminRolesPage() {
         </Stack>
       ) : null}
 
-      <AdminPageSection title='Administrators' subtitle='Invite by email, assign a role, or edit per-user permission overrides. Sub-admins skip MFA.'>
+      <AdminPageSection title='Administrators' subtitle='Invited until they sign in. Click a name for User 360, Logs for their admin activity. Same email can be trainer/trainee and admin.'>
         <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
           <Box sx={{ p: { xs: 2, sm: 2.5 }, borderBottom: `1px solid ${ops.hairline}` }}>
             <AdminFilterBar

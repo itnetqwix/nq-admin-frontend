@@ -14,13 +14,9 @@ import { refreshAdminAccessToken } from 'src/utils/authRefresh'
 import { clearLogRocketUser, identifyLogRocketUser } from 'src/lib/logrocket'
 import { identifyClarityUser } from 'src/lib/clarity'
 
-const apiBase = () => process.env.NEXT_PUBLIC_API_BASE_URL || ''
+import { isAdminAccount } from 'src/auth'
 
-function isAdminAccount(accountType) {
-  return String(accountType || '')
-    .trim()
-    .toLowerCase() === 'admin'
-}
+const apiBase = () => process.env.NEXT_PUBLIC_API_BASE_URL || ''
 
 async function fetchMe(token) {
   const res = await fetch(`${apiBase()}/user/me`, {
@@ -98,7 +94,7 @@ export const loginPassword = createAsyncThunk(
       const accessToken = response?.result?.data?.access_token
       const refreshToken = response?.result?.data?.refresh_token
       if (!accessToken) return rejectWithValue('Login failed: access token not found.')
-      if (!isAdminAccount(accountType)) return rejectWithValue('Please login with admin account')
+      if (!isAdminAccount(accountType, response?.result?.data)) return rejectWithValue('Please login with admin account')
 
       const userInfo = await fetchMe(accessToken)
       persistSession(accessToken, userInfo, {
@@ -141,7 +137,7 @@ export const loginGoogle = createAsyncThunk(
       const accessToken = tokens?.access_token
       const refreshToken = tokens?.refresh_token
       if (!accessToken) return rejectWithValue('Google sign-in failed: no access token.')
-      if (!isAdminAccount(accountType)) {
+      if (!isAdminAccount(accountType, tokens)) {
         return rejectWithValue('This Google account is not an administrator.')
       }
 

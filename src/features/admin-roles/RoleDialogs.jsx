@@ -32,8 +32,8 @@ export default function RoleDialogs({
         <DialogTitle>Invite sub-admin</DialogTitle>
         <DialogContent dividers>
           <Typography sx={{ mb: 2, fontSize: 13, color: ops.mute }}>
-            We’ll email a set-password link. They can sign in without MFA — only the main SuperAdmin
-            must use an authenticator.
+            New email gets a set-password link. An existing trainer or trainee keeps their marketplace
+            account and can sign in to this panel with the same password.
           </Typography>
           <Stack spacing={2}>
             <TextField
@@ -313,14 +313,32 @@ export default function RoleDialogs({
             <Typography sx={{ fontSize: 13, color: ops.mute }}>No sessions on record.</Typography>
           )}
           {devicesUser?.id ? (
-            <Button
-              component={Link}
-              href={`/apps/logs?tab=login&userId=${devicesUser.id}`}
-              size='small'
-              sx={{ mt: 2, textTransform: 'none' }}
-            >
-              Full login history →
-            </Button>
+            <Stack direction='row' spacing={1} sx={{ mt: 2 }} flexWrap='wrap' useFlexGap>
+              <Button
+                component={Link}
+                href={`/apps/users/${devicesUser.id}`}
+                size='small'
+                sx={{ textTransform: 'none' }}
+              >
+                User 360 →
+              </Button>
+              <Button
+                component={Link}
+                href={`/apps/logs?tab=admin&userId=${devicesUser.id}`}
+                size='small'
+                sx={{ textTransform: 'none' }}
+              >
+                Admin activity →
+              </Button>
+              <Button
+                component={Link}
+                href={`/apps/logs?tab=login&userId=${devicesUser.id}`}
+                size='small'
+                sx={{ textTransform: 'none' }}
+              >
+                Login history →
+              </Button>
+            </Stack>
           ) : null}
         </DialogContent>
         <DialogActions>
