@@ -20,7 +20,7 @@ export default function FinancePanel(p) {
     stuckStripVisible, moneyAtRisk, opsDashboard, heldSummary, aging, escrowSummary,
     tab, syncTab, handleGoTab, handleOverviewReconcile, page, loading, pageSize, total, setPage,
     searchQ, setSearchQ, refundStatus, setRefundStatus, escrowStatus, setEscrowStatus,
-    ledgerReferenceType, setLedgerReferenceType, rows, cols
+    ledgerReferenceType, setLedgerReferenceType, rows, cols, onSearch
   } = p
   return (
     <>
@@ -85,6 +85,15 @@ export default function FinancePanel(p) {
                 component={Link}
                 href='/apps/finance?tab=refunds'
                 clickable
+                label={`Chargebacks: ${opsDashboard.chargebackCount ?? 0}`}
+                color={(opsDashboard.chargebackCount ?? 0) > 0 ? 'error' : 'default'}
+                size='small'
+                variant='outlined'
+              />
+              <Chip
+                component={Link}
+                href='/apps/finance?tab=refunds'
+                clickable
                 label={`Open refunds: ${opsDashboard.openRefundCount ?? 0}${
                   moneyAtRisk?.openRefundMinor != null
                     ? ` · $${(moneyAtRisk.openRefundMinor / 100).toFixed(0)}`
@@ -133,10 +142,7 @@ export default function FinancePanel(p) {
           <Button
             size='small'
             variant='contained'
-            onClick={() => {
-              setTab(TAB.TRANSACTIONS)
-              setPage(1)
-            }}
+            onClick={() => onSearch?.()}
           >
             Search
           </Button>

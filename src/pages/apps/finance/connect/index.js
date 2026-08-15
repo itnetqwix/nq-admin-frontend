@@ -130,7 +130,7 @@ const ConnectAccountsPage = () => {
       eyebrow='Revenue · connect'
       icon='mdi:bank-transfer'
       title='Stripe Connect.'
-      subtitle='Trainer Connect accounts, KYC, and payout preferences.'
+      subtitle='Directory of existing trainer Connect account ids. New coaches are wallet-first — this is not a live onboarding tool.'
       actions={
         <Stack direction='row' spacing={1}>
           <Chip component={Link} href='/apps/finance' label='Finance' clickable variant='outlined' size='small' />

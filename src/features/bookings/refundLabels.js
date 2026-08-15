@@ -49,6 +49,7 @@ export function refundStatusLabel(status) {
   if (s === 'pending') return 'Pending'
   if (s === 'logged') return 'Logged'
   if (s === 'releasing') return 'Releasing'
+  if (s === 'open' || s === 'investigating') return 'Open chargeback'
   return status || '—'
 }
 
@@ -57,6 +58,8 @@ export function refundDestinationCopy(destination) {
   if (d === 'wallet') return 'Wallet — usually instant'
   if (d === 'card') return 'Card — 5–10 business days'
   if (d === 'bank') return 'Bank — typically 3–5 business days'
+  if (d === 'mixed') return 'Wallet + card — split refund'
+  if (d === 'chargeback') return 'Stripe chargeback'
   return destination || 'Original payment method'
 }
 

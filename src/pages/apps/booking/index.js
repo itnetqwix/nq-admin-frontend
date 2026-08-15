@@ -190,7 +190,9 @@ export default function Booking() {
     try {
       const result = await cancelAdminBooking(id, ok.reason)
       if (result?.refunded) toast.success('Session canceled and refund started')
-      else toast.success(result?.refundError ? `Canceled. Refund: ${result.refundError}` : 'Session canceled')
+      else if (result?.refundError)
+        toast.error(`Canceled, but refund failed: ${result.refundError}`)
+      else toast.success('Session canceled')
       void getBookingList()
     } catch (e) {
       toast.error(e?.message || 'Cancel failed')

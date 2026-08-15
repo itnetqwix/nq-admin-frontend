@@ -42,6 +42,17 @@ function formatEscrowMinor(minor) {
 
 function refundTransferLabel(transfer) {
   if (!transfer?.destination) return null
+  const legs = Array.isArray(transfer.legs) ? transfer.legs : []
+  if (transfer.destination === 'mixed' || legs.length > 1) {
+    const parts = (legs.length ? legs : [transfer]).map(leg => {
+      const dest =
+        leg.destination === 'wallet' ? 'Wallet' : leg.destination === 'card' ? 'Card' : 'Bank'
+      const amt =
+        leg.amount_minor != null ? `$${(Number(leg.amount_minor) / 100).toFixed(2)}` : ''
+      return `${dest}${amt ? ` ${amt}` : ''}: ${leg.status || ''}`.trim()
+    })
+    return parts.join(' · ')
+  }
   const dest =
     transfer.destination === 'wallet'
       ? 'Wallet'

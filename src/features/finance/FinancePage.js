@@ -274,6 +274,7 @@ const FinancePage = () => {
     ((opsDashboard.heldCount ?? 0) > 0 ||
       (opsDashboard.releasingCount ?? 0) > 0 ||
       (opsDashboard.disputedCount ?? 0) > 0 ||
+      (opsDashboard.chargebackCount ?? 0) > 0 ||
       (opsDashboard.openRefundCount ?? 0) > 0 ||
       (opsDashboard.pendingPayoutCount ?? 0) > 0 ||
       (opsDashboard.stuckTopUpsPending30m ?? 0) > 0)
@@ -422,6 +423,10 @@ const FinancePage = () => {
         setLedgerReferenceType={setLedgerReferenceType}
         rows={rows}
         cols={cols}
+        onSearch={() => {
+          setPage(1)
+          void load()
+        }}
       />
       <FinanceDialogs
         adjustOpen={adjustOpen}

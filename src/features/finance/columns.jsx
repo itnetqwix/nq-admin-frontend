@@ -42,7 +42,7 @@ function PersonCell({ person, fallbackId }) {
 function StatusChip({ status }) {
   const s = String(status || '').toLowerCase()
   const color =
-    s === 'failed' || s === 'disputed' ? 'error' : s === 'processing' || s === 'pending' || s === 'releasing' ? 'warning' : s === 'completed' || s === 'refunded' || s === 'released' ? 'success' : 'default'
+    s === 'failed' || s === 'disputed' || s === 'open' || s === 'chargeback' ? 'error' : s === 'processing' || s === 'pending' || s === 'releasing' ? 'warning' : s === 'completed' || s === 'refunded' || s === 'released' ? 'success' : 'default'
   return <Chip size='small' label={refundStatusLabel(status)} color={color} variant='outlined' />
 }
 

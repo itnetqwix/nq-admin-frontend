@@ -27,6 +27,7 @@ export default function FinanceOverviewPanel({ opsDashboard, escrowSummary, onGo
   const anomalyTotal =
     (dash.releasingCount ?? 0) +
     (dash.disputedCount ?? 0) +
+    (dash.chargebackCount ?? 0) +
     (dash.stuckTopUpsPending30m ?? 0) +
     (dash.paidUnappliedExtensions ?? 0) +
     (dash.transferFailuresLast7d ?? 0) +
@@ -67,6 +68,15 @@ export default function FinanceOverviewPanel({ opsDashboard, escrowSummary, onGo
             hint='Manual resolution'
             tone={(dash.disputedCount ?? 0) > 0 ? 'danger' : 'default'}
             onClick={() => onGoTab?.('escrow', { status: 'disputed' })}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <OpsMetricTile
+            label='Chargebacks'
+            value={dash.chargebackCount ?? 0}
+            hint='Stripe card disputes'
+            tone={(dash.chargebackCount ?? 0) > 0 ? 'danger' : 'default'}
+            onClick={() => onGoTab?.('refunds')}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
