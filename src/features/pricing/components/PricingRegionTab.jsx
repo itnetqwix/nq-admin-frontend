@@ -1,4 +1,3 @@
-import Box from '@mui/material/Box'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
@@ -13,11 +12,11 @@ import {
   US_PAYMENT_METHODS,
   GB_PAYMENT_METHODS,
   EU_PAYMENT_METHODS,
-  PRICING_REGIONS,
   STORAGE_PLAN_IDS,
   centsToInput,
   decimalToPctInput,
   decimalToTaxPctInput,
+  fmtMoney,
   inputToCents,
   pctInputToDecimal,
   taxPctInputToDecimal
@@ -158,7 +157,7 @@ export default function PricingRegionTab({
               onChange={e =>
                 onPatchRegion(regionKey, { defaultCommissionRate: pctInputToDecimal(e.target.value) })
               }
-              helperText='When coach has no override'
+              helperText={`On a $60 lesson this is ${fmtMoney(Math.round(6000 * Number(region.defaultCommissionRate || 0)), currency)} to NetQwix. Coaches with an override keep theirs.`}
               disabled={!canEdit}
             />
           </Grid>

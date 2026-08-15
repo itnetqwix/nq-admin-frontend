@@ -15,21 +15,24 @@ import { OpsSurfaceCard } from 'src/components/admin'
 import { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import { ops } from 'src/styles/opsSurface'
 import {
-  CA_PAYMENT_METHODS,
-  CA_PROVINCE_OPTIONS,
+  DEFAULT_LESSON_DOLLARS,
+  PRICING_REGIONS,
   PRODUCT_TYPES,
-  US_PAYMENT_METHODS,
-  US_STATE_OPTIONS,
+  currencyForRegion,
+  defaultJurisdiction,
+  defaultPaymentHint,
   fmtMoney,
   fmtPct,
-  inputToCents
+  inputToCents,
+  jurisdictionsForRegion,
+  paymentMethodsForRegion
 } from 'src/constants/pricingAdmin'
 import { previewPricingQuote } from 'src/services/pricingApi'
 
 const DEFAULT_INPUT = {
   region: 'US',
   productType: 'session_booking',
-  sessionDollars: '100.00',
+  sessionDollars: DEFAULT_LESSON_DOLLARS,
   state: 'TX',
   paymentMethodHint: 'card_domestic_us',
   promoDollars: '0'
@@ -42,9 +45,9 @@ export default function PricingSimulatorTab({ config, isDirty, variant = 'full' 
   const [loading, setLoading] = useState(false)
   const timer = useRef(null)
 
-  const paymentOptions = input.region === 'CA' ? CA_PAYMENT_METHODS : US_PAYMENT_METHODS
-  const stateOptions = input.region === 'CA' ? CA_PROVINCE_OPTIONS : US_STATE_OPTIONS
-  const currency = input.region === 'CA' ? 'CAD' : 'USD'
+  const paymentOptions = paymentMethodsForRegion(input.region)
+  const stateOptions = jurisdictionsForRegion(input.region)
+  const currency = currencyForRegion(input.region)
 
   const runQuote = useCallback(async () => {
     if (!config) return
@@ -80,8 +83,8 @@ export default function PricingSimulatorTab({ config, isDirty, variant = 'full' 
   useEffect(() => {
     setInput(prev => ({
       ...prev,
-      paymentMethodHint: prev.region === 'CA' ? 'card_domestic_ca' : 'card_domestic_us',
-      state: prev.region === 'CA' ? 'ON' : 'TX'
+      paymentMethodHint: defaultPaymentHint(prev.region),
+      state: defaultJurisdiction(prev.region)
     }))
   }, [input.region])
 
@@ -107,8 +110,11 @@ export default function PricingSimulatorTab({ config, isDirty, variant = 'full' 
                 value={input.region}
                 onChange={e => setInput(p => ({ ...p, region: e.target.value }))}
               >
-                <MenuItem value='US'>United States (USD)</MenuItem>
-                <MenuItem value='CA'>Canada (CAD)</MenuItem>
+                {PRICING_REGIONS.map(r => (
+                  <MenuItem key={r.key} value={r.key}>
+                    {r.label} ({r.currency})
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
             <FormControl fullWidth size='small' sx={{ minWidth: simple ? 180 : undefined, flex: simple ? 1 : undefined }}>
@@ -230,7 +236,7 @@ export default function PricingSimulatorTab({ config, isDirty, variant = 'full' 
             </Grid>
           </Grid>
           <Typography variant='caption' color='text.secondary' display='block' sx={{ mt: 1 }}>
-            Uses default card processing for {input.region === 'CA' ? 'Ontario' : 'Texas'}.
+            Uses default card processing for {stateOptions.find(s => s.code === input.state)?.label || input.region}.
           </Typography>
         </Grid>
       ) : null}

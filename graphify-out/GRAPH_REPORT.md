@@ -1,16 +1,16 @@
 # Graph Report - nq-admin  (2026-08-15)
 
 ## Corpus Check
-- 415 files · ~574,344 words
+- 416 files · ~577,713 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1995 nodes · 2814 edges · 260 communities (197 shown, 63 thin omitted)
-- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 185 edges (avg confidence: 0.81)
+- 2017 nodes · 2858 edges · 250 communities (188 shown, 62 thin omitted)
+- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 197 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `54c6367a`
+- Built from commit: `f7e164ec`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -118,7 +118,10 @@
 - [[_COMMUNITY_Overrides Button|Overrides Button]]
 - [[_COMMUNITY_Overrides Chip|Overrides Chip]]
 - [[_COMMUNITY_Overrides Datagrid|Overrides Datagrid]]
+- [[_COMMUNITY_Overrides Divider|Overrides Divider]]
 - [[_COMMUNITY_Overrides Input|Overrides Input]]
+- [[_COMMUNITY_Overrides Snackbar|Overrides Snackbar]]
+- [[_COMMUNITY_Overrides Table|Overrides Table]]
 - [[_COMMUNITY_Pages Favicon Image|Pages Favicon Image]]
 - [[_COMMUNITY_React Apexcharts Index|React Apexcharts Index]]
 - [[_COMMUNITY_React Apexcharts Index|React Apexcharts Index]]
@@ -129,6 +132,7 @@
 - [[_COMMUNITY_React Dropzone Index|React Dropzone Index]]
 - [[_COMMUNITY_React Hot Toast|React Hot Toast]]
 - [[_COMMUNITY_Recharts Index|Recharts Index]]
+- [[_COMMUNITY_Second Page Index|Second Page Index]]
 - [[_COMMUNITY_Spinner Index|Spinner Index]]
 - [[_COMMUNITY_Trainer Verifications Index|Trainer Verifications Index]]
 - [[_COMMUNITY_Utils Constant|Utils Constant]]
@@ -154,19 +158,12 @@
 - [[_COMMUNITY_Community 209|Community 209]]
 - [[_COMMUNITY_Community 212|Community 212]]
 - [[_COMMUNITY_Community 213|Community 213]]
+- [[_COMMUNITY_Community 214|Community 214]]
 - [[_COMMUNITY_Community 216|Community 216]]
 - [[_COMMUNITY_Community 217|Community 217]]
 - [[_COMMUNITY_Community 218|Community 218]]
 - [[_COMMUNITY_Community 219|Community 219]]
-- [[_COMMUNITY_Community 220|Community 220]]
-- [[_COMMUNITY_Community 221|Community 221]]
-- [[_COMMUNITY_Community 222|Community 222]]
-- [[_COMMUNITY_Community 223|Community 223]]
-- [[_COMMUNITY_Community 224|Community 224]]
-- [[_COMMUNITY_Community 225|Community 225]]
 - [[_COMMUNITY_Community 226|Community 226]]
-- [[_COMMUNITY_Community 227|Community 227]]
-- [[_COMMUNITY_Community 228|Community 228]]
 - [[_COMMUNITY_Community 229|Community 229]]
 - [[_COMMUNITY_Community 231|Community 231]]
 - [[_COMMUNITY_Community 247|Community 247]]
@@ -181,7 +178,6 @@
 - [[_COMMUNITY_Community 288|Community 288]]
 - [[_COMMUNITY_Community 291|Community 291]]
 - [[_COMMUNITY_Community 292|Community 292]]
-- [[_COMMUNITY_Community 294|Community 294]]
 - [[_COMMUNITY_Community 298|Community 298]]
 - [[_COMMUNITY_Community 307|Community 307]]
 - [[_COMMUNITY_Community 309|Community 309]]
@@ -203,19 +199,19 @@
 ## Surprising Connections (you probably didn't know these)
 - `GlobalStyles()` --calls--> `useSettings()`  [INFERRED]
   src/@core/theme/globalStyles.js → src/@core/hooks/useSettings.js
-- `AccountDeletionsPage()` --calls--> `useAdminConfirm()`  [INFERRED]
-  src/pages/apps/account-deletions/index.jsx → src/components/admin/useAdminConfirm.js
+- `BannersPage()` --calls--> `useAdminConfirm()`  [INFERRED]
+  src/pages/apps/banners/index.jsx → src/components/admin/useAdminConfirm.js
 - `BroadcastsPage()` --calls--> `useAdminConfirm()`  [INFERRED]
   src/pages/apps/broadcasts/index.jsx → src/components/admin/useAdminConfirm.js
 - `UsersDirectoryPage()` --calls--> `useAdminConfirm()`  [INFERRED]
   src/features/users/UsersDirectoryPage.jsx → src/components/admin/useAdminConfirm.js
-- `PricingDashboardTab()` --calls--> `fmtPct()`  [INFERRED]
-  src/features/pricing/components/PricingDashboardTab.jsx → src/constants/pricingAdmin.js
+- `AppBarContent()` --calls--> `getAdminApiEnvLabel()`  [INFERRED]
+  src/layouts/components/vertical/AppBarContent.js → src/configs/adminEnv.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (260 total, 63 thin omitted)
+## Communities (250 total, 62 thin omitted)
 
 ### Community 0 - "Package Dependencies"
 Cohesion: 0.03
@@ -230,20 +226,20 @@ Cohesion: 0.05
 Nodes (38): devDependencies, eslint, eslint-config-next, eslint-config-prettier, eslint-import-resolver-alias, eslint-import-resolver-typescript, eslint-plugin-import, @iconify/iconify (+30 more)
 
 ### Community 3 - "Auth Guards & Middleware"
-Cohesion: 0.08
-Nodes (21): useAdminRealtime(), fmtInt(), fmtMoney(), Home(), LessonStory(), LiveLessonsPage(), copyText(), FilterChip() (+13 more)
+Cohesion: 0.13
+Nodes (16): useAdminRealtime(), fmtInt(), fmtMoney(), Home(), LessonStory(), LiveLessonsPage(), copyText(), FilterChip() (+8 more)
 
 ### Community 4 - "Layouts & Navigation UI"
 Cohesion: 0.22
 Nodes (20): fetchAdminActionAlerts(), relativeTime(), apiUrl(), createBroadcast(), deleteBroadcast(), getAuthHeaders(), getBroadcastById(), getBroadcastDeliveryStats() (+12 more)
 
 ### Community 5 - "Commission Management"
-Cohesion: 0.07
-Nodes (22): Booking(), booking_status, FilterChip(), fmtInt(), STATUS_CHIPS, STATUS_COLORS, STATUS_TONE, ConcernByUsers() (+14 more)
+Cohesion: 0.18
+Nodes (7): Booking(), booking_status, FilterChip(), fmtInt(), STATUS_CHIPS, STATUS_COLORS, STATUS_TONE
 
 ### Community 6 - "Pricing Analytics UI"
-Cohesion: 0.11
-Nodes (14): PricingRegionTab(), CA_PAYMENT_METHODS, CA_PROVINCE_OPTIONS, centsToInput(), decimalToPctInput(), decimalToTaxPctInput(), EU_PAYMENT_METHODS, GB_PAYMENT_METHODS (+6 more)
+Cohesion: 0.09
+Nodes (18): CA_PAYMENT_METHODS, CA_PROVINCE_OPTIONS, defaultJurisdiction(), defaultPaymentHint(), EU_JURISDICTION_OPTIONS, EU_PAYMENT_METHODS, GB_JURISDICTION_OPTIONS, GB_PAYMENT_METHODS (+10 more)
 
 ### Community 7 - "App Bar Components"
 Cohesion: 0.08
@@ -278,24 +274,24 @@ Cohesion: 0.03
 Nodes (73): dependencies, apexcharts-clevision, axios, axios-mock-adapter, @babel/core, babel-eslint, @babel/eslint-parser, bootstrap-icons (+65 more)
 
 ### Community 15 - "Admin Admindatagrid"
-Cohesion: 0.06
-Nodes (9): VARIANT_META, defaultSx, AdminGoogleSignIn(), ADMIN_LIST_GRID_HEIGHT, AdminLoadingState(), AdminMasterDetailSkeleton(), HIGHLIGHTS, INITIAL (+1 more)
+Cohesion: 0.07
+Nodes (7): VARIANT_META, defaultSx, ADMIN_LIST_GRID_HEIGHT, AdminLoadingState(), AdminMasterDetailSkeleton(), HIGHLIGHTS, INITIAL
 
 ### Community 16 - "Services User360api"
 Cohesion: 0.33
 Nodes (14): apiUrl(), getAuthHeaders(), getOpsEventDetail(), getOpsEvents(), getOpsEventsForUser(), getOpsPlaybook(), getOpsStats(), parse() (+6 more)
 
 ### Community 17 - "Services Cmsapi"
-Cohesion: 0.07
-Nodes (22): AddEditCommision(), defaultValues, schema, PersonCell(), personDisplayName(), REFUND_REASON_LABELS, REFUND_REASON_PRESETS, refundDestinationCopy() (+14 more)
+Cohesion: 0.25
+Nodes (9): buildFinanceColumns(), formatMinor(), runReconcile(), searchPlaceholder(), TAB, TAB_SLUG, tabLabels, FinancePage() (+1 more)
 
 ### Community 18 - "Services Promocodeapi"
 Cohesion: 0.29
 Nodes (9): buildBannerColumns(), AUDIENCES, buildCtasPayload(), EMPTY_FORM, FilterChip(), normalizeCtasFromRow(), PLACEMENTS, SEVERITIES (+1 more)
 
 ### Community 19 - "Blank Layout With"
-Cohesion: 0.12
-Nodes (10): BlankLayoutAppBar(), LinkStyled, ColorBox, Customizer(), CustomizerSpacing, Drawer, Toggler, useSettings() (+2 more)
+Cohesion: 0.18
+Nodes (6): BlankLayoutAppBar(), LinkStyled, Customizer(), useSettings(), OptionsMenu(), Accordion()
 
 ### Community 20 - "Images Pages Auth"
 Cohesion: 0.20
@@ -310,12 +306,12 @@ Cohesion: 0.30
 Nodes (7): FilterChip(), fmtInt(), STATUS_CHIPS, STATUS_TONE, TYPE_CHIPS, buildUserColumns(), UsersDirectoryPage()
 
 ### Community 23 - "Analytics Analyticsoverview"
-Cohesion: 0.18
-Nodes (6): AnalyticsOverview(), AnalyticsSessions(), AnalyticsTotalRevenue(), defaultSeries, TimelineDot(), hexToRGBA()
+Cohesion: 0.22
+Nodes (5): AnalyticsOverview(), AnalyticsSessions(), AnalyticsTotalRevenue(), defaultSeries, hexToRGBA()
 
 ### Community 24 - "Banners Index"
-Cohesion: 0.22
-Nodes (4): AUDIENCES, EMPTY_FORM, PLACEMENTS, SEVERITIES
+Cohesion: 0.20
+Nodes (5): AUDIENCES, BannersPage(), EMPTY_FORM, PLACEMENTS, SEVERITIES
 
 ### Community 25 - "Login Index"
 Cohesion: 0.20
@@ -334,32 +330,28 @@ Cohesion: 0.20
 Nodes (8): acl, fs, horizontal, nav, path, required, subjects, vertical
 
 ### Community 30 - "Badge Index"
-Cohesion: 0.17
-Nodes (4): MenuItemTextWrapper, MenuItemTextMetaWrapper, MenuNavLink, ListSubheader
+Cohesion: 0.05
+Nodes (17): UserLayout(), hasActiveChild(), SwipeableDrawer, HorizontalNavGroup(), ListItem, NavigationMenu, HorizontalNavItems(), ListItem (+9 more)
 
 ### Community 31 - "Content Contentplacementconfig"
-Cohesion: 0.20
-Nodes (5): dashboardSlice, fetchHomeDashboard, fetchLogSummaryOnly, uiSlice, store
+Cohesion: 0.25
+Nodes (4): DEFAULT_LESSON, rowAmount(), SESSION_PRODUCTS, DEFAULT_INPUT
 
 ### Community 32 - "Iconify Bundle Bundle"
 Cohesion: 0.25
 Nodes (5): { dirname }, { getIcons, stringToIcon, minifyIconSet }, { importDirectory, cleanupSVG, parseColors, isEmptyColor, runSVGO }, { promises: fs }, sources
 
 ### Community 33 - "Register Index"
-Cohesion: 0.15
-Nodes (10): AdminEnvBanner(), adminRegisterEnvHint(), CLARITY_PROJECT_ID, getAdminApiEnvBannerCopy(), getAdminApiEnvKind(), getAdminApiEnvLabel(), isAdminRegisterEnabled(), LOGROCKET_APP_ID (+2 more)
+Cohesion: 0.24
+Nodes (10): adminRegisterEnvHint(), CLARITY_PROJECT_ID, getAdminApiEnvBannerCopy(), getAdminApiEnvKind(), getAdminApiEnvLabel(), isAdminRegisterEnabled(), LOGROCKET_APP_ID, showAdminMfaNotice() (+2 more)
 
 ### Community 34 - "Services Pricingapi"
 Cohesion: 0.64
 Nodes (8): apiUrl(), createBanner(), deleteBanner(), getAuthHeaders(), handleRes(), listBanners(), toggleBanner(), updateBanner()
 
 ### Community 35 - "Services Verificationapi"
-Cohesion: 0.17
-Nodes (5): SwipeableDrawer, StyledBoxForShadow, HeaderTitle, LinkStyled, MenuHeaderWrapper
-
-### Community 36 - "Utils Format"
-Cohesion: 0.25
-Nodes (5): Badge(), Chip(), showAdminMfaNotice(), UseBgColor(), LoginPage()
+Cohesion: 0.20
+Nodes (8): PersonCell(), personDisplayName(), REFUND_REASON_LABELS, REFUND_REASON_PRESETS, refundDestinationCopy(), refundStatusLabel(), StatusChip(), RefundPopups()
 
 ### Community 38 - "Context Settingscontext"
 Cohesion: 0.29
@@ -378,16 +370,16 @@ Cohesion: 0.20
 Nodes (9): BannerPlacementPreview(), formWithResolvedImage(), PLACEMENT_LABELS, renderPlacement(), SEVERITY_BG, SEVERITY_FG, BANNERS_PLACEMENT_HELP, bannerVisibleForAudience() (+1 more)
 
 ### Community 42 - "Auth Jwt"
-Cohesion: 0.20
-Nodes (4): UserLayout(), HorizontalNavItems(), ListItem, VerticalNavItems()
+Cohesion: 0.22
+Nodes (7): PricingDashboardTab(), PRICING_FLOW, PricingFlowStrip(), PricingMentalModel(), PricingMixups(), TAB_LABELS, TAB_SLUGS
 
 ### Community 43 - "Broadcasts Index"
 Cohesion: 0.20
 Nodes (32): apiUrl(), assignAdminRole(), createCustomRole(), deleteCustomRole(), exportLogs(), getAdminAccessLogs(), getAdminNavPreferences(), getApiLogs() (+24 more)
 
 ### Community 44 - "Cms Blog Index"
-Cohesion: 0.71
-Nodes (6): addAccountDeletionNote(), apiUrl(), getAuthHeaders(), handleRes(), listAccountDeletions(), restoreAccountDeletion()
+Cohesion: 0.53
+Nodes (11): apiUrl(), createPromoCode(), deletePromoCode(), getAuthHeaders(), getPromoAdminStats(), getPromoCodeById(), handleRes(), listPromoCodes() (+3 more)
 
 ### Community 45 - "Cms Faq Index"
 Cohesion: 0.52
@@ -409,13 +401,17 @@ Nodes (6): main branch trigger, Deploy Admin — Production Workflow, Vercel Pro
 Cohesion: 0.50
 Nodes (3): CmsOverviewPage(), fmtInt(), SECTIONS
 
+### Community 50 - "Utils Installapiauthhandler"
+Cohesion: 0.25
+Nodes (4): Badge(), Chip(), UseBgColor(), TimelineDot()
+
 ### Community 51 - "Utils Sessionexpired"
-Cohesion: 0.11
-Nodes (10): apiBase(), authSlice, bootstrapSession, fetchMe(), initialState, loginGoogle, loginPassword, logout (+2 more)
+Cohesion: 0.05
+Nodes (29): AdminRealtimeContext, AdminRealtimeProvider(), defaultValue, isAdminRole(), normalizeMetrics(), readStoredAdmin(), apiUrl(), authHeaders() (+21 more)
 
 ### Community 52 - "Account Deletions Index"
-Cohesion: 0.15
-Nodes (10): useAdminConfirm(), BannersPage(), BannersPage(), ClipTaxonomyPanel(), CmsLegalPage(), SLUGS, WRITING_TIPS, usePricingConfig() (+2 more)
+Cohesion: 0.12
+Nodes (11): AccountDeletionsPage(), STATUS_COLOR, useAdminConfirm(), BannersPage(), ClipTaxonomyPanel(), CmsLegalPage(), SLUGS, WRITING_TIPS (+3 more)
 
 ### Community 53 - "Context Authcontext"
 Cohesion: 0.20
@@ -430,8 +426,8 @@ Cohesion: 0.29
 Nodes (6): compilerOptions, baseUrl, include, compilerOptions, baseUrl, include
 
 ### Community 57 - "NetQwix Library Index"
-Cohesion: 0.64
-Nodes (8): apiUrl(), createTip(), deleteTip(), getAuthHeaders(), handleRes(), listTips(), toggleTip(), updateTip()
+Cohesion: 0.33
+Nodes (6): ALL_PERMISSION_KEYS, effectiveAdminPermissions(), FULL_OPS, PERM_GROUPS, perms(), ROLE_MATRIX
 
 ### Community 58 - "Ops Logs Index"
 Cohesion: 0.29
@@ -458,12 +454,16 @@ Cohesion: 0.18
 Nodes (4): DEFAULT_INFRA_FORM, DEFAULT_UNIT_ECONOMICS_INFRA, INFRA_CATEGORIES, INFRA_CATEGORY_LABELS
 
 ### Community 70 - "Auth Footerillustrationsv2"
-Cohesion: 0.25
-Nodes (4): hasActiveChild(), HorizontalNavGroup(), ListItem, NavigationMenu
+Cohesion: 0.40
+Nodes (4): AclGuard(), canAccessRoute(), ACL_ROUTE_SUBJECTS, subjectForPath()
 
 ### Community 74 - "Cms Index"
 Cohesion: 0.29
 Nodes (4): CmsOverviewPage(), fmtInt(), LINKS, SECTIONS
+
+### Community 75 - "Cms Legal Index"
+Cohesion: 0.47
+Nodes (4): FilterChip(), fmtInt(), ManageTrainer(), STATUS_CHIPS
 
 ### Community 76 - "Components Adminpageshell"
 Cohesion: 0.33
@@ -489,21 +489,25 @@ Nodes (3): CallDiagnosticsPage(), EVENT_TYPES, fmtInt()
 Cohesion: 0.32
 Nodes (6): FinancePage(), formatMinor(), searchPlaceholder(), TAB, TAB_SLUG, tabLabels
 
-### Community 117 - "Overrides Alerts"
-Cohesion: 0.33
-Nodes (6): ALL_PERMISSION_KEYS, effectiveAdminPermissions(), FULL_OPS, PERM_GROUPS, perms(), ROLE_MATRIX
-
-### Community 118 - "Overrides Autocomplete"
-Cohesion: 0.67
-Nodes (6): apiUrl(), authHeaders(), fetchDashboardMetrics(), fetchGlobalCommission(), fetchOnlineUsers(), unwrapAdminResult()
-
 ### Community 122 - "Overrides Button"
-Cohesion: 0.53
-Nodes (11): apiUrl(), createPromoCode(), deletePromoCode(), getAuthHeaders(), getPromoAdminStats(), getPromoCodeById(), handleRes(), listPromoCodes() (+3 more)
+Cohesion: 0.10
+Nodes (35): addAccountDeletionNote(), apiUrl(), getAuthHeaders(), handleRes(), listAccountDeletions(), restoreAccountDeletion(), api(), headers() (+27 more)
+
+### Community 127 - "Overrides Divider"
+Cohesion: 0.50
+Nodes (5): PricingLessonSplit(), PricingRegionTab(), centsToInput(), decimalToPctInput(), decimalToTaxPctInput()
 
 ### Community 129 - "Overrides Input"
 Cohesion: 0.06
 Nodes (32): API Layer, Approved / Locked Sections, Areas Needing Future Improvements, Auth Routes (Guest-Only), Authentication System, Border Radius, Colors, Dashboard Architecture (+24 more)
+
+### Community 134 - "Overrides Snackbar"
+Cohesion: 0.67
+Nodes (3): buildAbilityFor(), defaultACLObj, defineRulesFor()
+
+### Community 154 - "Second Page Index"
+Cohesion: 0.33
+Nodes (4): AddEditCommision(), defaultValues, schema, useCommon()
 
 ### Community 158 - "Spinner Index"
 Cohesion: 0.21
@@ -530,8 +534,8 @@ Cohesion: 0.47
 Nodes (4): io5ComponentName(), IoniconsPreview(), resolveIcon(), TIP_ICON_NAMES
 
 ### Community 205 - "Community 205"
-Cohesion: 0.28
-Nodes (6): PricingOverviewTab(), RegionCard(), DEFAULT_CUSTOM, PricingUnitEconomicsTab(), ScenarioInfraRow(), fmtPct()
+Cohesion: 0.21
+Nodes (9): PricingOverviewTab(), RegionCard(), PricingSimulatorTab(), DEFAULT_CUSTOM, PricingUnitEconomicsTab(), ScenarioInfraRow(), currencyForRegion(), fmtPct() (+1 more)
 
 ### Community 206 - "Community 206"
 Cohesion: 0.18
@@ -542,56 +546,36 @@ Cohesion: 0.38
 Nodes (4): DEVICE_PRESETS, getDeviceFrame(), MobilePreviewFrameContext, MobilePreviewFrameProvider()
 
 ### Community 208 - "Community 208"
-Cohesion: 0.15
-Nodes (5): DAYS, DEMAND_METRICS, PRODUCT_TYPES, TAB_LABELS, TAB_SLUGS
+Cohesion: 0.20
+Nodes (6): DAYS, DEMAND_METRICS, PRODUCT_TYPES, SESSION_PRODUCTS, SurgeWorkedExample(), inputToCents()
 
 ### Community 209 - "Community 209"
 Cohesion: 0.47
 Nodes (3): bannerActiveOnDay(), parseDay(), startOfMonth()
 
+### Community 214 - "Community 214"
+Cohesion: 0.40
+Nodes (4): ColorBox, CustomizerSpacing, Drawer, Toggler
+
 ### Community 216 - "Community 216"
-Cohesion: 0.19
-Nodes (34): apiUrl(), getAuthHeaders(), presignCmsAsset(), apiUrl(), deleteAdminEntity(), getAuditLogs(), getAuthHeaders(), getCallDiagnostics() (+26 more)
+Cohesion: 0.39
+Nodes (23): apiUrl(), deleteAdminEntity(), getAuditLogs(), getAuthHeaders(), getCallDiagnostics(), getClipPlayUrl(), getLiveLessonDebug(), getLiveLessons() (+15 more)
 
 ### Community 217 - "Community 217"
-Cohesion: 0.52
-Nodes (6): clearAuthStorage(), isRememberMeEnabled(), persistSession(), purgeIfEphemeralSessionEnded(), readStoredRefreshToken(), setRememberMeFlag()
+Cohesion: 0.60
+Nodes (4): FilterChip(), fmtInt(), ManageTrainee(), STATUS_CHIPS
 
 ### Community 218 - "Community 218"
-Cohesion: 0.40
-Nodes (4): AclGuard(), canAccessRoute(), ACL_ROUTE_SUBJECTS, subjectForPath()
+Cohesion: 0.67
+Nodes (3): ConcernByUsers(), fmtInt(), statusColors
 
 ### Community 219 - "Community 219"
-Cohesion: 0.40
-Nodes (5): AdminRealtimeContext, defaultValue, isAdminRole(), normalizeMetrics(), readStoredAdmin()
-
-### Community 220 - "Community 220"
-Cohesion: 0.73
-Nodes (5): api(), headers(), listFailedJobs(), retryFailedJob(), searchAdminUsers()
-
-### Community 221 - "Community 221"
-Cohesion: 0.40
-Nodes (3): adminFetch(), resolvePath(), refreshAdminAccessToken()
-
-### Community 222 - "Community 222"
-Cohesion: 0.73
-Nodes (5): apiUrl(), getAuthHeaders(), getReferralDashboard(), getReferralRewards(), unwrap()
-
-### Community 223 - "Community 223"
-Cohesion: 0.40
-Nodes (3): CommonContext, CommonProvider(), defaultProvider
-
-### Community 225 - "Community 225"
 Cohesion: 0.67
-Nodes (3): buildAbilityFor(), defaultACLObj, defineRulesFor()
+Nodes (3): fmtInt(), statusColors, WriteByUsers()
 
 ### Community 226 - "Community 226"
-Cohesion: 0.08
-Nodes (14): copyText(), Fact(), hasVal(), initials(), LogDetailDrawer(), LogsHubPage(), TABS, CATEGORIES (+6 more)
-
-### Community 227 - "Community 227"
-Cohesion: 0.67
-Nodes (3): AdminRealtimeProvider(), useAppDispatch(), useAppSelector()
+Cohesion: 0.06
+Nodes (19): copyText(), Fact(), hasVal(), initials(), LogDetailDrawer(), clientSurfaceFromRow(), SURFACE_FILTERS, buildLogColumns() (+11 more)
 
 ### Community 231 - "Community 231"
 Cohesion: 0.47
@@ -614,8 +598,8 @@ Cohesion: 0.22
 Nodes (7): BoxWrapper, ForgotPassword(), ForgotPasswordIllustration, ForgotPasswordIllustrationWrapper, LinkStyled, RightWrapper, TypographyStyled
 
 ### Community 269 - "Community 269"
-Cohesion: 0.15
-Nodes (7): AuthGuard(), GuestGuard(), useAuth(), MfaEnrollPage(), MfaChallengePage(), BadgeContentSpan, UserDropdown()
+Cohesion: 0.11
+Nodes (10): AuthGuard(), GuestGuard(), CommonContext, CommonProvider(), defaultProvider, useAuth(), MfaEnrollPage(), MfaChallengePage() (+2 more)
 
 ### Community 272 - "Community 272"
 Cohesion: 0.25
@@ -650,27 +634,27 @@ Cohesion: 0.28
 Nodes (8): FilterChip(), fmtInt(), STATUS_CHIPS, STATUS_COLORS, STATUS_TONE, TYPE_CHIPS, TYPE_FILTERS, UsersDirectoryPage()
 
 ### Community 316 - "Community 316"
-Cohesion: 0.24
-Nodes (5): clearLogRocketUser(), initLogRocket(), readAppId(), clearAuthStorage(), handleSessionExpired()
+Cohesion: 0.08
+Nodes (16): clearLogRocketUser(), initLogRocket(), readAppId(), adminFetch(), resolvePath(), refreshAdminAccessToken(), clearAuthStorage(), isRememberMeEnabled() (+8 more)
 
 ## Knowledge Gaps
-- **553 isolated node(s):** `editor.defaultFormatter`, `editor.defaultFormatter`, `source.fixAll.eslint`, `source.organizeImports`, `editor.defaultFormatter` (+548 more)
+- **560 isolated node(s):** `editor.defaultFormatter`, `editor.defaultFormatter`, `source.fixAll.eslint`, `source.organizeImports`, `editor.defaultFormatter` (+555 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **63 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **62 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `requireApiBaseUrl()` connect `Community 216` to `Services Pricingapi`, `Layouts & Navigation UI`, `Broadcasts Index`, `Cms Blog Index`, `Clips Admin API`, `Customizer Index`, `Booking API Services`, `Services User360api`, `Community 222`, `Services Broadcastapi`, `Overrides Autocomplete`, `NetQwix Library Index`, `Overrides Button`, `Community 220`, `Community 221`, `Spinner Index`?**
-  _High betweenness centrality (0.132) - this node is a cross-community bridge._
-- **Why does `useAdminConfirm()` connect `Account Deletions Index` to `Community 224`, `Booking & Clips Panel`, `Community 291`, `Community 260`, `Commission Management`, `Finance Index`, `Clips Admin API`, `Cms Faq Index`, `Admin Admindatagrid`, `Services Cmsapi`, `Community 309`, `Services Opsapi`, `Community 247`, `Community 312`, `Ops Logs Index`, `Community 189`?**
-  _High betweenness centrality (0.129) - this node is a cross-community bridge._
-- **Why does `useAuth()` connect `Community 269` to `Community 227`, `Utils Format`, `Commission Management`, `Theme & Responsive Layout`, `Community 218`, `Community 223`?**
-  _High betweenness centrality (0.110) - this node is a cross-community bridge._
+- **Why does `useAdminConfirm()` connect `Account Deletions Index` to `Booking & Clips Panel`, `Community 312`, `Community 291`, `Community 260`, `Commission Management`, `Finance Index`, `Cms Legal Index`, `Clips Admin API`, `Cms Faq Index`, `Admin Admindatagrid`, `Services Cmsapi`, `Community 309`, `Services Opsapi`, `Community 247`, `Banners Index`, `Community 217`, `Ops Logs Index`, `Community 189`?**
+  _High betweenness centrality (0.149) - this node is a cross-community bridge._
+- **Why does `requireApiBaseUrl()` connect `Overrides Button` to `Services Pricingapi`, `Layouts & Navigation UI`, `Broadcasts Index`, `Clips Admin API`, `Booking API Services`, `Customizer Index`, `Cms Blog Index`, `Services User360api`, `Utils Sessionexpired`, `Services Broadcastapi`, `Community 216`, `Community 316`, `Spinner Index`?**
+  _High betweenness centrality (0.142) - this node is a cross-community bridge._
+- **Why does `useAuth()` connect `Community 269` to `Register Index`, `Auth Footerillustrationsv2`, `Theme & Responsive Layout`, `Cms Legal Index`, `Utils Sessionexpired`?**
+  _High betweenness centrality (0.109) - this node is a cross-community bridge._
 - **Are the 24 inferred relationships involving `useAdminConfirm()` (e.g. with `AccountDeletionsPage()` and `BannersPage()`) actually correct?**
   _`useAdminConfirm()` has 24 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `editor.defaultFormatter`, `editor.defaultFormatter`, `source.fixAll.eslint` to the rest of the system?**
-  _553 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _560 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Package Dependencies` be split into smaller, more focused modules?**
   _Cohesion score 0.02531645569620253 - nodes in this community are weakly interconnected._
 - **Should `Booking & Clips Panel` be split into smaller, more focused modules?**

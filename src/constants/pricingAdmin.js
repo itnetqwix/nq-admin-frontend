@@ -56,6 +56,67 @@ export const taxPctInputToDecimal = v => Number(v || 0) / 100
 
 export const STORAGE_PLAN_IDS = ['free', 'plus_5gb', 'pro_10gb', 'max_25gb']
 
+export const LESSON_DURATION_MINUTES = [15, 30, 60]
+export const DEFAULT_LESSON_DOLLARS = '60.00'
+
+export const GB_JURISDICTION_OPTIONS = [{ code: 'GB', label: 'United Kingdom VAT (20%)' }]
+
+export const EU_JURISDICTION_OPTIONS = [
+  { code: 'DE', label: 'Germany (19%)' },
+  { code: 'FR', label: 'France (20%)' },
+  { code: 'IT', label: 'Italy (22%)' },
+  { code: 'ES', label: 'Spain (21%)' },
+  { code: 'NL', label: 'Netherlands (21%)' },
+  { code: 'IE', label: 'Ireland (23%)' }
+]
+
+export const SURGE_TIMEZONES = [
+  'America/New_York',
+  'America/Chicago',
+  'America/Denver',
+  'America/Los_Angeles',
+  'America/Toronto',
+  'Europe/London',
+  'Europe/Paris',
+  'Europe/Berlin',
+  'UTC'
+]
+
+export function paymentMethodsForRegion(region) {
+  if (region === 'CA') return CA_PAYMENT_METHODS
+  if (region === 'GB') return GB_PAYMENT_METHODS
+  if (region === 'EU') return EU_PAYMENT_METHODS
+  return US_PAYMENT_METHODS
+}
+
+export function jurisdictionsForRegion(region) {
+  if (region === 'CA') return CA_PROVINCE_OPTIONS
+  if (region === 'GB') return GB_JURISDICTION_OPTIONS
+  if (region === 'EU') return EU_JURISDICTION_OPTIONS
+  return US_STATE_OPTIONS
+}
+
+export function defaultPaymentHint(region) {
+  return paymentMethodsForRegion(region)[0]?.id
+}
+
+export function defaultJurisdiction(region) {
+  return jurisdictionsForRegion(region)[0]?.code
+}
+
+export function currencyForRegion(region) {
+  return PRICING_REGIONS.find(r => r.key === region)?.currency || 'USD'
+}
+
+export function hourlyCentsFromSession(sessionCents, durationMinutes) {
+  const mins = Math.max(1, Number(durationMinutes) || 30)
+  return Math.round((Number(sessionCents || 0) * 60) / mins)
+}
+
+export function surgeCentsOnSubtotal(subtotalCents, multiplierBps) {
+  return Math.round((Number(subtotalCents || 0) * Number(multiplierBps || 0)) / 10000)
+}
+
 export const PRICING_REGIONS = [
   { key: 'US', label: 'United States', currency: 'USD' },
   { key: 'CA', label: 'Canada', currency: 'CAD' },

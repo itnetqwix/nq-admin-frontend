@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import Chip from '@mui/material/Chip'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
@@ -15,12 +16,18 @@ import toast from 'react-hot-toast'
 import { OpsSurfaceCard } from 'src/components/admin'
 import { ops } from 'src/styles/opsSurface'
 import { previewPricingQuote } from 'src/services/pricingApi'
+import {
+  DEFAULT_LESSON_DOLLARS,
+  PRODUCT_TYPES,
+  SURGE_TIMEZONES,
+  fmtMoney,
+  inputToCents,
+  surgeCentsOnSubtotal
+} from 'src/constants/pricingAdmin'
 
-const PRODUCT_TYPES = [
-  { value: 'session_booking', label: 'Scheduled session' },
-  { value: 'instant_lesson', label: 'Instant lesson' },
-  { value: 'session_extension', label: 'Session extension' }
-]
+const SESSION_PRODUCTS = PRODUCT_TYPES.filter(
+  p => p.value === 'session_booking' || p.value === 'instant_lesson' || p.value === 'session_extension'
+)
 
 const DEMAND_METRICS = [
   { value: 'instant_queue_depth', label: 'Instant queue depth' },
@@ -41,6 +48,110 @@ function newId(prefix) {
   return `${prefix}_${Date.now().toString(36)}`
 }
 
+function ProductTypeChips({ value, onChange, disabled }) {
+  const selected = value || []
+  return (
+    <Stack direction='row' spacing={0.5} flexWrap='wrap' useFlexGap sx={{ mt: 1 }}>
+      {SESSION_PRODUCTS.map(p => {
+        const on = selected.includes(p.value)
+        return (
+          <Chip
+            key={p.value}
+            size='small'
+            label={p.label}
+            variant={on ? 'filled' : 'outlined'}
+            onClick={
+              disabled
+                ? undefined
+                : () => {
+                    const next = new Set(selected)
+                    if (on) next.delete(p.value)
+                    else next.add(p.value)
+                    onChange([...next])
+                  }
+            }
+            sx={{
+              fontFamily: ops.mono,
+              fontSize: 11,
+              bgcolor: on ? ops.ink : undefined,
+              color: on ? '#fff' : undefined,
+              cursor: disabled ? 'default' : 'pointer'
+            }}
+          />
+        )
+      })}
+    </Stack>
+  )
+}
+
+function SurgeWorkedExample({ surge }) {
+  const [dollars, setDollars] = useState(DEFAULT_LESSON_DOLLARS)
+  const subtotal = inputToCents(dollars)
+  const windows = surge.timeWindows || []
+  const demands = surge.demandRules || []
+
+  return (
+    <OpsSurfaceCard>
+      <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', mb: 0.5 }}>
+        What peak does to a lesson
+      </Typography>
+      <Typography sx={{ fontSize: 13, color: ops.body, mb: 2, lineHeight: 1.5 }}>
+        Surge is a % on the session price, before platform fees and tax. It is added to what the trainee
+        pays and held in escrow with the lesson. Coaches can opt out or cap it in Manage trainers.
+      </Typography>
+      <TextField
+        size='small'
+        type='number'
+        label='Example session'
+        value={dollars}
+        onChange={e => setDollars(e.target.value)}
+        sx={{ width: 160, mb: 2 }}
+      />
+      {!surge.enabled ? (
+        <Alert severity='warning' sx={{ mb: 1.5 }}>
+          Surge is off — windows below do nothing until you enable it.
+        </Alert>
+      ) : null}
+      {windows.length === 0 && demands.length === 0 ? (
+        <Typography sx={{ fontSize: 13, color: ops.mute }}>
+          Add a time window or demand rule to see the extra on {fmtMoney(subtotal)}.
+        </Typography>
+      ) : (
+        <Stack spacing={1}>
+          {windows.map((win, idx) => {
+            const extra = surgeCentsOnSubtotal(subtotal, win.multiplierBps)
+            const pct = (win.multiplierBps || 0) / 100
+            return (
+              <Stack key={win.id || idx} direction='row' justifyContent='space-between' flexWrap='wrap' gap={1}>
+                <Typography variant='body2'>
+                  {win.label || 'Window'} · {pct}% · {win.startHour ?? 0}–{win.endHour ?? 0}h
+                </Typography>
+                <Typography variant='body2' fontWeight={700}>
+                  {fmtMoney(subtotal)} → {fmtMoney(subtotal + extra)} (+{fmtMoney(extra)})
+                </Typography>
+              </Stack>
+            )
+          })}
+          {demands.map((rule, idx) => {
+            const extra = surgeCentsOnSubtotal(subtotal, rule.multiplierBps)
+            const pct = (rule.multiplierBps || 0) / 100
+            return (
+              <Stack key={rule.id || idx} direction='row' justifyContent='space-between' flexWrap='wrap' gap={1}>
+                <Typography variant='body2'>
+                  {rule.label || 'Demand'} · {pct}% when {rule.metric} ≥ {rule.threshold}
+                </Typography>
+                <Typography variant='body2' fontWeight={700}>
+                  {fmtMoney(subtotal)} → {fmtMoney(subtotal + extra)} (+{fmtMoney(extra)})
+                </Typography>
+              </Stack>
+            )
+          })}
+        </Stack>
+      )}
+    </OpsSurfaceCard>
+  )
+}
+
 export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirty }) {
   const surge = config.surgeRules || {
     enabled: false,
@@ -56,7 +167,7 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
   }
 
   const [simProduct, setSimProduct] = useState('session_booking')
-  const [simSubtotal, setSimSubtotal] = useState('100')
+  const [simSubtotal, setSimSubtotal] = useState(DEFAULT_LESSON_DOLLARS)
   const [simAt, setSimAt] = useState(() => new Date().toISOString().slice(0, 16))
   const [simResult, setSimResult] = useState(null)
   const [simBusy, setSimBusy] = useState(false)
@@ -95,9 +206,11 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
   return (
     <Stack spacing={3}>
       <Alert severity='info'>
-        Surge pricing adds a peak-time or high-demand uplift on the session subtotal before platform
-        fees and taxes. Coaches can opt out or cap surge via Manage trainers.
+        Peak pricing adds a % on the session before platform fees. On a $60 lesson, 15% peak is +$9 —
+        the trainee pays $69 plus fees. Saved rules apply on the next website and app quote.
       </Alert>
+
+      <SurgeWorkedExample surge={surge} />
 
       <OpsSurfaceCard>
           <FormControlLabel
@@ -111,6 +224,7 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
             label='Enable surge pricing'
           />
           <TextField
+            select
             label='Timezone'
             size='small'
             fullWidth
@@ -118,15 +232,26 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
             value={surge.timezone || 'America/New_York'}
             onChange={e => patchSurge({ timezone: e.target.value })}
             disabled={!canEdit}
-            helperText='IANA timezone for time-window rules (e.g. America/New_York)'
-          />
+            helperText='Windows use this timezone.'
+          >
+            {[surge.timezone, ...SURGE_TIMEZONES].filter((z, i, a) => z && a.indexOf(z) === i).map(z => (
+              <MenuItem key={z} value={z}>
+                {z}
+              </MenuItem>
+            ))}
+          </TextField>
         </OpsSurfaceCard>
 
       <OpsSurfaceCard>
           <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
-            <Typography variant='h6' fontWeight={700}>
-              Time windows
-            </Typography>
+            <Box>
+              <Typography variant='h6' fontWeight={700}>
+                Time windows
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                Weekday hours in the timezone above. Multiplier 15 = +15% on the session.
+              </Typography>
+            </Box>
             {canEdit ? (
               <Button
                 size='small'
@@ -164,7 +289,7 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
                   sx={{ minWidth: 160 }}
                 />
                 <TextField
-                  label='Multiplier %'
+                  label='Uplift %'
                   size='small'
                   type='number'
                   value={(win.multiplierBps || 0) / 100}
@@ -172,7 +297,8 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
                     updateTimeWindow(idx, 'multiplierBps', Math.round(Number(e.target.value || 0) * 100))
                   }
                   disabled={!canEdit}
-                  sx={{ width: 120 }}
+                  sx={{ width: 140 }}
+                  helperText={`$60 → ${fmtMoney(6000 + surgeCentsOnSubtotal(6000, win.multiplierBps))}`}
                 />
                 <TextField
                   label='Start hour'
@@ -226,15 +352,28 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
                   )
                 })}
               </Stack>
+              <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1 }}>
+                Applies to
+              </Typography>
+              <ProductTypeChips
+                value={win.productTypes}
+                disabled={!canEdit}
+                onChange={next => updateTimeWindow(idx, 'productTypes', next)}
+              />
             </Box>
           ))}
         </OpsSurfaceCard>
 
       <OpsSurfaceCard>
           <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
-            <Typography variant='h6' fontWeight={700}>
-              Demand rules
-            </Typography>
+            <Box>
+              <Typography variant='h6' fontWeight={700}>
+                Demand rules
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                Fires when the metric is at or above the threshold. Highest matching % wins with time windows.
+              </Typography>
+            </Box>
             {canEdit ? (
               <Button
                 size='small'
@@ -294,7 +433,7 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
                   sx={{ width: 100 }}
                 />
                 <TextField
-                  label='Multiplier %'
+                  label='Uplift %'
                   size='small'
                   type='number'
                   value={(rule.multiplierBps || 0) / 100}
@@ -302,7 +441,8 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
                     updateDemandRule(idx, 'multiplierBps', Math.round(Number(e.target.value || 0) * 100))
                   }
                   disabled={!canEdit}
-                  sx={{ width: 120 }}
+                  sx={{ width: 140 }}
+                  helperText={`$60 → ${fmtMoney(6000 + surgeCentsOnSubtotal(6000, rule.multiplierBps))}`}
                 />
                 {canEdit ? (
                   <IconButton
@@ -317,13 +457,25 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
                   </IconButton>
                 ) : null}
               </Stack>
+              <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1 }}>
+                Applies to
+              </Typography>
+              <ProductTypeChips
+                value={rule.productTypes}
+                disabled={!canEdit}
+                onChange={next => updateDemandRule(idx, 'productTypes', next)}
+              />
             </Box>
           ))}
         </OpsSurfaceCard>
 
       <OpsSurfaceCard>
           <Typography variant='h6' fontWeight={700} gutterBottom>
-            Quote simulator
+            Quote at a date & time
+          </Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+            Pick a $60 lesson and a clock time. If it lands in a window, peak shows in the breakdown —
+            the same quote website and app will charge.
           </Typography>
           <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
             <TextField
@@ -334,14 +486,14 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
               onChange={e => setSimProduct(e.target.value)}
               sx={{ minWidth: 180 }}
             >
-              {PRODUCT_TYPES.map(p => (
+              {SESSION_PRODUCTS.map(p => (
                 <MenuItem key={p.value} value={p.value}>
                   {p.label}
                 </MenuItem>
               ))}
             </TextField>
             <TextField
-              label='Session subtotal ($)'
+              label='Session price ($)'
               size='small'
               type='number'
               value={simSubtotal}
@@ -363,11 +515,17 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
           {simResult ? (
             <Box sx={{ bgcolor: ops.canvasSoft, p: 2, borderRadius: 1 }}>
               <Typography variant='body2' fontWeight={600} gutterBottom>
-                Total charged: ${((simResult.chargeTotalCents || 0) / 100).toFixed(2)}
+                Trainee pays {fmtMoney(simResult.chargeTotalCents || 0)}
+                {simResult.surgeCents > 0
+                  ? ` · peak ${fmtMoney(simResult.surgeCents)} (${simResult.surgeLabel || 'surge'})`
+                  : ' · no peak on this time'}
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                Coach receives {fmtMoney(simResult.trainerNetCents || 0)}
               </Typography>
               {(simResult.breakdown || []).map(row => (
                 <Typography key={row.key} variant='body2' color='text.secondary'>
-                  {row.label}: ${((row.amountMinor || 0) / 100).toFixed(2)}
+                  {row.label}: {fmtMoney(row.amountMinor || 0)}
                 </Typography>
               ))}
             </Box>

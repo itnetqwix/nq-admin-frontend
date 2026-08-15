@@ -1359,7 +1359,7 @@
       "source_file": "src/@core/components/auth/AclGuard.js",
       "source_location": "L1",
       "id": "auth_aclguard",
-      "community": 218,
+      "community": 70,
       "norm_label": "aclguard.js"
     },
     {
@@ -1368,7 +1368,7 @@
       "source_file": "src/@core/components/auth/AclGuard.js",
       "source_location": "L25",
       "id": "auth_aclguard_canaccessroute",
-      "community": 218,
+      "community": 70,
       "norm_label": "canaccessroute()"
     },
     {
@@ -1377,7 +1377,7 @@
       "source_file": "src/@core/components/auth/AclGuard.js",
       "source_location": "L40",
       "id": "auth_aclguard_aclguard",
-      "community": 218,
+      "community": 70,
       "norm_label": "aclguard()"
     },
     {
@@ -1611,7 +1611,7 @@
       "source_file": "src/@core/components/customizer/index.js",
       "source_location": "L1",
       "id": "customizer_index",
-      "community": 19,
+      "community": 214,
       "norm_label": "index.js"
     },
     {
@@ -1620,7 +1620,7 @@
       "source_file": "src/@core/components/customizer/index.js",
       "source_location": "L25",
       "id": "customizer_index_toggler",
-      "community": 19,
+      "community": 214,
       "norm_label": "toggler"
     },
     {
@@ -1629,7 +1629,7 @@
       "source_file": "src/@core/components/customizer/index.js",
       "source_location": "L40",
       "id": "customizer_index_drawer",
-      "community": 19,
+      "community": 214,
       "norm_label": "drawer"
     },
     {
@@ -1638,7 +1638,7 @@
       "source_file": "src/@core/components/customizer/index.js",
       "source_location": "L54",
       "id": "customizer_index_customizerspacing",
-      "community": 19,
+      "community": 214,
       "norm_label": "customizerspacing"
     },
     {
@@ -1647,7 +1647,7 @@
       "source_file": "src/@core/components/customizer/index.js",
       "source_location": "L58",
       "id": "customizer_index_colorbox",
-      "community": 19,
+      "community": 214,
       "norm_label": "colorbox"
     },
     {
@@ -1701,7 +1701,7 @@
       "source_file": "src/@core/components/mui/badge/index.js",
       "source_location": "L1",
       "id": "badge_index",
-      "community": 36,
+      "community": 50,
       "norm_label": "index.js"
     },
     {
@@ -1710,7 +1710,7 @@
       "source_file": "src/@core/components/mui/badge/index.js",
       "source_location": "L7",
       "id": "badge_index_badge",
-      "community": 36,
+      "community": 50,
       "norm_label": "badge()"
     },
     {
@@ -1719,7 +1719,7 @@
       "source_file": "src/@core/components/mui/chip/index.js",
       "source_location": "L1",
       "id": "chip_index",
-      "community": 36,
+      "community": 50,
       "norm_label": "index.js"
     },
     {
@@ -1728,7 +1728,7 @@
       "source_file": "src/@core/components/mui/chip/index.js",
       "source_location": "L10",
       "id": "chip_index_chip",
-      "community": 36,
+      "community": 50,
       "norm_label": "chip()"
     },
     {
@@ -1737,7 +1737,7 @@
       "source_file": "src/@core/components/mui/timeline-dot/index.js",
       "source_location": "L1",
       "id": "timeline_dot_index",
-      "community": 23,
+      "community": 50,
       "norm_label": "index.js"
     },
     {
@@ -1746,7 +1746,7 @@
       "source_file": "src/@core/components/mui/timeline-dot/index.js",
       "source_location": "L11",
       "id": "timeline_dot_index_timelinedot",
-      "community": 23,
+      "community": 50,
       "norm_label": "timelinedot()"
     },
     {
@@ -2034,7 +2034,7 @@
       "source_file": "src/@core/hooks/useBgColor.js",
       "source_location": "L1",
       "id": "hooks_usebgcolor",
-      "community": 36,
+      "community": 50,
       "norm_label": "usebgcolor.js"
     },
     {
@@ -2043,7 +2043,7 @@
       "source_file": "src/@core/hooks/useBgColor.js",
       "source_location": "L7",
       "id": "hooks_usebgcolor_usebgcolor",
-      "community": 36,
+      "community": 50,
       "norm_label": "usebgcolor()"
     },
     {
@@ -2322,7 +2322,7 @@
       "source_file": "src/@core/layouts/components/horizontal/navigation/HorizontalNavGroup.js",
       "source_location": "L1",
       "id": "navigation_horizontalnavgroup",
-      "community": 70,
+      "community": 30,
       "norm_label": "horizontalnavgroup.js"
     },
     {
@@ -2331,7 +2331,7 @@
       "source_file": "src/@core/layouts/components/horizontal/navigation/HorizontalNavGroup.js",
       "source_location": "L40",
       "id": "navigation_horizontalnavgroup_listitem",
-      "community": 70,
+      "community": 30,
       "norm_label": "listitem"
     },
     {
@@ -2340,7 +2340,7 @@
       "source_file": "src/@core/layouts/components/horizontal/navigation/HorizontalNavGroup.js",
       "source_location": "L49",
       "id": "navigation_horizontalnavgroup_navigationmenu",
-      "community": 70,
+      "community": 30,
       "norm_label": "navigationmenu"
     },
     {
@@ -2349,7 +2349,7 @@
       "source_file": "src/@core/layouts/components/horizontal/navigation/HorizontalNavGroup.js",
       "source_location": "L75",
       "id": "navigation_horizontalnavgroup_horizontalnavgroup",
-      "community": 70,
+      "community": 30,
       "norm_label": "horizontalnavgroup()"
     },
     {
@@ -2358,7 +2358,7 @@
       "source_file": "src/@core/layouts/components/horizontal/navigation/HorizontalNavItems.js",
       "source_location": "L1",
       "id": "navigation_horizontalnavitems",
-      "community": 42,
+      "community": 30,
       "norm_label": "horizontalnavitems.js"
     },
     {
@@ -2367,7 +2367,7 @@
       "source_file": "src/@core/layouts/components/horizontal/navigation/HorizontalNavItems.js",
       "source_location": "L5",
       "id": "navigation_horizontalnavitems_resolvecomponent",
-      "community": 42,
+      "community": 30,
       "norm_label": "resolvecomponent()"
     },
     {
@@ -2376,7 +2376,7 @@
       "source_file": "src/@core/layouts/components/horizontal/navigation/HorizontalNavItems.js",
       "source_location": "L11",
       "id": "navigation_horizontalnavitems_horizontalnavitems",
-      "community": 42,
+      "community": 30,
       "norm_label": "horizontalnavitems()"
     },
     {
@@ -2385,7 +2385,7 @@
       "source_file": "src/@core/layouts/components/horizontal/navigation/HorizontalNavLink.js",
       "source_location": "L1",
       "id": "navigation_horizontalnavlink",
-      "community": 42,
+      "community": 30,
       "norm_label": "horizontalnavlink.js"
     },
     {
@@ -2394,7 +2394,7 @@
       "source_file": "src/@core/layouts/components/horizontal/navigation/HorizontalNavLink.js",
       "source_location": "L32",
       "id": "navigation_horizontalnavlink_listitem",
-      "community": 42,
+      "community": 30,
       "norm_label": "listitem"
     },
     {
@@ -2403,7 +2403,7 @@
       "source_file": "src/@core/layouts/components/horizontal/navigation/HorizontalNavLink.js",
       "source_location": "L52",
       "id": "navigation_horizontalnavlink_horizontalnavlink",
-      "community": 42,
+      "community": 30,
       "norm_label": "horizontalnavlink()"
     },
     {
@@ -2412,7 +2412,7 @@
       "source_file": "src/@core/layouts/components/horizontal/navigation/index.js",
       "source_location": "L1",
       "id": "src_core_layouts_components_horizontal_navigation_index_js_navigation_index",
-      "community": 42,
+      "community": 30,
       "norm_label": "index.js"
     },
     {
@@ -2421,7 +2421,7 @@
       "source_file": "src/@core/layouts/components/horizontal/navigation/index.js",
       "source_location": "L10",
       "id": "src_core_layouts_components_horizontal_navigation_index_js_navigation_index_navigation",
-      "community": 42,
+      "community": 30,
       "norm_label": "navigation()"
     },
     {
@@ -2700,7 +2700,7 @@
       "source_file": "src/@core/layouts/components/vertical/navigation/Drawer.js",
       "source_location": "L1",
       "id": "navigation_drawer",
-      "community": 35,
+      "community": 30,
       "norm_label": "drawer.js"
     },
     {
@@ -2709,7 +2709,7 @@
       "source_file": "src/@core/layouts/components/vertical/navigation/Drawer.js",
       "source_location": "L5",
       "id": "navigation_drawer_swipeabledrawer",
-      "community": 35,
+      "community": 30,
       "norm_label": "swipeabledrawer"
     },
     {
@@ -2718,7 +2718,7 @@
       "source_file": "src/@core/layouts/components/vertical/navigation/Drawer.js",
       "source_location": "L23",
       "id": "navigation_drawer_drawer",
-      "community": 35,
+      "community": 30,
       "norm_label": "drawer()"
     },
     {
@@ -2754,7 +2754,7 @@
       "source_file": "src/@core/layouts/components/vertical/navigation/VerticalNavHeader.js",
       "source_location": "L1",
       "id": "navigation_verticalnavheader",
-      "community": 35,
+      "community": 30,
       "norm_label": "verticalnavheader.js"
     },
     {
@@ -2763,7 +2763,7 @@
       "source_file": "src/@core/layouts/components/vertical/navigation/VerticalNavHeader.js",
       "source_location": "L18",
       "id": "navigation_verticalnavheader_menuheaderwrapper",
-      "community": 35,
+      "community": 30,
       "norm_label": "menuheaderwrapper"
     },
     {
@@ -2772,7 +2772,7 @@
       "source_file": "src/@core/layouts/components/vertical/navigation/VerticalNavHeader.js",
       "source_location": "L27",
       "id": "navigation_verticalnavheader_headertitle",
-      "community": 35,
+      "community": 30,
       "norm_label": "headertitle"
     },
     {
@@ -2781,7 +2781,7 @@
       "source_file": "src/@core/layouts/components/vertical/navigation/VerticalNavHeader.js",
       "source_location": "L34",
       "id": "navigation_verticalnavheader_linkstyled",
-      "community": 35,
+      "community": 30,
       "norm_label": "linkstyled"
     },
     {
@@ -2790,7 +2790,7 @@
       "source_file": "src/@core/layouts/components/vertical/navigation/VerticalNavHeader.js",
       "source_location": "L40",
       "id": "navigation_verticalnavheader_verticalnavheader",
-      "community": 35,
+      "community": 30,
       "norm_label": "verticalnavheader()"
     },
     {
@@ -2817,7 +2817,7 @@
       "source_file": "src/@core/layouts/components/vertical/navigation/VerticalNavItems.js",
       "source_location": "L13",
       "id": "navigation_verticalnavitems_verticalnavitems",
-      "community": 42,
+      "community": 30,
       "norm_label": "verticalnavitems()"
     },
     {
@@ -2889,7 +2889,7 @@
       "source_file": "src/@core/layouts/components/vertical/navigation/index.js",
       "source_location": "L1",
       "id": "src_core_layouts_components_vertical_navigation_index_js_navigation_index",
-      "community": 35,
+      "community": 30,
       "norm_label": "index.js"
     },
     {
@@ -2898,7 +2898,7 @@
       "source_file": "src/@core/layouts/components/vertical/navigation/index.js",
       "source_location": "L31",
       "id": "navigation_index_filternavitems",
-      "community": 35,
+      "community": 30,
       "norm_label": "filternavitems()"
     },
     {
@@ -2907,7 +2907,7 @@
       "source_file": "src/@core/layouts/components/vertical/navigation/index.js",
       "source_location": "L60",
       "id": "navigation_index_withfavorites",
-      "community": 35,
+      "community": 30,
       "norm_label": "withfavorites()"
     },
     {
@@ -2916,7 +2916,7 @@
       "source_file": "src/@core/layouts/components/vertical/navigation/index.js",
       "source_location": "L81",
       "id": "navigation_index_styledboxforshadow",
-      "community": 35,
+      "community": 30,
       "norm_label": "styledboxforshadow"
     },
     {
@@ -2934,7 +2934,7 @@
       "source_file": "src/@core/layouts/utils.js",
       "source_location": "L1",
       "id": "layouts_utils",
-      "community": 70,
+      "community": 30,
       "norm_label": "utils.js"
     },
     {
@@ -2943,7 +2943,7 @@
       "source_file": "src/@core/layouts/utils.js",
       "source_location": "L8",
       "id": "layouts_utils_handleurlqueries",
-      "community": 70,
+      "community": 30,
       "norm_label": "handleurlqueries()"
     },
     {
@@ -2952,7 +2952,7 @@
       "source_file": "src/@core/layouts/utils.js",
       "source_location": "L25",
       "id": "layouts_utils_hasactivechild",
-      "community": 70,
+      "community": 30,
       "norm_label": "hasactivechild()"
     },
     {
@@ -2961,7 +2961,7 @@
       "source_file": "src/@core/layouts/utils.js",
       "source_location": "L60",
       "id": "layouts_utils_removechildren",
-      "community": 70,
+      "community": 30,
       "norm_label": "removechildren()"
     },
     {
@@ -3186,7 +3186,7 @@
       "source_file": "src/@core/theme/ThemeComponent.js",
       "source_location": "L1",
       "id": "theme_themecomponent",
-      "community": 228,
+      "community": 136,
       "norm_label": "themecomponent.js"
     },
     {
@@ -3195,7 +3195,7 @@
       "source_file": "src/@core/theme/ThemeComponent.js",
       "source_location": "L18",
       "id": "theme_themecomponent_themecomponent",
-      "community": 228,
+      "community": 136,
       "norm_label": "themecomponent()"
     },
     {
@@ -3240,7 +3240,7 @@
       "source_file": "src/@core/theme/globalStyles.js",
       "source_location": "L1",
       "id": "theme_globalstyles",
-      "community": 228,
+      "community": 136,
       "norm_label": "globalstyles.js"
     },
     {
@@ -3249,7 +3249,7 @@
       "source_file": "src/@core/theme/globalStyles.js",
       "source_location": "L4",
       "id": "theme_globalstyles_globalstyles",
-      "community": 228,
+      "community": 136,
       "norm_label": "globalstyles()"
     },
     {
@@ -3276,7 +3276,7 @@
       "source_file": "src/@core/theme/overrides/alerts.js",
       "source_location": "L1",
       "id": "overrides_alerts",
-      "community": 127,
+      "community": 26,
       "norm_label": "alerts.js"
     },
     {
@@ -3285,7 +3285,7 @@
       "source_file": "src/@core/theme/overrides/alerts.js",
       "source_location": "L7",
       "id": "overrides_alerts_alert",
-      "community": 127,
+      "community": 26,
       "norm_label": "alert()"
     },
     {
@@ -3312,7 +3312,7 @@
       "source_file": "src/@core/theme/overrides/avatars.js",
       "source_location": "L1",
       "id": "overrides_avatars",
-      "community": 230,
+      "community": 26,
       "norm_label": "avatars.js"
     },
     {
@@ -3321,7 +3321,7 @@
       "source_file": "src/@core/theme/overrides/avatars.js",
       "source_location": "L1",
       "id": "overrides_avatars_avatar",
-      "community": 230,
+      "community": 26,
       "norm_label": "avatar()"
     },
     {
@@ -3429,7 +3429,7 @@
       "source_file": "src/@core/theme/overrides/dataGrid.js",
       "source_location": "L1",
       "id": "overrides_datagrid",
-      "community": 134,
+      "community": 26,
       "norm_label": "datagrid.js"
     },
     {
@@ -3438,7 +3438,7 @@
       "source_file": "src/@core/theme/overrides/dataGrid.js",
       "source_location": "L1",
       "id": "overrides_datagrid_datagrid",
-      "community": 134,
+      "community": 26,
       "norm_label": "datagrid()"
     },
     {
@@ -3447,7 +3447,7 @@
       "source_file": "src/@core/theme/overrides/dialog.js",
       "source_location": "L1",
       "id": "overrides_dialog",
-      "community": 233,
+      "community": 26,
       "norm_label": "dialog.js"
     },
     {
@@ -3456,7 +3456,7 @@
       "source_file": "src/@core/theme/overrides/dialog.js",
       "source_location": "L1",
       "id": "overrides_dialog_dialog",
-      "community": 233,
+      "community": 26,
       "norm_label": "dialog()"
     },
     {
@@ -3564,7 +3564,7 @@
       "source_file": "src/@core/theme/overrides/menu.js",
       "source_location": "L1",
       "id": "overrides_menu",
-      "community": 26,
+      "community": 220,
       "norm_label": "menu.js"
     },
     {
@@ -3573,7 +3573,7 @@
       "source_file": "src/@core/theme/overrides/menu.js",
       "source_location": "L1",
       "id": "overrides_menu_menu",
-      "community": 26,
+      "community": 220,
       "norm_label": "menu()"
     },
     {
@@ -3582,7 +3582,7 @@
       "source_file": "src/@core/theme/overrides/pagination.js",
       "source_location": "L1",
       "id": "overrides_pagination",
-      "community": 236,
+      "community": 26,
       "norm_label": "pagination.js"
     },
     {
@@ -3591,7 +3591,7 @@
       "source_file": "src/@core/theme/overrides/pagination.js",
       "source_location": "L4",
       "id": "overrides_pagination_pagination",
-      "community": 236,
+      "community": 26,
       "norm_label": "pagination()"
     },
     {
@@ -3609,7 +3609,7 @@
       "source_file": "src/@core/theme/overrides/popover.js",
       "source_location": "L1",
       "id": "overrides_popover",
-      "community": 136,
+      "community": 26,
       "norm_label": "popover.js"
     },
     {
@@ -3618,7 +3618,7 @@
       "source_file": "src/@core/theme/overrides/popover.js",
       "source_location": "L1",
       "id": "overrides_popover_popover",
-      "community": 136,
+      "community": 26,
       "norm_label": "popover()"
     },
     {
@@ -3735,7 +3735,7 @@
       "source_file": "src/@core/theme/overrides/tabs.js",
       "source_location": "L1",
       "id": "overrides_tabs",
-      "community": 154,
+      "community": 221,
       "norm_label": "tabs.js"
     },
     {
@@ -3744,7 +3744,7 @@
       "source_file": "src/@core/theme/overrides/tabs.js",
       "source_location": "L1",
       "id": "overrides_tabs_tabs",
-      "community": 154,
+      "community": 221,
       "norm_label": "tabs()"
     },
     {
@@ -3780,7 +3780,7 @@
       "source_file": "src/@core/theme/overrides/tooltip.js",
       "source_location": "L1",
       "id": "overrides_tooltip",
-      "community": 238,
+      "community": 222,
       "norm_label": "tooltip.js"
     },
     {
@@ -3789,7 +3789,7 @@
       "source_file": "src/@core/theme/overrides/tooltip.js",
       "source_location": "L4",
       "id": "overrides_tooltip_tooltip",
-      "community": 238,
+      "community": 222,
       "norm_label": "tooltip()"
     },
     {
@@ -4203,7 +4203,7 @@
       "source_file": "src/components/admin/AdminGoogleSignIn.jsx",
       "source_location": "L1",
       "id": "admin_admingooglesignin",
-      "community": 15,
+      "community": 117,
       "norm_label": "admingooglesignin.jsx"
     },
     {
@@ -4212,7 +4212,7 @@
       "source_file": "src/components/admin/AdminGoogleSignIn.jsx",
       "source_location": "L8",
       "id": "admin_admingooglesignin_loadgis",
-      "community": 15,
+      "community": 117,
       "norm_label": "loadgis()"
     },
     {
@@ -4221,7 +4221,7 @@
       "source_file": "src/components/admin/AdminGoogleSignIn.jsx",
       "source_location": "L33",
       "id": "admin_admingooglesignin_admingooglesignin",
-      "community": 15,
+      "community": 117,
       "norm_label": "admingooglesignin()"
     },
     {
@@ -6165,7 +6165,7 @@
       "source_file": "src/configs/acl.js",
       "source_location": "L1",
       "id": "configs_acl",
-      "community": 225,
+      "community": 134,
       "norm_label": "acl.js"
     },
     {
@@ -6174,7 +6174,7 @@
       "source_file": "src/configs/acl.js",
       "source_location": "L9",
       "id": "configs_acl_definerulesfor",
-      "community": 225,
+      "community": 134,
       "norm_label": "definerulesfor()"
     },
     {
@@ -6183,7 +6183,7 @@
       "source_file": "src/configs/acl.js",
       "source_location": "L89",
       "id": "configs_acl_buildabilityfor",
-      "community": 225,
+      "community": 134,
       "norm_label": "buildabilityfor()"
     },
     {
@@ -6192,7 +6192,7 @@
       "source_file": "src/configs/acl.js",
       "source_location": "L97",
       "id": "configs_acl_defaultaclobj",
-      "community": 225,
+      "community": 134,
       "norm_label": "defaultaclobj"
     },
     {
@@ -6201,7 +6201,7 @@
       "source_file": "src/configs/aclRouteSubjects.js",
       "source_location": "L1",
       "id": "configs_aclroutesubjects",
-      "community": 218,
+      "community": 70,
       "norm_label": "aclroutesubjects.js"
     },
     {
@@ -6210,7 +6210,7 @@
       "source_file": "src/configs/aclRouteSubjects.js",
       "source_location": "L5",
       "id": "configs_aclroutesubjects_acl_route_subjects",
-      "community": 218,
+      "community": 70,
       "norm_label": "acl_route_subjects"
     },
     {
@@ -6219,7 +6219,7 @@
       "source_file": "src/configs/aclRouteSubjects.js",
       "source_location": "L43",
       "id": "configs_aclroutesubjects_subjectforpath",
-      "community": 218,
+      "community": 70,
       "norm_label": "subjectforpath()"
     },
     {
@@ -6309,7 +6309,7 @@
       "source_file": "src/configs/adminEnv.js",
       "source_location": "L56",
       "id": "configs_adminenv_showadminmfanotice",
-      "community": 36,
+      "community": 33,
       "norm_label": "showadminmfanotice()"
     },
     {
@@ -6318,7 +6318,7 @@
       "source_file": "src/configs/adminEnv.js",
       "source_location": "L60",
       "id": "configs_adminenv_getgoogleclientid",
-      "community": 15,
+      "community": 117,
       "norm_label": "getgoogleclientid()"
     },
     {
@@ -6327,7 +6327,7 @@
       "source_file": "src/configs/adminRoleMatrix.js",
       "source_location": "L1",
       "id": "configs_adminrolematrix",
-      "community": 117,
+      "community": 57,
       "norm_label": "adminrolematrix.js"
     },
     {
@@ -6336,7 +6336,7 @@
       "source_file": "src/configs/adminRoleMatrix.js",
       "source_location": "L6",
       "id": "configs_adminrolematrix_all_permission_keys",
-      "community": 117,
+      "community": 57,
       "norm_label": "all_permission_keys"
     },
     {
@@ -6345,7 +6345,7 @@
       "source_file": "src/configs/adminRoleMatrix.js",
       "source_location": "L79",
       "id": "configs_adminrolematrix_perms",
-      "community": 117,
+      "community": 57,
       "norm_label": "perms()"
     },
     {
@@ -6354,7 +6354,7 @@
       "source_file": "src/configs/adminRoleMatrix.js",
       "source_location": "L90",
       "id": "configs_adminrolematrix_full_ops",
-      "community": 117,
+      "community": 57,
       "norm_label": "full_ops"
     },
     {
@@ -6363,7 +6363,7 @@
       "source_file": "src/configs/adminRoleMatrix.js",
       "source_location": "L163",
       "id": "configs_adminrolematrix_role_matrix",
-      "community": 117,
+      "community": 57,
       "norm_label": "role_matrix"
     },
     {
@@ -6372,7 +6372,7 @@
       "source_file": "src/configs/adminRoleMatrix.js",
       "source_location": "L254",
       "id": "configs_adminrolematrix_perm_groups",
-      "community": 117,
+      "community": 57,
       "norm_label": "perm_groups"
     },
     {
@@ -6381,7 +6381,7 @@
       "source_file": "src/configs/adminRoleMatrix.js",
       "source_location": "L362",
       "id": "configs_adminrolematrix_effectiveadminpermissions",
-      "community": 117,
+      "community": 57,
       "norm_label": "effectiveadminpermissions()"
     },
     {
@@ -6552,7 +6552,7 @@
       "source_file": "src/constants/pricingAdmin.js",
       "source_location": "L54",
       "id": "constants_pricingadmin_decimaltotaxpctinput",
-      "community": 6,
+      "community": 127,
       "norm_label": "decimaltotaxpctinput()"
     },
     {
@@ -6574,10 +6574,109 @@
       "norm_label": "storage_plan_ids"
     },
     {
-      "label": "PRICING_REGIONS",
+      "label": "LESSON_DURATION_MINUTES",
       "file_type": "code",
       "source_file": "src/constants/pricingAdmin.js",
       "source_location": "L59",
+      "id": "constants_pricingadmin_lesson_duration_minutes",
+      "community": 6,
+      "norm_label": "lesson_duration_minutes"
+    },
+    {
+      "label": "GB_JURISDICTION_OPTIONS",
+      "file_type": "code",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L62",
+      "id": "constants_pricingadmin_gb_jurisdiction_options",
+      "community": 6,
+      "norm_label": "gb_jurisdiction_options"
+    },
+    {
+      "label": "EU_JURISDICTION_OPTIONS",
+      "file_type": "code",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L64",
+      "id": "constants_pricingadmin_eu_jurisdiction_options",
+      "community": 6,
+      "norm_label": "eu_jurisdiction_options"
+    },
+    {
+      "label": "SURGE_TIMEZONES",
+      "file_type": "code",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L73",
+      "id": "constants_pricingadmin_surge_timezones",
+      "community": 6,
+      "norm_label": "surge_timezones"
+    },
+    {
+      "label": "paymentMethodsForRegion()",
+      "file_type": "code",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L85",
+      "id": "constants_pricingadmin_paymentmethodsforregion",
+      "community": 6,
+      "norm_label": "paymentmethodsforregion()"
+    },
+    {
+      "label": "jurisdictionsForRegion()",
+      "file_type": "code",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L92",
+      "id": "constants_pricingadmin_jurisdictionsforregion",
+      "community": 6,
+      "norm_label": "jurisdictionsforregion()"
+    },
+    {
+      "label": "defaultPaymentHint()",
+      "file_type": "code",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L99",
+      "id": "constants_pricingadmin_defaultpaymenthint",
+      "community": 6,
+      "norm_label": "defaultpaymenthint()"
+    },
+    {
+      "label": "defaultJurisdiction()",
+      "file_type": "code",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L103",
+      "id": "constants_pricingadmin_defaultjurisdiction",
+      "community": 6,
+      "norm_label": "defaultjurisdiction()"
+    },
+    {
+      "label": "currencyForRegion()",
+      "file_type": "code",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L107",
+      "id": "constants_pricingadmin_currencyforregion",
+      "community": 205,
+      "norm_label": "currencyforregion()"
+    },
+    {
+      "label": "hourlyCentsFromSession()",
+      "file_type": "code",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L111",
+      "id": "constants_pricingadmin_hourlycentsfromsession",
+      "community": 205,
+      "norm_label": "hourlycentsfromsession()"
+    },
+    {
+      "label": "surgeCentsOnSubtotal()",
+      "file_type": "code",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L116",
+      "id": "constants_pricingadmin_surgecentsonsubtotal",
+      "community": 6,
+      "norm_label": "surgecentsonsubtotal()"
+    },
+    {
+      "label": "PRICING_REGIONS",
+      "file_type": "code",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L120",
       "id": "constants_pricingadmin_pricing_regions",
       "community": 6,
       "norm_label": "pricing_regions"
@@ -6586,7 +6685,7 @@
       "label": "GB_PAYMENT_METHODS",
       "file_type": "code",
       "source_file": "src/constants/pricingAdmin.js",
-      "source_location": "L66",
+      "source_location": "L127",
       "id": "constants_pricingadmin_gb_payment_methods",
       "community": 6,
       "norm_label": "gb_payment_methods"
@@ -6595,7 +6694,7 @@
       "label": "EU_PAYMENT_METHODS",
       "file_type": "code",
       "source_file": "src/constants/pricingAdmin.js",
-      "source_location": "L76",
+      "source_location": "L137",
       "id": "constants_pricingadmin_eu_payment_methods",
       "community": 6,
       "norm_label": "eu_payment_methods"
@@ -6604,7 +6703,7 @@
       "label": "fmtMoney()",
       "file_type": "code",
       "source_file": "src/constants/pricingAdmin.js",
-      "source_location": "L86",
+      "source_location": "L147",
       "id": "constants_pricingadmin_fmtmoney",
       "community": 6,
       "norm_label": "fmtmoney()"
@@ -6613,7 +6712,7 @@
       "label": "fmtPct()",
       "file_type": "code",
       "source_file": "src/constants/pricingAdmin.js",
-      "source_location": "L96",
+      "source_location": "L157",
       "id": "constants_pricingadmin_fmtpct",
       "community": 205,
       "norm_label": "fmtpct()"
@@ -6622,25 +6721,25 @@
       "label": "centsToInput()",
       "file_type": "code",
       "source_file": "src/constants/pricingAdmin.js",
-      "source_location": "L98",
+      "source_location": "L159",
       "id": "constants_pricingadmin_centstoinput",
-      "community": 6,
+      "community": 127,
       "norm_label": "centstoinput()"
     },
     {
       "label": "inputToCents()",
       "file_type": "code",
       "source_file": "src/constants/pricingAdmin.js",
-      "source_location": "L99",
+      "source_location": "L160",
       "id": "constants_pricingadmin_inputtocents",
-      "community": 6,
+      "community": 208,
       "norm_label": "inputtocents()"
     },
     {
       "label": "pctInputToDecimal()",
       "file_type": "code",
       "source_file": "src/constants/pricingAdmin.js",
-      "source_location": "L100",
+      "source_location": "L161",
       "id": "constants_pricingadmin_pctinputtodecimal",
       "community": 6,
       "norm_label": "pctinputtodecimal()"
@@ -6649,16 +6748,16 @@
       "label": "decimalToPctInput()",
       "file_type": "code",
       "source_file": "src/constants/pricingAdmin.js",
-      "source_location": "L101",
+      "source_location": "L162",
       "id": "constants_pricingadmin_decimaltopctinput",
-      "community": 6,
+      "community": 127,
       "norm_label": "decimaltopctinput()"
     },
     {
       "label": "deepClone()",
       "file_type": "code",
       "source_file": "src/constants/pricingAdmin.js",
-      "source_location": "L103",
+      "source_location": "L164",
       "id": "constants_pricingadmin_deepclone",
       "community": 6,
       "norm_label": "deepclone()"
@@ -6768,7 +6867,7 @@
       "source_file": "src/context/AdminRealtimeContext.js",
       "source_location": "L1",
       "id": "context_adminrealtimecontext",
-      "community": 219,
+      "community": 51,
       "norm_label": "adminrealtimecontext.js"
     },
     {
@@ -6777,7 +6876,7 @@
       "source_file": "src/context/AdminRealtimeContext.js",
       "source_location": "L16",
       "id": "context_adminrealtimecontext_defaultvalue",
-      "community": 219,
+      "community": 51,
       "norm_label": "defaultvalue"
     },
     {
@@ -6786,7 +6885,7 @@
       "source_file": "src/context/AdminRealtimeContext.js",
       "source_location": "L27",
       "id": "context_adminrealtimecontext_adminrealtimecontext",
-      "community": 219,
+      "community": 51,
       "norm_label": "adminrealtimecontext"
     },
     {
@@ -6795,7 +6894,7 @@
       "source_file": "src/context/AdminRealtimeContext.js",
       "source_location": "L29",
       "id": "context_adminrealtimecontext_isadminrole",
-      "community": 219,
+      "community": 51,
       "norm_label": "isadminrole()"
     },
     {
@@ -6804,7 +6903,7 @@
       "source_file": "src/context/AdminRealtimeContext.js",
       "source_location": "L31",
       "id": "context_adminrealtimecontext_readstoredadmin",
-      "community": 219,
+      "community": 51,
       "norm_label": "readstoredadmin()"
     },
     {
@@ -6813,7 +6912,7 @@
       "source_file": "src/context/AdminRealtimeContext.js",
       "source_location": "L41",
       "id": "context_adminrealtimecontext_normalizemetrics",
-      "community": 219,
+      "community": 51,
       "norm_label": "normalizemetrics()"
     },
     {
@@ -6822,7 +6921,7 @@
       "source_file": "src/context/AdminRealtimeContext.js",
       "source_location": "L47",
       "id": "context_adminrealtimecontext_adminrealtimeprovider",
-      "community": 227,
+      "community": 51,
       "norm_label": "adminrealtimeprovider()"
     },
     {
@@ -6921,7 +7020,7 @@
       "source_file": "src/context/CommonContext.js",
       "source_location": "L1",
       "id": "context_commoncontext",
-      "community": 223,
+      "community": 269,
       "norm_label": "commoncontext.js"
     },
     {
@@ -6930,7 +7029,7 @@
       "source_file": "src/context/CommonContext.js",
       "source_location": "L6",
       "id": "context_commoncontext_defaultprovider",
-      "community": 223,
+      "community": 269,
       "norm_label": "defaultprovider"
     },
     {
@@ -6939,7 +7038,7 @@
       "source_file": "src/context/CommonContext.js",
       "source_location": "L15",
       "id": "context_commoncontext_commoncontext",
-      "community": 223,
+      "community": 269,
       "norm_label": "commoncontext"
     },
     {
@@ -6948,7 +7047,7 @@
       "source_file": "src/context/CommonContext.js",
       "source_location": "L17",
       "id": "context_commoncontext_authheaders",
-      "community": 223,
+      "community": 269,
       "norm_label": "authheaders()"
     },
     {
@@ -6957,7 +7056,7 @@
       "source_file": "src/context/CommonContext.js",
       "source_location": "L22",
       "id": "context_commoncontext_commonprovider",
-      "community": 223,
+      "community": 269,
       "norm_label": "commonprovider()"
     },
     {
@@ -7209,7 +7308,7 @@
       "source_file": "src/features/bookings/refundLabels.js",
       "source_location": "L1",
       "id": "bookings_refundlabels",
-      "community": 17,
+      "community": 35,
       "norm_label": "refundlabels.js"
     },
     {
@@ -7218,7 +7317,7 @@
       "source_file": "src/features/bookings/refundLabels.js",
       "source_location": "L1",
       "id": "bookings_refundlabels_refund_reason_labels",
-      "community": 17,
+      "community": 35,
       "norm_label": "refund_reason_labels"
     },
     {
@@ -7227,7 +7326,7 @@
       "source_file": "src/features/bookings/refundLabels.js",
       "source_location": "L18",
       "id": "bookings_refundlabels_refund_reason_presets",
-      "community": 17,
+      "community": 35,
       "norm_label": "refund_reason_presets"
     },
     {
@@ -7236,7 +7335,7 @@
       "source_file": "src/features/bookings/refundLabels.js",
       "source_location": "L27",
       "id": "bookings_refundlabels_refundreasonlabel",
-      "community": 17,
+      "community": 35,
       "norm_label": "refundreasonlabel()"
     },
     {
@@ -7245,7 +7344,7 @@
       "source_file": "src/features/bookings/refundLabels.js",
       "source_location": "L39",
       "id": "bookings_refundlabels_isrefundterminal",
-      "community": 17,
+      "community": 35,
       "norm_label": "isrefundterminal()"
     },
     {
@@ -7254,7 +7353,7 @@
       "source_file": "src/features/bookings/refundLabels.js",
       "source_location": "L44",
       "id": "bookings_refundlabels_refundstatuslabel",
-      "community": 17,
+      "community": 35,
       "norm_label": "refundstatuslabel()"
     },
     {
@@ -7263,7 +7362,7 @@
       "source_file": "src/features/bookings/refundLabels.js",
       "source_location": "L56",
       "id": "bookings_refundlabels_refunddestinationcopy",
-      "community": 17,
+      "community": 35,
       "norm_label": "refunddestinationcopy()"
     },
     {
@@ -7272,7 +7371,7 @@
       "source_file": "src/features/bookings/refundLabels.js",
       "source_location": "L66",
       "id": "bookings_refundlabels_persondisplayname",
-      "community": 17,
+      "community": 35,
       "norm_label": "persondisplayname()"
     },
     {
@@ -7398,7 +7497,7 @@
       "source_file": "src/features/finance/columns.jsx",
       "source_location": "L42",
       "id": "finance_columns_statuschip",
-      "community": 17,
+      "community": 35,
       "norm_label": "statuschip()"
     },
     {
@@ -7623,7 +7722,7 @@
       "source_file": "src/features/logs/LogsHubPage.jsx",
       "source_location": "L1",
       "id": "logs_logshubpage",
-      "community": 3,
+      "community": 226,
       "norm_label": "logshubpage.jsx"
     },
     {
@@ -7632,7 +7731,7 @@
       "source_file": "src/features/logs/LogsHubPage.jsx",
       "source_location": "L32",
       "id": "logs_logshubpage_tabs",
-      "community": 3,
+      "community": 226,
       "norm_label": "tabs"
     },
     {
@@ -7641,7 +7740,7 @@
       "source_file": "src/features/logs/LogsHubPage.jsx",
       "source_location": "L42",
       "id": "logs_logshubpage_emptyfilters",
-      "community": 3,
+      "community": 226,
       "norm_label": "emptyfilters()"
     },
     {
@@ -7650,7 +7749,7 @@
       "source_file": "src/features/logs/LogsHubPage.jsx",
       "source_location": "L55",
       "id": "logs_logshubpage_logshubpage",
-      "community": 3,
+      "community": 226,
       "norm_label": "logshubpage()"
     },
     {
@@ -7659,7 +7758,7 @@
       "source_file": "src/features/logs/LogsTable.jsx",
       "source_location": "L1",
       "id": "logs_logstable",
-      "community": 3,
+      "community": 226,
       "norm_label": "logstable.jsx"
     },
     {
@@ -7668,7 +7767,7 @@
       "source_file": "src/features/logs/LogsTable.jsx",
       "source_location": "L17",
       "id": "logs_logstable_logstable",
-      "community": 3,
+      "community": 226,
       "norm_label": "logstable()"
     },
     {
@@ -7677,7 +7776,7 @@
       "source_file": "src/features/logs/OverviewTab.jsx",
       "source_location": "L1",
       "id": "logs_overviewtab",
-      "community": 3,
+      "community": 226,
       "norm_label": "overviewtab.jsx"
     },
     {
@@ -7686,7 +7785,7 @@
       "source_file": "src/features/logs/OverviewTab.jsx",
       "source_location": "L9",
       "id": "logs_overviewtab_overviewtab",
-      "community": 3,
+      "community": 226,
       "norm_label": "overviewtab()"
     },
     {
@@ -7731,7 +7830,7 @@
       "source_file": "src/features/logs/clientSurface.js",
       "source_location": "L1",
       "id": "logs_clientsurface",
-      "community": 3,
+      "community": 226,
       "norm_label": "clientsurface.js"
     },
     {
@@ -7740,7 +7839,7 @@
       "source_file": "src/features/logs/clientSurface.js",
       "source_location": "L2",
       "id": "logs_clientsurface_clientsurfacefromrow",
-      "community": 3,
+      "community": 226,
       "norm_label": "clientsurfacefromrow()"
     },
     {
@@ -7749,7 +7848,7 @@
       "source_file": "src/features/logs/clientSurface.js",
       "source_location": "L14",
       "id": "logs_clientsurface_surface_filters",
-      "community": 3,
+      "community": 226,
       "norm_label": "surface_filters"
     },
     {
@@ -7785,7 +7884,7 @@
       "source_file": "src/features/logs/columns.jsx",
       "source_location": "L1",
       "id": "logs_columns",
-      "community": 3,
+      "community": 226,
       "norm_label": "columns.jsx"
     },
     {
@@ -7794,7 +7893,7 @@
       "source_file": "src/features/logs/columns.jsx",
       "source_location": "L9",
       "id": "logs_columns_statuschip",
-      "community": 3,
+      "community": 226,
       "norm_label": "statuschip()"
     },
     {
@@ -7803,7 +7902,7 @@
       "source_file": "src/features/logs/columns.jsx",
       "source_location": "L28",
       "id": "logs_columns_buildlogcolumns",
-      "community": 3,
+      "community": 226,
       "norm_label": "buildlogcolumns()"
     },
     {
@@ -7812,7 +7911,7 @@
       "source_file": "src/features/pricing/PricingPage.jsx",
       "source_location": "L1",
       "id": "pricing_pricingpage",
-      "community": 208,
+      "community": 42,
       "norm_label": "pricingpage.jsx"
     },
     {
@@ -7821,7 +7920,7 @@
       "source_file": "src/features/pricing/PricingPage.jsx",
       "source_location": "L25",
       "id": "pricing_pricingpage_tab_labels",
-      "community": 208,
+      "community": 42,
       "norm_label": "tab_labels"
     },
     {
@@ -7830,7 +7929,7 @@
       "source_file": "src/features/pricing/PricingPage.jsx",
       "source_location": "L26",
       "id": "pricing_pricingpage_tab_slugs",
-      "community": 208,
+      "community": 42,
       "norm_label": "tab_slugs"
     },
     {
@@ -7848,25 +7947,16 @@
       "source_file": "src/features/pricing/components/PricingDashboardTab.jsx",
       "source_location": "L1",
       "id": "components_pricingdashboardtab",
-      "community": 294,
+      "community": 42,
       "norm_label": "pricingdashboardtab.jsx"
-    },
-    {
-      "label": "FlowStep()",
-      "file_type": "code",
-      "source_file": "src/features/pricing/components/PricingDashboardTab.jsx",
-      "source_location": "L17",
-      "id": "components_pricingdashboardtab_flowstep",
-      "community": 294,
-      "norm_label": "flowstep()"
     },
     {
       "label": "PricingDashboardTab()",
       "file_type": "code",
       "source_file": "src/features/pricing/components/PricingDashboardTab.jsx",
-      "source_location": "L31",
+      "source_location": "L19",
       "id": "components_pricingdashboardtab_pricingdashboardtab",
-      "community": 294,
+      "community": 42,
       "norm_label": "pricingdashboardtab()"
     },
     {
@@ -7888,31 +7978,49 @@
       "norm_label": "pricingescrowpolicytab()"
     },
     {
-      "label": "PricingFeeExplainer.jsx",
+      "label": "PricingGuide.jsx",
       "file_type": "code",
-      "source_file": "src/features/pricing/components/PricingFeeExplainer.jsx",
+      "source_file": "src/features/pricing/components/PricingGuide.jsx",
       "source_location": "L1",
-      "id": "components_pricingfeeexplainer",
-      "community": 214,
-      "norm_label": "pricingfeeexplainer.jsx"
+      "id": "components_pricingguide",
+      "community": 42,
+      "norm_label": "pricingguide.jsx"
     },
     {
-      "label": "FeeCard()",
+      "label": "PRICING_FLOW",
       "file_type": "code",
-      "source_file": "src/features/pricing/components/PricingFeeExplainer.jsx",
-      "source_location": "L9",
-      "id": "components_pricingfeeexplainer_feecard",
-      "community": 214,
-      "norm_label": "feecard()"
+      "source_file": "src/features/pricing/components/PricingGuide.jsx",
+      "source_location": "L10",
+      "id": "components_pricingguide_pricing_flow",
+      "community": 42,
+      "norm_label": "pricing_flow"
     },
     {
-      "label": "PricingFeeExplainer()",
+      "label": "PricingFlowStrip()",
       "file_type": "code",
-      "source_file": "src/features/pricing/components/PricingFeeExplainer.jsx",
-      "source_location": "L29",
-      "id": "components_pricingfeeexplainer_pricingfeeexplainer",
-      "community": 214,
-      "norm_label": "pricingfeeexplainer()"
+      "source_file": "src/features/pricing/components/PricingGuide.jsx",
+      "source_location": "L18",
+      "id": "components_pricingguide_pricingflowstrip",
+      "community": 42,
+      "norm_label": "pricingflowstrip()"
+    },
+    {
+      "label": "PricingMentalModel()",
+      "file_type": "code",
+      "source_file": "src/features/pricing/components/PricingGuide.jsx",
+      "source_location": "L71",
+      "id": "components_pricingguide_pricingmentalmodel",
+      "community": 42,
+      "norm_label": "pricingmentalmodel()"
+    },
+    {
+      "label": "PricingMixups()",
+      "file_type": "code",
+      "source_file": "src/features/pricing/components/PricingGuide.jsx",
+      "source_location": "L110",
+      "id": "components_pricingguide_pricingmixups",
+      "community": 42,
+      "norm_label": "pricingmixups()"
     },
     {
       "label": "PricingHistoryTab.jsx",
@@ -7920,17 +8028,71 @@
       "source_file": "src/features/pricing/components/PricingHistoryTab.jsx",
       "source_location": "L1",
       "id": "components_pricinghistorytab",
-      "community": 208,
+      "community": 204,
       "norm_label": "pricinghistorytab.jsx"
     },
     {
       "label": "PricingHistoryTab()",
       "file_type": "code",
       "source_file": "src/features/pricing/components/PricingHistoryTab.jsx",
-      "source_location": "L9",
+      "source_location": "L8",
       "id": "components_pricinghistorytab_pricinghistorytab",
-      "community": 208,
+      "community": 204,
       "norm_label": "pricinghistorytab()"
+    },
+    {
+      "label": "PricingLessonSplit.jsx",
+      "file_type": "code",
+      "source_file": "src/features/pricing/components/PricingLessonSplit.jsx",
+      "source_location": "L1",
+      "id": "components_pricinglessonsplit",
+      "community": 31,
+      "norm_label": "pricinglessonsplit.jsx"
+    },
+    {
+      "label": "SESSION_PRODUCTS",
+      "file_type": "code",
+      "source_file": "src/features/pricing/components/PricingLessonSplit.jsx",
+      "source_location": "L33",
+      "id": "components_pricinglessonsplit_session_products",
+      "community": 31,
+      "norm_label": "session_products"
+    },
+    {
+      "label": "DEFAULT_LESSON",
+      "file_type": "code",
+      "source_file": "src/features/pricing/components/PricingLessonSplit.jsx",
+      "source_location": "L37",
+      "id": "components_pricinglessonsplit_default_lesson",
+      "community": 31,
+      "norm_label": "default_lesson"
+    },
+    {
+      "label": "rowAmount()",
+      "file_type": "code",
+      "source_file": "src/features/pricing/components/PricingLessonSplit.jsx",
+      "source_location": "L44",
+      "id": "components_pricinglessonsplit_rowamount",
+      "community": 31,
+      "norm_label": "rowamount()"
+    },
+    {
+      "label": "SplitBar()",
+      "file_type": "code",
+      "source_file": "src/features/pricing/components/PricingLessonSplit.jsx",
+      "source_location": "L48",
+      "id": "components_pricinglessonsplit_splitbar",
+      "community": 31,
+      "norm_label": "splitbar()"
+    },
+    {
+      "label": "PricingLessonSplit()",
+      "file_type": "code",
+      "source_file": "src/features/pricing/components/PricingLessonSplit.jsx",
+      "source_location": "L82",
+      "id": "components_pricinglessonsplit_pricinglessonsplit",
+      "community": 127,
+      "norm_label": "pricinglessonsplit()"
     },
     {
       "label": "PricingOverviewTab.jsx",
@@ -7983,16 +8145,16 @@
       "source_file": "src/features/pricing/components/PricingProfitCheckTab.jsx",
       "source_location": "L1",
       "id": "components_pricingprofitchecktab",
-      "community": 50,
+      "community": 31,
       "norm_label": "pricingprofitchecktab.jsx"
     },
     {
       "label": "PricingProfitCheckTab()",
       "file_type": "code",
       "source_file": "src/features/pricing/components/PricingProfitCheckTab.jsx",
-      "source_location": "L7",
+      "source_location": "L14",
       "id": "components_pricingprofitchecktab_pricingprofitchecktab",
-      "community": 50,
+      "community": 31,
       "norm_label": "pricingprofitchecktab()"
     },
     {
@@ -8001,7 +8163,7 @@
       "source_file": "src/features/pricing/components/PricingPromoSponsorTab.jsx",
       "source_location": "L1",
       "id": "components_pricingpromosponsortab",
-      "community": 208,
+      "community": 42,
       "norm_label": "pricingpromosponsortab.jsx"
     },
     {
@@ -8010,7 +8172,7 @@
       "source_file": "src/features/pricing/components/PricingPromoSponsorTab.jsx",
       "source_location": "L8",
       "id": "components_pricingpromosponsortab_pricingpromosponsortab",
-      "community": 208,
+      "community": 42,
       "norm_label": "pricingpromosponsortab()"
     },
     {
@@ -8044,9 +8206,9 @@
       "label": "PricingRegionTab()",
       "file_type": "code",
       "source_file": "src/features/pricing/components/PricingRegionTab.jsx",
-      "source_location": "L26",
+      "source_location": "L25",
       "id": "components_pricingregiontab_pricingregiontab",
-      "community": 6,
+      "community": 127,
       "norm_label": "pricingregiontab()"
     },
     {
@@ -8055,25 +8217,25 @@
       "source_file": "src/features/pricing/components/PricingSimulatorTab.jsx",
       "source_location": "L1",
       "id": "components_pricingsimulatortab",
-      "community": 50,
+      "community": 31,
       "norm_label": "pricingsimulatortab.jsx"
     },
     {
       "label": "DEFAULT_INPUT",
       "file_type": "code",
       "source_file": "src/features/pricing/components/PricingSimulatorTab.jsx",
-      "source_location": "L29",
+      "source_location": "L32",
       "id": "components_pricingsimulatortab_default_input",
-      "community": 50,
+      "community": 31,
       "norm_label": "default_input"
     },
     {
       "label": "PricingSimulatorTab()",
       "file_type": "code",
       "source_file": "src/features/pricing/components/PricingSimulatorTab.jsx",
-      "source_location": "L38",
+      "source_location": "L41",
       "id": "components_pricingsimulatortab_pricingsimulatortab",
-      "community": 50,
+      "community": 205,
       "norm_label": "pricingsimulatortab()"
     },
     {
@@ -8086,19 +8248,19 @@
       "norm_label": "pricingsurgetab.jsx"
     },
     {
-      "label": "PRODUCT_TYPES",
+      "label": "SESSION_PRODUCTS",
       "file_type": "code",
       "source_file": "src/features/pricing/components/PricingSurgeTab.jsx",
-      "source_location": "L19",
-      "id": "components_pricingsurgetab_product_types",
+      "source_location": "L28",
+      "id": "components_pricingsurgetab_session_products",
       "community": 208,
-      "norm_label": "product_types"
+      "norm_label": "session_products"
     },
     {
       "label": "DEMAND_METRICS",
       "file_type": "code",
       "source_file": "src/features/pricing/components/PricingSurgeTab.jsx",
-      "source_location": "L25",
+      "source_location": "L32",
       "id": "components_pricingsurgetab_demand_metrics",
       "community": 208,
       "norm_label": "demand_metrics"
@@ -8107,7 +8269,7 @@
       "label": "DAYS",
       "file_type": "code",
       "source_file": "src/features/pricing/components/PricingSurgeTab.jsx",
-      "source_location": "L30",
+      "source_location": "L37",
       "id": "components_pricingsurgetab_days",
       "community": 208,
       "norm_label": "days"
@@ -8116,16 +8278,34 @@
       "label": "newId()",
       "file_type": "code",
       "source_file": "src/features/pricing/components/PricingSurgeTab.jsx",
-      "source_location": "L40",
+      "source_location": "L47",
       "id": "components_pricingsurgetab_newid",
       "community": 208,
       "norm_label": "newid()"
     },
     {
+      "label": "ProductTypeChips()",
+      "file_type": "code",
+      "source_file": "src/features/pricing/components/PricingSurgeTab.jsx",
+      "source_location": "L51",
+      "id": "components_pricingsurgetab_producttypechips",
+      "community": 208,
+      "norm_label": "producttypechips()"
+    },
+    {
+      "label": "SurgeWorkedExample()",
+      "file_type": "code",
+      "source_file": "src/features/pricing/components/PricingSurgeTab.jsx",
+      "source_location": "L87",
+      "id": "components_pricingsurgetab_surgeworkedexample",
+      "community": 208,
+      "norm_label": "surgeworkedexample()"
+    },
+    {
       "label": "PricingSurgeTab()",
       "file_type": "code",
       "source_file": "src/features/pricing/components/PricingSurgeTab.jsx",
-      "source_location": "L44",
+      "source_location": "L155",
       "id": "components_pricingsurgetab_pricingsurgetab",
       "community": 208,
       "norm_label": "pricingsurgetab()"
@@ -8143,7 +8323,7 @@
       "label": "DEFAULT_CUSTOM",
       "file_type": "code",
       "source_file": "src/features/pricing/components/PricingUnitEconomicsTab.jsx",
-      "source_location": "L54",
+      "source_location": "L62",
       "id": "components_pricinguniteconomicstab_default_custom",
       "community": 205,
       "norm_label": "default_custom"
@@ -8152,7 +8332,7 @@
       "label": "ProfitChip()",
       "file_type": "code",
       "source_file": "src/features/pricing/components/PricingUnitEconomicsTab.jsx",
-      "source_location": "L60",
+      "source_location": "L68",
       "id": "components_pricinguniteconomicstab_profitchip",
       "community": 205,
       "norm_label": "profitchip()"
@@ -8161,7 +8341,7 @@
       "label": "ScenarioInfraRow()",
       "file_type": "code",
       "source_file": "src/features/pricing/components/PricingUnitEconomicsTab.jsx",
-      "source_location": "L71",
+      "source_location": "L79",
       "id": "components_pricinguniteconomicstab_scenarioinfrarow",
       "community": 205,
       "norm_label": "scenarioinfrarow()"
@@ -8170,7 +8350,7 @@
       "label": "PricingUnitEconomicsTab()",
       "file_type": "code",
       "source_file": "src/features/pricing/components/PricingUnitEconomicsTab.jsx",
-      "source_location": "L128",
+      "source_location": "L138",
       "id": "components_pricinguniteconomicstab_pricinguniteconomicstab",
       "community": 205,
       "norm_label": "pricinguniteconomicstab()"
@@ -8307,7 +8487,7 @@
       "source_file": "src/hooks/useCommon.js",
       "source_location": "L1",
       "id": "hooks_usecommon",
-      "community": 5,
+      "community": 154,
       "norm_label": "usecommon.js"
     },
     {
@@ -8316,7 +8496,7 @@
       "source_file": "src/hooks/useCommon.js",
       "source_location": "L4",
       "id": "hooks_usecommon_usecommon",
-      "community": 5,
+      "community": 154,
       "norm_label": "usecommon()"
     },
     {
@@ -8424,7 +8604,7 @@
       "source_file": "src/layouts/UserLayout.js",
       "source_location": "L1",
       "id": "layouts_userlayout",
-      "community": 33,
+      "community": 118,
       "norm_label": "userlayout.js"
     },
     {
@@ -8433,7 +8613,7 @@
       "source_file": "src/layouts/UserLayout.js",
       "source_location": "L22",
       "id": "layouts_userlayout_userlayout",
-      "community": 42,
+      "community": 30,
       "norm_label": "userlayout()"
     },
     {
@@ -8505,7 +8685,7 @@
       "source_file": "src/layouts/components/AdminEnvBanner.jsx",
       "source_location": "L1",
       "id": "components_adminenvbanner",
-      "community": 33,
+      "community": 118,
       "norm_label": "adminenvbanner.jsx"
     },
     {
@@ -8514,7 +8694,7 @@
       "source_file": "src/layouts/components/AdminEnvBanner.jsx",
       "source_location": "L6",
       "id": "components_adminenvbanner_adminenvbanner",
-      "community": 33,
+      "community": 118,
       "norm_label": "adminenvbanner()"
     },
     {
@@ -8739,7 +8919,7 @@
       "source_file": "src/layouts/components/horizontal/AppBarContent.js",
       "source_location": "L1",
       "id": "horizontal_appbarcontent",
-      "community": 33,
+      "community": 118,
       "norm_label": "appbarcontent.js"
     },
     {
@@ -8748,7 +8928,7 @@
       "source_file": "src/layouts/components/horizontal/AppBarContent.js",
       "source_location": "L14",
       "id": "horizontal_appbarcontent_appbarcontent",
-      "community": 33,
+      "community": 118,
       "norm_label": "appbarcontent()"
     },
     {
@@ -8973,7 +9153,7 @@
       "source_file": "src/layouts/components/vertical/AppBarContent.js",
       "source_location": "L1",
       "id": "vertical_appbarcontent",
-      "community": 33,
+      "community": 118,
       "norm_label": "appbarcontent.js"
     },
     {
@@ -8982,7 +9162,7 @@
       "source_file": "src/layouts/components/vertical/AppBarContent.js",
       "source_location": "L15",
       "id": "vertical_appbarcontent_appbarcontent",
-      "community": 33,
+      "community": 118,
       "norm_label": "appbarcontent()"
     },
     {
@@ -9432,7 +9612,7 @@
       "source_file": "src/pages/apps/account-deletions/index.jsx",
       "source_location": "L1",
       "id": "account_deletions_index",
-      "community": 224,
+      "community": 52,
       "norm_label": "index.jsx"
     },
     {
@@ -9441,7 +9621,7 @@
       "source_file": "src/pages/apps/account-deletions/index.jsx",
       "source_location": "L37",
       "id": "account_deletions_index_status_color",
-      "community": 224,
+      "community": 52,
       "norm_label": "status_color"
     },
     {
@@ -9450,7 +9630,7 @@
       "source_file": "src/pages/apps/account-deletions/index.jsx",
       "source_location": "L45",
       "id": "account_deletions_index_daysleft",
-      "community": 224,
+      "community": 52,
       "norm_label": "daysleft()"
     },
     {
@@ -9459,7 +9639,7 @@
       "source_file": "src/pages/apps/account-deletions/index.jsx",
       "source_location": "L53",
       "id": "account_deletions_index_accountdeletionspage",
-      "community": 224,
+      "community": 52,
       "norm_label": "accountdeletionspage()"
     },
     {
@@ -9549,7 +9729,7 @@
       "source_file": "src/pages/apps/booking/index.js",
       "source_location": "L80",
       "id": "booking_index_personcell",
-      "community": 17,
+      "community": 35,
       "norm_label": "personcell()"
     },
     {
@@ -9927,7 +10107,7 @@
       "source_file": "src/pages/apps/concern-by-user/index.js",
       "source_location": "L1",
       "id": "concern_by_user_index",
-      "community": 5,
+      "community": 218,
       "norm_label": "index.js"
     },
     {
@@ -9936,7 +10116,7 @@
       "source_file": "src/pages/apps/concern-by-user/index.js",
       "source_location": "L19",
       "id": "concern_by_user_index_fmtint",
-      "community": 5,
+      "community": 218,
       "norm_label": "fmtint()"
     },
     {
@@ -9945,7 +10125,7 @@
       "source_file": "src/pages/apps/concern-by-user/index.js",
       "source_location": "L21",
       "id": "concern_by_user_index_concernbyusers",
-      "community": 5,
+      "community": 218,
       "norm_label": "concernbyusers()"
     },
     {
@@ -10071,7 +10251,7 @@
       "source_file": "src/pages/apps/manage-trainee/index.jsx",
       "source_location": "L1",
       "id": "manage_trainee_index",
-      "community": 5,
+      "community": 217,
       "norm_label": "index.jsx"
     },
     {
@@ -10080,7 +10260,7 @@
       "source_file": "src/pages/apps/manage-trainee/index.jsx",
       "source_location": "L39",
       "id": "manage_trainee_index_managetrainee",
-      "community": 5,
+      "community": 217,
       "norm_label": "managetrainee()"
     },
     {
@@ -10089,7 +10269,7 @@
       "source_file": "src/pages/apps/manage-trainer/index.jsx",
       "source_location": "L1",
       "id": "manage_trainer_index",
-      "community": 5,
+      "community": 75,
       "norm_label": "index.jsx"
     },
     {
@@ -10098,7 +10278,7 @@
       "source_file": "src/pages/apps/manage-trainer/index.jsx",
       "source_location": "L40",
       "id": "manage_trainer_index_managetrainer",
-      "community": 5,
+      "community": 75,
       "norm_label": "managetrainer()"
     },
     {
@@ -10575,7 +10755,7 @@
       "source_file": "src/pages/apps/write-by-user/index.js",
       "source_location": "L1",
       "id": "write_by_user_index",
-      "community": 5,
+      "community": 219,
       "norm_label": "index.js"
     },
     {
@@ -10584,7 +10764,7 @@
       "source_file": "src/pages/apps/write-by-user/index.js",
       "source_location": "L18",
       "id": "write_by_user_index_fmtint",
-      "community": 5,
+      "community": 219,
       "norm_label": "fmtint()"
     },
     {
@@ -10593,7 +10773,7 @@
       "source_file": "src/pages/apps/write-by-user/index.js",
       "source_location": "L20",
       "id": "write_by_user_index_writebyusers",
-      "community": 5,
+      "community": 219,
       "norm_label": "writebyusers()"
     },
     {
@@ -10602,7 +10782,7 @@
       "source_file": "src/pages/components/add-edit-commision/index.js",
       "source_location": "L1",
       "id": "add_edit_commision_index",
-      "community": 17,
+      "community": 154,
       "norm_label": "index.js"
     },
     {
@@ -10611,7 +10791,7 @@
       "source_file": "src/pages/components/add-edit-commision/index.js",
       "source_location": "L17",
       "id": "add_edit_commision_index_defaultvalues",
-      "community": 17,
+      "community": 154,
       "norm_label": "defaultvalues"
     },
     {
@@ -10620,7 +10800,7 @@
       "source_file": "src/pages/components/add-edit-commision/index.js",
       "source_location": "L23",
       "id": "add_edit_commision_index_schema",
-      "community": 17,
+      "community": 154,
       "norm_label": "schema"
     },
     {
@@ -10629,7 +10809,7 @@
       "source_file": "src/pages/components/add-edit-commision/index.js",
       "source_location": "L38",
       "id": "add_edit_commision_index_addeditcommision",
-      "community": 17,
+      "community": 154,
       "norm_label": "addeditcommision()"
     },
     {
@@ -10692,7 +10872,7 @@
       "source_file": "src/pages/components/common/index.js",
       "source_location": "L1",
       "id": "common_index",
-      "community": 17,
+      "community": 36,
       "norm_label": "index.js"
     },
     {
@@ -10701,7 +10881,7 @@
       "source_file": "src/pages/components/common/index.js",
       "source_location": "L5",
       "id": "common_index_custombutton",
-      "community": 17,
+      "community": 36,
       "norm_label": "custombutton"
     },
     {
@@ -10710,7 +10890,7 @@
       "source_file": "src/pages/components/common/index.js",
       "source_location": "L11",
       "id": "common_index_common",
-      "community": 17,
+      "community": 36,
       "norm_label": "common()"
     },
     {
@@ -10764,7 +10944,7 @@
       "source_file": "src/pages/components/modal/CancelSessionPopups.jsx",
       "source_location": "L1",
       "id": "modal_cancelsessionpopups",
-      "community": 17,
+      "community": 36,
       "norm_label": "cancelsessionpopups.jsx"
     },
     {
@@ -10773,7 +10953,7 @@
       "source_file": "src/pages/components/modal/CancelSessionPopups.jsx",
       "source_location": "L10",
       "id": "modal_cancelsessionpopups_cancelsessionpopups",
-      "community": 17,
+      "community": 36,
       "norm_label": "cancelsessionpopups()"
     },
     {
@@ -10782,7 +10962,7 @@
       "source_file": "src/pages/components/modal/DeletePopup.jsx",
       "source_location": "L1",
       "id": "modal_deletepopup",
-      "community": 17,
+      "community": 36,
       "norm_label": "deletepopup.jsx"
     },
     {
@@ -10791,7 +10971,7 @@
       "source_file": "src/pages/components/modal/DeletePopup.jsx",
       "source_location": "L3",
       "id": "modal_deletepopup_deletepopup",
-      "community": 17,
+      "community": 36,
       "norm_label": "deletepopup()"
     },
     {
@@ -10800,7 +10980,7 @@
       "source_file": "src/pages/components/modal/Modal.jsx",
       "source_location": "L1",
       "id": "modal_modal",
-      "community": 17,
+      "community": 36,
       "norm_label": "modal.jsx"
     },
     {
@@ -10809,7 +10989,7 @@
       "source_file": "src/pages/components/modal/Modal.jsx",
       "source_location": "L9",
       "id": "modal_modal_modal",
-      "community": 17,
+      "community": 36,
       "norm_label": "modal()"
     },
     {
@@ -10836,7 +11016,7 @@
       "source_file": "src/pages/components/modal/RefundPopups.jsx",
       "source_location": "L1",
       "id": "modal_refundpopups",
-      "community": 17,
+      "community": 36,
       "norm_label": "refundpopups.jsx"
     },
     {
@@ -10845,7 +11025,7 @@
       "source_file": "src/pages/components/modal/RefundPopups.jsx",
       "source_location": "L21",
       "id": "modal_refundpopups_refundpopups",
-      "community": 17,
+      "community": 35,
       "norm_label": "refundpopups()"
     },
     {
@@ -11016,7 +11196,7 @@
       "source_file": "src/pages/login/index.js",
       "source_location": "L45",
       "id": "login_index_loginpage",
-      "community": 36,
+      "community": 33,
       "norm_label": "loginpage()"
     },
     {
@@ -11115,7 +11295,7 @@
       "source_file": "src/services/accountDeletionsApi.js",
       "source_location": "L1",
       "id": "services_accountdeletionsapi",
-      "community": 44,
+      "community": 122,
       "norm_label": "accountdeletionsapi.js"
     },
     {
@@ -11124,7 +11304,7 @@
       "source_file": "src/services/accountDeletionsApi.js",
       "source_location": "L4",
       "id": "services_accountdeletionsapi_getauthheaders",
-      "community": 44,
+      "community": 122,
       "norm_label": "getauthheaders()"
     },
     {
@@ -11133,7 +11313,7 @@
       "source_file": "src/services/accountDeletionsApi.js",
       "source_location": "L12",
       "id": "services_accountdeletionsapi_apiurl",
-      "community": 44,
+      "community": 122,
       "norm_label": "apiurl()"
     },
     {
@@ -11142,7 +11322,7 @@
       "source_file": "src/services/accountDeletionsApi.js",
       "source_location": "L14",
       "id": "services_accountdeletionsapi_handleres",
-      "community": 44,
+      "community": 122,
       "norm_label": "handleres()"
     },
     {
@@ -11151,7 +11331,7 @@
       "source_file": "src/services/accountDeletionsApi.js",
       "source_location": "L23",
       "id": "services_accountdeletionsapi_listaccountdeletions",
-      "community": 44,
+      "community": 122,
       "norm_label": "listaccountdeletions()"
     },
     {
@@ -11160,7 +11340,7 @@
       "source_file": "src/services/accountDeletionsApi.js",
       "source_location": "L34",
       "id": "services_accountdeletionsapi_restoreaccountdeletion",
-      "community": 44,
+      "community": 122,
       "norm_label": "restoreaccountdeletion()"
     },
     {
@@ -11169,7 +11349,7 @@
       "source_file": "src/services/accountDeletionsApi.js",
       "source_location": "L43",
       "id": "services_accountdeletionsapi_addaccountdeletionnote",
-      "community": 44,
+      "community": 122,
       "norm_label": "addaccountdeletionnote()"
     },
     {
@@ -11241,7 +11421,7 @@
       "source_file": "src/services/adminDashboardApi.js",
       "source_location": "L1",
       "id": "services_admindashboardapi",
-      "community": 118,
+      "community": 51,
       "norm_label": "admindashboardapi.js"
     },
     {
@@ -11250,7 +11430,7 @@
       "source_file": "src/services/adminDashboardApi.js",
       "source_location": "L4",
       "id": "services_admindashboardapi_authheaders",
-      "community": 118,
+      "community": 51,
       "norm_label": "authheaders()"
     },
     {
@@ -11259,7 +11439,7 @@
       "source_file": "src/services/adminDashboardApi.js",
       "source_location": "L9",
       "id": "services_admindashboardapi_apiurl",
-      "community": 118,
+      "community": 51,
       "norm_label": "apiurl()"
     },
     {
@@ -11268,7 +11448,7 @@
       "source_file": "src/services/adminDashboardApi.js",
       "source_location": "L12",
       "id": "services_admindashboardapi_unwrapadminresult",
-      "community": 118,
+      "community": 51,
       "norm_label": "unwrapadminresult()"
     },
     {
@@ -11277,7 +11457,7 @@
       "source_file": "src/services/adminDashboardApi.js",
       "source_location": "L20",
       "id": "services_admindashboardapi_fetchdashboardmetrics",
-      "community": 118,
+      "community": 51,
       "norm_label": "fetchdashboardmetrics()"
     },
     {
@@ -11286,7 +11466,7 @@
       "source_file": "src/services/adminDashboardApi.js",
       "source_location": "L29",
       "id": "services_admindashboardapi_fetchglobalcommission",
-      "community": 118,
+      "community": 51,
       "norm_label": "fetchglobalcommission()"
     },
     {
@@ -11295,7 +11475,7 @@
       "source_file": "src/services/adminDashboardApi.js",
       "source_location": "L42",
       "id": "services_admindashboardapi_fetchonlineusers",
-      "community": 118,
+      "community": 51,
       "norm_label": "fetchonlineusers()"
     },
     {
@@ -11520,7 +11700,7 @@
       "source_file": "src/services/adminOpsApi.js",
       "source_location": "L1",
       "id": "services_adminopsapi",
-      "community": 220,
+      "community": 122,
       "norm_label": "adminopsapi.js"
     },
     {
@@ -11529,7 +11709,7 @@
       "source_file": "src/services/adminOpsApi.js",
       "source_location": "L4",
       "id": "services_adminopsapi_headers",
-      "community": 220,
+      "community": 122,
       "norm_label": "headers()"
     },
     {
@@ -11538,7 +11718,7 @@
       "source_file": "src/services/adminOpsApi.js",
       "source_location": "L9",
       "id": "services_adminopsapi_api",
-      "community": 220,
+      "community": 122,
       "norm_label": "api()"
     },
     {
@@ -11547,7 +11727,7 @@
       "source_file": "src/services/adminOpsApi.js",
       "source_location": "L12",
       "id": "services_adminopsapi_listfailedjobs",
-      "community": 220,
+      "community": 122,
       "norm_label": "listfailedjobs()"
     },
     {
@@ -11556,7 +11736,7 @@
       "source_file": "src/services/adminOpsApi.js",
       "source_location": "L35",
       "id": "services_adminopsapi_retryfailedjob",
-      "community": 220,
+      "community": 122,
       "norm_label": "retryfailedjob()"
     },
     {
@@ -11565,7 +11745,7 @@
       "source_file": "src/services/adminOpsApi.js",
       "source_location": "L47",
       "id": "services_adminopsapi_searchadminusers",
-      "community": 220,
+      "community": 122,
       "norm_label": "searchadminusers()"
     },
     {
@@ -12366,7 +12546,7 @@
       "source_file": "src/services/cmsAssetApi.js",
       "source_location": "L1",
       "id": "services_cmsassetapi",
-      "community": 216,
+      "community": 122,
       "norm_label": "cmsassetapi.js"
     },
     {
@@ -12375,7 +12555,7 @@
       "source_file": "src/services/cmsAssetApi.js",
       "source_location": "L4",
       "id": "services_cmsassetapi_getauthheaders",
-      "community": 216,
+      "community": 122,
       "norm_label": "getauthheaders()"
     },
     {
@@ -12384,7 +12564,7 @@
       "source_file": "src/services/cmsAssetApi.js",
       "source_location": "L12",
       "id": "services_cmsassetapi_apiurl",
-      "community": 216,
+      "community": 122,
       "norm_label": "apiurl()"
     },
     {
@@ -12393,7 +12573,7 @@
       "source_file": "src/services/cmsAssetApi.js",
       "source_location": "L17",
       "id": "services_cmsassetapi_presigncmsasset",
-      "community": 216,
+      "community": 122,
       "norm_label": "presigncmsasset()"
     },
     {
@@ -12663,7 +12843,7 @@
       "source_file": "src/services/http.js",
       "source_location": "L1",
       "id": "services_http",
-      "community": 221,
+      "community": 316,
       "norm_label": "http.js"
     },
     {
@@ -12672,7 +12852,7 @@
       "source_file": "src/services/http.js",
       "source_location": "L9",
       "id": "services_http_resolvepath",
-      "community": 221,
+      "community": 316,
       "norm_label": "resolvepath()"
     },
     {
@@ -12681,7 +12861,7 @@
       "source_file": "src/services/http.js",
       "source_location": "L15",
       "id": "services_http_adminfetch",
-      "community": 221,
+      "community": 316,
       "norm_label": "adminfetch()"
     },
     {
@@ -12942,7 +13122,7 @@
       "source_file": "src/services/promoCodeApi.js",
       "source_location": "L1",
       "id": "services_promocodeapi",
-      "community": 122,
+      "community": 44,
       "norm_label": "promocodeapi.js"
     },
     {
@@ -12951,7 +13131,7 @@
       "source_file": "src/services/promoCodeApi.js",
       "source_location": "L4",
       "id": "services_promocodeapi_getauthheaders",
-      "community": 122,
+      "community": 44,
       "norm_label": "getauthheaders()"
     },
     {
@@ -12960,7 +13140,7 @@
       "source_file": "src/services/promoCodeApi.js",
       "source_location": "L12",
       "id": "services_promocodeapi_apiurl",
-      "community": 122,
+      "community": 44,
       "norm_label": "apiurl()"
     },
     {
@@ -12969,7 +13149,7 @@
       "source_file": "src/services/promoCodeApi.js",
       "source_location": "L14",
       "id": "services_promocodeapi_handleres",
-      "community": 122,
+      "community": 44,
       "norm_label": "handleres()"
     },
     {
@@ -12978,7 +13158,7 @@
       "source_file": "src/services/promoCodeApi.js",
       "source_location": "L23",
       "id": "services_promocodeapi_listpromocodes",
-      "community": 122,
+      "community": 44,
       "norm_label": "listpromocodes()"
     },
     {
@@ -12987,7 +13167,7 @@
       "source_file": "src/services/promoCodeApi.js",
       "source_location": "L34",
       "id": "services_promocodeapi_getpromocodebyid",
-      "community": 122,
+      "community": 44,
       "norm_label": "getpromocodebyid()"
     },
     {
@@ -12996,7 +13176,7 @@
       "source_file": "src/services/promoCodeApi.js",
       "source_location": "L42",
       "id": "services_promocodeapi_createpromocode",
-      "community": 122,
+      "community": 44,
       "norm_label": "createpromocode()"
     },
     {
@@ -13005,7 +13185,7 @@
       "source_file": "src/services/promoCodeApi.js",
       "source_location": "L51",
       "id": "services_promocodeapi_updatepromocode",
-      "community": 122,
+      "community": 44,
       "norm_label": "updatepromocode()"
     },
     {
@@ -13014,7 +13194,7 @@
       "source_file": "src/services/promoCodeApi.js",
       "source_location": "L60",
       "id": "services_promocodeapi_deletepromocode",
-      "community": 122,
+      "community": 44,
       "norm_label": "deletepromocode()"
     },
     {
@@ -13023,7 +13203,7 @@
       "source_file": "src/services/promoCodeApi.js",
       "source_location": "L68",
       "id": "services_promocodeapi_togglepromocode",
-      "community": 122,
+      "community": 44,
       "norm_label": "togglepromocode()"
     },
     {
@@ -13032,7 +13212,7 @@
       "source_file": "src/services/promoCodeApi.js",
       "source_location": "L76",
       "id": "services_promocodeapi_togglepromovisibility",
-      "community": 122,
+      "community": 44,
       "norm_label": "togglepromovisibility()"
     },
     {
@@ -13041,7 +13221,7 @@
       "source_file": "src/services/referralAdminApi.js",
       "source_location": "L1",
       "id": "services_referraladminapi",
-      "community": 222,
+      "community": 122,
       "norm_label": "referraladminapi.js"
     },
     {
@@ -13050,7 +13230,7 @@
       "source_file": "src/services/referralAdminApi.js",
       "source_location": "L4",
       "id": "services_referraladminapi_getauthheaders",
-      "community": 222,
+      "community": 122,
       "norm_label": "getauthheaders()"
     },
     {
@@ -13059,7 +13239,7 @@
       "source_file": "src/services/referralAdminApi.js",
       "source_location": "L12",
       "id": "services_referraladminapi_apiurl",
-      "community": 222,
+      "community": 122,
       "norm_label": "apiurl()"
     },
     {
@@ -13068,7 +13248,7 @@
       "source_file": "src/services/referralAdminApi.js",
       "source_location": "L14",
       "id": "services_referraladminapi_unwrap",
-      "community": 222,
+      "community": 122,
       "norm_label": "unwrap()"
     },
     {
@@ -13077,7 +13257,7 @@
       "source_file": "src/services/referralAdminApi.js",
       "source_location": "L19",
       "id": "services_referraladminapi_getreferraldashboard",
-      "community": 222,
+      "community": 122,
       "norm_label": "getreferraldashboard()"
     },
     {
@@ -13086,7 +13266,7 @@
       "source_file": "src/services/referralAdminApi.js",
       "source_location": "L28",
       "id": "services_referraladminapi_getreferralrewards",
-      "community": 222,
+      "community": 122,
       "norm_label": "getreferralrewards()"
     },
     {
@@ -13095,7 +13275,7 @@
       "source_file": "src/services/tipsApi.js",
       "source_location": "L1",
       "id": "services_tipsapi",
-      "community": 57,
+      "community": 122,
       "norm_label": "tipsapi.js"
     },
     {
@@ -13104,7 +13284,7 @@
       "source_file": "src/services/tipsApi.js",
       "source_location": "L4",
       "id": "services_tipsapi_getauthheaders",
-      "community": 57,
+      "community": 122,
       "norm_label": "getauthheaders()"
     },
     {
@@ -13113,7 +13293,7 @@
       "source_file": "src/services/tipsApi.js",
       "source_location": "L12",
       "id": "services_tipsapi_apiurl",
-      "community": 57,
+      "community": 122,
       "norm_label": "apiurl()"
     },
     {
@@ -13122,7 +13302,7 @@
       "source_file": "src/services/tipsApi.js",
       "source_location": "L14",
       "id": "services_tipsapi_handleres",
-      "community": 57,
+      "community": 122,
       "norm_label": "handleres()"
     },
     {
@@ -13131,7 +13311,7 @@
       "source_file": "src/services/tipsApi.js",
       "source_location": "L23",
       "id": "services_tipsapi_listtips",
-      "community": 57,
+      "community": 122,
       "norm_label": "listtips()"
     },
     {
@@ -13140,7 +13320,7 @@
       "source_file": "src/services/tipsApi.js",
       "source_location": "L34",
       "id": "services_tipsapi_createtip",
-      "community": 57,
+      "community": 122,
       "norm_label": "createtip()"
     },
     {
@@ -13149,7 +13329,7 @@
       "source_file": "src/services/tipsApi.js",
       "source_location": "L43",
       "id": "services_tipsapi_updatetip",
-      "community": 57,
+      "community": 122,
       "norm_label": "updatetip()"
     },
     {
@@ -13158,7 +13338,7 @@
       "source_file": "src/services/tipsApi.js",
       "source_location": "L52",
       "id": "services_tipsapi_toggletip",
-      "community": 57,
+      "community": 122,
       "norm_label": "toggletip()"
     },
     {
@@ -13167,7 +13347,7 @@
       "source_file": "src/services/tipsApi.js",
       "source_location": "L60",
       "id": "services_tipsapi_deletetip",
-      "community": 57,
+      "community": 122,
       "norm_label": "deletetip()"
     },
     {
@@ -13392,7 +13572,7 @@
       "source_file": "src/services/userAdminApi.js",
       "source_location": "L1",
       "id": "services_useradminapi",
-      "community": 216,
+      "community": 122,
       "norm_label": "useradminapi.js"
     },
     {
@@ -13401,7 +13581,7 @@
       "source_file": "src/services/userAdminApi.js",
       "source_location": "L4",
       "id": "services_useradminapi_headers",
-      "community": 216,
+      "community": 122,
       "norm_label": "headers()"
     },
     {
@@ -13410,7 +13590,7 @@
       "source_file": "src/services/userAdminApi.js",
       "source_location": "L12",
       "id": "services_useradminapi_fetchuserlist",
-      "community": 216,
+      "community": 122,
       "norm_label": "fetchuserlist()"
     },
     {
@@ -13419,7 +13599,7 @@
       "source_file": "src/services/userAdminApi.js",
       "source_location": "L28",
       "id": "services_useradminapi_listusers",
-      "community": 216,
+      "community": 122,
       "norm_label": "listusers()"
     },
     {
@@ -13428,7 +13608,7 @@
       "source_file": "src/services/userAdminApi.js",
       "source_location": "L77",
       "id": "services_useradminapi_listtrainers",
-      "community": 216,
+      "community": 122,
       "norm_label": "listtrainers()"
     },
     {
@@ -13437,7 +13617,7 @@
       "source_file": "src/services/userAdminApi.js",
       "source_location": "L97",
       "id": "services_useradminapi_listtrainees",
-      "community": 216,
+      "community": 122,
       "norm_label": "listtrainees()"
     },
     {
@@ -13446,7 +13626,7 @@
       "source_file": "src/services/userAdminApi.js",
       "source_location": "L101",
       "id": "services_useradminapi_deleteuser",
-      "community": 216,
+      "community": 122,
       "norm_label": "deleteuser()"
     },
     {
@@ -13536,7 +13716,7 @@
       "source_file": "src/store/hooks.js",
       "source_location": "L1",
       "id": "store_hooks",
-      "community": 227,
+      "community": 51,
       "norm_label": "hooks.js"
     },
     {
@@ -13545,7 +13725,7 @@
       "source_file": "src/store/hooks.js",
       "source_location": "L4",
       "id": "store_hooks_useappdispatch",
-      "community": 227,
+      "community": 51,
       "norm_label": "useappdispatch()"
     },
     {
@@ -13554,7 +13734,7 @@
       "source_file": "src/store/hooks.js",
       "source_location": "L7",
       "id": "store_hooks_useappselector",
-      "community": 227,
+      "community": 51,
       "norm_label": "useappselector()"
     },
     {
@@ -13563,7 +13743,7 @@
       "source_file": "src/store/index.js",
       "source_location": "L1",
       "id": "store_index",
-      "community": 31,
+      "community": 51,
       "norm_label": "index.js"
     },
     {
@@ -13572,7 +13752,7 @@
       "source_file": "src/store/index.js",
       "source_location": "L6",
       "id": "store_index_store",
-      "community": 31,
+      "community": 51,
       "norm_label": "store"
     },
     {
@@ -13725,7 +13905,7 @@
       "source_file": "src/store/slices/dashboardSlice.js",
       "source_location": "L1",
       "id": "slices_dashboardslice",
-      "community": 31,
+      "community": 51,
       "norm_label": "dashboardslice.js"
     },
     {
@@ -13734,7 +13914,7 @@
       "source_file": "src/store/slices/dashboardSlice.js",
       "source_location": "L7",
       "id": "slices_dashboardslice_fetchhomedashboard",
-      "community": 31,
+      "community": 51,
       "norm_label": "fetchhomedashboard"
     },
     {
@@ -13743,7 +13923,7 @@
       "source_file": "src/store/slices/dashboardSlice.js",
       "source_location": "L23",
       "id": "slices_dashboardslice_fetchlogsummaryonly",
-      "community": 31,
+      "community": 51,
       "norm_label": "fetchlogsummaryonly"
     },
     {
@@ -13752,7 +13932,7 @@
       "source_file": "src/store/slices/dashboardSlice.js",
       "source_location": "L28",
       "id": "slices_dashboardslice_dashboardslice",
-      "community": 31,
+      "community": 51,
       "norm_label": "dashboardslice"
     },
     {
@@ -13761,7 +13941,7 @@
       "source_file": "src/store/slices/dashboardSlice.js",
       "source_location": "L79",
       "id": "slices_dashboardslice_selectdashboard",
-      "community": 31,
+      "community": 51,
       "norm_label": "selectdashboard()"
     },
     {
@@ -13770,7 +13950,7 @@
       "source_file": "src/store/slices/uiSlice.js",
       "source_location": "L1",
       "id": "slices_uislice",
-      "community": 31,
+      "community": 51,
       "norm_label": "uislice.js"
     },
     {
@@ -13779,7 +13959,7 @@
       "source_file": "src/store/slices/uiSlice.js",
       "source_location": "L3",
       "id": "slices_uislice_uislice",
-      "community": 31,
+      "community": 51,
       "norm_label": "uislice"
     },
     {
@@ -13788,7 +13968,7 @@
       "source_file": "src/store/slices/uiSlice.js",
       "source_location": "L46",
       "id": "slices_uislice_selectui",
-      "community": 31,
+      "community": 51,
       "norm_label": "selectui()"
     },
     {
@@ -13797,7 +13977,7 @@
       "source_file": "src/store/slices/uiSlice.js",
       "source_location": "L47",
       "id": "slices_uislice_selectcommandpaletteopen",
-      "community": 31,
+      "community": 51,
       "norm_label": "selectcommandpaletteopen()"
     },
     {
@@ -13869,7 +14049,7 @@
       "source_file": "src/utils/apiBase.js",
       "source_location": "L1",
       "id": "utils_apibase",
-      "community": 216,
+      "community": 122,
       "norm_label": "apibase.js"
     },
     {
@@ -13878,7 +14058,7 @@
       "source_file": "src/utils/apiBase.js",
       "source_location": "L5",
       "id": "utils_apibase_getapibaseurl",
-      "community": 216,
+      "community": 122,
       "norm_label": "getapibaseurl()"
     },
     {
@@ -13887,7 +14067,7 @@
       "source_file": "src/utils/apiBase.js",
       "source_location": "L13",
       "id": "utils_apibase_requireapibaseurl",
-      "community": 216,
+      "community": 122,
       "norm_label": "requireapibaseurl()"
     },
     {
@@ -13896,7 +14076,7 @@
       "source_file": "src/utils/authRefresh.js",
       "source_location": "L1",
       "id": "utils_authrefresh",
-      "community": 221,
+      "community": 316,
       "norm_label": "authrefresh.js"
     },
     {
@@ -13905,7 +14085,7 @@
       "source_file": "src/utils/authRefresh.js",
       "source_location": "L4",
       "id": "utils_authrefresh_apibase",
-      "community": 221,
+      "community": 316,
       "norm_label": "apibase()"
     },
     {
@@ -13914,7 +14094,7 @@
       "source_file": "src/utils/authRefresh.js",
       "source_location": "L12",
       "id": "utils_authrefresh_refreshadminaccesstoken",
-      "community": 221,
+      "community": 316,
       "norm_label": "refreshadminaccesstoken()"
     },
     {
@@ -13923,7 +14103,7 @@
       "source_file": "src/utils/authStorage.js",
       "source_location": "L1",
       "id": "utils_authstorage",
-      "community": 217,
+      "community": 316,
       "norm_label": "authstorage.js"
     },
     {
@@ -13932,7 +14112,7 @@
       "source_file": "src/utils/authStorage.js",
       "source_location": "L5",
       "id": "utils_authstorage_isremembermeenabled",
-      "community": 217,
+      "community": 316,
       "norm_label": "isremembermeenabled()"
     },
     {
@@ -13941,7 +14121,7 @@
       "source_file": "src/utils/authStorage.js",
       "source_location": "L12",
       "id": "utils_authstorage_setremembermeflag",
-      "community": 217,
+      "community": 316,
       "norm_label": "setremembermeflag()"
     },
     {
@@ -13950,7 +14130,7 @@
       "source_file": "src/utils/authStorage.js",
       "source_location": "L17",
       "id": "utils_authstorage_clearauthstorage",
-      "community": 217,
+      "community": 316,
       "norm_label": "clearauthstorage()"
     },
     {
@@ -13959,7 +14139,7 @@
       "source_file": "src/utils/authStorage.js",
       "source_location": "L25",
       "id": "utils_authstorage_readstoredtoken",
-      "community": 75,
+      "community": 316,
       "norm_label": "readstoredtoken()"
     },
     {
@@ -13968,7 +14148,7 @@
       "source_file": "src/utils/authStorage.js",
       "source_location": "L30",
       "id": "utils_authstorage_readstoredrefreshtoken",
-      "community": 217,
+      "community": 316,
       "norm_label": "readstoredrefreshtoken()"
     },
     {
@@ -13977,7 +14157,7 @@
       "source_file": "src/utils/authStorage.js",
       "source_location": "L39",
       "id": "utils_authstorage_purgeifephemeralsessionended",
-      "community": 217,
+      "community": 316,
       "norm_label": "purgeifephemeralsessionended()"
     },
     {
@@ -13986,7 +14166,7 @@
       "source_file": "src/utils/authStorage.js",
       "source_location": "L46",
       "id": "utils_authstorage_persistsession",
-      "community": 217,
+      "community": 316,
       "norm_label": "persistsession()"
     },
     {
@@ -14040,7 +14220,7 @@
       "source_file": "src/utils/installApiAuthHandler.js",
       "source_location": "L1",
       "id": "utils_installapiauthhandler",
-      "community": 75,
+      "community": 316,
       "norm_label": "installapiauthhandler.js"
     },
     {
@@ -14049,7 +14229,7 @@
       "source_file": "src/utils/installApiAuthHandler.js",
       "source_location": "L9",
       "id": "utils_installapiauthhandler_resolverequesturl",
-      "community": 75,
+      "community": 316,
       "norm_label": "resolverequesturl()"
     },
     {
@@ -14058,7 +14238,7 @@
       "source_file": "src/utils/installApiAuthHandler.js",
       "source_location": "L15",
       "id": "utils_installapiauthhandler_isapirequest",
-      "community": 75,
+      "community": 316,
       "norm_label": "isapirequest()"
     },
     {
@@ -14067,7 +14247,7 @@
       "source_file": "src/utils/installApiAuthHandler.js",
       "source_location": "L20",
       "id": "utils_installapiauthhandler_isauthskip",
-      "community": 75,
+      "community": 316,
       "norm_label": "isauthskip()"
     },
     {
@@ -14076,7 +14256,7 @@
       "source_file": "src/utils/installApiAuthHandler.js",
       "source_location": "L22",
       "id": "utils_installapiauthhandler_installapiauthhandler",
-      "community": 75,
+      "community": 316,
       "norm_label": "installapiauthhandler()"
     },
     {
@@ -14085,7 +14265,7 @@
       "source_file": "src/utils/installApiAuthHandler.js",
       "source_location": "L60",
       "id": "utils_installapiauthhandler_currentaccesstoken",
-      "community": 75,
+      "community": 316,
       "norm_label": "currentaccesstoken()"
     },
     {
@@ -14926,11 +15106,29 @@
       "norm_label": "appability"
     },
     {
+      "label": "FlowStep()",
+      "file_type": "code",
+      "source_file": "src/features/pricing/components/PricingDashboardTab.jsx",
+      "source_location": "L17",
+      "community": 42,
+      "norm_label": "flowstep()",
+      "id": "components_pricingdashboardtab_flowstep"
+    },
+    {
+      "label": "PRODUCT_TYPES",
+      "file_type": "code",
+      "source_file": "src/features/pricing/components/PricingSurgeTab.jsx",
+      "source_location": "L19",
+      "community": 208,
+      "norm_label": "product_types",
+      "id": "components_pricingsurgetab_product_types"
+    },
+    {
       "label": "decodeJwtEmail()",
       "file_type": "code",
       "source_file": "src/components/admin/AdminGoogleSignIn.jsx",
       "source_location": "L10",
-      "community": 15,
+      "community": 117,
       "norm_label": "decodejwtemail()",
       "id": "admin_admingooglesignin_decodejwtemail"
     },
@@ -14984,7 +15182,7 @@
       "file_type": "code",
       "source_file": "src/pages/apps/manage-trainee/index.jsx",
       "source_location": "L38",
-      "community": 5,
+      "community": 217,
       "norm_label": "status_chips",
       "id": "manage_trainee_index_status_chips"
     },
@@ -14993,7 +15191,7 @@
       "file_type": "code",
       "source_file": "src/pages/apps/manage-trainee/index.jsx",
       "source_location": "L45",
-      "community": 5,
+      "community": 217,
       "norm_label": "fmtint()",
       "id": "manage_trainee_index_fmtint"
     },
@@ -15002,7 +15200,7 @@
       "file_type": "code",
       "source_file": "src/pages/apps/manage-trainee/index.jsx",
       "source_location": "L47",
-      "community": 5,
+      "community": 217,
       "norm_label": "filterchip()",
       "id": "manage_trainee_index_filterchip"
     },
@@ -15011,7 +15209,7 @@
       "file_type": "code",
       "source_file": "src/pages/apps/manage-trainer/index.jsx",
       "source_location": "L33",
-      "community": 5,
+      "community": 75,
       "norm_label": "custompagination()",
       "id": "manage_trainer_index_custompagination"
     },
@@ -15362,7 +15560,7 @@
       "file_type": "code",
       "source_file": "src/pages/apps/banners/index.jsx",
       "source_location": "L159",
-      "community": 52,
+      "community": 24,
       "norm_label": "bannerspage()",
       "id": "banners_index_bannerspage"
     },
@@ -15542,7 +15740,7 @@
       "file_type": "code",
       "source_file": "src/pages/apps/manage-trainer/index.jsx",
       "source_location": "L41",
-      "community": 5,
+      "community": 75,
       "norm_label": "status_chips",
       "id": "manage_trainer_index_status_chips"
     },
@@ -15551,7 +15749,7 @@
       "file_type": "code",
       "source_file": "src/pages/apps/manage-trainer/index.jsx",
       "source_location": "L48",
-      "community": 5,
+      "community": 75,
       "norm_label": "fmtint()",
       "id": "manage_trainer_index_fmtint"
     },
@@ -15560,7 +15758,7 @@
       "file_type": "code",
       "source_file": "src/pages/apps/manage-trainer/index.jsx",
       "source_location": "L50",
-      "community": 5,
+      "community": 75,
       "norm_label": "filterchip()",
       "id": "manage_trainer_index_filterchip"
     },
@@ -15803,7 +16001,7 @@
       "file_type": "code",
       "source_file": "src/services/promoCodeApi.js",
       "source_location": "L23",
-      "community": 122,
+      "community": 44,
       "norm_label": "getpromoadminstats()",
       "id": "services_promocodeapi_getpromoadminstats"
     },
@@ -15839,7 +16037,7 @@
       "file_type": "code",
       "source_file": "src/store/index.js",
       "source_location": "L1",
-      "community": 31,
+      "community": 51,
       "norm_label": "index.js",
       "id": "src_store_index_js_store_index"
     },
@@ -15857,7 +16055,7 @@
       "file_type": "code",
       "source_file": "src/utils/installApiAuthHandler.js",
       "source_location": "L20",
-      "community": 75,
+      "community": 316,
       "norm_label": "isauthloginrequest()",
       "id": "utils_installapiauthhandler_isauthloginrequest"
     },
@@ -17612,7 +17810,7 @@
       "file_type": "code",
       "source_file": "src/pages/apps/concern-by-user/index.js",
       "source_location": "L27",
-      "community": 5,
+      "community": 218,
       "norm_label": "statuscolors",
       "id": "concern_by_user_index_statuscolors"
     },
@@ -17621,7 +17819,7 @@
       "file_type": "code",
       "source_file": "src/pages/apps/write-by-user/index.js",
       "source_location": "L18",
-      "community": 5,
+      "community": 219,
       "norm_label": "statuscolors",
       "id": "write_by_user_index_statuscolors"
     },
@@ -17630,7 +17828,7 @@
       "file_type": "code",
       "source_file": "src/pages/components/modal/Modal.jsx",
       "source_location": "L12",
-      "community": 17,
+      "community": 36,
       "norm_label": "modaldialog",
       "id": "modal_modal_modaldialog"
     },
@@ -22819,9 +23017,9 @@
       "source_file": "src/auth/index.js",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "auth_index",
-      "target": "auth_index_isadminaccount",
-      "confidence_score": 1.0
+      "target": "auth_index_isadminaccount"
     },
     {
       "relation": "contains",
@@ -22829,9 +23027,9 @@
       "source_file": "src/components/admin/AdminButton.jsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "admin_adminbutton",
-      "target": "admin_adminbutton_adminbutton",
-      "confidence_score": 1.0
+      "target": "admin_adminbutton_adminbutton"
     },
     {
       "relation": "imports_from",
@@ -22840,9 +23038,9 @@
       "source_file": "src/components/admin/AdminRefreshButton.jsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "admin_adminrefreshbutton",
-      "target": "admin_adminbutton",
-      "confidence_score": 1.0
+      "target": "admin_adminbutton"
     },
     {
       "relation": "re_exports",
@@ -22851,9 +23049,9 @@
       "source_file": "src/components/admin/index.js",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "admin_index",
-      "target": "admin_adminbutton",
-      "confidence_score": 1.0
+      "target": "admin_adminbutton"
     },
     {
       "relation": "contains",
@@ -23038,9 +23236,9 @@
       "source_file": "src/components/admin/AdminGoogleSignIn.jsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "admin_admingooglesignin",
-      "target": "admin_admingooglesignin_loadgis",
-      "confidence_score": 1.0
+      "target": "admin_admingooglesignin_loadgis"
     },
     {
       "relation": "re_exports",
@@ -26124,9 +26322,9 @@
       "source_file": "src/components/user360/tabs/User360LessonsTab.jsx",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tabs_user360lessonstab",
-      "target": "tabs_user360lessonstab_refunddone",
-      "confidence_score": 1.0
+      "target": "tabs_user360lessonstab_refunddone"
     },
     {
       "relation": "contains",
@@ -27579,6 +27777,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L107",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "constants_pricingadmin",
+      "target": "constants_pricingadmin_currencyforregion"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/constants/pricingAdmin.js",
       "source_location": "L68",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -27604,6 +27812,36 @@
       "confidence_score": 1.0,
       "source": "constants_pricingadmin",
       "target": "constants_pricingadmin_deepclone"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L103",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "constants_pricingadmin",
+      "target": "constants_pricingadmin_defaultjurisdiction"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L99",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "constants_pricingadmin",
+      "target": "constants_pricingadmin_defaultpaymenthint"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L64",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "constants_pricingadmin",
+      "target": "constants_pricingadmin_eu_jurisdiction_options"
     },
     {
       "relation": "contains",
@@ -27639,6 +27877,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L62",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "constants_pricingadmin",
+      "target": "constants_pricingadmin_gb_jurisdiction_options"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/constants/pricingAdmin.js",
       "source_location": "L66",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -27649,11 +27897,51 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L111",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "constants_pricingadmin",
+      "target": "constants_pricingadmin_hourlycentsfromsession"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/constants/pricingAdmin.js",
       "source_location": "L66",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "constants_pricingadmin",
       "target": "constants_pricingadmin_inputtocents"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L92",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "constants_pricingadmin",
+      "target": "constants_pricingadmin_jurisdictionsforregion"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L59",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "constants_pricingadmin",
+      "target": "constants_pricingadmin_lesson_duration_minutes"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L85",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "constants_pricingadmin",
+      "target": "constants_pricingadmin_paymentmethodsforregion"
     },
     {
       "relation": "contains",
@@ -27709,6 +27997,26 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L73",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "constants_pricingadmin",
+      "target": "constants_pricingadmin_surge_timezones"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L116",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "constants_pricingadmin",
+      "target": "constants_pricingadmin_surgecentsonsubtotal"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/constants/pricingAdmin.js",
       "source_location": "L55",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -27751,10 +28059,109 @@
       "context": "call",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
+      "source_file": "src/features/pricing/components/PricingSimulatorTab.jsx",
+      "source_location": "L48",
+      "weight": 1.0,
+      "source": "components_pricingsimulatortab_pricingsimulatortab",
+      "target": "constants_pricingadmin_paymentmethodsforregion"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L100",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "constants_pricingadmin_defaultpaymenthint",
+      "target": "constants_pricingadmin_paymentmethodsforregion"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/features/pricing/components/PricingSimulatorTab.jsx",
+      "source_location": "L49",
+      "weight": 1.0,
+      "source": "components_pricingsimulatortab_pricingsimulatortab",
+      "target": "constants_pricingadmin_jurisdictionsforregion"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/constants/pricingAdmin.js",
+      "source_location": "L104",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "constants_pricingadmin_defaultjurisdiction",
+      "target": "constants_pricingadmin_jurisdictionsforregion"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/features/pricing/components/PricingLessonSplit.jsx",
+      "source_location": "L98",
+      "weight": 1.0,
+      "source": "components_pricinglessonsplit_pricinglessonsplit",
+      "target": "constants_pricingadmin_currencyforregion"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/features/pricing/components/PricingSimulatorTab.jsx",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "components_pricingsimulatortab_pricingsimulatortab",
+      "target": "constants_pricingadmin_currencyforregion"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/features/pricing/components/PricingUnitEconomicsTab.jsx",
+      "source_location": "L162",
+      "weight": 1.0,
+      "source": "components_pricinguniteconomicstab_pricinguniteconomicstab",
+      "target": "constants_pricingadmin_currencyforregion"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/features/pricing/components/PricingUnitEconomicsTab.jsx",
+      "source_location": "L499",
+      "weight": 1.0,
+      "source": "components_pricinguniteconomicstab_pricinguniteconomicstab",
+      "target": "constants_pricingadmin_hourlycentsfromsession"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
       "source_file": "src/pages/apps/pricing/components/PricingDashboardTab.jsx",
       "source_location": "L89",
       "weight": 1.0,
       "source": "components_pricingdashboardtab_pricingdashboardtab",
+      "target": "constants_pricingadmin_fmtpct"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/features/pricing/components/PricingLessonSplit.jsx",
+      "source_location": "L270",
+      "weight": 1.0,
+      "source": "components_pricinglessonsplit_pricinglessonsplit",
       "target": "constants_pricingadmin_fmtpct"
     },
     {
@@ -27817,11 +28224,66 @@
       "context": "call",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
+      "source_file": "src/features/pricing/components/PricingLessonSplit.jsx",
+      "source_location": "L323",
+      "weight": 1.0,
+      "source": "components_pricinglessonsplit_pricinglessonsplit",
+      "target": "constants_pricingadmin_centstoinput"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
       "source_file": "src/pages/apps/pricing/components/PricingRegionTab.jsx",
       "source_location": "L106",
       "weight": 1.0,
       "source": "components_pricingregiontab_pricingregiontab",
       "target": "constants_pricingadmin_centstoinput"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/features/pricing/components/PricingLessonSplit.jsx",
+      "source_location": "L254",
+      "weight": 1.0,
+      "source": "components_pricinglessonsplit_pricinglessonsplit",
+      "target": "constants_pricingadmin_inputtocents"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/features/pricing/components/PricingSurgeTab.jsx",
+      "source_location": "L89",
+      "weight": 1.0,
+      "source": "components_pricingsurgetab_surgeworkedexample",
+      "target": "constants_pricingadmin_inputtocents"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/features/pricing/components/PricingUnitEconomicsTab.jsx",
+      "source_location": "L499",
+      "weight": 1.0,
+      "source": "components_pricinguniteconomicstab_pricinguniteconomicstab",
+      "target": "constants_pricingadmin_inputtocents"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/features/pricing/components/PricingLessonSplit.jsx",
+      "source_location": "L299",
+      "weight": 1.0,
+      "source": "components_pricinglessonsplit_pricinglessonsplit",
+      "target": "constants_pricingadmin_decimaltopctinput"
     },
     {
       "relation": "calls",
@@ -28375,9 +28837,9 @@
       "source_file": "src/features/admin-roles/columns.jsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "admin_roles_columns",
-      "target": "admin_roles_columns_marketlabel",
-      "confidence_score": 1.0
+      "target": "admin_roles_columns_marketlabel"
     },
     {
       "relation": "contains",
@@ -28671,9 +29133,9 @@
       "source_file": "src/features/bookings/refundLabels.js",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "bookings_refundlabels",
-      "target": "bookings_refundlabels_isrefundterminal",
-      "confidence_score": 1.0
+      "target": "bookings_refundlabels_isrefundterminal"
     },
     {
       "relation": "contains",
@@ -28681,9 +29143,9 @@
       "source_file": "src/features/bookings/refundLabels.js",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "bookings_refundlabels",
-      "target": "bookings_refundlabels_persondisplayname",
-      "confidence_score": 1.0
+      "target": "bookings_refundlabels_persondisplayname"
     },
     {
       "relation": "contains",
@@ -28691,9 +29153,9 @@
       "source_file": "src/features/bookings/refundLabels.js",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "bookings_refundlabels",
-      "target": "bookings_refundlabels_refund_reason_labels",
-      "confidence_score": 1.0
+      "target": "bookings_refundlabels_refund_reason_labels"
     },
     {
       "relation": "contains",
@@ -28701,9 +29163,9 @@
       "source_file": "src/features/bookings/refundLabels.js",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "bookings_refundlabels",
-      "target": "bookings_refundlabels_refund_reason_presets",
-      "confidence_score": 1.0
+      "target": "bookings_refundlabels_refund_reason_presets"
     },
     {
       "relation": "contains",
@@ -28711,9 +29173,9 @@
       "source_file": "src/features/bookings/refundLabels.js",
       "source_location": "L56",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "bookings_refundlabels",
-      "target": "bookings_refundlabels_refunddestinationcopy",
-      "confidence_score": 1.0
+      "target": "bookings_refundlabels_refunddestinationcopy"
     },
     {
       "relation": "contains",
@@ -28721,9 +29183,9 @@
       "source_file": "src/features/bookings/refundLabels.js",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "bookings_refundlabels",
-      "target": "bookings_refundlabels_refundreasonlabel",
-      "confidence_score": 1.0
+      "target": "bookings_refundlabels_refundreasonlabel"
     },
     {
       "relation": "contains",
@@ -28731,9 +29193,9 @@
       "source_file": "src/features/bookings/refundLabels.js",
       "source_location": "L44",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "bookings_refundlabels",
-      "target": "bookings_refundlabels_refundstatuslabel",
-      "confidence_score": 1.0
+      "target": "bookings_refundlabels_refundstatuslabel"
     },
     {
       "relation": "calls",
@@ -29052,9 +29514,9 @@
       "source_file": "src/features/finance/columns.jsx",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "finance_columns",
-      "target": "finance_columns_personcell",
-      "confidence_score": 1.0
+      "target": "finance_columns_personcell"
     },
     {
       "relation": "contains",
@@ -29062,9 +29524,9 @@
       "source_file": "src/features/finance/columns.jsx",
       "source_location": "L42",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "finance_columns",
-      "target": "finance_columns_statuschip",
-      "confidence_score": 1.0
+      "target": "finance_columns_statuschip"
     },
     {
       "relation": "imports_from",
@@ -29721,6 +30183,28 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/features/pricing/PricingPage.jsx",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "pricing_pricingpage",
+      "target": "components_pricingguide",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/PricingPage.jsx",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "pricing_pricingpage",
+      "target": "components_pricingguide_pricingflowstrip",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/PricingPage.jsx",
       "source_location": "L22",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -29836,6 +30320,50 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/components/PricingDashboardTab.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "components_pricingdashboardtab",
+      "target": "components_pricingguide",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/components/PricingDashboardTab.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "components_pricingdashboardtab",
+      "target": "components_pricingguide_pricingmentalmodel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/components/PricingDashboardTab.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "components_pricingdashboardtab",
+      "target": "components_pricingguide_pricingmixups",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/components/PricingDashboardTab.jsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "components_pricingdashboardtab",
+      "target": "components_pricingpromosponsortab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "src/pages/apps/pricing/index.jsx",
       "source_location": "L14",
       "weight": 1.0,
@@ -29867,33 +30395,42 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/pages/apps/pricing/components/PricingFeeExplainer.jsx",
-      "source_location": "L9",
+      "source_file": "src/features/pricing/components/PricingGuide.jsx",
+      "source_location": "L10",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_pricingfeeexplainer",
-      "target": "components_pricingfeeexplainer_feecard"
+      "source": "components_pricingguide",
+      "target": "components_pricingguide_pricing_flow",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/pages/apps/pricing/components/PricingFeeExplainer.jsx",
-      "source_location": "L25",
+      "source_file": "src/features/pricing/components/PricingGuide.jsx",
+      "source_location": "L18",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_pricingfeeexplainer",
-      "target": "components_pricingfeeexplainer_pricingfeeexplainer"
+      "source": "components_pricingguide",
+      "target": "components_pricingguide_pricingflowstrip",
+      "confidence_score": 1.0
     },
     {
-      "relation": "imports_from",
-      "context": "import",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/pages/apps/pricing/components/PricingRatesTab.jsx",
-      "source_location": "L16",
+      "source_file": "src/features/pricing/components/PricingGuide.jsx",
+      "source_location": "L71",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "components_pricingratestab",
-      "target": "components_pricingfeeexplainer"
+      "source": "components_pricingguide",
+      "target": "components_pricingguide_pricingmentalmodel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/components/PricingGuide.jsx",
+      "source_location": "L110",
+      "weight": 1.0,
+      "source": "components_pricingguide",
+      "target": "components_pricingguide_pricingmixups",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -29915,6 +30452,100 @@
       "confidence_score": 1.0,
       "source": "pricing_index",
       "target": "components_pricinghistorytab"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/components/PricingLessonSplit.jsx",
+      "source_location": "L37",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_pricinglessonsplit",
+      "target": "components_pricinglessonsplit_default_lesson"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/components/PricingLessonSplit.jsx",
+      "source_location": "L82",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_pricinglessonsplit",
+      "target": "components_pricinglessonsplit_pricinglessonsplit"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/components/PricingLessonSplit.jsx",
+      "source_location": "L44",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_pricinglessonsplit",
+      "target": "components_pricinglessonsplit_rowamount"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/components/PricingLessonSplit.jsx",
+      "source_location": "L33",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_pricinglessonsplit",
+      "target": "components_pricinglessonsplit_session_products"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/components/PricingLessonSplit.jsx",
+      "source_location": "L48",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_pricinglessonsplit",
+      "target": "components_pricinglessonsplit_splitbar"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/components/PricingProfitCheckTab.jsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_pricingprofitchecktab",
+      "target": "components_pricinglessonsplit"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/components/PricingRatesTab.jsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_pricingratestab",
+      "target": "components_pricinglessonsplit"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/components/PricingProfitCheckTab.jsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_pricingprofitchecktab",
+      "target": "components_pricinglessonsplit_default_lesson"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/components/PricingLessonSplit.jsx",
+      "source_location": "L143",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_pricinglessonsplit_pricinglessonsplit",
+      "target": "components_pricinglessonsplit_rowamount"
     },
     {
       "relation": "contains",
@@ -30176,6 +30807,36 @@
       "confidence_score": 1.0,
       "source": "components_pricingsurgetab",
       "target": "components_pricingsurgetab_product_types"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/components/PricingSurgeTab.jsx",
+      "source_location": "L51",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_pricingsurgetab",
+      "target": "components_pricingsurgetab_producttypechips"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/components/PricingSurgeTab.jsx",
+      "source_location": "L28",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_pricingsurgetab",
+      "target": "components_pricingsurgetab_session_products"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/pricing/components/PricingSurgeTab.jsx",
+      "source_location": "L87",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "components_pricingsurgetab",
+      "target": "components_pricingsurgetab_surgeworkedexample"
     },
     {
       "relation": "imports_from",
@@ -31861,9 +32522,9 @@
       "source_file": "src/pages/apps/booking/index.js",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "booking_index",
-      "target": "booking_index_matchessearch",
-      "confidence_score": 1.0
+      "target": "booking_index_matchessearch"
     },
     {
       "relation": "contains",
@@ -31871,9 +32532,9 @@
       "source_file": "src/pages/apps/booking/index.js",
       "source_location": "L80",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "booking_index",
-      "target": "booking_index_personcell",
-      "confidence_score": 1.0
+      "target": "booking_index_personcell"
     },
     {
       "relation": "contains",
@@ -31901,9 +32562,9 @@
       "source_file": "src/pages/apps/booking/index.js",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "booking_index",
-      "target": "booking_index_status_chips",
-      "confidence_score": 1.0
+      "target": "booking_index_status_chips"
     },
     {
       "relation": "contains",
@@ -31921,9 +32582,9 @@
       "source_file": "src/pages/apps/booking/index.js",
       "source_location": "L43",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "booking_index",
-      "target": "booking_index_status_tone",
-      "confidence_score": 1.0
+      "target": "booking_index_status_tone"
     },
     {
       "relation": "contains",
@@ -31931,9 +32592,9 @@
       "source_file": "src/pages/apps/booking/index.js",
       "source_location": "L69",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "booking_index",
-      "target": "booking_index_statuschip",
-      "confidence_score": 1.0
+      "target": "booking_index_statuschip"
     },
     {
       "relation": "calls",
@@ -32797,9 +33458,9 @@
       "source_file": "src/pages/apps/netqwix-library/index.jsx",
       "source_location": "L57",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "netqwix_library_index",
-      "target": "netqwix_library_index_batchtitle",
-      "confidence_score": 1.0
+      "target": "netqwix_library_index_batchtitle"
     },
     {
       "relation": "contains",
@@ -32827,9 +33488,9 @@
       "source_file": "src/pages/apps/netqwix-library/index.jsx",
       "source_location": "L53",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "netqwix_library_index",
-      "target": "netqwix_library_index_filestem",
-      "confidence_score": 1.0
+      "target": "netqwix_library_index_filestem"
     },
     {
       "relation": "contains",
@@ -32867,9 +33528,9 @@
       "source_file": "src/pages/apps/netqwix-library/index.jsx",
       "source_location": "L115",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "netqwix_library_index",
-      "target": "netqwix_library_index_publishlibraryfile",
-      "confidence_score": 1.0
+      "target": "netqwix_library_index_publishlibraryfile"
     },
     {
       "relation": "contains",
@@ -32899,9 +33560,9 @@
       "source_file": "src/pages/apps/netqwix-library/index.jsx",
       "source_location": "L58",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "netqwix_library_index_batchtitle",
-      "target": "netqwix_library_index_filestem",
-      "confidence_score": 1.0
+      "target": "netqwix_library_index_filestem"
     },
     {
       "relation": "calls",
@@ -32910,9 +33571,9 @@
       "source_file": "src/pages/apps/netqwix-library/index.jsx",
       "source_location": "L124",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "netqwix_library_index_publishlibraryfile",
-      "target": "netqwix_library_index_putpresigned",
-      "confidence_score": 1.0
+      "target": "netqwix_library_index_putpresigned"
     },
     {
       "relation": "calls",
@@ -32921,9 +33582,9 @@
       "source_file": "src/pages/apps/netqwix-library/index.jsx",
       "source_location": "L127",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "netqwix_library_index_publishlibraryfile",
-      "target": "netqwix_library_index_capturevideothumbnail",
-      "confidence_score": 1.0
+      "target": "netqwix_library_index_capturevideothumbnail"
     },
     {
       "relation": "calls",
@@ -34275,9 +34936,9 @@
       "source_file": "src/pages/login/index.js",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "login_index",
-      "target": "login_index_fieldsx",
-      "confidence_score": 1.0
+      "target": "login_index_fieldsx"
     },
     {
       "relation": "contains",
@@ -34405,9 +35066,9 @@
       "source_file": "src/pages/register/index.js",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "register_index",
-      "target": "register_index_getserversideprops",
-      "confidence_score": 1.0
+      "target": "register_index_getserversideprops"
     },
     {
       "relation": "contains",
@@ -34455,9 +35116,9 @@
       "source_file": "src/pages/register/index.js",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "register_index",
-      "target": "register_index_registerredirect",
-      "confidence_score": 1.0
+      "target": "register_index_registerredirect"
     },
     {
       "relation": "contains",
@@ -34739,9 +35400,9 @@
       "source_file": "src/services/adminAuthApi.js",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_adminauthapi",
-      "target": "services_adminauthapi_verifygoogleadminlogin",
-      "confidence_score": 1.0
+      "target": "services_adminauthapi_verifygoogleadminlogin"
     },
     {
       "relation": "calls",
@@ -34761,9 +35422,9 @@
       "source_file": "src/services/adminAuthApi.js",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_adminauthapi_verifygoogleadminlogin",
-      "target": "services_adminauthapi_apibase",
-      "confidence_score": 1.0
+      "target": "services_adminauthapi_apibase"
     },
     {
       "relation": "contains",
@@ -36279,9 +36940,9 @@
       "source_file": "src/services/bookingApi.js",
       "source_location": "L60",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_bookingapi",
-      "target": "services_bookingapi_canceladminbooking",
-      "confidence_score": 1.0
+      "target": "services_bookingapi_canceladminbooking"
     },
     {
       "relation": "contains",
@@ -36289,9 +36950,9 @@
       "source_file": "src/services/bookingApi.js",
       "source_location": "L47",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_bookingapi",
-      "target": "services_bookingapi_createadminrefund",
-      "confidence_score": 1.0
+      "target": "services_bookingapi_createadminrefund"
     },
     {
       "relation": "contains",
@@ -36329,9 +36990,9 @@
       "source_file": "src/services/bookingApi.js",
       "source_location": "L69",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_bookingapi",
-      "target": "services_bookingapi_getpaymentintentdetails",
-      "confidence_score": 1.0
+      "target": "services_bookingapi_getpaymentintentdetails"
     },
     {
       "relation": "contains",
@@ -36339,9 +37000,9 @@
       "source_file": "src/services/bookingApi.js",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_bookingapi",
-      "target": "services_bookingapi_parsejson",
-      "confidence_score": 1.0
+      "target": "services_bookingapi_parsejson"
     },
     {
       "relation": "calls",
@@ -36350,9 +37011,9 @@
       "source_file": "src/services/bookingApi.js",
       "source_location": "L63",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_bookingapi_canceladminbooking",
-      "target": "services_bookingapi_getauthheaders",
-      "confidence_score": 1.0
+      "target": "services_bookingapi_getauthheaders"
     },
     {
       "relation": "calls",
@@ -36361,9 +37022,9 @@
       "source_file": "src/services/bookingApi.js",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_bookingapi_createadminrefund",
-      "target": "services_bookingapi_getauthheaders",
-      "confidence_score": 1.0
+      "target": "services_bookingapi_getauthheaders"
     },
     {
       "relation": "calls",
@@ -36394,9 +37055,9 @@
       "source_file": "src/services/bookingApi.js",
       "source_location": "L72",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_bookingapi_getpaymentintentdetails",
-      "target": "services_bookingapi_getauthheaders",
-      "confidence_score": 1.0
+      "target": "services_bookingapi_getauthheaders"
     },
     {
       "relation": "calls",
@@ -36416,9 +37077,9 @@
       "source_file": "src/services/bookingApi.js",
       "source_location": "L61",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_bookingapi_canceladminbooking",
-      "target": "services_bookingapi_apiurl",
-      "confidence_score": 1.0
+      "target": "services_bookingapi_apiurl"
     },
     {
       "relation": "calls",
@@ -36427,9 +37088,9 @@
       "source_file": "src/services/bookingApi.js",
       "source_location": "L48",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_bookingapi_createadminrefund",
-      "target": "services_bookingapi_apiurl",
-      "confidence_score": 1.0
+      "target": "services_bookingapi_apiurl"
     },
     {
       "relation": "calls",
@@ -36460,9 +37121,9 @@
       "source_file": "src/services/bookingApi.js",
       "source_location": "L70",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_bookingapi_getpaymentintentdetails",
-      "target": "services_bookingapi_apiurl",
-      "confidence_score": 1.0
+      "target": "services_bookingapi_apiurl"
     },
     {
       "relation": "calls",
@@ -36471,9 +37132,9 @@
       "source_file": "src/services/bookingApi.js",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_bookingapi_canceladminbooking",
-      "target": "services_bookingapi_parsejson",
-      "confidence_score": 1.0
+      "target": "services_bookingapi_parsejson"
     },
     {
       "relation": "calls",
@@ -36482,9 +37143,9 @@
       "source_file": "src/services/bookingApi.js",
       "source_location": "L57",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "services_bookingapi_createadminrefund",
-      "target": "services_bookingapi_parsejson",
-      "confidence_score": 1.0
+      "target": "services_bookingapi_parsejson"
     },
     {
       "relation": "contains",
@@ -47459,5 +48120,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "54c6367ae47aca67267742931e66df66f63dc423"
+  "built_at_commit": "f7e164eca3afe87145baf1b9020d461a0ab7c32e"
 }

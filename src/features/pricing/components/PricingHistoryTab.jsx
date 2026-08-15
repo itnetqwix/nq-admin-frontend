@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import Button from '@mui/material/Button'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
 import AdminGridContainer from 'src/components/admin/AdminGridContainer'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
@@ -67,8 +66,9 @@ export default function PricingHistoryTab() {
 
   return (
     <AdminPageSection
-      title='Configuration history'
-      actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}
+      title='What you published'
+      subtitle='Each save is a new version. The active row is what website and app quote now. Bookings already paid keep the snapshot they were charged under — changing rates here never rewrites old escrow.'
+      action={<AdminRefreshButton onClick={() => void load()} loading={loading} />}
     >
       <AdminGridContainer>
         <AdminDataGrid autoHeight rows={rows} columns={cols} loading={loading} hideFooter />

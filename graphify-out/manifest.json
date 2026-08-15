@@ -750,8 +750,8 @@
     "semantic_hash": ""
   },
   "src/constants/pricingAdmin.js": {
-    "mtime": 1785861435.618407,
-    "ast_hash": "4bb72568ffe588f4c96ac001e8b79449",
+    "mtime": 1786796008.6261818,
+    "ast_hash": "7289af6677c034b508a8c34d1cad7b04",
     "semantic_hash": ""
   },
   "src/context/AdminRealtimeContext.js": {
@@ -2040,28 +2040,23 @@
     "semantic_hash": ""
   },
   "src/features/pricing/PricingPage.jsx": {
-    "mtime": 1786728440.4526827,
-    "ast_hash": "11392f951fbbbbcc40972d420bd1348d",
+    "mtime": 1786796656.9244838,
+    "ast_hash": "d28fa92af459f3d62a795abd28b60591",
     "semantic_hash": ""
   },
   "src/features/pricing/components/PricingDashboardTab.jsx": {
-    "mtime": 1785861435.6346283,
-    "ast_hash": "2d41550bfff905792b44e5e566b40d78",
+    "mtime": 1786796704.113886,
+    "ast_hash": "e9f5cf9d11c14e32a4d7aaa0e063e69f",
     "semantic_hash": ""
   },
   "src/features/pricing/components/PricingEscrowPolicyTab.jsx": {
-    "mtime": 1785861435.6350994,
-    "ast_hash": "f48a49d824c606562821d3d3ace601a9",
-    "semantic_hash": ""
-  },
-  "src/features/pricing/components/PricingFeeExplainer.jsx": {
-    "mtime": 1785861435.6354878,
-    "ast_hash": "7fcfb6156dcda39abd86ea056b9b2737",
+    "mtime": 1786796757.8445237,
+    "ast_hash": "5ded82b8554711da85ab6be57e53b7bb",
     "semantic_hash": ""
   },
   "src/features/pricing/components/PricingHistoryTab.jsx": {
-    "mtime": 1785861435.6355753,
-    "ast_hash": "980cf3eb7bcaefa33a629ef4f9f679cc",
+    "mtime": 1786796776.7403886,
+    "ast_hash": "0bb8c3898dc3775edf3abcefef50d5b8",
     "semantic_hash": ""
   },
   "src/features/pricing/components/PricingOverviewTab.jsx": {
@@ -2075,38 +2070,38 @@
     "semantic_hash": ""
   },
   "src/features/pricing/components/PricingProfitCheckTab.jsx": {
-    "mtime": 1785861435.637115,
-    "ast_hash": "d267c6201ba48199ac0d322b76e7fa11",
+    "mtime": 1786796747.00982,
+    "ast_hash": "a2284c012ad4d22817dcd237d0b7c915",
     "semantic_hash": ""
   },
   "src/features/pricing/components/PricingPromoSponsorTab.jsx": {
-    "mtime": 1785861435.6372626,
-    "ast_hash": "9ac05415f74de28746b1794e46b46777",
+    "mtime": 1786796760.6138763,
+    "ast_hash": "aca0a9ff28ac50eb7cb86d169cd6cfc4",
     "semantic_hash": ""
   },
   "src/features/pricing/components/PricingRatesTab.jsx": {
-    "mtime": 1785861435.637413,
-    "ast_hash": "0461f78cf2b3ffd9f7100ae10cf44561",
+    "mtime": 1786796736.8038232,
+    "ast_hash": "d4c08b7471ec70af65c811063976e88d",
     "semantic_hash": ""
   },
   "src/features/pricing/components/PricingRegionTab.jsx": {
-    "mtime": 1785861435.637643,
-    "ast_hash": "24a9d2a53f84a8e0719dee217ecbdc4c",
+    "mtime": 1786796465.9970007,
+    "ast_hash": "5f6d733eb41edcc6dbdb584127120135",
     "semantic_hash": ""
   },
   "src/features/pricing/components/PricingSimulatorTab.jsx": {
-    "mtime": 1785861435.6378074,
-    "ast_hash": "f931e9475a26cb57609494e5d3f276f3",
+    "mtime": 1786796147.6834881,
+    "ast_hash": "598e9ed4d613d0d2b1df1485697a671a",
     "semantic_hash": ""
   },
   "src/features/pricing/components/PricingSurgeTab.jsx": {
-    "mtime": 1785861435.6380365,
-    "ast_hash": "3f4999417bef925ff5ea59b9f789603e",
+    "mtime": 1786796336.8782408,
+    "ast_hash": "eea4f56ce29895b8ca692821d79b3392",
     "semantic_hash": ""
   },
   "src/features/pricing/components/PricingUnitEconomicsTab.jsx": {
-    "mtime": 1785861435.638193,
-    "ast_hash": "76594706a042b0b277c1d85f2723da9a",
+    "mtime": 1786796115.6020772,
+    "ast_hash": "f54b4fa8bc9c295e3f73028f69362f24",
     "semantic_hash": ""
   },
   "src/features/users/DirectoryBody.jsx": {
@@ -2227,6 +2222,16 @@
   "src/features/bookings/refundLabels.js": {
     "mtime": 1786793924.60968,
     "ast_hash": "4e9d6965c138d69c901e4947c5a46d06",
+    "semantic_hash": ""
+  },
+  "src/features/pricing/components/PricingLessonSplit.jsx": {
+    "mtime": 1786796786.7726502,
+    "ast_hash": "3e0ac74204f6f045e6769ce6f8ee814f",
+    "semantic_hash": ""
+  },
+  "src/features/pricing/components/PricingGuide.jsx": {
+    "mtime": 1786796612.2746017,
+    "ast_hash": "a340c68e00a770477642f8db508ccaff",
     "semantic_hash": ""
   }
 }

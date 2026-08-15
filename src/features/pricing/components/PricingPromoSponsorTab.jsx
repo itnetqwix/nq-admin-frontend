@@ -7,7 +7,7 @@ import { ops } from 'src/styles/opsSurface'
 
 export default function PricingPromoSponsorTab() {
   return (
-    <AdminPageSection title='Promo discounts — who pays?'>
+    <AdminPageSection title='Promo codes — who eats the discount?'>
       <Stack spacing={2}>
         <OpsSurfaceCard>
           <Stack direction='row' spacing={1} alignItems='center' sx={{ mb: 1 }}>
@@ -21,8 +21,8 @@ export default function PricingPromoSponsorTab() {
             </Typography>
           </Stack>
           <Typography sx={{ fontSize: 13, color: ops.body, lineHeight: 1.5 }}>
-            Trainee pays less at checkout. Coach still earns commission on the <strong>pre-discount</strong>{' '}
-            session price. Platform margin is reduced by the promo amount.
+            Enthusiast pays less. Coach still earns as if the session were full price. NetQwix margin
+            shrinks by the discount — use this for growth codes.
           </Typography>
         </OpsSurfaceCard>
         <OpsSurfaceCard>

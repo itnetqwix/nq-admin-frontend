@@ -43,7 +43,15 @@ import {
   readInfraFieldValue,
   writeInfraFieldValue
 } from 'src/constants/unitEconomicsAdmin'
-import { PRODUCT_TYPES, fmtMoney, fmtPct, inputToCents } from 'src/constants/pricingAdmin'
+import {
+  DEFAULT_LESSON_DOLLARS,
+  PRODUCT_TYPES,
+  currencyForRegion,
+  fmtMoney,
+  fmtPct,
+  hourlyCentsFromSession,
+  inputToCents
+} from 'src/constants/pricingAdmin'
 import {
   fetchUnitEconomics,
   fetchUnitEconomicsConfig,
@@ -54,7 +62,7 @@ import {
 const DEFAULT_CUSTOM = {
   productType: 'session_booking',
   durationMinutes: '30',
-  hourlyRateDollars: '80.00'
+  sessionDollars: DEFAULT_LESSON_DOLLARS
 }
 
 function ProfitChip({ profitable, label }) {
@@ -71,10 +79,11 @@ function ProfitChip({ profitable, label }) {
 function ScenarioInfraRow({ row, currency }) {
   const [open, setOpen] = useState(false)
   const infraLines = (row.economics?.breakdown || []).filter(l => l.key?.startsWith('infra:'))
+  const isSixty = row.economics?.sessionSubtotalCents === 6000
 
   return (
     <>
-      <TableRow hover>
+      <TableRow hover selected={isSixty}>
         <TableCell>
           <IconButton size='small' onClick={() => setOpen(v => !v)} aria-label='expand'>
             {open ? <KeyboardArrowUpIcon fontSize='small' /> : <KeyboardArrowDownIcon fontSize='small' />}
@@ -85,7 +94,8 @@ function ScenarioInfraRow({ row, currency }) {
             {row.label}
           </Typography>
           <Typography variant='caption' color='text.secondary'>
-            {fmtPct(row.quote.commissionRate)} commission
+            {row.durationMinutes} min · {fmtPct(row.quote.commissionRate)} commission
+            {isSixty ? ' · $60 ticket' : ''}
           </Typography>
         </TableCell>
         <TableCell align='right'>{fmtMoney(row.economics.sessionSubtotalCents, currency)}</TableCell>
@@ -125,7 +135,7 @@ function ScenarioInfraRow({ row, currency }) {
   )
 }
 
-export default function PricingUnitEconomicsTab({ config, isDirty }) {
+export default function PricingUnitEconomicsTab({ config, isDirty, lesson }) {
   const ability = useContext(AbilityContext)
   const canEdit = ability?.can('update', 'admin-action-pricing') ?? true
 
@@ -141,7 +151,16 @@ export default function PricingUnitEconomicsTab({ config, isDirty }) {
   const [error, setError] = useState('')
   const timer = useRef(null)
 
-  const currency = region === 'CA' ? 'CAD' : 'USD'
+  const effectiveCustom = lesson
+    ? {
+        productType: lesson.productType || 'session_booking',
+        durationMinutes: String(lesson.durationMinutes || 30),
+        sessionDollars: lesson.sessionDollars || DEFAULT_LESSON_DOLLARS
+      }
+    : custom
+  const effectiveRegion = lesson?.region || region
+  const currency = currencyForRegion(effectiveRegion)
+  const hideCustomForm = Boolean(lesson)
 
   useEffect(() => {
     void (async () => {
@@ -163,19 +182,24 @@ export default function PricingUnitEconomicsTab({ config, isDirty }) {
   }, [])
 
   const payload = useMemo(
-    () => ({
-      region,
-      days: Number(infraForm.global.analysisPeriodDays) || 30,
-      draftConfig: config,
-      infraConfig: formToInfraPayload(infraForm),
-      customScenario: {
-        productType: custom.productType,
-        durationMinutes: Number(custom.durationMinutes) || 30,
-        hourlyRateCents: inputToCents(custom.hourlyRateDollars)
-      },
-      useSavedInfra: false
-    }),
-    [custom, config, infraForm, region]
+    () => {
+      const sessionSubtotalCents = inputToCents(effectiveCustom.sessionDollars)
+      const durationMinutes = Number(effectiveCustom.durationMinutes) || 30
+      return {
+        region: effectiveRegion,
+        days: Number(infraForm.global.analysisPeriodDays) || 30,
+        draftConfig: config,
+        infraConfig: formToInfraPayload(infraForm),
+        customScenario: {
+          productType: effectiveCustom.productType,
+          durationMinutes,
+          sessionSubtotalCents,
+          hourlyRateCents: hourlyCentsFromSession(sessionSubtotalCents, durationMinutes)
+        },
+        useSavedInfra: false
+      }
+    },
+    [effectiveCustom, config, infraForm, effectiveRegion]
   )
 
   const load = useCallback(async () => {
@@ -274,7 +298,7 @@ export default function PricingUnitEconomicsTab({ config, isDirty }) {
           <AdminPageSection
             title='Infrastructure cost model'
             subtitle='Every production vendor in the stack — costs persist across admin sessions.'
-            actions={
+            action={
               canEdit ? (
                 <Stack direction='row' spacing={1}>
                   <Button size='small' onClick={() => void resetInfraDefaults()} disabled={infraSaving}>
@@ -295,9 +319,16 @@ export default function PricingUnitEconomicsTab({ config, isDirty }) {
             <Stack spacing={2} sx={{ mb: 2 }}>
               <FormControl fullWidth size='small'>
                 <InputLabel>Checkout region</InputLabel>
-                <Select label='Checkout region' value={region} onChange={e => setRegion(e.target.value)}>
+                <Select
+                  label='Checkout region'
+                  value={effectiveRegion}
+                  onChange={e => setRegion(e.target.value)}
+                  disabled={hideCustomForm}
+                >
                   <MenuItem value='US'>United States (USD)</MenuItem>
                   <MenuItem value='CA'>Canada (CAD)</MenuItem>
+                  <MenuItem value='GB'>United Kingdom (GBP)</MenuItem>
+                  <MenuItem value='EU'>European Union (EUR)</MenuItem>
                 </Select>
               </FormControl>
               <TextField
@@ -431,8 +462,9 @@ export default function PricingUnitEconomicsTab({ config, isDirty }) {
             )}
           </AdminPageSection>
 
+          {!hideCustomForm ? (
           <Box sx={{ mt: 2 }}>
-            <AdminPageSection title='Custom session' subtitle='Model any coach rate and duration.'>
+            <AdminPageSection title='Custom session' subtitle='Model a $60 lesson at 15 or 30 minutes — or any other ticket.'>
               <Stack spacing={2}>
                 <FormControl fullWidth size='small'>
                   <InputLabel>Product</InputLabel>
@@ -459,15 +491,17 @@ export default function PricingUnitEconomicsTab({ config, isDirty }) {
                 />
                 <TextField
                   size='small'
-                  label='Coach hourly rate'
+                  label='Session price'
                   type='number'
-                  value={custom.hourlyRateDollars}
-                  onChange={e => setCustom(p => ({ ...p, hourlyRateDollars: e.target.value }))}
+                  value={custom.sessionDollars}
+                  onChange={e => setCustom(p => ({ ...p, sessionDollars: e.target.value }))}
                   InputProps={{ startAdornment: <InputAdornment position='start'>$</InputAdornment> }}
+                  helperText={`${custom.durationMinutes} min at this price is ${fmtMoney(hourlyCentsFromSession(inputToCents(custom.sessionDollars), custom.durationMinutes), currency)}/hr`}
                 />
               </Stack>
             </AdminPageSection>
           </Box>
+          ) : null}
         </Grid>
 
         <Grid item xs={12} lg={7}>
@@ -585,11 +619,12 @@ export default function PricingUnitEconomicsTab({ config, isDirty }) {
                 <Stack direction='row' justifyContent='space-between' alignItems='flex-start'>
                   <Box>
                     <Typography variant='subtitle1' fontWeight={700}>
-                      Custom session
+                      This lesson after infra
                     </Typography>
                     <Typography variant='body2' color='text.secondary'>
                       {customRow.durationMinutes} min · {fmtMoney(customRow.economics.sessionSubtotalCents, currency)}{' '}
-                      · Breakeven {fmtPct(customRow.economics.breakevenCommissionRate)}
+                      session · Net {fmtMoney(customRow.economics.netProfitCents, currency)} · Breakeven commission{' '}
+                      {fmtPct(customRow.economics.breakevenCommissionRate)}
                     </Typography>
                   </Box>
                   <ProfitChip profitable={customRow.economics.profitable} />
@@ -620,7 +655,7 @@ export default function PricingUnitEconomicsTab({ config, isDirty }) {
               </OpsSurfaceCard>
             ) : null}
 
-            <AdminPageSection title='Preset scenarios' subtitle='Expand a row for per-vendor infra breakdown.'>
+            <AdminPageSection title='Preset lessons' subtitle='$60 at 15 and 30 min are highlighted. Expand a row for per-vendor infra.'>
               <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
                 <Table size='small'>
                   <TableHead>

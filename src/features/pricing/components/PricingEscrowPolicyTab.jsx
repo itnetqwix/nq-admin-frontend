@@ -13,9 +13,7 @@ export default function PricingEscrowPolicyTab({ policy, canEdit, onPatch }) {
   return (
     <Stack spacing={2}>
       <Alert severity='info'>
-        Escrow policy applies platform-wide. After a session ends, both parties should rate. If ratings
-        are still missing after the grace period, funds auto-release to the coach (disputed holds are
-        excluded).
+        Platform-wide. Disputed holds are skipped. Coach cash still lands in the NetQwix wallet — not a bank.
       </Alert>
       <AdminPageSection title='Clearance & ratings'>
         <Grid container spacing={3}>
