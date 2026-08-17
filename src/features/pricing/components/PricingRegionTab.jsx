@@ -141,7 +141,7 @@ export default function PricingRegionTab({
               onChange={e =>
                 onPatchRegion(regionKey, { trainerPlatformFeeMinor: inputToCents(e.target.value) })
               }
-              helperText='Added to trainee checkout (not deducted from coach)'
+              helperText='Trainee checkout only — not taken from the coach'
               disabled={!canEdit}
             />
           </Grid>
@@ -168,6 +168,47 @@ export default function PricingRegionTab({
               value={decimalToPctInput(region.minCommissionRateFloor)}
               onChange={e =>
                 onPatchRegion(regionKey, { minCommissionRateFloor: pctInputToDecimal(e.target.value) })
+              }
+              disabled={!canEdit}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField
+              fullWidth
+              label={`Withdrawal fee (${currencySymbol})`}
+              type='number'
+              inputProps={{ step: '0.01', min: 0 }}
+              value={centsToInput(region.withdrawalFeeMinor)}
+              onChange={e =>
+                onPatchRegion(regionKey, { withdrawalFeeMinor: inputToCents(e.target.value) })
+              }
+              helperText='Taken once when the coach cashes out — not on the lesson'
+              disabled={!canEdit}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField
+              fullWidth
+              label='Withdrawal fee (bps)'
+              type='number'
+              inputProps={{ step: '1', min: 0 }}
+              value={region.withdrawalFeeBps ?? 0}
+              onChange={e =>
+                onPatchRegion(regionKey, { withdrawalFeeBps: Math.max(0, Math.round(Number(e.target.value) || 0)) })
+              }
+              helperText='100 bps = 1% of the withdrawal. 0 = off.'
+              disabled={!canEdit}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <TextField
+              fullWidth
+              label={`Minimum withdrawal (${currencySymbol})`}
+              type='number'
+              inputProps={{ step: '0.01', min: 0 }}
+              value={centsToInput(region.minWithdrawMinor ?? 100)}
+              onChange={e =>
+                onPatchRegion(regionKey, { minWithdrawMinor: inputToCents(e.target.value) })
               }
               disabled={!canEdit}
             />

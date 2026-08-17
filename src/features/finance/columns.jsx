@@ -464,17 +464,22 @@ export function buildFinanceColumns({ allowRefund, allowPayout, confirm, load, t
     },
     { field: 'status', headerName: 'Status', width: 140 },
     {
-      field: 'stripe_transfer_id',
-      headerName: 'Stripe transfer',
-      flex: 1,
-      minWidth: 120,
-      valueGetter: p => p.row.stripe_transfer_id || '—'
+      field: 'amount_minor',
+      headerName: 'Gross',
+      width: 100,
+      valueGetter: p => formatMinor(p.row.gross_minor ?? p.row.amount_minor)
     },
     {
-      field: 'amount_minor',
-      headerName: 'Amount',
+      field: 'fee_minor',
+      headerName: 'Fee',
+      width: 90,
+      valueGetter: p => formatMinor(p.row.fee_minor || 0)
+    },
+    {
+      field: 'net_minor',
+      headerName: 'Net',
       width: 100,
-      valueGetter: p => formatMinor(p.row.amount_minor)
+      valueGetter: p => formatMinor(p.row.net_minor ?? p.row.amount_minor)
     },
     {
       field: 'actions',

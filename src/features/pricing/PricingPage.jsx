@@ -15,15 +15,14 @@ import { AbilityContext } from 'src/layouts/components/acl/Can'
 import { usePricingConfig } from 'src/hooks/usePricingConfig'
 import { ops } from 'src/styles/opsSurface'
 import { formatDiffValue, pricingConfigDiff } from 'src/utils/pricingDiff'
-import PricingDashboardTab from './components/PricingDashboardTab'
 import PricingRatesTab from './components/PricingRatesTab'
 import PricingProfitCheckTab from './components/PricingProfitCheckTab'
 import PricingHistoryTab from './components/PricingHistoryTab'
 import PricingSurgeTab from './components/PricingSurgeTab'
 import { PricingFlowStrip } from './components/PricingGuide'
 
-const TAB_LABELS = ['1 · Understand', '2 · Rates & fees', '3 · Surge & peak', '4 · Profit check', '5 · History']
-const TAB_SLUGS = ['overview', 'rates', 'surge', 'profit', 'history']
+const TAB_LABELS = ['Rates & fees', 'Surge & peak', 'Profit check', 'History']
+const TAB_SLUGS = ['rates', 'surge', 'profit', 'history']
 
 const PricingPage = () => {
   const router = useRouter()
@@ -114,7 +113,7 @@ const PricingPage = () => {
 
   if (loading || !config) {
     return (
-      <AdminPageShell bare eyebrow='Revenue · pricing' icon='mdi:currency-usd' title='Pricing & fees.' subtitle='Loading…'>
+      <AdminPageShell bare eyebrow='Revenue · pricing' icon='mdi:currency-usd' title='Pricing.' subtitle='Loading…'>
         <Typography color='text.secondary'>Loading…</Typography>
       </AdminPageShell>
     )
@@ -126,8 +125,8 @@ const PricingPage = () => {
         bare
         eyebrow='Revenue · pricing'
         icon='mdi:currency-usd'
-        title='Pricing & fees.'
-        subtitle='Read how a dollar moves, set commission, then check a $60 lesson (15 or 30 min). Save publishes to website and app on the next checkout.'
+        title='Pricing.'
+        subtitle='Configure → preview → check profit → save. New rates apply on the next checkout.'
         actions={
           <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
             <Chip component={Link} href='/apps/finance' label='Finance' clickable variant='outlined' size='small' />
@@ -193,11 +192,6 @@ const PricingPage = () => {
         <PricingFlowStrip tab={tab} onGoTab={syncTab} />
 
         {tab === 0 ? (
-          <Stack spacing={3}>
-            <PricingDashboardTab config={config} onGoTab={syncTab} />
-          </Stack>
-        ) : null}
-        {tab === 1 ? (
           <PricingRatesTab
             config={config}
             canEdit={canEdit}
@@ -211,10 +205,10 @@ const PricingPage = () => {
             onPatchEscrowPolicy={patchEscrowPolicy}
           />
         ) : null}
-        {tab === 2 ? (
+        {tab === 1 ? (
           <PricingSurgeTab config={config} canEdit={canEdit} onPatchGlobal={patchGlobal} isDirty={isDirty} />
         ) : null}
-        {tab === 3 ? (
+        {tab === 2 ? (
           <PricingProfitCheckTab
             config={config}
             isDirty={isDirty}
@@ -222,7 +216,7 @@ const PricingPage = () => {
             onPatchRegion={patchRegion}
           />
         ) : null}
-        {tab === 4 ? <PricingHistoryTab /> : null}
+        {tab === 3 ? <PricingHistoryTab /> : null}
       </AdminPageShell>
 
       {isDirty && canEdit ? (

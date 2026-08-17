@@ -161,4 +161,13 @@ export const inputToCents = v => Math.round(Number(v || 0) * 100)
 export const pctInputToDecimal = v => Number(v || 0) / 100
 export const decimalToPctInput = v => (Number(v || 0) * 100).toFixed(1)
 
+export const withdrawalSettlement = (grossMinor, feeMinor = 0, feeBps = 0) => {
+  const gross = Math.max(0, Math.round(Number(grossMinor) || 0))
+  const fee = Math.min(
+    gross,
+    Math.max(0, Math.round(Number(feeMinor) || 0)) + Math.round(gross * (Math.max(0, Number(feeBps) || 0) / 10000))
+  )
+  return { grossMinor: gross, feeMinor: fee, taxMinor: 0, deductionsMinor: fee, netMinor: gross - fee }
+}
+
 export const deepClone = obj => JSON.parse(JSON.stringify(obj ?? {}))

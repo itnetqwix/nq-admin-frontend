@@ -45,11 +45,10 @@ function rowAmount(quote, key) {
   return (quote?.breakdown || []).find(r => r.key === key)?.amountMinor ?? 0
 }
 
-function SplitBar({ coach, commission, coachFee, currency }) {
+function SplitBar({ coach, commission, currency }) {
   const parts = [
     { key: 'coach', label: 'Coach', cents: Math.max(0, coach), color: ops.live },
-    { key: 'commission', label: 'Commission', cents: Math.max(0, commission), color: ops.indigo },
-    { key: 'fee', label: 'Coach fee', cents: Math.max(0, coachFee), color: ops.clay }
+    { key: 'commission', label: 'Commission', cents: Math.max(0, commission), color: ops.indigo }
   ]
   const total = parts.reduce((s, p) => s + p.cents, 0) || 1
 
@@ -332,7 +331,7 @@ export default function PricingLessonSplit({
         </Grid>
       </Grid>
 
-      <SplitBar coach={coachGets} commission={commissionCents} coachFee={coachFee} currency={currency} />
+      <SplitBar coach={coachGets} commission={commissionCents} currency={currency} />
 
       {showCommissionControls && onPatchRegion && regionCfg ? (
         <OpsSurfaceCard>

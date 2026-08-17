@@ -23,7 +23,7 @@ export default function PricingProductsTab({ productFees, onPatchProductFee, can
     },
     {
       field: 'trainerDisplay',
-      headerName: 'Coach fee ($)',
+      headerName: 'Service fee ($)',
       width: 140,
       editable: true
     }

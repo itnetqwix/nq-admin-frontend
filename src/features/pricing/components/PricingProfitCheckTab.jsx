@@ -17,8 +17,8 @@ export default function PricingProfitCheckTab({ config, isDirty, canEdit, onPatc
   return (
     <Stack spacing={3}>
       <AdminPageSection
-        title='1 · This lesson — who pays, who gets paid'
-        subtitle='Same quote website and app will charge. Enthusiast is charged now. Coach is paid later into wallet. Tune commission here; save at the top to publish.'
+        title='This lesson'
+        subtitle='Same quote website and app will charge. Tune commission here; save at the top to publish.'
       >
         <PricingLessonSplit
           config={config}
@@ -31,15 +31,15 @@ export default function PricingProfitCheckTab({ config, isDirty, canEdit, onPatc
       </AdminPageSection>
 
       <AdminPageSection
-        title='2 · After infrastructure (the real profit)'
-        subtitle='Step 1 is take-rate minus Stripe. This step subtracts AWS, video, and vendors. 15 min costs less video than 30 min on the same $60 ticket. Expand a row for the per-vendor cut.'
+        title='After infrastructure'
+        subtitle='Step 1 is take-rate minus Stripe. This subtracts AWS and video. 15 min costs less video than 30 min on the same $60 ticket.'
       >
         <PricingUnitEconomicsTab config={config} isDirty={isDirty} lesson={lesson} />
       </AdminPageSection>
 
       <Accordion disableGutters sx={{ boxShadow: 'none', '&:before': { display: 'none' } }}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography sx={{ fontWeight: 600 }}>3 · Advanced — promo, tax, payment method</Typography>
+          <Typography sx={{ fontWeight: 600 }}>Promo, tax, payment method</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <PricingSimulatorTab config={config} isDirty={isDirty} variant='full' />
