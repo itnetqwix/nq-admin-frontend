@@ -4,21 +4,24 @@ import Box from '@mui/material/Box'
 
 // Styled component for Blank Layout component
 const BlankLayoutWrapper = styled(Box)(({ theme }) => ({
-  height: '100vh',
+  minHeight: '100dvh',
 
   // For V1 Blank layout pages
   '& .content-center': {
     display: 'flex',
-    minHeight: '100vh',
+    minHeight: '100dvh',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: theme.spacing(5)
+    padding: theme.spacing(5),
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(2)
+    }
   },
 
   // For V2 Blank layout pages
   '& .content-right': {
     display: 'flex',
-    minHeight: '100vh',
+    minHeight: '100dvh',
     overflowX: 'hidden',
     position: 'relative'
   }
@@ -27,7 +30,7 @@ const BlankLayoutWrapper = styled(Box)(({ theme }) => ({
 const BlankLayout = ({ children }) => {
   return (
     <BlankLayoutWrapper className='layout-wrapper'>
-      <Box className='app-content' sx={{ minHeight: '100vh', overflowX: 'hidden', position: 'relative' }}>
+      <Box className='app-content' sx={{ minHeight: '100dvh', overflowX: 'hidden', position: 'relative' }}>
         {children}
       </Box>
     </BlankLayoutWrapper>

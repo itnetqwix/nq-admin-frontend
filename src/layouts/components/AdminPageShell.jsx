@@ -102,7 +102,10 @@ export default function AdminPageShell({
             alignItems: 'center',
             justifyContent: { xs: 'flex-start', sm: 'flex-end' },
             width: { xs: '100%', sm: 'auto' },
-            maxWidth: { xs: '100%', sm: '58%', md: '52%' }
+            maxWidth: { xs: '100%', sm: '58%', md: '52%' },
+            '& .MuiButton-root, & .MuiChip-root': {
+              maxWidth: '100%'
+            }
           }}
         >
           {headerActions}

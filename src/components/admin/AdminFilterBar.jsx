@@ -62,7 +62,7 @@ export default function AdminFilterBar({
           ) : null}
           {children}
         </Stack>
-        <Box sx={{ display: 'flex', gap: 1, flexShrink: 0, alignItems: 'center', flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', gap: 1, flexShrink: 0, alignItems: 'center', flexWrap: 'wrap', width: { xs: '100%', md: 'auto' } }}>
           {typeof resultCount === 'number' ? (
             <Chip
               size='small'

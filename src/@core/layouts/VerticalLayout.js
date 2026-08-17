@@ -1,5 +1,6 @@
 // ** React Imports
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 
 // ** MUI Imports
 import Fab from '@mui/material/Fab'
@@ -21,14 +22,16 @@ import ScrollToTop from 'src/@core/components/scroll-to-top'
 
 const VerticalLayoutWrapper = styled('div')({
   height: '100%',
-  display: 'flex'
+  display: 'flex',
+  minWidth: 0,
+  overflowX: 'clip'
 })
 
 const MainContentWrapper = styled(Box)({
   flexGrow: 1,
   minWidth: 0,
   display: 'flex',
-  minHeight: '100vh',
+  minHeight: '100dvh',
   flexDirection: 'column'
 })
 
@@ -60,9 +63,14 @@ const VerticalLayout = props => {
 
   // ** States
   const [navVisible, setNavVisible] = useState(false)
+  const router = useRouter()
 
   // ** Toggle Functions
   const toggleNavVisibility = () => setNavVisible(!navVisible)
+
+  useEffect(() => {
+    if (hidden) setNavVisible(false)
+  }, [router.asPath, hidden])
 
   return (
     <>

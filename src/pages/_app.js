@@ -116,7 +116,7 @@ const App = props => {
           content={`${themeConfig.templateName} administrator console — people, ops, logs, and business.`}
         />
         <meta name='keywords' content='NetQwix, Admin, Operations' />
-        <meta name='viewport' content='initial-scale=1, width=device-width' />
+        <meta name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover' />
 
       </Head>
 

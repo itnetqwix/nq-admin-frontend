@@ -40,7 +40,7 @@ export default function PlayVideo({ handleCloseVideoPlayer, selectedVideo }) {
           </div>
         </div>
         <video
-          style={videoDimensions}
+          style={{ ...videoDimensions, maxWidth: '100%', height: 'auto' }}
           autoPlay
           controls
           onLoadedData={handleVideoLoad}

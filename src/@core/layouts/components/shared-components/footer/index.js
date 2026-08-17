@@ -31,6 +31,7 @@ const Footer = props => {
           width: '100%',
           px: { xs: 2, sm: 3, md: 4 },
           py: 1.5,
+          pb: { xs: 'max(12px, env(safe-area-inset-bottom))', sm: 1.5 },
           ...(contentWidth === 'boxed' && { '@media (min-width:1440px)': { maxWidth: 1440 } })
         }}
       >

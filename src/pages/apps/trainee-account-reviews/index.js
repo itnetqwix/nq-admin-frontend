@@ -186,7 +186,7 @@ export default function TraineeAccountReviewsPage() {
         anchor='right'
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        PaperProps={{ sx: { width: 420, p: 3 } }}
+        PaperProps={{ sx: { width: { xs: '100%', sm: 420 }, p: 3 } }}
       >
         {detail ? (
           <Stack spacing={2}>

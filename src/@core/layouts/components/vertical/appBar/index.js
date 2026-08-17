@@ -13,6 +13,7 @@ const AppBar = styled(MuiAppBar)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   padding: theme.spacing(0, 3),
+  paddingTop: 'env(safe-area-inset-top, 0px)',
   backgroundColor: theme.palette.background.paper,
   color: theme.palette.text.primary,
   borderBottom: `1px solid ${theme.palette.divider}`,
@@ -20,8 +21,9 @@ const AppBar = styled(MuiAppBar)(({ theme }) => ({
   backgroundImage: 'none',
   minHeight: theme.mixins.toolbar.minHeight,
   [theme.breakpoints.down('sm')]: {
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2)
+    paddingLeft: theme.spacing(1.25),
+    paddingRight: theme.spacing(1.25),
+    minHeight: 56
   }
 }))
 

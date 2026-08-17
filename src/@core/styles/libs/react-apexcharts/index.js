@@ -2,6 +2,10 @@
 import { styled } from '@mui/material/styles'
 
 const ApexChartWrapper = styled('div')(({ theme }) => ({
+  minWidth: 0,
+  maxWidth: '100%',
+  overflowX: 'auto',
+  WebkitOverflowScrolling: 'touch',
   '& .apexcharts-canvas': {
     "& line[stroke='transparent']": {
       display: 'none'

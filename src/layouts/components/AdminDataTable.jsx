@@ -105,7 +105,7 @@ export default function AdminDataTable({
         </Alert>
       ) : null}
 
-      <Box className='admin-data-grid' sx={{ height, width: '100%' }}>
+      <Box className='admin-data-grid' sx={{ height: { xs: Math.min(height, 480), sm: height }, width: '100%', minWidth: 0, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <DataGrid
           rows={rows}
           columns={cols}

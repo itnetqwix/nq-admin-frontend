@@ -106,7 +106,6 @@ const LoginPage = () => {
             rules={{ required: true }}
             render={({ field: { value, onChange, onBlur } }) => (
               <TextField
-                autoFocus
                 label='Email'
                 value={value}
                 onBlur={onBlur}

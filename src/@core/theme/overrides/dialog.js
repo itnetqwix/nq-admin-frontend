@@ -51,7 +51,16 @@ const Dialog = skin => {
         root: ({ theme }) => ({
           padding: theme.spacing(5),
           [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(2)
+            padding: theme.spacing(2),
+            flexDirection: 'column-reverse',
+            alignItems: 'stretch',
+            gap: theme.spacing(1),
+            '& > :not(:first-of-type)': {
+              marginLeft: '0 !important'
+            },
+            '& .MuiButton-root': {
+              width: '100%'
+            }
           },
           '&.dialog-actions-dense': {
             padding: theme.spacing(2.5),

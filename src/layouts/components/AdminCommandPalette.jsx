@@ -11,6 +11,10 @@ import List from '@mui/material/List'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemText from '@mui/material/ListItemText'
 import CircularProgress from '@mui/material/CircularProgress'
+import IconButton from '@mui/material/IconButton'
+import useMediaQuery from '@mui/material/useMediaQuery'
+import { useTheme } from '@mui/material/styles'
+import Icon from 'src/@core/components/icon'
 import { searchAdminUsers } from 'src/services/adminOpsApi'
 import authConfig from 'src/configs/auth'
 import { requireApiBaseUrl } from 'src/utils/apiBase'
@@ -39,6 +43,8 @@ const STATIC_PAGES = [
 
 export default function AdminCommandPalette({ open, onClose }) {
   const router = useRouter()
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   const [value, setValue] = useState('')
   const [hits, setHits] = useState([])
   const [busy, setBusy] = useState(false)
@@ -129,14 +135,21 @@ export default function AdminCommandPalette({ open, onClose }) {
   })
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth='sm'>
-      <DialogTitle>Jump to…</DialogTitle>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth='sm' fullScreen={fullScreen}>
+      <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+        Jump to…
+        {fullScreen ? (
+          <IconButton aria-label='Close' onClick={onClose} edge='end'>
+            <Icon icon='mdi:close' />
+          </IconButton>
+        ) : null}
+      </DialogTitle>
       <DialogContent>
         <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
           User id / email → User 360 · Booking ObjectId → bookings · path like{' '}
           <code>/apps/failed-jobs</code>. ⌘/Ctrl+K.
         </Typography>
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'stretch', flexDirection: { xs: 'column', sm: 'row' } }}>
           <TextField
             autoFocus
             fullWidth
@@ -146,7 +159,7 @@ export default function AdminCommandPalette({ open, onClose }) {
             onChange={e => setValue(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && void run()}
           />
-          <Button variant='contained' onClick={() => void run()} disabled={busy}>
+          <Button variant='contained' onClick={() => void run()} disabled={busy} sx={{ flexShrink: 0 }}>
             {busy ? <CircularProgress size={18} color='inherit' /> : 'Go'}
           </Button>
         </Box>

@@ -261,9 +261,9 @@ export default function User360Page() {
   }
 
   return (
-    <Box sx={{ bgcolor: 'grey.50', minHeight: '100vh', pb: 6 }}>
-      <Container maxWidth='xl' sx={{ pt: 3 }}>
-        <Breadcrumbs sx={{ mb: 2 }} separator='/'>
+    <Box sx={{ bgcolor: 'grey.50', minHeight: 0, pb: { xs: 2, md: 6 } }}>
+      <Container maxWidth='xl' sx={{ pt: { xs: 1, md: 3 }, px: { xs: 0, sm: 3 } }}>
+        <Breadcrumbs sx={{ mb: 2, px: { xs: 1, sm: 0 } }} separator='/'>
           <MuiLink component={Link} href='/home' underline='hover' color='inherit' sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <HomeOutlinedIcon sx={{ fontSize: 18 }} /> Home
           </MuiLink>
@@ -280,17 +280,17 @@ export default function User360Page() {
           spacing={2}
           alignItems={{ xs: 'flex-start', md: 'center' }}
           justifyContent='space-between'
-          sx={{ mb: 2 }}
+          sx={{ mb: 2, px: { xs: 1, sm: 0 } }}
         >
           <Box>
-            <Typography variant='h4' component='h1' sx={{ fontWeight: 700, letterSpacing: '-0.02em', mb: 0.5 }}>
+            <Typography variant='h4' component='h1' sx={{ fontWeight: 700, letterSpacing: '-0.02em', mb: 0.5, fontSize: { xs: 22, sm: 28, md: 34 }, wordBreak: 'break-word' }}>
               {overviewLoading && !userData ? 'Loading…' : displayName}
             </Typography>
             <Typography variant='body2' color='text.secondary'>
               Full access view for support, moderation, and billing context.
             </Typography>
           </Box>
-          <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
+          <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap sx={{ width: { xs: '100%', md: 'auto' } }}>
             <Button
               size='small'
               variant='outlined'

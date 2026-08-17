@@ -89,6 +89,7 @@ const Drawer = props => {
         sx: {
           backgroundColor: 'background.paper',
           width: navCollapsed && !navHover ? collapsedNavWidth : navWidth,
+          maxWidth: hidden ? 'min(280px, calc(100vw - 40px))' : undefined,
           ...(!hidden && navCollapsed && navHover ? { boxShadow: 10 } : {}),
           borderRight: theme =>
             navigationBorderWidth === 0 ? 0 : `${navigationBorderWidth}px solid ${theme.palette.divider}`,
@@ -97,7 +98,7 @@ const Drawer = props => {
         ...navMenuProps?.PaperProps
       }}
       sx={{
-        width: navCollapsed ? collapsedNavWidth : navWidth,
+        ...(hidden ? { width: 'auto' } : { width: navCollapsed ? collapsedNavWidth : navWidth, flexShrink: 0 }),
         ...userNavMenuStyle
       }}
       {...userNavMenuProps}

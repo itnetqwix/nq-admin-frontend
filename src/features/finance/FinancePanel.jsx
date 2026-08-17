@@ -137,7 +137,7 @@ export default function FinancePanel(p) {
             placeholder={searchPlaceholder(tab)}
             value={searchQ}
             onChange={e => setSearchQ(e.target.value)}
-            sx={{ minWidth: 280, flex: 1 }}
+            sx={{ minWidth: { xs: '100%', sm: 280 }, width: { xs: '100%', sm: 'auto' }, flex: 1 }}
           />
           <Button
             size='small'
@@ -153,7 +153,7 @@ export default function FinancePanel(p) {
               label='Refund status'
               value={refundStatus}
               onChange={e => setRefundStatus(e.target.value)}
-              sx={{ minWidth: 180 }}
+              sx={{ minWidth: { xs: '100%', sm: 180 } }}
             >
               <MenuItem value=''>All</MenuItem>
               <MenuItem value='pending'>Pending</MenuItem>
@@ -169,7 +169,7 @@ export default function FinancePanel(p) {
               label='Escrow status'
               value={escrowStatus}
               onChange={e => setEscrowStatus(e.target.value)}
-              sx={{ minWidth: 160 }}
+              sx={{ minWidth: { xs: '100%', sm: 160 } }}
             >
               <MenuItem value=''>All</MenuItem>
               <MenuItem value='held'>Held</MenuItem>
@@ -186,7 +186,7 @@ export default function FinancePanel(p) {
               label='Reference type'
               value={ledgerReferenceType}
               onChange={e => setLedgerReferenceType(e.target.value)}
-              sx={{ minWidth: 180 }}
+              sx={{ minWidth: { xs: '100%', sm: 180 } }}
             >
               <MenuItem value=''>All</MenuItem>
               <MenuItem value='topup'>topup</MenuItem>
@@ -255,7 +255,7 @@ export default function FinancePanel(p) {
         <FinanceTabGuide tab={tab} />
         {tab === TAB.OVERVIEW ? <FinanceTabLegend /> : null}
         {tab !== TAB.OVERVIEW ? (
-        <Stack direction='row' spacing={1} sx={{ mb: 2, alignItems: 'center' }}>
+        <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2, alignItems: 'center' }}>
           <Button size='small' disabled={page <= 1 || loading} onClick={() => setPage(p => Math.max(1, p - 1))}>
             Previous
           </Button>

@@ -17,7 +17,7 @@ export default function UserQuickPreviewModal({ open, handleClose, loading, user
 
   return (
     <MModal open={open} handleClose={handleClose} maxWidth='md'>
-      <Box sx={{ p: 3, minWidth: { xs: '90vw', md: 760 } }}>
+      <Box sx={{ p: { xs: 0.5, sm: 3 }, minWidth: 0, width: '100%' }}>
         <Typography variant='h6' sx={{ mb: 2 }}>Quick User Preview</Typography>
         {loading ? (
           <Box sx={{ py: 6, display: 'flex', justifyContent: 'center' }}>

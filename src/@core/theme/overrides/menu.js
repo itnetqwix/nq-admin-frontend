@@ -14,6 +14,7 @@ const Menu = skin => {
           '& .MuiMenu-paper': {
             borderRadius: 5,
             boxShadow: boxShadow(theme),
+            maxWidth: 'calc(100vw - 24px)',
             ...(skin === 'bordered' && { border: `1px solid ${theme.palette.divider}` })
           }
         })

@@ -5,6 +5,7 @@ const Popover = skin => {
         root: ({ theme }) => ({
           '& .MuiPopover-paper': {
             boxShadow: theme.shadows[skin === 'bordered' ? 0 : 6],
+            maxWidth: 'calc(100vw - 24px)',
             ...(skin === 'bordered' && { border: `1px solid ${theme.palette.divider}` })
           }
         })

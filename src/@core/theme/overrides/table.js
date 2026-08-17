@@ -70,10 +70,32 @@ const Table = () => {
         root: ({ theme }) => ({
           '& .MuiIconButton-root.Mui-disabled': {
             color: theme.palette.action.active
+          },
+          [theme.breakpoints.down('sm')]: {
+            overflow: 'visible'
+          }
+        }),
+        toolbar: ({ theme }) => ({
+          [theme.breakpoints.down('sm')]: {
+            flexWrap: 'wrap',
+            justifyContent: 'flex-end',
+            minHeight: 48,
+            paddingLeft: theme.spacing(1),
+            paddingRight: theme.spacing(0.5),
+            gap: theme.spacing(0.5)
+          }
+        }),
+        selectLabel: ({ theme }) => ({
+          [theme.breakpoints.down('sm')]: {
+            display: 'none'
           }
         }),
         displayedRows: ({ theme }) => ({
-          color: theme.palette.text.primary
+          color: theme.palette.text.primary,
+          [theme.breakpoints.down('sm')]: {
+            margin: 0,
+            fontSize: 12
+          }
         })
       }
     }

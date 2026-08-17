@@ -35,7 +35,7 @@ export default function LogsTable(p) {
                   placeholder='Preset name'
                   value={presetName}
                   onChange={e => setPresetName(e.target.value)}
-                  sx={{ width: 140 }}
+                  sx={{ width: { xs: '100%', sm: 140 } }}
                 />
                 <Button size='small' variant='outlined' onClick={saveCurrentPreset} sx={{ textTransform: 'none' }}>
                   Save preset

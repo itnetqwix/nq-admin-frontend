@@ -25,6 +25,21 @@ const GlobalStyles = theme => {
       minWidth: 0,
       maxWidth: '100%'
     },
+    '.layout-content-wrapper': {
+      minWidth: 0,
+      maxWidth: '100%'
+    },
+    '.MuiGrid-item': {
+      minWidth: 0
+    },
+    '.MuiDataGrid-root': {
+      maxWidth: '100%'
+    },
+    '.MuiInputBase-input': {
+      [theme.breakpoints.down('sm')]: {
+        fontSize: '16px !important'
+      }
+    },
     '.demo-space-x > *': {
       marginTop: '1rem !important',
       marginRight: '1rem !important',

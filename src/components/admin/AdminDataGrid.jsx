@@ -1,5 +1,7 @@
 import Box from '@mui/material/Box'
 import LinearProgress from '@mui/material/LinearProgress'
+import { useTheme } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
 import { DataGrid } from '@mui/x-data-grid'
 import AdminEmptyState from './AdminEmptyState'
 import { ops } from 'src/styles/opsSurface'
@@ -80,6 +82,9 @@ export default function AdminDataGrid({
   ...props
 }) {
   const rowClickable = clickableRows || Boolean(props.onRowClick)
+  const theme = useTheme()
+  const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
+  const resolvedDensity = density === 'comfortable' && isPhone ? 'compact' : density
   return (
     <Box
       sx={{
@@ -87,12 +92,13 @@ export default function AdminDataGrid({
         minWidth: 0,
         overflowX: 'auto',
         WebkitOverflowScrolling: 'touch',
+        overscrollBehaviorX: 'contain',
         ...(autoHeight ? {} : { height: '100%' })
       }}
     >
     <DataGrid
       autoHeight={autoHeight}
-      density={density}
+      density={resolvedDensity}
       disableRowSelectionOnClick
       pageSizeOptions={[25, 50, 100]}
       initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}

@@ -19,7 +19,7 @@ export default function OpsAuthShell({
   footerNote = 'Restricted · invite only'
 }) {
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', bgcolor: ops.canvasSoft }}>
+    <Box sx={{ minHeight: '100dvh', display: 'flex', bgcolor: ops.canvasSoft }}>
       <Box
         sx={{
           display: { xs: 'none', md: 'flex' },
@@ -103,7 +103,9 @@ export default function OpsAuthShell({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          p: { xs: 3, sm: 5 },
+          p: { xs: 2.5, sm: 5 },
+          pt: { xs: 'max(20px, env(safe-area-inset-top, 20px))', sm: 5 },
+          pb: { xs: 'max(20px, env(safe-area-inset-bottom, 20px))', sm: 5 },
           bgcolor: ops.canvas,
           boxShadow: { md: 'inset 1px 0 0 ' + ops.hairline }
         }}

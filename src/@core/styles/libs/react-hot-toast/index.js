@@ -19,7 +19,13 @@ const ReactHotToast = styled(Box)(({ theme }) => {
       top: layout === 'horizontal' && !navHidden ? '139px !important' : '75px !important',
       zIndex: useMediaQuery(theme.breakpoints.down('lg'))
         ? `${theme.zIndex.drawer - 1} !important`
-        : `${theme.zIndex.drawer + 1} !important`
+        : `${theme.zIndex.drawer + 1} !important`,
+      [theme.breakpoints.down('sm')]: {
+        left: '12px !important',
+        right: '12px !important',
+        top: '64px !important',
+        bottom: 'auto !important'
+      }
     },
     '& .react-hot-toast': {
       fontWeight: 400,
@@ -32,6 +38,10 @@ const ReactHotToast = styled(Box)(({ theme }) => {
         theme.palette.mode === 'light'
           ? '0px 4px 10px -4px rgba(76, 78, 100, 0.6)'
           : '0px 8px 16px -4px rgba(20, 21, 33, 0.65)',
+      [theme.breakpoints.down('sm')]: {
+        maxWidth: '100%',
+        width: '100%'
+      },
       '&>:first-of-type:not([role])>:first-of-type': {
         width: 14,
         height: 14

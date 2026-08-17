@@ -15,9 +15,27 @@ const UserThemeOptions = () => {
     components: {
       MuiCssBaseline: {
         styleOverrides: {
+          html: {
+            overflowX: 'clip',
+            WebkitTextSizeAdjust: '100%',
+            textSizeAdjust: '100%'
+          },
           body: {
             fontFeatureSettings: '"ss01", "ss02", "tnum"',
-            WebkitFontSmoothing: 'antialiased'
+            WebkitFontSmoothing: 'antialiased',
+            overflowX: 'clip',
+            minHeight: '100dvh',
+            overscrollBehaviorX: 'none',
+            paddingLeft: 'env(safe-area-inset-left)',
+            paddingRight: 'env(safe-area-inset-right)'
+          },
+          '#__next': {
+            minHeight: '100dvh',
+            minWidth: 0
+          },
+          'img, video': {
+            maxWidth: '100%',
+            height: 'auto'
           },
           '::selection': {
             backgroundColor: ops.ink,
@@ -71,6 +89,10 @@ const UserThemeOptions = () => {
             borderRadius: 8,
             '&:hover': {
               backgroundColor: theme.palette.action.hover
+            },
+            [theme.breakpoints.down('sm')]: {
+              minWidth: 40,
+              minHeight: 40
             }
           })
         }
@@ -119,9 +141,13 @@ const UserThemeOptions = () => {
               borderWidth: 1
             }
           }),
-          input: {
-            fontSize: '0.875rem'
-          }
+          input: ({ theme }) => ({
+            fontSize: '0.875rem',
+            // ponytail: iOS zooms focused inputs under 16px; keep 14px on desktop
+            [theme.breakpoints.down('sm')]: {
+              fontSize: '16px'
+            }
+          })
         }
       },
       MuiInputLabel: {
@@ -163,25 +189,32 @@ const UserThemeOptions = () => {
       },
       MuiAccordionSummary: {
         styleOverrides: {
-          root: {
+          root: ({ theme }) => ({
             minHeight: 48,
             paddingLeft: 20,
             paddingRight: 16,
+            [theme.breakpoints.down('sm')]: {
+              paddingLeft: 12,
+              paddingRight: 12
+            },
             '& .MuiAccordionSummary-content': {
               margin: '12px 0',
               fontWeight: 600,
               letterSpacing: '-0.28px',
               color: ops.ink
             }
-          }
+          })
         }
       },
       MuiAccordionDetails: {
         styleOverrides: {
-          root: {
+          root: ({ theme }) => ({
             padding: '8px 20px 20px',
-            borderTop: `1px solid ${ops.hairline}`
-          }
+            borderTop: `1px solid ${ops.hairline}`,
+            [theme.breakpoints.down('sm')]: {
+              padding: '8px 12px 16px'
+            }
+          })
         }
       },
       MuiTab: {
@@ -195,7 +228,15 @@ const UserThemeOptions = () => {
         }
       },
       MuiTabs: {
+        defaultProps: {
+          variant: 'scrollable',
+          scrollButtons: 'auto',
+          allowScrollButtonsMobile: true
+        },
         styleOverrides: {
+          root: {
+            minHeight: 44
+          },
           indicator: ({ theme }) => ({
             height: 2,
             borderRadius: 1,
@@ -229,17 +270,24 @@ const UserThemeOptions = () => {
       },
       MuiDialog: {
         styleOverrides: {
-          paper: {
+          paper: ({ theme }) => ({
             borderRadius: 12,
             boxShadow:
-              '0px 1px 1px #00000005, 0px 8px 16px -4px #0000000a, 0px 24px 32px -8px #0000000f'
-          }
+              '0px 1px 1px #00000005, 0px 8px 16px -4px #0000000a, 0px 24px 32px -8px #0000000f',
+            [theme.breakpoints.down('sm')]: {
+              borderRadius: 10
+            }
+          })
         }
       },
       MuiDrawer: {
         styleOverrides: {
           paper: ({ theme }) => ({
-            borderColor: theme.palette.divider
+            borderColor: theme.palette.divider,
+            maxWidth: '100vw',
+            [theme.breakpoints.down('sm')]: {
+              maxWidth: '100%'
+            }
           })
         }
       },

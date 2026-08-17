@@ -32,12 +32,12 @@ const AppBarContent = props => {
     <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
       <Box className='actions-left' sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
         {hidden ? (
-          <IconButton color='inherit' sx={{ ml: -2.75 }} onClick={toggleNavVisibility}>
+          <IconButton color='inherit' sx={{ ml: { xs: -0.5, sm: -2.75 } }} onClick={toggleNavVisibility} aria-label='Open menu'>
             <Icon icon='mdi:menu' />
           </IconButton>
         ) : null}
 
-        <IconButton color='inherit' onClick={() => setPaletteOpen(true)} title='Jump to (⌘/Ctrl+K)'>
+        <IconButton color='inherit' onClick={() => setPaletteOpen(true)} title='Jump to (⌘/Ctrl+K)' aria-label='Jump to page'>
           <Icon icon='mdi:magnify' />
         </IconButton>
         <AdminCommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />

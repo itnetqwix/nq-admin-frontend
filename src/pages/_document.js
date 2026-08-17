@@ -23,6 +23,8 @@ class CustomDocument extends Document {
           />
           <link rel='apple-touch-icon' sizes='180x180' href='/images/apple-touch-icon.png' />
           <link rel='shortcut icon' href='/images/favicon.png' />
+          <meta name='theme-color' content='#ffffff' />
+          <meta name='mobile-web-app-capable' content='yes' />
         </Head>
         <body>
           <Main />

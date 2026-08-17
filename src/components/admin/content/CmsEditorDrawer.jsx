@@ -62,11 +62,13 @@ export default function CmsEditorDrawer({
 
       <Divider sx={{ borderColor: ops.hairline }} />
       <Stack
-        direction='row'
+        direction={{ xs: 'column-reverse', sm: 'row' }}
         spacing={1}
         justifyContent='flex-end'
-        alignItems='center'
-        sx={{ px: 2.5, py: 2, bgcolor: ops.canvas }}
+        alignItems={{ xs: 'stretch', sm: 'center' }}
+        flexWrap='wrap'
+        useFlexGap
+        sx={{ px: { xs: 2, sm: 2.5 }, py: 2, bgcolor: ops.canvas, '& .MuiButton-root': { width: { xs: '100%', sm: 'auto' } } }}
       >
         {secondaryAction}
         <Button onClick={onClose} disabled={saving} sx={{ textTransform: 'none' }}>
