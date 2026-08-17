@@ -1,16 +1,16 @@
-# Graph Report - nq-admin  (2026-08-17)
+# Graph Report - nq-admin  (2026-08-15)
 
 ## Corpus Check
-- 416 files · ~577,650 words
+- 416 files · ~577,713 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2017 nodes · 2858 edges · 249 communities (187 shown, 62 thin omitted)
+- 2017 nodes · 2858 edges · 250 communities (188 shown, 62 thin omitted)
 - Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 197 edges (avg confidence: 0.81)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `7569fcdb`
+- Built from commit: `f7e164ec`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -118,6 +118,7 @@
 - [[_COMMUNITY_Overrides Button|Overrides Button]]
 - [[_COMMUNITY_Overrides Chip|Overrides Chip]]
 - [[_COMMUNITY_Overrides Datagrid|Overrides Datagrid]]
+- [[_COMMUNITY_Overrides Divider|Overrides Divider]]
 - [[_COMMUNITY_Overrides Input|Overrides Input]]
 - [[_COMMUNITY_Overrides Snackbar|Overrides Snackbar]]
 - [[_COMMUNITY_Overrides Table|Overrides Table]]
@@ -210,7 +211,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (249 total, 62 thin omitted)
+## Communities (250 total, 62 thin omitted)
 
 ### Community 0 - "Package Dependencies"
 Cohesion: 0.03
@@ -333,8 +334,8 @@ Cohesion: 0.05
 Nodes (17): UserLayout(), hasActiveChild(), SwipeableDrawer, HorizontalNavGroup(), ListItem, NavigationMenu, HorizontalNavItems(), ListItem (+9 more)
 
 ### Community 31 - "Content Contentplacementconfig"
-Cohesion: 0.18
-Nodes (9): DEFAULT_LESSON, PricingLessonSplit(), rowAmount(), SESSION_PRODUCTS, PricingRegionTab(), DEFAULT_INPUT, centsToInput(), decimalToPctInput() (+1 more)
+Cohesion: 0.25
+Nodes (4): DEFAULT_LESSON, rowAmount(), SESSION_PRODUCTS, DEFAULT_INPUT
 
 ### Community 32 - "Iconify Bundle Bundle"
 Cohesion: 0.25
@@ -491,6 +492,10 @@ Nodes (6): FinancePage(), formatMinor(), searchPlaceholder(), TAB, TAB_SLUG, tab
 ### Community 122 - "Overrides Button"
 Cohesion: 0.10
 Nodes (35): addAccountDeletionNote(), apiUrl(), getAuthHeaders(), handleRes(), listAccountDeletions(), restoreAccountDeletion(), api(), headers() (+27 more)
+
+### Community 127 - "Overrides Divider"
+Cohesion: 0.50
+Nodes (5): PricingLessonSplit(), PricingRegionTab(), centsToInput(), decimalToPctInput(), decimalToTaxPctInput()
 
 ### Community 129 - "Overrides Input"
 Cohesion: 0.06

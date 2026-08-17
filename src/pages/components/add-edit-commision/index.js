@@ -3,7 +3,6 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
-import InputLabel from "@mui/material/InputLabel";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import CheckIcon from '@mui/icons-material/Check';
@@ -21,11 +20,13 @@ const defaultValues = {
 };
 
 const schema = yup.object().shape({
+  // Blank = use Pricing defaultCommissionRate (no frozen override).
   commission: yup
     .number()
-    .min(0, "Commission should be at list 0")
-    .max(100, "Commission should be maximul 100")
-    .required("Commission is Required"),
+    .nullable()
+    .transform((v, o) => (o === '' || o == null ? null : v))
+    .min(0, "Commission should be at least 0")
+    .max(100, "Commission should be at most 100"),
   surge_multiplier_cap_bps: yup
     .number()
     .nullable()
@@ -45,9 +46,6 @@ export default function AddEditCommision({ handleClose, trainer_id }) {
     control,
     handleSubmit,
     formState: { errors },
-    reset,
-    setValue,
-    watch
   } = useForm({
     defaultValues,
     resolver: yupResolver(schema),
@@ -56,13 +54,11 @@ export default function AddEditCommision({ handleClose, trainer_id }) {
     reValidateMode: 'onChange'
   });
 
-  console.log("data ===", errors)
   const updateCommision = (data) => {
-    console.log("data ===", data)
-
     const payload = {
       trainer_id,
-      commission: data.commission,
+      commission:
+        data.commission === '' || data.commission == null ? null : data.commission,
       surge_multiplier_cap_bps:
         data.surge_multiplier_cap_bps === '' || data.surge_multiplier_cap_bps == null
           ? null
@@ -79,6 +75,9 @@ export default function AddEditCommision({ handleClose, trainer_id }) {
         <Typography variant="h6" gutterBottom sx={{ textAlign: 'center', fontWeight: "600" }}>
           Edit commission
         </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mb: 1 }}>
+          Leave blank to use the Pricing default. Enter a percent only to override for this coach.
+        </Typography>
 
         <Box paddingTop={"1rem"}>
           <form noValidate autoComplete="off"
@@ -89,26 +88,26 @@ export default function AddEditCommision({ handleClose, trainer_id }) {
                 <Controller
                   name='commission'
                   control={control}
-                  rules={{ required: true }}
                   render={({ field: { value, onChange, onBlur } }) => (
                     <TextField
-                      required
                       fullWidth
                       type='number'
                       size="small"
+                      label="Override commission (%)"
+                      placeholder="Blank = Pricing default"
                       autoComplete="off"
                       InputProps={{
                         style: {
                           boxShadow: ' 0px 0px 40px 0px rgba(59, 59, 61, 0.20)',
-                          border: errors?.commission ? 'none' : '1px solid #48BDFF',
                           border: '1px solid #48BDFF',
                           borderRadius: "5px"
                         },
                       }}
                       error={Boolean(errors?.commission)}
-                      value={value}
+                      value={value ?? ''}
+                      onBlur={onBlur}
                       onChange={onChange}
-                      helperText={errors?.commission?.message}
+                      helperText={errors?.commission?.message || 'Blank clears override and uses live Pricing default'}
                     />
                   )}
                 />
@@ -121,11 +120,13 @@ export default function AddEditCommision({ handleClose, trainer_id }) {
                     <TextField
                       fullWidth
                       type='number'
-                      size='small'
-                      label='Surge cap (bps, optional)'
-                      helperText='Max surge uplift in basis points (1500 = 15%). Leave empty for no cap.'
+                      size="small"
+                      label="Surge cap (bps)"
+                      autoComplete="off"
                       value={value ?? ''}
                       onChange={onChange}
+                      helperText={errors?.surge_multiplier_cap_bps?.message}
+                      error={Boolean(errors?.surge_multiplier_cap_bps)}
                     />
                   )}
                 />
@@ -137,31 +138,28 @@ export default function AddEditCommision({ handleClose, trainer_id }) {
                   render={({ field: { value, onChange } }) => (
                     <FormControlLabel
                       control={<Switch checked={!!value} onChange={e => onChange(e.target.checked)} />}
-                      label='Coach absorbs surge (trainee price unchanged)'
+                      label="Opt out of surge"
                     />
                   )}
                 />
               </Grid>
-              <Grid item xs={12} sm={6} />
-              <Grid item xs={12} sm={5} />
-
-              <Grid container justifyContent={"right"}>
-                {/* <CustomButton name={LABELS.CANCEL} backgroundColor="#3B3B3D" marginRight="1rem" textwidth="auto" onClick={handleClose} />
-                <CustomButton type="submit" name={LABELS.SAVE} textwidth="auto" /> */}
-
-                <CustomButton
-                  onClick={handleClose}
-                  variant='contained'
-                  startIcon={<CancelPresentationIcon />} sx={{ marginRight: "10px", backgroundColor: "gray", color: "white" }}>
-                  Cancel
-                </CustomButton>
-                <CustomButton
-                  type="submit"
-                  // onClick={onConform}
-                  variant='contained'
-                  startIcon={<CheckIcon />} sx={{ marginLeft: "10px", backgroundColor: "#14328d", color: "white" }}>
-                  Update
-                </CustomButton>
+              <Grid item xs={12} sm={12}>
+                <Box display="flex" gap={1} justifyContent="flex-end">
+                  <CustomButton
+                    onClick={handleClose}
+                    startIcon={<CancelPresentationIcon />}
+                    variant="outlined"
+                  >
+                    Cancel
+                  </CustomButton>
+                  <CustomButton
+                    type="submit"
+                    startIcon={<CheckIcon />}
+                    variant="contained"
+                  >
+                    Save
+                  </CustomButton>
+                </Box>
               </Grid>
             </Grid>
           </form>

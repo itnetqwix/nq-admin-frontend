@@ -155,15 +155,15 @@ export default function PricingLessonSplit({
     ['Session price', sessionCents, 'What the coach listed. 15 vs 30 min does not change this if the ticket is flat $60.'],
     surge ? ['Peak / surge', surge, quote?.surgeLabel || 'Extra % on the session before fees. Held with the lesson.'] : null,
     traineeFee ? ['Enthusiast platform fee', traineeFee, 'Added on checkout. This is yours, not taken from the coach.'] : null,
+    coachFee ? ['Service fee', coachFee, 'Added on checkout to recover infra. Not deducted from the coach.'] : null,
     processing ? ['Card processing', processing, 'Stripe. $0 if they pay from wallet. Passed through when “pass processing to trainee” is on.'] : null,
     tax ? ['Tax', tax, 'Estimated unless Stripe Tax is on.'] : null
   ].filter(Boolean)
 
   const afterLines = [
-    [`Commission (${fmtPct(quote?.commissionRate)})`, commissionCents, 'Taken from the session. Coaches with an override keep theirs.'],
-    ['Coach platform fee', coachFee, 'Taken from the coach, not added to checkout.'],
-    ['Coach wallet (later)', coachGets, 'After ratings or 7 days + 24h clearance. Stays in NetQwix wallet — not a bank.'],
-    ['You keep (before infra)', youKeep, 'Commission + both fees − Stripe. AWS/video is the next section.']
+    [`Commission (${fmtPct(quote?.commissionRate)})`, commissionCents, 'Taken from the session. Intact — infra is recovered via trainee fees, not this line.'],
+    ['Coach wallet (later)', coachGets, 'Session minus commission only. After ratings or 7 days + 24h clearance. Stays in NetQwix wallet — not a bank.'],
+    ['You keep (before infra)', youKeep, 'Commission + trainee fees − Stripe (if not passed through). AWS/video is the next section.']
   ]
 
   function MoneyCol({ title, chip, lines, totalLabel, totalCents, emphasize }) {
@@ -376,11 +376,11 @@ export default function PricingLessonSplit({
             <TextField
               size='small'
               type='number'
-              label='Coach platform fee'
+              label='Service fee'
               value={centsToInput(regionCfg.trainerPlatformFeeMinor)}
               onChange={e => onPatchRegion(region, { trainerPlatformFeeMinor: inputToCents(e.target.value) })}
               disabled={!canEdit}
-              helperText='Taken from coach'
+              helperText='Added on checkout (not from coach)'
             />
           </Stack>
         </OpsSurfaceCard>

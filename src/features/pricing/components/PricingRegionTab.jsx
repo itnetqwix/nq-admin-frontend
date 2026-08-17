@@ -15,11 +15,9 @@ import {
   STORAGE_PLAN_IDS,
   centsToInput,
   decimalToPctInput,
-  decimalToTaxPctInput,
   fmtMoney,
   inputToCents,
-  pctInputToDecimal,
-  taxPctInputToDecimal
+  pctInputToDecimal
 } from 'src/constants/pricingAdmin'
 
 export default function PricingRegionTab({
@@ -136,14 +134,14 @@ export default function PricingRegionTab({
           <Grid item xs={12} sm={6} md={3}>
             <TextField
               fullWidth
-              label={`Coach platform fee (${currencySymbol})`}
+              label={`Service fee (${currencySymbol})`}
               type='number'
               inputProps={{ step: '0.01', min: 0 }}
               value={centsToInput(region.trainerPlatformFeeMinor)}
               onChange={e =>
                 onPatchRegion(regionKey, { trainerPlatformFeeMinor: inputToCents(e.target.value) })
               }
-              helperText='Deducted from coach payout'
+              helperText='Added to trainee checkout (not deducted from coach)'
               disabled={!canEdit}
             />
           </Grid>
@@ -157,7 +155,7 @@ export default function PricingRegionTab({
               onChange={e =>
                 onPatchRegion(regionKey, { defaultCommissionRate: pctInputToDecimal(e.target.value) })
               }
-              helperText={`On a $60 lesson this is ${fmtMoney(Math.round(6000 * Number(region.defaultCommissionRate || 0)), currency)} to NetQwix. Coaches with an override keep theirs.`}
+              helperText={`Live default for coaches without an override. On a $60 lesson: ${fmtMoney(Math.round(6000 * Number(region.defaultCommissionRate || 0)), currency)} to NetQwix; coach keeps the rest of the session.`}
               disabled={!canEdit}
             />
           </Grid>
@@ -180,108 +178,46 @@ export default function PricingRegionTab({
 
       {showCheckout ? (
       <AdminPageSection title={section === 'checkout' ? undefined : 'Checkout policy'}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={!!region.passProcessingFeeToTrainee}
-                  onChange={e =>
-                    onPatchRegion(regionKey, { passProcessingFeeToTrainee: e.target.checked })
-                  }
-                  disabled={!canEdit}
-                />
+        <FormControlLabel
+          control={
+            <Switch
+              checked={!!region.passProcessingFeeToTrainee}
+              onChange={e =>
+                onPatchRegion(regionKey, { passProcessingFeeToTrainee: e.target.checked })
               }
-              label='Pass Stripe processing fee to trainee'
+              disabled={!canEdit}
             />
-            <Typography variant='caption' color='text.secondary' display='block' sx={{ ml: 4.5 }}>
-              When off, platform absorbs processing from commission margin.
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={!!region.stripeTaxEnabled}
-                  onChange={e => onPatchRegion(regionKey, { stripeTaxEnabled: e.target.checked })}
-                  disabled={!canEdit}
-                />
-              }
-              label='Enable Stripe Tax (requires dashboard registration)'
-            />
-          </Grid>
-        </Grid>
+          }
+          label='Pass Stripe processing fee to trainee'
+        />
+        <Typography variant='caption' color='text.secondary' display='block' sx={{ ml: 4.5 }}>
+          When off, platform absorbs processing from commission margin.
+        </Typography>
       </AdminPageSection>
       ) : null}
 
       {showTax ? (
-      <AdminPageSection title={section === 'tax' ? undefined : 'Estimated sales tax rates'}>
-        {region.stripeTaxEnabled ? (
-          <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
-            Stripe Tax is enabled — rates below are ignored at checkout. Stripe calculates tax live.
-          </Typography>
-        ) : (
-          <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
-            Used when Stripe Tax is off. Edit state/province rates (as %). Applies to new quotes only.
-          </Typography>
-        )}
-        <Grid container spacing={2} sx={{ mb: 2 }}>
-          <Grid item xs={12} sm={6} md={4}>
-            <TextField
-              fullWidth
-              size='small'
-              label='Default rate when state/province unknown (%)'
-              type='number'
-              inputProps={{ step: '0.001', min: 0, max: 30 }}
-              value={decimalToTaxPctInput(
-                region.defaultSalesTaxRate ??
-                  region.salesTaxRates?.DEFAULT ??
-                  (regionKey === 'CA' ? 0.13 : 0.08)
-              )}
-              onChange={e =>
-                onPatchRegion(regionKey, {
-                  defaultSalesTaxRate: taxPctInputToDecimal(e.target.value)
-                })
-              }
+      <AdminPageSection title={section === 'tax' ? undefined : 'Stripe Tax'}>
+        <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+          Tax on lessons is calculated by Stripe Tax, not admin rate tables. Quotes and charges use
+          Stripe&apos;s Tax Calculations API. Add active registrations in the Stripe Dashboard or tax
+          stays $0.
+        </Typography>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={!!region.stripeTaxEnabled}
+              onChange={e => onPatchRegion(regionKey, { stripeTaxEnabled: e.target.checked })}
               disabled={!canEdit}
             />
-          </Grid>
-        </Grid>
-        <AdminGridContainer>
-          <AdminDataGrid
-            autoHeight
-            rows={Object.entries(region.salesTaxRates || {})
-              .filter(([code]) => code !== 'DEFAULT')
-              .sort(([a], [b]) => a.localeCompare(b))
-              .map(([code, rate]) => ({
-                id: code,
-                code,
-                ratePct: Number(rate || 0) * 100,
-                displayRate: `${(Number(rate || 0) * 100).toFixed(3)}%`
-              }))}
-            columns={[
-              { field: 'code', headerName: regionKey === 'CA' ? 'Province' : regionKey === 'US' ? 'State' : 'Country', width: 120 },
-              {
-                field: 'ratePct',
-                headerName: 'Rate (%)',
-                width: 130,
-                editable: true,
-                type: 'number'
-              },
-              { field: 'displayRate', headerName: 'Effective', width: 120 }
-            ]}
-            hideFooter
-            isCellEditable={() => canEdit && !region.stripeTaxEnabled}
-            processRowUpdate={newRow => {
-              onPatchTaxRate(regionKey, newRow.code, taxPctInputToDecimal(newRow.ratePct))
-              return {
-                ...newRow,
-                displayRate: `${Number(newRow.ratePct).toFixed(3)}%`
-              }
-            }}
-            onProcessRowUpdateError={() => {}}
-          />
-        </AdminGridContainer>
+          }
+          label='Use Stripe Tax in this region'
+        />
+        <Typography variant='caption' color='text.secondary' display='block' sx={{ ml: 4.5, mt: 1 }}>
+          Also requires STRIPE_TAX_ENABLED, STRIPE_TAX_REGISTRATIONS_CONFIRMED, and at least one
+          active Stripe Tax registration. Product tax code is the Dashboard preset, or STRIPE_PRODUCT_TAX_CODE.
+          Manage locations at dashboard.stripe.com/tax/registrations
+        </Typography>
       </AdminPageSection>
       ) : null}
 

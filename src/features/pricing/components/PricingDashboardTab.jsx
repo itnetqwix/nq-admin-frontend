@@ -49,7 +49,7 @@ export default function PricingDashboardTab({ config, onGoTab }) {
   const profitable = health?.actuals?.profitable
   const netPerLesson = health?.actuals?.estimatedNetPerLessonCents
   const lossScenarios = (health?.scenarios || []).filter(s => !s.economics?.profitable).length
-  const commission = us?.defaultCommissionRate ?? 0.15
+  const commission = us?.defaultCommissionRate ?? 0.25
   const onSixty = Math.round(6000 * commission)
 
   return (
@@ -71,7 +71,11 @@ export default function PricingDashboardTab({ config, onGoTab }) {
               <Chip size='small' label='Enthusiast' sx={{ mb: 1, fontFamily: ops.mono, fontSize: 11, bgcolor: ops.canvasSoft2 }} />
               <Typography sx={{ fontWeight: 600, mb: 0.5 }}>Pays ~$60 + fees now</Typography>
               <Typography sx={{ fontSize: 13, color: ops.body, lineHeight: 1.5 }}>
-                Session $60 + {fmtMoney(us?.traineePlatformFeeMinor)} platform fee + card processing
+                Session $60 + {fmtMoney(us?.traineePlatformFeeMinor)} platform fee
+                {us?.trainerPlatformFeeMinor
+                  ? ` + ${fmtMoney(us.trainerPlatformFeeMinor)} service fee`
+                  : ''}{' '}
+                + card processing
                 (about 2.9% + $0.30 if they use a card; $0 if they pay from wallet) + tax where it applies.
               </Typography>
             </OpsSurfaceCard>
@@ -80,11 +84,11 @@ export default function PricingDashboardTab({ config, onGoTab }) {
             <OpsSurfaceCard>
               <Chip size='small' label='Coach' sx={{ mb: 1, fontFamily: ops.mono, fontSize: 11, bgcolor: ops.softMint, color: ops.live }} />
               <Typography sx={{ fontWeight: 600, mb: 0.5 }}>
-                Receives {fmtMoney(6000 - onSixty - (us?.trainerPlatformFeeMinor || 0))} later
+                Receives {fmtMoney(6000 - onSixty)} later
               </Typography>
               <Typography sx={{ fontSize: 13, color: ops.body, lineHeight: 1.5 }}>
-                $60 minus {fmtPct(commission)} commission ({fmtMoney(onSixty)}) minus{' '}
-                {fmtMoney(us?.trainerPlatformFeeMinor)} coach fee. Credited to their NetQwix wallet after
+                $60 minus {fmtPct(commission)} commission ({fmtMoney(onSixty)}) only — service fees are
+                charged to the enthusiast, not the coach. Credited to their NetQwix wallet after
                 ratings or 7 days, plus 24h — not to a bank.
               </Typography>
             </OpsSurfaceCard>
@@ -96,8 +100,8 @@ export default function PricingDashboardTab({ config, onGoTab }) {
                 Keeps {fmtMoney(onSixty + (us?.traineePlatformFeeMinor || 0) + (us?.trainerPlatformFeeMinor || 0))} before Stripe & infra
               </Typography>
               <Typography sx={{ fontSize: 13, color: ops.body, lineHeight: 1.5 }}>
-                Commission + both platform fees. Card processing is either passed to the enthusiast or
-                absorbed (Rates → checkout). Open Profit check to subtract AWS/video.
+                Intact commission + trainee-facing fees. Size fees so overall margin stays ≥ ~$14.50
+                on this $60 / 25% reference (Profit check). Card processing is either passed through or absorbed.
               </Typography>
             </OpsSurfaceCard>
           </Grid>

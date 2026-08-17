@@ -293,6 +293,12 @@ export default function PricingUnitEconomicsTab({ config, isDirty, lesson }) {
         </Alert>
       ))}
 
+      <Alert severity='info'>
+        Guardrail: on a reference <strong>$60</strong> lesson at the live commission rate, overall net
+        (commission + trainee fees − Stripe − infra) should stay ≥ <strong>$14.50</strong>. Raise
+        platform/service fees to recover infra — do not shrink intact commission.
+      </Alert>
+
       <Grid container spacing={3}>
         <Grid item xs={12} lg={5}>
           <AdminPageSection
