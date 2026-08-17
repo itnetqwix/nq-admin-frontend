@@ -31,6 +31,7 @@ export const OPS_PAGE_EYEBROWS = {
   '/apps/cms': 'CMS · overview',
   '/apps/cms-blog': 'CMS · blog',
   '/apps/cms-legal': 'CMS · legal',
+  '/apps/careers': 'CMS · careers',
   '/apps/cms-faq': 'CMS · faq',
   '/apps/netqwix-library': 'Library · published',
   '/apps/library-submissions': 'Library · submissions',

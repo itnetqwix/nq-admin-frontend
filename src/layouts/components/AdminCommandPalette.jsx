@@ -32,6 +32,7 @@ const STATIC_PAGES = [
   { label: 'Audit log', path: '/apps/audit-logs' },
   { label: 'Call diagnostics', path: '/apps/call-diagnostics' },
   { label: 'Live lessons', path: '/apps/live-lessons' },
+  { label: 'Careers', path: '/apps/careers' },
   { label: 'Broadcasts', path: '/apps/broadcasts' },
   { label: 'Promo codes', path: '/apps/promo-codes' }
 ]

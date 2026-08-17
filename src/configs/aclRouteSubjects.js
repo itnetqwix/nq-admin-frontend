@@ -33,6 +33,7 @@ export const ACL_ROUTE_SUBJECTS = {
   '/apps/cms-blog': 'admin-nav-cms-blog',
   '/apps/cms-faq': 'admin-nav-cms-faq',
   '/apps/cms-legal': 'admin-nav-cms-legal',
+  '/apps/careers': 'admin-nav-careers',
   '/apps/netqwix-library': 'admin-nav-netqwix-library',
   '/apps/clip-taxonomy': 'admin-nav-clip-taxonomy',
   '/apps/library-submissions': 'admin-nav-library-submissions',

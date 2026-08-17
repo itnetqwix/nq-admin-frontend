@@ -68,6 +68,7 @@ const navigation = () => [
       link('Blog & pages', '/apps/cms-blog', 'mdi:post-outline', 'admin-nav-cms-blog'),
       link('FAQ', '/apps/cms-faq', 'mdi:help-circle-outline', 'admin-nav-cms-faq'),
       link('Legal', '/apps/cms-legal', 'mdi:file-document-outline', 'admin-nav-cms-legal'),
+      link('Careers', '/apps/careers', 'mdi:briefcase-outline', 'admin-nav-careers'),
       link('Broadcasts', '/apps/broadcasts', 'mdi:bullhorn-outline', 'admin-nav-broadcasts')
     ]
   },

@@ -40,6 +40,7 @@ const required = [
   '/apps/cms-blog',
   '/apps/cms-faq',
   '/apps/cms-legal',
+  '/apps/careers',
   '/apps/broadcasts',
   '/apps/netqwix-library',
   '/apps/clip-taxonomy',
@@ -64,6 +65,8 @@ for (const p of required) {
 assert(nav.includes('Admin roles'), 'Invite sub-admins lives on Admin roles — must be in the sidebar')
 assert(acl.includes('admin-nav-admin-settings'), 'acl.js must grant Admin roles')
 assert(acl.includes('admin-nav-users-directory'), 'acl.js must grant Users directory')
+assert(subjects.includes("'/apps/careers'"), 'aclRouteSubjects must map Careers')
+assert(acl.includes('admin-nav-careers'), 'acl.js must grant Careers')
 assert(subjects.includes("'/apps/admin-roles'"), 'aclRouteSubjects must map Admin roles')
 assert(subjects.includes("'/apps/live-lessons'"), 'aclRouteSubjects must map live lessons')
 

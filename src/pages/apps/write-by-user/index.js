@@ -35,7 +35,7 @@ export default function WriteByUsers() {
     const q = search.trim().toLowerCase()
     if (!q) return rows
     return rows.filter(row => {
-      const hay = [row.name, row.email, row.subject, row.description, row.user_info?.email, row.user_info?.fullName]
+      const hay = [row.name, row.email, row.company, row.kind, row.subject, row.description, row.user_info?.email, row.user_info?.fullName]
         .filter(Boolean)
         .join(' ')
         .toLowerCase()
@@ -67,7 +67,38 @@ export default function WriteByUsers() {
         </Stack>
       )
     },
-    { field: 'subject', headerName: 'Subject', flex: 1, minWidth: 160 },
+    { field: 'subject', headerName: 'Subject', flex: 1, minWidth: 140 },
+    {
+      field: 'kind',
+      headerName: 'Type',
+      width: 130,
+      renderCell: p => (
+        <Chip
+          size='small'
+          label={p.row.kind === 'connect' ? 'Connect' : 'Contact'}
+          sx={{ height: 22, fontFamily: ops.mono, fontSize: 10 }}
+        />
+      )
+    },
+    {
+      field: 'company',
+      headerName: 'Company',
+      flex: 0.8,
+      minWidth: 120,
+      renderCell: p => p.row.company || '—'
+    },
+    {
+      field: 'description',
+      headerName: 'Message',
+      flex: 1.4,
+      minWidth: 200,
+      sortable: false,
+      renderCell: p => (
+        <Typography sx={{ fontSize: 12, color: ops.body }} noWrap>
+          {p.row.description || '—'}
+        </Typography>
+      )
+    },
     {
       field: 'account_type',
       headerName: 'Role',

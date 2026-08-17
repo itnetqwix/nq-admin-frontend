@@ -40,6 +40,7 @@ const defineRulesFor = (role, user) => {
     ['nav_cms_blog', 'admin-nav-cms-blog'],
     ['nav_cms_faq', 'admin-nav-cms-faq'],
     ['nav_cms_legal', 'admin-nav-cms-legal'],
+    ['nav_careers', 'admin-nav-careers'],
     ['nav_netqwix_library', 'admin-nav-netqwix-library'],
     ['nav_clip_taxonomy', 'admin-nav-clip-taxonomy'],
     ['nav_library_submissions', 'admin-nav-library-submissions'],
@@ -68,6 +69,7 @@ const defineRulesFor = (role, user) => {
   }
   if (ok('nav_banners') || ok('nav_cms')) can('read', 'admin-nav-banners')
   if (ok('nav_tips') || ok('nav_cms')) can('read', 'admin-nav-tips')
+  if (ok('nav_careers') || ok('nav_cms')) can('read', 'admin-nav-careers')
   if (ok('nav_clips')) {
     can('read', 'admin-nav-netqwix-library')
     can('read', 'admin-nav-clip-taxonomy')
