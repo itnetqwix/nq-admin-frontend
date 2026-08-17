@@ -15,7 +15,7 @@ import PricingRegionTab from './PricingRegionTab'
 import PricingProductsTab from './PricingProductsTab'
 import PricingEscrowPolicyTab from './PricingEscrowPolicyTab'
 import PricingLessonSplit from './PricingLessonSplit'
-import { PRICING_REGIONS, fmtMoney, fmtPct, withdrawalSettlement } from 'src/constants/pricingAdmin'
+import { PRICING_REGIONS, PAYOUT_PROCESSING_FEES, fmtMoney, fmtPct, withdrawalSettlement } from 'src/constants/pricingAdmin'
 
 function TapeLine({ label, value, mute, strong }) {
   return (
@@ -26,13 +26,14 @@ function TapeLine({ label, value, mute, strong }) {
   )
 }
 
-function SettlementTape({ region, currency }) {
+function SettlementTape({ region, regionKey, currency }) {
   const commissionRate = Number(region?.defaultCommissionRate || 0)
   const lesson = 6000
   const commission = Math.round(lesson * commissionRate)
   const coachWallet = lesson - commission
   const wdExample = 10000
-  const wd = withdrawalSettlement(wdExample, region?.withdrawalFeeMinor, region?.withdrawalFeeBps)
+  const payoutFee = PAYOUT_PROCESSING_FEES[regionKey] || PAYOUT_PROCESSING_FEES.US
+  const wd = withdrawalSettlement(wdExample, payoutFee.fixedMinor, payoutFee.bps)
 
   return (
     <Box
@@ -54,7 +55,11 @@ function SettlementTape({ region, currency }) {
         <TapeLine label='Coach wallet' value={fmtMoney(coachWallet, currency)} strong />
         <Box sx={{ borderTop: `1px dashed ${ops.onNightMuted}`, my: 1 }} />
         <TapeLine label='$100 cash-out' value={fmtMoney(wdExample, currency)} />
-        <TapeLine label='Withdrawal fee' value={wd.feeMinor ? `−${fmtMoney(wd.feeMinor, currency)}` : 'none'} mute />
+        <TapeLine
+          label='Payout processing'
+          value={wd.feeMinor ? `−${fmtMoney(wd.feeMinor, currency)}` : 'none'}
+          mute
+        />
         <TapeLine label='Tax on withdrawal' value='none' mute />
         <TapeLine label='Coach receives' value={fmtMoney(wd.netMinor, currency)} strong />
       </Stack>
@@ -105,14 +110,14 @@ export default function PricingRatesTab({
         ))}
       </ToggleButtonGroup>
 
-      <SettlementTape region={regionData} currency={currency} />
+      <SettlementTape region={regionData} regionKey={region} currency={currency} />
 
       <OpsSurfaceCard>
         <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', fontSize: 16, mb: 0.5 }}>
           Configure · {title}
         </Typography>
         <Typography sx={{ fontSize: 13, color: ops.body, mb: 2, lineHeight: 1.5 }}>
-          Lesson fees hit the enthusiast at checkout. Withdrawal fees hit the coach only when they cash out.
+          Lesson fees hit the enthusiast at checkout. Cash-out processing is taken from the amount the coach withdraws — not a separate Admin rate.
           Custom coach commission in Manage trainers still wins, down to the floor.
         </Typography>
         <PricingRegionTab

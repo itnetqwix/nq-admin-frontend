@@ -99,15 +99,22 @@ function ScenarioInfraRow({ row, currency }) {
           </Typography>
         </TableCell>
         <TableCell align='right'>{fmtMoney(row.economics.sessionSubtotalCents, currency)}</TableCell>
-        <TableCell align='right'>{fmtMoney(row.economics.platformGrossCents, currency)}</TableCell>
+        <TableCell align='right'>{fmtMoney(row.economics.commissionCents ?? row.quote.platformFeePercentCents, currency)}</TableCell>
         <TableCell align='right'>{fmtMoney(row.economics.infraCostCents, currency)}</TableCell>
         <TableCell align='right'>
-          <Typography variant='body2' fontWeight={600} color={row.economics.profitable ? 'success.main' : 'error.main'}>
+          <Typography
+            variant='body2'
+            fontWeight={600}
+            color={row.economics.coversCommission ? 'success.main' : 'error.main'}
+          >
             {fmtMoney(row.economics.netProfitCents, currency)}
           </Typography>
         </TableCell>
         <TableCell align='center'>
-          <ProfitChip profitable={row.economics.profitable} />
+          <ProfitChip
+            profitable={row.economics.coversCommission}
+            label={row.economics.coversCommission ? 'Keeps commission' : row.economics.profitable ? 'Below commission' : 'Loss'}
+          />
         </TableCell>
       </TableRow>
       <TableRow>
@@ -625,15 +632,53 @@ export default function PricingUnitEconomicsTab({ config, isDirty, lesson }) {
                 <Stack direction='row' justifyContent='space-between' alignItems='flex-start'>
                   <Box>
                     <Typography variant='subtitle1' fontWeight={700}>
-                      This lesson after infra
+                      This session after infra
                     </Typography>
                     <Typography variant='body2' color='text.secondary'>
                       {customRow.durationMinutes} min · {fmtMoney(customRow.economics.sessionSubtotalCents, currency)}{' '}
-                      session · Net {fmtMoney(customRow.economics.netProfitCents, currency)} · Breakeven commission{' '}
-                      {fmtPct(customRow.economics.breakevenCommissionRate)}
+                      ticket. Commission is what NetQwix should still have after Stripe, fees, tax recovery, and infra.
                     </Typography>
                   </Box>
-                  <ProfitChip profitable={customRow.economics.profitable} />
+                  <ProfitChip
+                    profitable={customRow.economics.coversCommission}
+                    label={
+                      customRow.economics.coversCommission
+                        ? 'Keeps commission'
+                        : customRow.economics.profitable
+                          ? 'Below commission'
+                          : 'Loss'
+                    }
+                  />
+                </Stack>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 2 }}>
+                  <Box>
+                    <Typography variant='caption' color='text.secondary'>
+                      Commission
+                    </Typography>
+                    <Typography variant='h6' fontWeight={700}>
+                      {fmtMoney(customRow.economics.commissionCents, currency)}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant='caption' color='text.secondary'>
+                      Infra ({customRow.durationMinutes} min)
+                    </Typography>
+                    <Typography variant='h6' fontWeight={700}>
+                      {fmtMoney(customRow.economics.infraCostCents, currency)}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant='caption' color='text.secondary'>
+                      After infra
+                    </Typography>
+                    <Typography
+                      variant='h6'
+                      fontWeight={700}
+                      color={customRow.economics.coversCommission ? 'success.main' : 'error.main'}
+                    >
+                      {fmtMoney(customRow.economics.netProfitCents, currency)}
+                    </Typography>
+                  </Box>
                 </Stack>
                 <Divider sx={{ my: 2 }} />
                 <Stack spacing={0.5}>
@@ -668,10 +713,10 @@ export default function PricingUnitEconomicsTab({ config, isDirty, lesson }) {
                     <TableRow>
                       <TableCell width={48} />
                       <TableCell>Scenario</TableCell>
-                      <TableCell align='right'>Subtotal</TableCell>
-                      <TableCell align='right'>Gross</TableCell>
+                      <TableCell align='right'>Session</TableCell>
+                      <TableCell align='right'>Commission</TableCell>
                       <TableCell align='right'>Infra</TableCell>
-                      <TableCell align='right'>Net</TableCell>
+                      <TableCell align='right'>After infra</TableCell>
                       <TableCell align='center'>Status</TableCell>
                     </TableRow>
                   </TableHead>

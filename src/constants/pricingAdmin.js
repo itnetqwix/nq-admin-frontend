@@ -170,4 +170,12 @@ export const withdrawalSettlement = (grossMinor, feeMinor = 0, feeBps = 0) => {
   return { grossMinor: gross, feeMinor: fee, taxMinor: 0, deductionsMinor: fee, netMinor: gross - fee }
 }
 
+/** Mirrors backend PAYOUT_PROCESSING_FEES — amount-based, not Admin-set. */
+export const PAYOUT_PROCESSING_FEES = {
+  US: { bps: 25, fixedMinor: 25 },
+  CA: { bps: 25, fixedMinor: 25 },
+  GB: { bps: 20, fixedMinor: 20 },
+  EU: { bps: 25, fixedMinor: 25 }
+}
+
 export const deepClone = obj => JSON.parse(JSON.stringify(obj ?? {}))

@@ -32,7 +32,7 @@ export default function PricingProfitCheckTab({ config, isDirty, canEdit, onPatc
 
       <AdminPageSection
         title='After infrastructure'
-        subtitle='Step 1 is take-rate minus Stripe. This subtracts AWS and video. 15 min costs less video than 30 min on the same $60 ticket.'
+        subtitle='Commission is the company take. After infra for this duration should still be at least that commission — raise trainee fees if it falls short.'
       >
         <PricingUnitEconomicsTab config={config} isDirty={isDirty} lesson={lesson} />
       </AdminPageSection>

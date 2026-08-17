@@ -28,8 +28,7 @@ export default function PricingHistoryTab() {
           updated_by: r.updated_by_admin_id,
           commission: usRegion(r).defaultCommissionRate,
           traineeFee: usRegion(r).traineePlatformFeeMinor,
-          serviceFee: usRegion(r).trainerPlatformFeeMinor,
-          withdrawalFee: usRegion(r).withdrawalFeeMinor
+          serviceFee: usRegion(r).trainerPlatformFeeMinor
         }))
       )
     } catch {
@@ -68,12 +67,6 @@ export default function PricingHistoryTab() {
       headerName: 'Service fee',
       width: 120,
       valueGetter: p => (p.row.serviceFee != null ? fmtMoney(p.row.serviceFee) : '—')
-    },
-    {
-      field: 'withdrawalFee',
-      headerName: 'Cash-out fee',
-      width: 120,
-      valueGetter: p => (p.row.withdrawalFee != null ? fmtMoney(p.row.withdrawalFee) : '—')
     },
     {
       field: 'effective_at',

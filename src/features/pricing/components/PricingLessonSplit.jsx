@@ -162,7 +162,7 @@ export default function PricingLessonSplit({
   const afterLines = [
     [`Commission (${fmtPct(quote?.commissionRate)})`, commissionCents, 'Taken from the session. Intact — infra is recovered via trainee fees, not this line.'],
     ['Coach wallet (later)', coachGets, 'Session minus commission only. After ratings or 7 days + 24h clearance. Stays in NetQwix wallet — not a bank.'],
-    ['You keep (before infra)', youKeep, 'Commission + trainee fees − Stripe (if not passed through). AWS/video is the next section.']
+    ['You keep (before infra)', youKeep, 'Commission + trainee fees − Stripe if not passed through. Profit check shows after infra — that number should stay at least the commission.'],
   ]
 
   function MoneyCol({ title, chip, lines, totalLabel, totalCents, emphasize }) {

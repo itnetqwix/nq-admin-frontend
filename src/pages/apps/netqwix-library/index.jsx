@@ -50,13 +50,26 @@ const MAX_BYTES = 50 * 1024 * 1024
 const MAX_BATCH = 5
 const fmtInt = v => new Intl.NumberFormat('en-US').format(Number(v) || 0)
 
+function catIdOf(c) {
+  return String(c?.id || c?._id || '')
+}
+
 function fileStem(name) {
   return String(name || '').replace(/\.[^.]+$/, '') || 'Clip'
 }
 
-function batchTitle(prefix, file, index, total) {
-  const base = String(prefix || '').trim() || fileStem(file.name)
-  return total > 1 ? `${base} (${index + 1})` : base
+function draftFromFile(file) {
+  return {
+    file,
+    title: fileStem(file.name),
+    categoryId: '',
+    subcategoryId: ''
+  }
+}
+
+function subsForCategory(taxonomy, categoryId) {
+  const cat = (taxonomy || []).find(c => catIdOf(c) === categoryId)
+  return (cat?.subcategories || []).filter(s => s.is_active !== false)
 }
 
 async function putPresigned(url, body, contentType) {
@@ -140,10 +153,6 @@ async function publishLibraryFile(file, { title, categoryId, subcategoryId }) {
     category_id: categoryId,
     subcategory_id: subcategoryId || null
   })
-}
-
-function catIdOf(c) {
-  return String(c?.id || c?._id || '')
 }
 
 function LibraryClipThumb({ clip, onPlay }) {
@@ -245,9 +254,6 @@ export default function NetqwixLibraryPage() {
   const [groups, setGroups] = useState([])
   const [taxonomy, setTaxonomy] = useState([])
   const [pendingQueue, setPendingQueue] = useState(0)
-  const [title, setTitle] = useState('')
-  const [categoryId, setCategoryId] = useState('')
-  const [subcategoryId, setSubcategoryId] = useState('')
   const [files, setFiles] = useState([])
   const [uploading, setUploading] = useState(false)
   const [uploadStep, setUploadStep] = useState('')
@@ -293,15 +299,8 @@ export default function NetqwixLibraryPage() {
   }, [load])
 
   const activeCategories = useMemo(() => taxonomy.filter(c => c.is_active !== false), [taxonomy])
-  const selectedCat = activeCategories.find(c => catIdOf(c) === categoryId)
-  const subs = (selectedCat?.subcategories || []).filter(s => s.is_active !== false)
   const editCat = activeCategories.find(c => catIdOf(c) === editCategoryId)
   const editSubs = (editCat?.subcategories || []).filter(s => s.is_active !== false)
-
-  const onCategoryChange = id => {
-    setCategoryId(id)
-    setSubcategoryId('')
-  }
 
   let clipCount = 0
   const categoryCount = groups.length
@@ -340,7 +339,7 @@ export default function NetqwixLibraryPage() {
     const kept = []
     for (const f of incoming) {
       if (f.size > MAX_BYTES) toast.error(`${f.name} is over 50 MB`)
-      else kept.push(f)
+      else kept.push(draftFromFile(f))
     }
     if (!kept.length) return
     setFiles(prev => {
@@ -353,18 +352,33 @@ export default function NetqwixLibraryPage() {
     })
   }
 
+  const patchDraft = (index, patch) => {
+    setFiles(prev => prev.map((row, i) => (i === index ? { ...row, ...patch } : row)))
+  }
+
   const upload = async () => {
-    if (!files.length || !title.trim() || !categoryId) {
-      toast.error('Fill title, category, and choose at least one video')
+    if (!files.length) {
+      toast.error('Choose at least one video')
+      return
+    }
+    const incomplete = files.find(row => !String(row.title || '').trim() || !row.categoryId)
+    if (incomplete) {
+      toast.error('Each video needs a title and category')
       return
     }
 
-    const catName = activeCategories.find(c => catIdOf(c) === categoryId)?.name
-    const subName = subs.find(s => catIdOf(s) === subcategoryId)?.name
     const ok = await confirm({
       title: files.length > 1 ? `Publish ${files.length} clips to library?` : 'Publish clip to library?',
       message: 'This uploads and publishes to the public NetQwix library.',
-      detail: `${files.length} video${files.length > 1 ? 's' : ''} → ${catName}${subName ? ` › ${subName}` : ' › General'}`,
+      detail: files
+        .map(row => {
+          const catName = activeCategories.find(c => catIdOf(c) === row.categoryId)?.name || 'Category'
+          const subName = subsForCategory(activeCategories, row.categoryId).find(
+            s => catIdOf(s) === row.subcategoryId
+          )?.name
+          return `${row.title.trim()} → ${catName}${subName ? ` › ${subName}` : ' › General'}`
+        })
+        .join('\n'),
       confirmLabel: 'Publish',
       variant: 'warning'
     })
@@ -374,20 +388,17 @@ export default function NetqwixLibraryPage() {
     let published = 0
     try {
       for (let i = 0; i < files.length; i++) {
-        const f = files[i]
+        const row = files[i]
         setUploadStep(`Uploading ${i + 1} of ${files.length}…`)
         // ponytail: sequential presign/PUT/confirm; parallelize if 5-file latency hurts
-        await publishLibraryFile(f, {
-          title: batchTitle(title, f, i, files.length),
-          categoryId,
-          subcategoryId
+        await publishLibraryFile(row.file, {
+          title: String(row.title).trim(),
+          categoryId: row.categoryId,
+          subcategoryId: row.subcategoryId
         })
         published += 1
       }
       toast.success(published === 1 ? 'Library clip published' : `${published} library clips published`)
-      setTitle('')
-      setCategoryId('')
-      setSubcategoryId('')
       setFiles([])
       void load()
     } catch (e) {
@@ -536,47 +547,10 @@ export default function NetqwixLibraryPage() {
         <OpsSurfaceCard sx={{ maxWidth: 720 }}>
           <Stack spacing={2.5}>
             <Typography sx={{ fontSize: 13, color: ops.body, lineHeight: 1.5 }}>
-              Upload up to {MAX_BATCH} coaching clips at once. Max 50 MB each. Subcategory is optional (defaults to
-              General). Appears under Locker → NetQwix Library.
+              Upload up to {MAX_BATCH} coaching clips at once. Max 50 MB each. Set title, category, and subcategory
+              per video — same as Enthusiast and Expert locker uploads. Subcategory is optional (defaults to General).
+              Appears under Locker → NetQwix Library.
             </Typography>
-
-            <TextField
-              label={files.length > 1 ? 'Title prefix' : 'Clip title'}
-              helperText={files.length > 1 ? `Saved as "${title.trim() || 'Title'} (1)", (2), …` : undefined}
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              fullWidth
-              size='small'
-              disabled={uploading}
-            />
-
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <FormControl fullWidth size='small' disabled={uploading || !activeCategories.length}>
-                <InputLabel>Category</InputLabel>
-                <Select label='Category' value={categoryId} onChange={e => onCategoryChange(e.target.value)}>
-                  {activeCategories.map(c => (
-                    <MenuItem key={catIdOf(c)} value={catIdOf(c)}>
-                      {c.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl fullWidth size='small' disabled={uploading || !categoryId}>
-                <InputLabel>Subcategory (optional)</InputLabel>
-                <Select
-                  label='Subcategory (optional)'
-                  value={subcategoryId}
-                  onChange={e => setSubcategoryId(e.target.value)}
-                >
-                  <MenuItem value=''>None — General</MenuItem>
-                  {subs.map(s => (
-                    <MenuItem key={catIdOf(s)} value={catIdOf(s)}>
-                      {s.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Stack>
 
             {!activeCategories.length ? (
               <Typography sx={{ fontSize: 13, color: '#ab570a' }}>
@@ -612,40 +586,82 @@ export default function NetqwixLibraryPage() {
                 />
               </Button>
               {files.length ? (
-                <Stack spacing={1} sx={{ mt: 1.5 }} alignItems='stretch'>
-                  {files.map((f, i) => (
-                    <Stack
-                      key={`${f.name}-${f.size}-${i}`}
-                      direction='row'
-                      spacing={1}
-                      alignItems='center'
-                      justifyContent='space-between'
-                      sx={{
-                        px: 1.25,
-                        py: 0.75,
-                        borderRadius: 1,
-                        bgcolor: ops.canvas,
-                        textAlign: 'left'
-                      }}
-                    >
-                      <Box sx={{ minWidth: 0 }}>
-                        <Typography noWrap sx={{ fontSize: 13, fontWeight: 600 }}>
-                          {f.name}
-                        </Typography>
-                        <Typography sx={{ fontSize: 11, color: ops.mute, fontFamily: ops.mono }}>
-                          {(f.size / (1024 * 1024)).toFixed(1)} MB
-                        </Typography>
-                      </Box>
-                      <IconButton
-                        size='small'
-                        disabled={uploading}
-                        aria-label={`Remove ${f.name}`}
-                        onClick={() => setFiles(prev => prev.filter((_, idx) => idx !== i))}
+                <Stack spacing={1.5} sx={{ mt: 1.5 }} alignItems='stretch'>
+                  {files.map((row, i) => {
+                    const f = row.file
+                    const rowSubs = subsForCategory(activeCategories, row.categoryId)
+                    return (
+                      <Stack
+                        key={`${f.name}-${f.size}-${i}`}
+                        spacing={1.25}
+                        sx={{
+                          px: 1.5,
+                          py: 1.25,
+                          borderRadius: 1,
+                          bgcolor: ops.canvas,
+                          textAlign: 'left'
+                        }}
                       >
-                        <DeleteOutlineIcon fontSize='small' />
-                      </IconButton>
-                    </Stack>
-                  ))}
+                        <Stack direction='row' spacing={1} alignItems='center' justifyContent='space-between'>
+                          <Box sx={{ minWidth: 0 }}>
+                            <Typography noWrap sx={{ fontSize: 13, fontWeight: 600 }}>
+                              {f.name}
+                            </Typography>
+                            <Typography sx={{ fontSize: 11, color: ops.mute, fontFamily: ops.mono }}>
+                              {(f.size / (1024 * 1024)).toFixed(1)} MB
+                            </Typography>
+                          </Box>
+                          <IconButton
+                            size='small'
+                            disabled={uploading}
+                            aria-label={`Remove ${f.name}`}
+                            onClick={() => setFiles(prev => prev.filter((_, idx) => idx !== i))}
+                          >
+                            <DeleteOutlineIcon fontSize='small' />
+                          </IconButton>
+                        </Stack>
+                        <TextField
+                          label='Title'
+                          value={row.title}
+                          onChange={e => patchDraft(i, { title: e.target.value })}
+                          fullWidth
+                          size='small'
+                          disabled={uploading}
+                        />
+                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
+                          <FormControl fullWidth size='small' disabled={uploading || !activeCategories.length}>
+                            <InputLabel>Category</InputLabel>
+                            <Select
+                              label='Category'
+                              value={row.categoryId}
+                              onChange={e => patchDraft(i, { categoryId: e.target.value, subcategoryId: '' })}
+                            >
+                              {activeCategories.map(c => (
+                                <MenuItem key={catIdOf(c)} value={catIdOf(c)}>
+                                  {c.name}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                          <FormControl fullWidth size='small' disabled={uploading || !row.categoryId}>
+                            <InputLabel>Subcategory (optional)</InputLabel>
+                            <Select
+                              label='Subcategory (optional)'
+                              value={row.subcategoryId}
+                              onChange={e => patchDraft(i, { subcategoryId: e.target.value })}
+                            >
+                              <MenuItem value=''>None — General</MenuItem>
+                              {rowSubs.map(s => (
+                                <MenuItem key={catIdOf(s)} value={catIdOf(s)}>
+                                  {s.name}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Stack>
+                      </Stack>
+                    )
+                  })}
                 </Stack>
               ) : (
                 <Typography sx={{ fontSize: 12, color: ops.mute, display: 'block', mt: 1 }}>
@@ -669,7 +685,12 @@ export default function NetqwixLibraryPage() {
 
             <Button
               variant='contained'
-              disabled={uploading || !files.length || !title.trim() || !categoryId || !activeCategories.length}
+              disabled={
+                uploading ||
+                !files.length ||
+                !activeCategories.length ||
+                files.some(row => !String(row.title || '').trim() || !row.categoryId)
+              }
               onClick={() => void upload()}
               sx={{ bgcolor: ops.indigo, boxShadow: 'none', textTransform: 'none', fontWeight: 500 }}
             >
