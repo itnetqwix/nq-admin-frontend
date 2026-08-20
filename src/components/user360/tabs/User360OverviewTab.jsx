@@ -20,6 +20,7 @@ import { revokeAllUserSessions, revokeUserSession } from 'src/services/user360Ap
 import { useAdminConfirm } from 'src/components/admin/useAdminConfirm'
 
 import User360AccountReviewActions from '../User360AccountReviewActions'
+import User360StoragePanel from '../User360StoragePanel'
 import { SectionShell, StatTile, OpsSurfaceCard } from '../user360Shared'
 import { KeyValueRow, NotificationPreferencesPanel, ExtraInfoTree, safeImg } from '../user360Parts'
 
@@ -31,6 +32,7 @@ export default function User360OverviewTab({ userId, userData, onRefresh }) {
   const profile = userData?.user || {}
   const identity = overview.identity || {}
   const money = overview.money || {}
+  const storage = overview.storage || {}
   const media = overview.media || {}
   const preferences = overview.preferences || {}
   const sessions = overview.sessions || userData?.sessions || []
@@ -85,6 +87,12 @@ export default function User360OverviewTab({ userId, userData, onRefresh }) {
             accountType={identity.account_type || profile?.account_type}
             status={identity.status || profile?.status}
             onUpdated={onRefresh}
+          />
+
+          <User360StoragePanel
+            userId={userId || identity._id || profile?._id}
+            storage={storage}
+            onRefresh={onRefresh}
           />
 
           <OpsSurfaceCard sx={{ mb: 3, bgcolor: ops.canvasSoft }}>

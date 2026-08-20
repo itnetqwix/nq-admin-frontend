@@ -41,7 +41,7 @@ export const searchPlaceholder = tab => {
   if (tab === TAB.ESCROW) return 'Session ID'
   if (tab === TAB.TOPUPS) return 'User ID'
   if (tab === TAB.TRANSACTIONS) return 'PI (pi_…), user ID, or session ID'
-  if (tab === TAB.REFUNDS) return 'Filter by status; open a session for names and timeline'
+  if (tab === TAB.REFUNDS) return 'Booking ID, user, email, or PI'
   return 'Search…'
 }
 

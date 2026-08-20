@@ -10,7 +10,8 @@ import {
   disputeEscrowHold,
   refundEscrowHold,
   releaseEscrowHold,
-  resolveDisputeEscrow
+  resolveDisputeEscrow,
+  retryBookingRefund
 } from 'src/services/financeApi'
 import { formatMinor, TAB } from './constants'
 import { formatOpsDateTime } from 'src/utils/opsDateTime'
@@ -445,7 +446,51 @@ export function buildFinanceColumns({ allowRefund, allowPayout, confirm, load, t
           '—'
         )
     },
-    { field: 'source', headerName: 'Source', width: 90 }
+    { field: 'source', headerName: 'Source', width: 90 },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 140,
+      sortable: false,
+      renderCell: params => {
+        const status = String(params.row.status || '').toLowerCase()
+        const canRetry =
+          allowRefund &&
+          params.row.source === 'booking' &&
+          params.row.session_id &&
+          (status === 'failed' || status === 'processing' || status === 'pending')
+        if (!canRetry) return null
+        return (
+          <Button
+            size='small'
+            color='warning'
+            variant='outlined'
+            onClick={async e => {
+              e.stopPropagation()
+              const ok = await confirm({
+                title: 'Retry refund?',
+                message: `Re-run escrow refund for booking ${params.row.session_id}. Use this for failed or stuck refunds.`,
+                detail: `Booking ID: ${params.row.session_id}`,
+                confirmLabel: 'Retry refund',
+                variant: 'warning',
+                reasonRequired: true,
+                reasonLabel: 'Retry reason'
+              })
+              if (!ok) return
+              try {
+                await retryBookingRefund(params.row.session_id, ok.reason)
+                toast.success('Refund retry submitted')
+                load?.()
+              } catch (err) {
+                toast.error(err?.message || 'Retry failed')
+              }
+            }}
+          >
+            Retry
+          </Button>
+        )
+      }
+    }
   ]
 
   const payoutCols = [

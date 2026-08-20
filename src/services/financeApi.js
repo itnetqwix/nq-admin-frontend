@@ -125,8 +125,8 @@ export async function adjustWallet(payload) {
   return postFinance('/admin/finance/wallet/adjust', payload)
 }
 
-export async function refundWalletSession(payload) {
-  return postFinance('/admin/finance/wallet/refund-session', payload)
+export async function retryBookingRefund(bookingId, reason) {
+  return postFinance(`/admin/finance/bookings/${bookingId}/retry-refund`, { reason })
 }
 
 export async function getStuckTopUps(query = {}) {

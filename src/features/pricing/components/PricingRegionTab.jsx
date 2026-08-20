@@ -89,13 +89,19 @@ export default function PricingRegionTab({
       label: plan.label || planId,
       monthlyMinor: plan.monthlyMinor ?? 0,
       yearlyMinor: plan.yearlyMinor ?? 0,
-      quotaGb: plan.quotaBytes ? (plan.quotaBytes / (1024 ** 3)).toFixed(0) : '—'
+      quotaGb: plan.quotaBytes ? Number((plan.quotaBytes / (1024 ** 3)).toFixed(2)) : 0
     }
   })
 
   const storageCols = [
     { field: 'label', headerName: 'Plan', width: 120 },
-    { field: 'quotaGb', headerName: 'Quota (GB)', width: 100 },
+    {
+      field: 'quotaGb',
+      headerName: 'Quota (GB)',
+      width: 120,
+      editable: true,
+      type: 'number'
+    },
     {
       field: 'monthlyMinor',
       headerName: 'Monthly (¢)',
@@ -274,11 +280,13 @@ export default function PricingRegionTab({
             hideFooter
             isCellEditable={() => canEdit}
             processRowUpdate={newRow => {
+              const gb = Math.max(0, Number(newRow.quotaGb) || 0)
               onPatchStoragePlan(regionKey, newRow.id, {
                 monthlyMinor: Number(newRow.monthlyMinor) || 0,
-                yearlyMinor: Number(newRow.yearlyMinor) || 0
+                yearlyMinor: Number(newRow.yearlyMinor) || 0,
+                quotaBytes: Math.round(gb * 1024 * 1024 * 1024)
               })
-              return newRow
+              return { ...newRow, quotaGb: gb }
             }}
             onProcessRowUpdateError={() => {}}
           />

@@ -167,7 +167,12 @@ const FinancePage = () => {
         setTotal(r?.total ?? 0)
         setEscrowSummary(summary)
       } else if (tab === TAB.REFUNDS) {
-        const r = await getRefundQueue({ page, limit: pageSize, status: refundStatus || undefined })
+        const r = await getRefundQueue({
+          page,
+          limit: pageSize,
+          status: refundStatus || undefined,
+          q: searchQ || undefined
+        })
         setRefunds(r?.items ?? [])
         setTotal(r?.total ?? 0)
       } else if (tab === TAB.PAYOUTS) {

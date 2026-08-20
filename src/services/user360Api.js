@@ -257,3 +257,15 @@ export const revokeAllUserSessions = async userId => {
   if (isApiFailure(data, response)) throw new Error(readError(data))
   return unwrapData(data) || data?.data || { revokedCount: 0 }
 }
+
+export const setUserStorage = async (userId, body) => {
+  if (!userId || userId === 'undefined') throw new Error('Invalid user id')
+  const response = await fetch(apiUrl(`/admin/users/${userId}/storage`), {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(body || {})
+  })
+  const data = await response.json()
+  if (isApiFailure(data, response)) throw new Error(readError(data))
+  return unwrapData(data) || data?.data || data
+}
