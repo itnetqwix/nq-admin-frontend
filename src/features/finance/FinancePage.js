@@ -204,7 +204,7 @@ const FinancePage = () => {
     void getFinanceOpsDashboard()
       .then(setOpsDashboard)
       .catch(() => setOpsDashboard(null))
-  }, [tab, page])
+  }, [])
 
   useEffect(() => {
     setPage(1)
