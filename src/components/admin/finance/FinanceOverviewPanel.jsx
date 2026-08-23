@@ -193,7 +193,7 @@ export default function FinanceOverviewPanel({ opsDashboard, escrowSummary, onGo
               hint='Ops log'
               tone={(dash.extensionReconcileAlerts7d ?? 0) > 0 ? 'danger' : 'default'}
               onClick={() =>
-                router.push('/apps/ops-logs?category=payment&event_type=EXTENSION_RECONCILE_ALERT')
+                router.push('/apps/ops?tab=events&category=payment&event_type=EXTENSION_RECONCILE_ALERT')
               }
             />
           </Grid>
@@ -229,7 +229,7 @@ export default function FinanceOverviewPanel({ opsDashboard, escrowSummary, onGo
           <Button size='small' variant='outlined' component={Link} href='/apps/finance/connect'>
             Stripe Connect
           </Button>
-          <Button size='small' variant='outlined' component={Link} href='/apps/platform-health'>
+          <Button size='small' variant='outlined' component={Link} href='/apps/ops?tab=health'>
             Platform health →
           </Button>
         </Stack>

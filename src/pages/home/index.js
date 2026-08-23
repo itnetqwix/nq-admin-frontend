@@ -194,7 +194,7 @@ const Home = () => {
                 title='ICE / call failures'
                 chipText='Preflight & call errors'
                 icon={<Icon icon='mdi:video-off-outline' />}
-                onCardClick={() => router.push('/apps/call-diagnostics?eventType=CLIENT_PRECALL_CHECK')}
+                onCardClick={() => router.push('/apps/ops?tab=calls&eventType=CLIENT_PRECALL_CHECK')}
               />
             </Grid>
             <Grid item xs={6} sm={3}>
@@ -218,7 +218,7 @@ const Home = () => {
                 title='Failed jobs'
                 chipText='PDF / reminders'
                 icon={<Icon icon='mdi:alert-octagon-outline' />}
-                onCardClick={() => router.push('/apps/failed-jobs')}
+                onCardClick={() => router.push('/apps/ops?tab=jobs')}
               />
             </Grid>
             <Grid item xs={6} sm={3}>
@@ -230,7 +230,7 @@ const Home = () => {
                 title='Call diagnostics'
                 chipText='Quality & events'
                 icon={<Icon icon='mdi:video-outline' />}
-                onCardClick={() => router.push('/apps/call-diagnostics')}
+                onCardClick={() => router.push('/apps/ops?tab=calls')}
               />
             </Grid>
           </Grid>

@@ -53,6 +53,9 @@ export default function User360WalletTab({ userId, walletAmount, currency = 'USD
         <Button size='small' component={Link} href={`/apps/finance?userId=${userId}`} variant='outlined'>
           Open in Finance
         </Button>
+        <Button size='small' component={Link} href={`/apps/users/${userId}?tab=5&category=wallet`} variant='text'>
+          Wallet activity →
+        </Button>
       </Stack>
       <Stack direction='row' spacing={1} alignItems='center'>
         <Button size='small' disabled={page <= 1 || loading} onClick={() => setPage(p => Math.max(1, p - 1))}>

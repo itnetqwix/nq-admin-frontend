@@ -9,8 +9,9 @@ const headers = () => ({
 const api = path => `${requireApiBaseUrl()}${path.startsWith('/') ? path : `/${path}`}`
 
 /** GET /admin/jobs/failed — flatten queue buckets into rows. */
-export async function listFailedJobs({ limit = 50, search = '', queue = '' } = {}) {
+export async function listFailedJobs({ page = 1, limit = 25, search = '', queue = '' } = {}) {
   const params = new URLSearchParams()
+  params.set('page', String(page))
   params.set('limit', String(limit))
   if (search?.trim()) params.set('search', search.trim())
   if (queue) params.set('queue', queue)
@@ -31,6 +32,8 @@ export async function listFailedJobs({ limit = 50, search = '', queue = '' } = {
   return {
     available: !!data.available,
     total: data.total ?? rows.length,
+    page: data.page ?? page,
+    limit: data.limit ?? limit,
     queues: data.queues || [],
     rows
   }

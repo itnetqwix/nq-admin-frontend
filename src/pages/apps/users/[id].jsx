@@ -52,8 +52,28 @@ export default function User360Page() {
     lessons: { page: 1, limit: 20, sortBy: 'createdAt', sortOrder: 'desc', status: '', search: '' },
     reviews: { page: 1, limit: 20, sortBy: 'createdAt', sortOrder: 'desc', status: '', search: '' },
     assets: { page: 1, limit: 20, sortBy: 'createdAt', sortOrder: 'desc', search: '' },
-    activity: { page: 1, limit: 30, eventType: '' }
+    activity: { page: 1, limit: 30, eventType: '', category: '' }
   })
+
+  useEffect(() => {
+    if (!router.isReady) return
+    const qTab = router.query.tab
+    if (qTab != null && qTab !== '') {
+      const n = Number(Array.isArray(qTab) ? qTab[0] : qTab)
+      if (!Number.isNaN(n) && n >= 0 && n <= 9) setTab(n)
+    }
+    const qCat = router.query.category
+    if (qCat != null && qCat !== '') {
+      setQuery(prev => ({
+        ...prev,
+        activity: {
+          ...prev.activity,
+          category: String(Array.isArray(qCat) ? qCat[0] : qCat),
+          page: 1
+        }
+      }))
+    }
+  }, [router.isReady, router.query.tab, router.query.category])
 
   const updateSectionQuery = (section, nextPatch) => {
     setQuery(prev => ({

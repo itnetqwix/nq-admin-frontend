@@ -13,6 +13,7 @@ export const ACL_ROUTE_SUBJECTS = {
   '/apps/booking': 'admin-nav-bookings',
   '/apps/write-by-user': 'admin-nav-user-feedback',
   '/apps/concern-by-user': 'admin-nav-support-tickets',
+  '/apps/ops': 'admin-nav-ops-logs',
   '/apps/call-diagnostics': 'admin-nav-call-diagnostics',
   '/apps/live-lessons': 'admin-nav-call-diagnostics',
   '/apps/failed-jobs': 'admin-nav-failed-jobs',

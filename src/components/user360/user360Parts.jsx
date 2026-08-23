@@ -21,19 +21,23 @@ import { getImageUrl } from 'src/utils/utils'
 import { AbilityContext } from 'src/layouts/components/acl/Can'
 import { ops } from 'src/styles/opsSurface'
 
-export const timelineDotColor = type => {
-  const t = String(type || '').toLowerCase()
+export const timelineDotColor = (typeOrCategory) => {
+  const t = String(typeOrCategory || '').toLowerCase()
+  if (t === 'wallet' || t.includes('auto_topup') || t.includes('financial')) return 'info'
+  if (t === 'support' || t.includes('support_ticket')) return 'warning'
+  if (t === 'verification') return 'secondary'
+  if (t === 'security' || t.includes('login') || t.includes('pin_')) return 'success'
+  if (t === 'social' || t.includes('clip') || t.includes('report') || t.includes('review')) return 'secondary'
+  if (t === 'profile') return 'default'
   if (t.includes('admin')) return 'error'
   if (t.includes('booking')) return 'primary'
-  if (t.includes('clip')) return 'secondary'
-  if (t.includes('login') || t.includes('user_activity')) return 'success'
-  if (t.includes('report') || t.includes('saved')) return 'info'
+  if (t.includes('saved')) return 'info'
   if (t.includes('online')) return 'warning'
   return 'default'
 }
 
-export const timelineDotBg = (type, theme) => {
-  const c = timelineDotColor(type)
+export const timelineDotBg = (typeOrCategory, theme) => {
+  const c = timelineDotColor(typeOrCategory)
   if (c === 'error') return theme.palette.error.main
   if (c === 'primary') return theme.palette.primary.main
   if (c === 'secondary') return theme.palette.secondary.main

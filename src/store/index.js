@@ -6,6 +6,7 @@ import bookingsReducer from './slices/bookingsSlice'
 import supportReducer from './slices/supportSlice'
 import traineeReviewsReducer from './slices/traineeReviewsSlice'
 import usersListReducer from './slices/usersListSlice'
+import opsReducer from './slices/opsSlice'
 
 export const store = configureStore({
   reducer: {
@@ -15,7 +16,8 @@ export const store = configureStore({
     bookings: bookingsReducer,
     support: supportReducer,
     traineeReviews: traineeReviewsReducer,
-    usersList: usersListReducer
+    usersList: usersListReducer,
+    ops: opsReducer
   },
   // ponytail: user blobs from /user/me include Dates / nested objects
   middleware: getDefaultMiddleware =>

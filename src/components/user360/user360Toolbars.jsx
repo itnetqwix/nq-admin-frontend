@@ -15,6 +15,7 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
 import { ops } from 'src/styles/opsSurface'
+import { TIMELINE_CATEGORY_META, TIMELINE_CATEGORY_QUICK } from './constants'
 
 export const ToolbarRefreshExport = ({ onRefresh, onExport, exportLabel = 'Export CSV', busy }) => (
   <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
@@ -120,7 +121,7 @@ export const QueryToolbar = ({ section, sectionQuery, onQueryChange, lessonSortO
   )
 }
 
-export const ActivityToolbar = ({ query, onQueryChange }) => {
+export const ActivityToolbar = ({ query, onQueryChange, userId: userIdProp }) => {
   const router = useRouter()
   const aq = query?.activity || {}
   const [typeDraft, setTypeDraft] = useState(aq.eventType ?? '')
@@ -137,29 +138,24 @@ export const ActivityToolbar = ({ query, onQueryChange }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- debounce filter only
   }, [typeDraft])
 
-  const quick = [
-    { label: 'All', value: '' },
-    { label: 'Bookings', value: 'booking' },
-    { label: 'Clips', value: 'clip' },
-    { label: 'Admin', value: 'admin' },
-    { label: 'Logins', value: 'login' },
-    { label: 'Reports', value: 'report' }
-  ]
-
-  const userId = router.query?.id ? String(router.query.id) : ''
+  const userId = userIdProp || (router.query?.id ? String(router.query.id) : '')
+  const activeCategory = String(aq.category || 'all')
 
   return (
     <Stack spacing={2}>
       <Stack direction='row' flexWrap='wrap' useFlexGap spacing={1} alignItems='center'>
-        {quick.map(q => {
-          const selected = q.value === '' ? !aq.eventType : String(aq.eventType) === q.value
+        {TIMELINE_CATEGORY_QUICK.map(key => {
+          const selected = activeCategory === key
+          const label = TIMELINE_CATEGORY_META[key]?.label || key
           return (
             <Chip
-              key={q.label}
-              label={q.label}
+              key={key}
+              label={label}
               onClick={() => {
-                setTypeDraft(q.value)
-                onQueryChange('activity', { eventType: q.value, page: 1 })
+                onQueryChange('activity', {
+                  category: key === 'all' ? '' : key,
+                  page: 1
+                })
               }}
               color={selected ? 'primary' : 'default'}
               variant={selected ? 'filled' : 'outlined'}
@@ -168,14 +164,36 @@ export const ActivityToolbar = ({ query, onQueryChange }) => {
             />
           )
         })}
+      </Stack>
+      <Stack direction='row' flexWrap='wrap' useFlexGap spacing={1} alignItems='center'>
         {userId ? (
           <Button
             size='small'
             component={Link}
             href={`/apps/platform-activity?userId=${userId}`}
-            sx={{ textTransform: 'none', ml: 0.5 }}
+            sx={{ textTransform: 'none' }}
           >
-            Open in Platform activity →
+            Platform activity →
+          </Button>
+        ) : null}
+        {userId ? (
+          <Button
+            size='small'
+            component={Link}
+            href={`/apps/finance?userId=${userId}`}
+            sx={{ textTransform: 'none' }}
+          >
+            Finance →
+          </Button>
+        ) : null}
+        {userId ? (
+          <Button
+            size='small'
+            component={Link}
+            href={`/apps/audit-logs?userId=${userId}`}
+            sx={{ textTransform: 'none' }}
+          >
+            Admin audit →
           </Button>
         ) : null}
         {userId ? (

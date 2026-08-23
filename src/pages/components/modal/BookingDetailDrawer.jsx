@@ -306,7 +306,7 @@ export default function BookingDetailDrawer({
                   <Button
                     size='small'
                     variant='outlined'
-                    href={`/apps/ops-logs?sessionId=${s._id}`}
+                      href={`/apps/ops?tab=events&sessionId=${s._id}`}
                     component='a'
                   >
                     Ops logs
@@ -314,7 +314,7 @@ export default function BookingDetailDrawer({
                   <Button
                     size='small'
                     variant='outlined'
-                    href={`/apps/call-diagnostics?sessionId=${s._id}`}
+                      href={`/apps/ops?tab=calls&sessionId=${s._id}`}
                     component='a'
                   >
                     Call diagnostics

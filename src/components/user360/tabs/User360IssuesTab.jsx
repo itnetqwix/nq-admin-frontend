@@ -11,7 +11,7 @@ export default function User360IssuesTab({ userId, opsItems = [], loadingOpsEven
       title='Issues & logs'
       subtitle='Ops events for this user: calls, instant lessons, wallet, support tickets, and errors.'
       action={
-        <Button component={Link} href={`/apps/ops-logs?userId=${userId}`} variant='outlined' size='small'>
+        <Button component={Link} href={`/apps/ops?tab=events&userId=${userId}`} variant='outlined' size='small'>
           View all logs
         </Button>
       }

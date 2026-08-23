@@ -46,14 +46,11 @@ const required = [
   '/apps/clip-taxonomy',
   '/apps/library-submissions',
   '/apps/logs',
+  '/apps/ops',
   '/apps/platform-activity',
   '/apps/concern-by-user',
   '/apps/write-by-user',
   '/apps/audit-logs',
-  '/apps/ops-logs',
-  '/apps/failed-jobs',
-  '/apps/platform-health',
-  '/apps/call-diagnostics',
   '/apps/live-lessons',
   '/apps/admin-roles'
 ]

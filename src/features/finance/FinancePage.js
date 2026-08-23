@@ -357,7 +357,7 @@ const FinancePage = () => {
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
           >
-            <MenuItem component={Link} href='/apps/platform-health' onClick={() => setOpsMenuAnchor(null)}>
+            <MenuItem component={Link} href='/apps/ops?tab=health' onClick={() => setOpsMenuAnchor(null)}>
               <ListItemText primary='Platform health' secondary='Messaging & service checks' />
             </MenuItem>
             <MenuItem

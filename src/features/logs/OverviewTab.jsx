@@ -17,7 +17,7 @@ export default function OverviewTab({ summary, jumpTo, router, setDetail }) {
               ['API hits', kpis.api_hits, () => jumpTo('api'), null],
               ['API errors', kpis.api_errors, () => jumpTo('api', { minStatus: '400' }), 'warn'],
               ['Error rate %', kpis.error_rate, () => jumpTo('api', { minStatus: '400' }), null],
-              ['Open ops', kpis.open_ops, () => router.push('/apps/ops-logs'), null],
+              ['Open ops', kpis.open_ops, () => router.push('/apps/ops?tab=events'), null],
               ['Uploads', kpis.uploads, () => jumpTo('files'), null]
             ].map(([label, value, onClick, tone]) => (
               <Grid item xs={6} sm={4} md={3} lg={true} key={label}>

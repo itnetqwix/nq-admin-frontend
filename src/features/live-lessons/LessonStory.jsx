@@ -53,7 +53,7 @@ export default function LessonStory(p) {
                     <Button
                       size='small'
                       variant='outlined'
-                      href={`/apps/call-diagnostics?sessionId=${encodeURIComponent(detail.sessionId)}`}
+                      href={`/apps/ops?tab=calls&sessionId=${encodeURIComponent(detail.sessionId)}`}
                     >
                       Call diagnostics
                     </Button>

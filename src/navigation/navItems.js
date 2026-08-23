@@ -92,9 +92,18 @@ const navigation = () => [
     ]
   },
   {
+    title: 'Support',
+    icon: 'mdi:lifebuoy',
+    children: [
+      link('Support tickets', '/apps/concern-by-user', 'mdi:lifebuoy', 'admin-nav-support-tickets'),
+      link('User feedback', '/apps/write-by-user', 'mdi:account-question', 'admin-nav-user-feedback')
+    ]
+  },
+  {
     title: 'Ops',
     icon: 'mdi:shield-account-outline',
     children: [
+      link('Ops center', '/apps/ops', 'mdi:heart-pulse', 'admin-nav-ops-logs'),
       link('Logs', '/apps/logs', 'mdi:text-box-search-outline', 'admin-nav-logs'),
       link(
         'Platform activity',
@@ -102,18 +111,7 @@ const navigation = () => [
         'mdi:chart-timeline-variant',
         'admin-nav-platform-activity'
       ),
-      link('Support tickets', '/apps/concern-by-user', 'mdi:lifebuoy', 'admin-nav-support-tickets'),
-      link('User feedback', '/apps/write-by-user', 'mdi:account-question', 'admin-nav-user-feedback'),
       link('Audit log', '/apps/audit-logs', 'mdi:clipboard-text-clock-outline', 'admin-nav-audit-logs'),
-      link('Ops / errors', '/apps/ops-logs', 'mdi:alert-circle-outline', 'admin-nav-ops-logs'),
-      link('Failed jobs', '/apps/failed-jobs', 'mdi:alert-octagon-outline', 'admin-nav-failed-jobs'),
-      link(
-        'Platform health',
-        '/apps/platform-health',
-        'mdi:heart-pulse',
-        'admin-nav-platform-health'
-      ),
-      link('Call diagnostics', '/apps/call-diagnostics', 'mdi:video-outline', 'admin-nav-call-diagnostics'),
       link('Live lessons', '/apps/live-lessons', 'mdi:record-rec', 'admin-nav-call-diagnostics'),
       link('Admin roles', '/apps/admin-roles', 'mdi:shield-account-outline', 'admin-nav-admin-settings')
     ]

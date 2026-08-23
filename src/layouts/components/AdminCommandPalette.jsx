@@ -32,9 +32,10 @@ const STATIC_PAGES = [
   { label: 'Trainees', path: '/apps/manage-trainee' },
   { label: 'Bookings', path: '/apps/booking' },
   { label: 'Support tickets', path: '/apps/concern-by-user' },
-  { label: 'Failed jobs', path: '/apps/failed-jobs' },
+  { label: 'Ops center', path: '/apps/ops' },
+  { label: 'Failed jobs', path: '/apps/ops?tab=jobs' },
   { label: 'Audit log', path: '/apps/audit-logs' },
-  { label: 'Call diagnostics', path: '/apps/call-diagnostics' },
+  { label: 'Call diagnostics', path: '/apps/ops?tab=calls' },
   { label: 'Live lessons', path: '/apps/live-lessons' },
   { label: 'Careers', path: '/apps/careers' },
   { label: 'Broadcasts', path: '/apps/broadcasts' },
@@ -147,7 +148,7 @@ export default function AdminCommandPalette({ open, onClose }) {
       <DialogContent>
         <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
           User id / email → User 360 · Booking ObjectId → bookings · path like{' '}
-          <code>/apps/failed-jobs</code>. ⌘/Ctrl+K.
+          <code>/apps/ops</code>. ⌘/Ctrl+K.
         </Typography>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'stretch', flexDirection: { xs: 'column', sm: 'row' } }}>
           <TextField

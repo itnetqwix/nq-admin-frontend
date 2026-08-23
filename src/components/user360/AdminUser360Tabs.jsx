@@ -146,6 +146,7 @@ export default function AdminUser360Tabs({
 
         {tab === 5 ? (
           <User360ActivityTab
+            userId={userId}
             timeline={timeline}
             loadingTimeline={loadingTimeline}
             query={query}

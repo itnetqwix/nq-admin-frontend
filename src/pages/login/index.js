@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
@@ -24,6 +24,7 @@ import BlankLayout from 'src/@core/layouts/BlankLayout'
 import { OpsAuthShell } from 'src/components/admin'
 import AdminGoogleSignIn from 'src/components/admin/AdminGoogleSignIn'
 import { ops } from 'src/styles/opsSurface'
+import { isRememberMeEnabled } from 'src/utils/authStorage'
 
 const schema = yup.object().shape({
   email: yup.string().email().required(),
@@ -48,6 +49,10 @@ const LoginPage = () => {
   const [formError, setFormError] = useState('')
   const [googleError, setGoogleError] = useState('')
   const auth = useAuth()
+
+  useEffect(() => {
+    setRememberMe(isRememberMeEnabled())
+  }, [])
 
   const {
     control,

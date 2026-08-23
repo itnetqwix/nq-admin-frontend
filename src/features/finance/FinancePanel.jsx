@@ -214,7 +214,7 @@ export default function FinancePanel(p) {
               size='small'
               variant='outlined'
               component='a'
-              href='/apps/ops-logs?category=payment&event_type=EXTENSION_RECONCILE_ALERT'
+              href='/apps/ops?tab=events&category=payment&event_type=EXTENSION_RECONCILE_ALERT'
               clickable
             />
             <Chip
