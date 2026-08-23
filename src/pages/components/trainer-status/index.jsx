@@ -1,9 +1,8 @@
 import { FormControl, MenuItem, Select } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { trainerStatusColors } from 'src/utils/utils'
-import { getApiBaseUrl } from 'src/utils/apiBase'
-import authConfig from 'src/configs/auth'
 import toast from 'react-hot-toast'
+import { trainerStatusColors } from 'src/utils/utils'
+import { updateTrainerStatus } from 'src/services/userAdminApi'
 
 export default function TrainerStatus({ params, cb }) {
   const [status, setStatus] = useState(params.row.status)
@@ -13,40 +12,20 @@ export default function TrainerStatus({ params, cb }) {
     setStatus(params.row.status)
   }, [params.row.status])
 
-  const handleChange = event => {
+  const handleChange = async event => {
     const next = event.target.value
     const prev = status
     setStatus(next)
     setBusy(true)
-    const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
-    const base = getApiBaseUrl()
-    if (!storedToken || !base) {
+    try {
+      await updateTrainerStatus(params.row._id || params.row.id, next)
+      cb?.()
+    } catch (e) {
       setStatus(prev)
+      toast.error(e?.message || 'Could not update status')
+    } finally {
       setBusy(false)
-      return
     }
-    fetch(`${base}/user/update-trainer-status`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${storedToken}`
-      },
-      body: JSON.stringify({ trainer_id: params.row._id || params.row.id, status: next })
-    })
-      .then(r => r.json())
-      .then(response => {
-        if (response.code === 400 || response.status === 'fail') {
-          setStatus(prev)
-          toast.error(response?.error || response?.message || 'Could not update status')
-          return
-        }
-        cb?.()
-      })
-      .catch(() => {
-        setStatus(prev)
-        toast.error('Could not update status')
-      })
-      .finally(() => setBusy(false))
   }
 
   return (
@@ -54,7 +33,7 @@ export default function TrainerStatus({ params, cb }) {
       <Select
         size='small'
         value={status || 'pending'}
-        onChange={handleChange}
+        onChange={e => void handleChange(e)}
         disabled={busy}
         sx={{
           height: 32,
@@ -73,4 +52,3 @@ export default function TrainerStatus({ params, cb }) {
     </FormControl>
   )
 }
-

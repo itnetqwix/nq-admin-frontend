@@ -200,13 +200,13 @@ const Home = () => {
             <Grid item xs={6} sm={3}>
               <CardStatisticsVertical
                 color='warning'
-                stats={metrics != null ? fmtInt(metrics.pendingTrainerKyc ?? 0) : '—'}
-                trendNumber='KYC'
+                stats={metrics != null ? fmtInt(metrics.pendingTrainerReview ?? 0) : '—'}
+                trendNumber='Review'
                 trend='positive'
-                title='Pending trainer KYC'
-                chipText='Incomplete'
-                icon={<Icon icon='mdi:card-account-details-outline' />}
-                onCardClick={() => router.push('/apps/manage-trainer?kyc=incomplete')}
+                title='Pending trainer review'
+                chipText='Profile approval'
+                icon={<Icon icon='mdi:account-clock-outline' />}
+                onCardClick={() => router.push('/apps/manage-trainer?status=pending')}
               />
             </Grid>
             <Grid item xs={6} sm={3}>

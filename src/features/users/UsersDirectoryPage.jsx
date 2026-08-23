@@ -11,8 +11,10 @@ import { useAdminConfirm } from 'src/components/admin'
 import AdminPageShell from 'src/layouts/components/AdminPageShell'
 import UserQuickPreviewModal from 'src/components/user360/UserQuickPreviewModal'
 import { getUser360 } from 'src/services/user360Api'
-import { deleteUser, listUsers } from 'src/services/userAdminApi'
+import { deleteUser } from 'src/services/userAdminApi'
 import { ops } from 'src/styles/opsSurface'
+import { useAppDispatch, useAppSelector } from 'src/store/hooks'
+import { fetchUsersList, selectUsersList, setUsersPage, setUsersSearch } from 'src/store/slices/usersListSlice'
 
 import { buildUserColumns } from './columns'
 import DirectoryBody from './DirectoryBody'
@@ -20,15 +22,14 @@ import DirectoryBody from './DirectoryBody'
 
 export default function UsersDirectoryPage() {
   const router = useRouter()
+  const dispatch = useAppDispatch()
   const searchTimerRef = useRef(null)
   const { confirm, ConfirmDialog } = useAdminConfirm()
 
-  const [rows, setRows] = useState([])
-  const [total, setTotal] = useState(0)
-  const [counts, setCounts] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const { items: rows, total, counts, loading, page, limit: pageSize, search, error } =
+    useAppSelector(selectUsersList)
+
   const [searchInput, setSearchInput] = useState('')
-  const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   // Applied filters (drive API). Draft fields only commit on Apply.
@@ -50,8 +51,6 @@ export default function UsersDirectoryPage() {
     min_sessions: '',
     max_sessions: ''
   })
-  const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(25)
   const [filtersOpen, setFiltersOpen] = useState(false)
 
   const [previewOpen, setPreviewOpen] = useState(false)
@@ -65,7 +64,7 @@ export default function UsersDirectoryPage() {
     const q = router.query
     if (q.search != null) {
       setSearchInput(String(q.search))
-      setSearch(String(q.search))
+      dispatch(setUsersSearch(String(q.search)))
     }
     if (q.account_type != null) setTypeFilter(String(q.account_type))
     if (q.status != null) setStatusFilter(String(q.status))
@@ -122,13 +121,40 @@ export default function UsersDirectoryPage() {
     [router]
   )
 
-  const load = useCallback(async () => {
-    setLoading(true)
-    try {
-      const data = await listUsers({
-        page,
-        limit: pageSize,
-        search,
+  const reload = useCallback(
+    () =>
+      void dispatch(
+        fetchUsersList({
+          account_type: typeFilter,
+          status: statusFilter,
+          category,
+          login_type: loginType,
+          time_zone: timeZone,
+          country,
+          from: fromDate,
+          to: toDate,
+          min_sessions: minSessions,
+          max_sessions: maxSessions
+        })
+      ),
+    [
+      dispatch,
+      typeFilter,
+      statusFilter,
+      category,
+      loginType,
+      timeZone,
+      country,
+      fromDate,
+      toDate,
+      minSessions,
+      maxSessions
+    ]
+  )
+
+  useEffect(() => {
+    void dispatch(
+      fetchUsersList({
         account_type: typeFilter,
         status: statusFilter,
         category,
@@ -140,17 +166,9 @@ export default function UsersDirectoryPage() {
         min_sessions: minSessions,
         max_sessions: maxSessions
       })
-      setRows(data.items)
-      setTotal(data.total)
-      setCounts(data.counts)
-    } catch (e) {
-      toast.error(e?.message || 'Failed to load users')
-      setRows([])
-      setTotal(0)
-    } finally {
-      setLoading(false)
-    }
+    )
   }, [
+    dispatch,
     page,
     pageSize,
     search,
@@ -167,14 +185,20 @@ export default function UsersDirectoryPage() {
   ])
 
   useEffect(() => {
-    void load()
-  }, [load])
+    if (error) toast.error(error)
+  }, [error])
+
+  useEffect(() => {
+    setSearchInput(search)
+  }, [search])
+
+  const resetPage = () => dispatch(setUsersPage({ page: 1 }))
 
   const scheduleSearch = value => {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
     searchTimerRef.current = setTimeout(() => {
-      setSearch(value)
-      setPage(1)
+      dispatch(setUsersSearch(value))
+      resetPage()
       pushQuery({
         search: value,
         account_type: typeFilter,
@@ -200,7 +224,7 @@ export default function UsersDirectoryPage() {
     setLoginType(draft.login_type)
     setMinSessions(draft.min_sessions)
     setMaxSessions(draft.max_sessions)
-    setPage(1)
+    resetPage()
     pushQuery({
       search,
       account_type: typeFilter,
@@ -236,7 +260,7 @@ export default function UsersDirectoryPage() {
     setLoginType('')
     setMinSessions('')
     setMaxSessions('')
-    setPage(1)
+    resetPage()
     pushQuery({
       search,
       account_type: typeFilter,
@@ -257,7 +281,7 @@ export default function UsersDirectoryPage() {
 
   const setType = value => {
     setTypeFilter(value)
-    setPage(1)
+    resetPage()
     pushQuery({
       search,
       account_type: value,
@@ -268,7 +292,7 @@ export default function UsersDirectoryPage() {
 
   const setStatus = value => {
     setStatusFilter(value)
-    setPage(1)
+    resetPage()
     pushQuery({
       search,
       account_type: typeFilter,
@@ -306,7 +330,7 @@ export default function UsersDirectoryPage() {
     try {
       await deleteUser(id)
       toast.success('User deleted')
-      void load()
+      void reload()
     } catch (err) {
       toast.error(err?.message || 'Delete failed')
     }
@@ -401,14 +425,14 @@ export default function UsersDirectoryPage() {
           category={category}
           loginType={loginType}
           setFiltersOpen={setFiltersOpen}
-          setPage={setPage}
+          setPage={p => dispatch(setUsersPage({ page: p }))}
           setDraft={setDraft}
           setFromDate={setFromDate}
           setToDate={setToDate}
           searchInput={searchInput}
           setSearchInput={setSearchInput}
           scheduleSearch={scheduleSearch}
-          load={load}
+          load={reload}
           loading={loading}
           total={total}
           filtersOpen={filtersOpen}
@@ -420,7 +444,7 @@ export default function UsersDirectoryPage() {
           columns={columns}
           page={page}
           pageSize={pageSize}
-          setPageSize={setPageSize}
+          setPageSize={s => dispatch(setUsersPage({ limit: s }))}
           router={router}
         />
       </AdminPageShell>

@@ -31,7 +31,6 @@ const ConnectAccountsPage = () => {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
   const [searchQ, setSearchQ] = useState('')
-  const [kycFilter, setKycFilter] = useState('all')
   const pageSize = 50
 
   const load = useCallback(async () => {
@@ -50,15 +49,6 @@ const ConnectAccountsPage = () => {
   useEffect(() => {
     void load()
   }, [load])
-
-  const kycVerified = useMemo(() => rows.filter(r => r.is_kyc_completed).length, [rows])
-  const kycPending = useMemo(() => rows.filter(r => !r.is_kyc_completed).length, [rows])
-
-  const filteredRows = useMemo(() => {
-    if (kycFilter === 'verified') return rows.filter(r => r.is_kyc_completed)
-    if (kycFilter === 'incomplete') return rows.filter(r => !r.is_kyc_completed)
-    return rows
-  }, [rows, kycFilter])
 
   const cols = useMemo(
     () => [
@@ -86,24 +76,6 @@ const ConnectAccountsPage = () => {
         )
       },
       {
-        field: 'is_kyc_completed',
-        headerName: 'KYC',
-        width: 120,
-        renderCell: params => (
-          <Chip
-            size='small'
-            label={params.row.is_kyc_completed ? 'Verified' : 'Incomplete'}
-            sx={{
-              height: 22,
-              fontFamily: ops.mono,
-              fontSize: 10,
-              bgcolor: params.row.is_kyc_completed ? '#AAFFEC' : ops.softAmber,
-              color: params.row.is_kyc_completed ? '#1A8F76' : '#ab570a'
-            }}
-          />
-        )
-      },
-      {
         field: 'payout_preference',
         headerName: 'Payout pref',
         width: 140,
@@ -112,17 +84,6 @@ const ConnectAccountsPage = () => {
     ],
     []
   )
-
-  const chipSx = active => ({
-    borderRadius: ops.radiusPill,
-    textTransform: 'none',
-    fontSize: 13,
-    px: 2,
-    minHeight: 36,
-    color: active ? ops.onNight : ops.body,
-    bgcolor: active ? ops.ink : ops.canvas,
-    border: `1px solid ${active ? ops.ink : ops.hairline}`
-  })
 
   return (
     <AdminPageShell
@@ -139,38 +100,15 @@ const ConnectAccountsPage = () => {
       }
     >
       <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
-        <Grid item xs={6} sm={3}>
-          <OpsMetricTile icon='mdi:bank' label='Accounts' value={fmtInt(total)} hint='Matching search' tone='accent' />
+        <Grid item xs={12} sm={6}>
+          <OpsMetricTile icon='mdi:bank' label='Connect accounts' value={fmtInt(total)} hint='Matching search' tone='accent' />
         </Grid>
-        <Grid item xs={6} sm={3}>
-          <OpsMetricTile icon='mdi:check-decagram' label='KYC verified' value={fmtInt(kycVerified)} hint='Current page' tone='success' />
-        </Grid>
-        <Grid item xs={6} sm={3}>
-          <OpsMetricTile
-            icon='mdi:alert-outline'
-            label='KYC incomplete'
-            value={fmtInt(kycPending)}
-            hint='Current page'
-            tone={kycPending > 0 ? 'warn' : 'default'}
-          />
-        </Grid>
-        <Grid item xs={6} sm={3}>
-          <OpsMetricTile icon='mdi:filter' label='View' value={kycFilter} hint='Chip filter' />
+        <Grid item xs={12} sm={6}>
+          <OpsMetricTile icon='mdi:page-layout-body' label='This page' value={fmtInt(rows.length)} hint={`Up to ${pageSize} rows`} />
         </Grid>
       </Grid>
 
       <OpsSurfaceCard sx={{ p: { xs: 2, sm: 3 } }}>
-        <Stack direction='row' spacing={0.75} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
-          {[
-            ['all', 'All'],
-            ['verified', 'KYC verified'],
-            ['incomplete', 'KYC incomplete']
-          ].map(([key, label]) => (
-            <Button key={key} onClick={() => setKycFilter(key)} sx={chipSx(kycFilter === key)}>
-              {label}
-            </Button>
-          ))}
-        </Stack>
         <AdminFilterBar
           searchPlaceholder='Search name, email, or account id'
           searchValue={searchQ}
@@ -185,7 +123,7 @@ const ConnectAccountsPage = () => {
         />
         <AdminGridContainer>
           <AdminDataGrid
-            rows={filteredRows}
+            rows={rows}
             columns={cols}
             loading={loading}
             getRowId={row => row._id}
@@ -199,7 +137,7 @@ const ConnectAccountsPage = () => {
               '& .MuiDataGrid-cell': { border: 'none' }
             }}
             emptyMessage='No Connect accounts'
-            emptyDescription='Try a broader search or clear KYC filter.'
+            emptyDescription='Try a broader search.'
           />
         </AdminGridContainer>
       </OpsSurfaceCard>

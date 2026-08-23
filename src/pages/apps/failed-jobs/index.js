@@ -36,22 +36,19 @@ export default function FailedJobsPage() {
     setLoading(true)
     setError('')
     try {
-      const data = await listFailedJobs(Math.max(pageSize, 50))
+      const data = await listFailedJobs({
+        limit: Math.max(pageSize, 50),
+        search: search.trim(),
+        queue: ''
+      })
       setAvailable(data.available)
-      let list = data.rows
-      const s = search.trim().toLowerCase()
-      if (s) {
-        list = list.filter(
-          r =>
-            r.queue?.toLowerCase().includes(s) ||
-            r.name?.toLowerCase().includes(s) ||
-            r.failedReason?.toLowerCase().includes(s) ||
-            String(r.jobId).includes(s)
-        )
-      }
-      setTotal(list.length)
+      setTotal(data.total)
       const start = page * pageSize
-      setRows(list.slice(start, start + pageSize).map(r => ({ ...r, why: whyFailed(r.queue, r.failedReason) })))
+      setRows(
+        data.rows
+          .slice(start, start + pageSize)
+          .map(r => ({ ...r, why: whyFailed(r.queue, r.failedReason) }))
+      )
     } catch (e) {
       setError(e?.message || 'Failed to load jobs')
       setRows([])

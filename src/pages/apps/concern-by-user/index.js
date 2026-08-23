@@ -1,7 +1,9 @@
 import { Chip, Grid, Link as MuiLink, Stack, Typography } from '@mui/material'
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import moment from 'moment'
+import toast from 'react-hot-toast'
 
 import {
   AdminDataGrid,
@@ -11,55 +13,71 @@ import {
   OpsSurfaceCard
 } from 'src/components/admin'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
-import { useCommon } from 'src/hooks/useCommon'
 import { updateTicketBaseUrl } from 'src/utils/utils'
 import TicketStatusComponent from 'src/pages/components/ticket-status'
 import { ops } from 'src/styles/opsSurface'
+import { useAppDispatch, useAppSelector } from 'src/store/hooks'
+import { useAdminListUrlSync } from 'src/hooks/useAdminListUrlSync'
+import {
+  fetchRaiseConcern,
+  selectRaiseConcern,
+  setRaiseConcernFilters,
+  setRaiseConcernPage,
+  setRaiseConcernSearch
+} from 'src/store/slices/supportSlice'
 
 const fmtInt = v => new Intl.NumberFormat('en-US').format(Number(v) || 0)
 
 export default function ConcernByUsers() {
-  const common = useCommon()
-  const [search, setSearch] = React.useState('')
-  const [reasonFilter, setReasonFilter] = React.useState('')
-  const { concernByUsers, getConcernByUsers } = common
+  const router = useRouter()
+  const dispatch = useAppDispatch()
+  const { items, total, page, limit, search, filters, counts, loading, error } =
+    useAppSelector(selectRaiseConcern)
+  const searchTimer = useRef(null)
+  const [searchInput, setSearchInput] = useState('')
+  const reasonFilter = filters.reason || ''
+
+  const { pushQuery } = useAdminListUrlSync({
+    router,
+    pathname: '/apps/concern-by-user',
+    queryMap: { reason: 'reason' },
+    onHydrate: values => {
+      if (values.search) {
+        setSearchInput(values.search)
+        dispatch(setRaiseConcernSearch(values.search))
+      }
+      if (values.reason) dispatch(setRaiseConcernFilters({ reason: values.reason }))
+      if (values.page) dispatch(setRaiseConcernPage({ page: Number(values.page) }))
+    }
+  })
 
   useEffect(() => {
-    getConcernByUsers()
-  }, [])
+    setSearchInput(search)
+  }, [search])
 
-  const filteredRows = useMemo(() => {
-    let rows = concernByUsers ?? []
-    if (reasonFilter) {
-      rows = rows.filter(row => String(row.reason ?? '') === reasonFilter)
-    }
-    const q = search.trim().toLowerCase()
-    if (!q) return rows
-    return rows.filter(row => {
-      const hay = [
-        row.name,
-        row.email,
-        row.subject,
-        row.reason,
-        row.description,
-        row.user_info?.email,
-        row.user_info?.fullName
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
-      return hay.includes(q)
-    })
-  }, [concernByUsers, search, reasonFilter])
+  useEffect(() => {
+    void dispatch(fetchRaiseConcern())
+  }, [dispatch, page, limit, search, reasonFilter])
 
-  const refundRelated = useMemo(
-    () => (concernByUsers ?? []).filter(r => r.is_releted_to_refund).length,
-    [concernByUsers]
-  )
-  const coachLeft = useMemo(
-    () => (concernByUsers ?? []).filter(r => r.reason === 'coach_left_session').length,
-    [concernByUsers]
-  )
+  useEffect(() => {
+    if (error) toast.error(error)
+  }, [error])
+
+  const reload = () => void dispatch(fetchRaiseConcern())
+
+  const scheduleSearch = value => {
+    setSearchInput(value)
+    if (searchTimer.current) clearTimeout(searchTimer.current)
+    searchTimer.current = setTimeout(() => {
+      dispatch(setRaiseConcernSearch(value.trim()))
+      pushQuery({ search: value.trim(), reason: reasonFilter, page: 1 })
+    }, 400)
+  }
+
+  const setReason = reason => {
+    dispatch(setRaiseConcernFilters({ reason }))
+    pushQuery({ search, reason, page: 1 })
+  }
 
   const columns = [
     {
@@ -96,7 +114,7 @@ export default function ConcernByUsers() {
       headerName: 'Refund',
       width: 90,
       renderCell: p =>
-        p.value ? (
+        p.value === 'yes' || p.value === true ? (
           <Chip size='small' label='Yes' sx={{ height: 22, fontSize: 10, bgcolor: '#ffefcf', color: '#ab570a' }} />
         ) : (
           '—'
@@ -125,9 +143,7 @@ export default function ConcernByUsers() {
       sortable: false,
       renderCell: p => (
         <Typography sx={{ fontFamily: ops.mono, fontSize: 11 }} noWrap>
-          {p.row?.booking_details?._id
-            ? String(p.row.booking_details._id).slice(0, 10) + '…'
-            : '—'}
+          {p.row?.booking_details?._id ? String(p.row.booking_details._id).slice(0, 10) + '…' : '—'}
         </Typography>
       )
     },
@@ -145,7 +161,7 @@ export default function ConcernByUsers() {
       headerName: 'Status',
       width: 180,
       renderCell: params => (
-        <TicketStatusComponent params={params} base={updateTicketBaseUrl.raise_concern} cb={getConcernByUsers} />
+        <TicketStatusComponent params={params} base={updateTicketBaseUrl.raise_concern} cb={reload} />
       )
     }
   ]
@@ -173,7 +189,7 @@ export default function ConcernByUsers() {
           <OpsMetricTile
             icon='mdi:lifebuoy'
             label='Total'
-            value={fmtInt((concernByUsers ?? []).length)}
+            value={fmtInt(counts?.total)}
             hint='All concerns'
             tone='accent'
           />
@@ -182,22 +198,22 @@ export default function ConcernByUsers() {
           <OpsMetricTile
             icon='mdi:cash-refund'
             label='Refund related'
-            value={fmtInt(refundRelated)}
+            value={fmtInt(counts?.refund_related)}
             hint='Flagged'
-            tone={refundRelated > 0 ? 'warn' : 'default'}
+            tone={(counts?.refund_related || 0) > 0 ? 'warn' : 'default'}
           />
         </Grid>
         <Grid item xs={6} sm={3}>
           <OpsMetricTile
             icon='mdi:account-arrow-left'
             label='Coach left'
-            value={fmtInt(coachLeft)}
+            value={fmtInt(counts?.coach_left)}
             hint='Reason filter'
-            onClick={() => setReasonFilter('coach_left_session')}
+            onClick={() => setReason('coach_left_session')}
           />
         </Grid>
         <Grid item xs={6} sm={3}>
-          <OpsMetricTile icon='mdi:filter-variant' label='Showing' value={fmtInt(filteredRows.length)} hint='After filters' />
+          <OpsMetricTile icon='mdi:filter-variant' label='Matching' value={fmtInt(total)} hint='After filters' />
         </Grid>
       </Grid>
 
@@ -205,17 +221,17 @@ export default function ConcernByUsers() {
         <AdminPageSection>
           <AdminFilterBar
             searchPlaceholder='Name, email, subject, reason…'
-            searchValue={search}
-            onSearchChange={e => setSearch(e.target.value)}
-            onRefresh={() => getConcernByUsers()}
-            resultCount={filteredRows.length}
-            helperText='Update status inline. Open User 360 for full context.'
+            searchValue={searchInput}
+            onSearchChange={e => scheduleSearch(e.target.value)}
+            onRefresh={reload}
+            resultCount={total}
+            helperText='Server-paginated. Update status inline. Open User 360 for full context.'
           >
             <Chip
               size='small'
               clickable
               label='All reasons'
-              onClick={() => setReasonFilter('')}
+              onClick={() => setReason('')}
               sx={{
                 height: 28,
                 fontFamily: ops.mono,
@@ -228,10 +244,8 @@ export default function ConcernByUsers() {
             <Chip
               size='small'
               clickable
-              label={`Coach left · ${fmtInt(coachLeft)}`}
-              onClick={() =>
-                setReasonFilter(prev => (prev === 'coach_left_session' ? '' : 'coach_left_session'))
-              }
+              label={`Coach left · ${fmtInt(counts?.coach_left)}`}
+              onClick={() => setReason(reasonFilter === 'coach_left_session' ? '' : 'coach_left_session')}
               sx={{
                 height: 28,
                 fontFamily: ops.mono,
@@ -245,10 +259,19 @@ export default function ConcernByUsers() {
           <AdminGridContainer>
             <AdminDataGrid
               autoHeight={false}
-              rows={filteredRows}
+              rows={items}
               columns={columns}
+              loading={loading}
               getRowHeight={() => 64}
               emptyMessage='No tickets match'
+              paginationMode='server'
+              rowCount={total}
+              paginationModel={{ page: page - 1, pageSize: limit }}
+              onPaginationModelChange={m => {
+                dispatch(setRaiseConcernPage({ page: m.page + 1, limit: m.pageSize }))
+                pushQuery({ search, reason: reasonFilter, page: m.page + 1 })
+              }}
+              pageSizeOptions={[10, 25, 50]}
             />
           </AdminGridContainer>
         </AdminPageSection>

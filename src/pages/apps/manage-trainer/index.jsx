@@ -31,78 +31,75 @@ import TrainerStatus from 'src/pages/components/trainer-status'
 import MModal from 'src/pages/components/modal/Modal'
 import AddEditCommision from 'src/pages/components/add-edit-commision'
 import { getUser360 } from 'src/services/user360Api'
-import { deleteUser, listUsers } from 'src/services/userAdminApi'
+import { deleteUser } from 'src/services/userAdminApi'
 import { getImageUrl } from 'src/utils/utils'
 import { formatOpsDateTime } from 'src/utils/opsDateTime'
 import { ops } from 'src/styles/opsSurface'
 import { FilterChip, fmtInt, STATUS_CHIPS } from 'src/features/users/chips'
+import { useAppDispatch, useAppSelector } from 'src/store/hooks'
+import {
+  fetchUsersList,
+  selectUsersList,
+  setUsersFilters,
+  setUsersPage,
+  setUsersSearch
+} from 'src/store/slices/usersListSlice'
 
 export default function ManageTrainer() {
   const router = useRouter()
+  const dispatch = useAppDispatch()
   const searchTimerRef = useRef(null)
   const { confirm, ConfirmDialog } = useAdminConfirm()
 
-  const kycQuery = router.isReady ? String(router.query?.kyc || '') : ''
-  const kycFilter = kycQuery === 'incomplete' || kycQuery === '0' ? 'incomplete' : ''
+  const statusQuery = router.isReady ? String(router.query?.status || '').toLowerCase() : ''
+  const { items: rows, total, counts, loading, page, limit: pageSize, search, filters, error } =
+    useAppSelector(selectUsersList)
+  const statusFilter = filters.status || ''
 
-  const [rows, setRows] = useState([])
-  const [total, setTotal] = useState(0)
-  const [counts, setCounts] = useState(null)
-  const [loading, setLoading] = useState(false)
   const [searchInput, setSearchInput] = useState('')
-  const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState('')
-  const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(25)
-
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewLoading, setPreviewLoading] = useState(false)
   const [previewData, setPreviewData] = useState({})
   const [previewUserId, setPreviewUserId] = useState(null)
   const [commissionId, setCommissionId] = useState(null)
 
-  const load = useCallback(async () => {
-    if (!router.isReady) return
-    setLoading(true)
-    try {
-      const data = await listUsers({
-        page,
-        limit: pageSize,
-        search,
-        account_type: 'trainer',
-        status: statusFilter,
-        kyc: kycFilter
-      })
-      setRows(data.items)
-      setTotal(data.total)
-      setCounts(data.counts)
-    } catch (e) {
-      toast.error(e?.message || 'Failed to load trainers')
-      setRows([])
-      setTotal(0)
-    } finally {
-      setLoading(false)
-    }
-  }, [router.isReady, page, pageSize, search, statusFilter, kycFilter])
+  const reload = useCallback(
+    () => void dispatch(fetchUsersList({ account_type: 'trainer' })),
+    [dispatch]
+  )
 
   useEffect(() => {
-    void load()
-  }, [load])
+    if (!router.isReady) return
+    const st = ['pending', 'approved', 'rejected'].includes(statusQuery) ? statusQuery : ''
+    dispatch(setUsersFilters({ account_type: 'trainer', status: st }))
+  }, [router.isReady, statusQuery, dispatch])
+
+  useEffect(() => {
+    if (!router.isReady) return
+    void dispatch(fetchUsersList({ account_type: 'trainer' }))
+  }, [dispatch, router.isReady, page, pageSize, search, statusFilter])
+
+  useEffect(() => {
+    if (error) toast.error(error)
+  }, [error])
+
+  useEffect(() => {
+    setSearchInput(search)
+  }, [search])
+
+  const setStatus = value => {
+    const query = { ...router.query }
+    if (value) query.status = value
+    else delete query.status
+    void router.push({ pathname: router.pathname, query }, undefined, { shallow: true })
+    dispatch(setUsersFilters({ status: value }))
+  }
 
   const scheduleSearch = value => {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
     searchTimerRef.current = setTimeout(() => {
-      setSearch(value)
-      setPage(1)
+      dispatch(setUsersSearch(value))
     }, 400)
-  }
-
-  const setKyc = incomplete => {
-    const query = { ...router.query }
-    if (incomplete) query.kyc = 'incomplete'
-    else delete query.kyc
-    void router.push({ pathname: router.pathname, query }, undefined, { shallow: true })
-    setPage(1)
   }
 
   const openPreview = async (e, id) => {
@@ -134,7 +131,7 @@ export default function ManageTrainer() {
     try {
       await deleteUser(id)
       toast.success('Trainer deleted')
-      void load()
+      void reload()
     } catch (err) {
       toast.error(err?.message || 'Delete failed')
     }
@@ -178,28 +175,8 @@ export default function ManageTrainer() {
         sortable: false,
         renderCell: p => (
           <Box onClick={e => e.stopPropagation()}>
-            <TrainerStatus params={p} cb={() => void load()} />
+            <TrainerStatus params={p} cb={reload} />
           </Box>
-        )
-      },
-      {
-        field: 'kyc',
-        headerName: 'KYC',
-        width: 110,
-        sortable: false,
-        renderCell: p => (
-          <Chip
-            size='small'
-            label={p.row.is_kyc_completed ? 'Complete' : 'Incomplete'}
-            sx={{
-              height: 22,
-              fontFamily: ops.mono,
-              fontSize: 10,
-              fontWeight: 600,
-              bgcolor: p.row.is_kyc_completed ? ops.softMint : ops.errorSoft,
-              color: p.row.is_kyc_completed ? ops.live : ops.error
-            }}
-          />
         )
       },
       {
@@ -290,13 +267,8 @@ export default function ManageTrainer() {
         )
       }
     ],
-    [load]
+    [reload]
   )
-
-  const kycSubtitle =
-    kycFilter === 'incomplete'
-      ? 'Filtered: pending KYC (from ops home). Clear the KYC chip to see all trainers.'
-      : 'All trainer accounts. Search, filter status/KYC, click a row for User 360.'
 
   return (
     <>
@@ -316,7 +288,7 @@ export default function ManageTrainer() {
         icon='mdi:account-tie-outline'
         eyebrow='People'
         title='Trainers'
-        subtitle={kycSubtitle}
+        subtitle='All trainer accounts. Search, filter by status, click a row for User 360.'
         actions={
           <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
             <Chip component={Link} href='/apps/users' label='All users' clickable variant='outlined' size='small' />
@@ -349,20 +321,17 @@ export default function ManageTrainer() {
               value={counts ? fmtInt(counts.pending) : '—'}
               hint='Needs review'
               tone='warn'
-              onClick={() => {
-                setStatusFilter('pending')
-                setPage(1)
-              }}
+              onClick={() => setStatus('pending')}
             />
           </Grid>
           <Grid item xs={6} sm={3}>
             <OpsMetricTile
-              icon='mdi:shield-alert-outline'
-              label='KYC filter'
-              value={kycFilter === 'incomplete' ? 'On' : 'Off'}
-              hint='Incomplete Stripe/KYC'
-              tone={kycFilter === 'incomplete' ? 'warn' : 'success'}
-              onClick={() => setKyc(kycFilter !== 'incomplete')}
+              icon='mdi:account-check-outline'
+              label='Approved'
+              value={counts ? fmtInt(counts.approved) : '—'}
+              hint='Active trainers'
+              tone='success'
+              onClick={() => setStatus('approved')}
             />
           </Grid>
           <Grid item xs={6} sm={3}>
@@ -384,7 +353,7 @@ export default function ManageTrainer() {
                 setSearchInput(e.target.value)
                 scheduleSearch(e.target.value)
               }}
-              onRefresh={() => void load()}
+              onRefresh={reload}
               refreshLoading={loading}
               resultCount={total}
               helperText='Status and commission edit inline. Row click opens User 360.'
@@ -392,21 +361,12 @@ export default function ManageTrainer() {
               {STATUS_CHIPS.map(s => (
                 <FilterChip
                   key={s.value || 'any'}
-                  active={statusFilter === s.value && !kycFilter}
+                  active={statusFilter === s.value}
                   label={s.label}
                   count={s.value ? counts?.[s.value] : counts?.trainers}
-                  onClick={() => {
-                    setStatusFilter(s.value)
-                    if (kycFilter) setKyc(false)
-                    setPage(1)
-                  }}
+                  onClick={() => setStatus(s.value)}
                 />
               ))}
-              <FilterChip
-                active={kycFilter === 'incomplete'}
-                label='KYC incomplete'
-                onClick={() => setKyc(kycFilter !== 'incomplete')}
-              />
             </AdminFilterBar>
 
             <AdminGridContainer>
@@ -420,8 +380,7 @@ export default function ManageTrainer() {
                 paginationMode='server'
                 paginationModel={{ page: page - 1, pageSize }}
                 onPaginationModelChange={m => {
-                  setPage(m.page + 1)
-                  setPageSize(m.pageSize)
+                  dispatch(setUsersPage({ page: m.page + 1, limit: m.pageSize }))
                 }}
                 onRowClick={p => {
                   const id = p.row?.id || p.row?._id
@@ -429,7 +388,7 @@ export default function ManageTrainer() {
                 }}
                 clickableRows
                 emptyMessage='No trainers match'
-                emptyDescription='Try clearing status or KYC filters.'
+                emptyDescription='Try clearing status filters.'
               />
             </AdminGridContainer>
           </AdminPageSection>
@@ -438,10 +397,8 @@ export default function ManageTrainer() {
 
       <MModal handleClose={() => setCommissionId(null)} open={Boolean(commissionId)} maxWidth='xs'>
         <AddEditCommision
-          handleClose={() => {
-            setCommissionId(null)
-            void load()
-          }}
+          handleClose={() => setCommissionId(null)}
+          onSaved={reload}
           trainer_id={commissionId}
         />
       </MModal>

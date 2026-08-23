@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useRouter } from 'next/router'
 import { Box, Button, Chip, Drawer, Grid, Stack, TextField, Typography } from '@mui/material'
 import moment from 'moment'
 import toast from 'react-hot-toast'
@@ -11,65 +12,65 @@ import OpsMetricTile from 'src/components/admin/OpsMetricTile'
 import OpsSurfaceCard from 'src/components/admin/OpsSurfaceCard'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import { ops } from 'src/styles/opsSurface'
+import { approveTraineeAccount, rejectTraineeAccount } from 'src/services/clipsAdminApi'
+import { useAppDispatch, useAppSelector } from 'src/store/hooks'
+import { useAdminListUrlSync } from 'src/hooks/useAdminListUrlSync'
 import {
-  approveTraineeAccount,
-  getPendingTraineeAccounts,
-  rejectTraineeAccount
-} from 'src/services/clipsAdminApi'
+  fetchTraineeReviews,
+  selectTraineeReviews,
+  setTraineeReviewPage,
+  setTraineeReviewSearch
+} from 'src/store/slices/traineeReviewsSlice'
 
 const fmtInt = v => new Intl.NumberFormat('en-US').format(Number(v) || 0)
 
 export default function TraineeAccountReviewsPage() {
-  const [rows, setRows] = useState([])
-  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+  const dispatch = useAppDispatch()
+  const { items, total, page, limit, search, loading, error } = useAppSelector(selectTraineeReviews)
+  const searchTimer = useRef(null)
+  const [searchInput, setSearchInput] = useState('')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [detail, setDetail] = useState(null)
   const [rejectReason, setRejectReason] = useState('')
   const [acting, setActing] = useState(false)
-  const [searchInput, setSearchInput] = useState('')
-  const [search, setSearch] = useState('')
-  const searchTimer = useRef(null)
 
-  const load = useCallback(async () => {
-    setLoading(true)
-    try {
-      const data = await getPendingTraineeAccounts({ limit: 100 })
-      setRows(
-        (data?.items || []).map((r, i) => ({
-          id: r._id || i,
-          ...r,
-          submitted: r.updatedAt || r.createdAt
-        }))
-      )
-    } catch (e) {
-      toast.error(e?.message || 'Failed to load')
-      setRows([])
-    } finally {
-      setLoading(false)
+  const { pushQuery } = useAdminListUrlSync({
+    router,
+    pathname: '/apps/trainee-account-reviews',
+    queryMap: {},
+    onHydrate: values => {
+      if (values.search) {
+        setSearchInput(values.search)
+        dispatch(setTraineeReviewSearch(values.search))
+      }
+      if (values.page) dispatch(setTraineeReviewPage({ page: Number(values.page) }))
     }
-  }, [])
+  })
 
   useEffect(() => {
-    void load()
-  }, [load])
+    setSearchInput(search)
+  }, [search])
+
+  useEffect(() => {
+    void dispatch(fetchTraineeReviews())
+  }, [dispatch, page, limit, search])
+
+  useEffect(() => {
+    if (error) toast.error(error)
+  }, [error])
+
+  const reload = useCallback(() => void dispatch(fetchTraineeReviews()), [dispatch])
 
   const handleSearchChange = e => {
     const val = e.target.value
     setSearchInput(val)
     if (searchTimer.current) clearTimeout(searchTimer.current)
-    searchTimer.current = setTimeout(() => setSearch(val.trim().toLowerCase()), 300)
+    searchTimer.current = setTimeout(() => {
+      dispatch(setTraineeReviewSearch(val.trim()))
+      pushQuery({ search: val.trim(), page: 1 })
+    }, 300)
   }
-
-  const filtered = useMemo(() => {
-    if (!search) return rows
-    return rows.filter(r =>
-      [r.fullname, r.email, r.mobile_no, r.id]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
-        .includes(search)
-    )
-  }, [rows, search])
 
   const openDetail = row => {
     setDetail(row)
@@ -84,7 +85,7 @@ export default function TraineeAccountReviewsPage() {
       await approveTraineeAccount(detail.id)
       toast.success('Trainee approved')
       setDrawerOpen(false)
-      void load()
+      reload()
     } catch (e) {
       toast.error(e?.message || 'Approve failed')
     } finally {
@@ -102,7 +103,7 @@ export default function TraineeAccountReviewsPage() {
       await rejectTraineeAccount(detail.id, rejectReason.trim())
       toast.success('Trainee rejected')
       setDrawerOpen(false)
-      void load()
+      reload()
     } catch (e) {
       toast.error(e?.message || 'Reject failed')
     } finally {
@@ -110,22 +111,25 @@ export default function TraineeAccountReviewsPage() {
     }
   }
 
-  const columns = [
-    {
-      field: 'submitted',
-      headerName: 'Updated',
-      width: 170,
-      valueFormatter: p => (p.value ? moment(p.value).format('YYYY-MM-DD HH:mm') : '')
-    },
-    { field: 'fullname', headerName: 'Name', flex: 1, minWidth: 160 },
-    { field: 'email', headerName: 'Email', flex: 1, minWidth: 180 },
-    {
-      field: 'status',
-      headerName: 'Status',
-      width: 110,
-      renderCell: () => <Chip size='small' color='warning' label='Pending' />
-    }
-  ]
+  const columns = useMemo(
+    () => [
+      {
+        field: 'submitted',
+        headerName: 'Updated',
+        width: 170,
+        valueFormatter: p => (p.value ? moment(p.value).format('YYYY-MM-DD HH:mm') : '')
+      },
+      { field: 'fullname', headerName: 'Name', flex: 1, minWidth: 160 },
+      { field: 'email', headerName: 'Email', flex: 1, minWidth: 180 },
+      {
+        field: 'status',
+        headerName: 'Status',
+        width: 110,
+        renderCell: () => <Chip size='small' color='warning' label='Pending' />
+      }
+    ],
+    []
+  )
 
   return (
     <AdminPageShell
@@ -134,24 +138,24 @@ export default function TraineeAccountReviewsPage() {
       icon='mdi:account-clock-outline'
       title='Trainee account reviews.'
       subtitle='Review trainees who resubmitted after rejection or were set to pending.'
-      actions={<AdminRefreshButton onClick={() => void load()} loading={loading} />}
+      actions={<AdminRefreshButton onClick={reload} loading={loading} />}
     >
       <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
         <Grid item xs={6} sm={4}>
           <OpsMetricTile
             icon='mdi:account-clock'
             label='In queue'
-            value={fmtInt(rows.length)}
+            value={fmtInt(total)}
             hint='Awaiting review'
-            tone={rows.length > 0 ? 'warn' : 'default'}
+            tone={total > 0 ? 'warn' : 'default'}
           />
         </Grid>
         <Grid item xs={6} sm={4}>
           <OpsMetricTile
             icon='mdi:filter-outline'
-            label='Showing'
-            value={fmtInt(filtered.length)}
-            hint={search ? 'Filtered' : 'All pending'}
+            label='Page'
+            value={`${page}`}
+            hint={`${limit} per page`}
           />
         </Grid>
       </Grid>
@@ -163,20 +167,28 @@ export default function TraineeAccountReviewsPage() {
               searchPlaceholder='Search name, email, phone…'
               searchValue={searchInput}
               onSearchChange={handleSearchChange}
-              resultCount={filtered.length}
-              onRefresh={() => void load()}
+              resultCount={total}
+              onRefresh={reload}
               refreshLoading={loading}
             />
           </Box>
           <AdminGridContainer>
             <AdminDataGrid
               autoHeight={false}
-              rows={filtered}
+              rows={items}
               columns={columns}
               loading={loading}
               onRowClick={p => openDetail(p.row)}
               emptyMessage='No trainees awaiting review.'
               emptyDescription='Clear search or refresh the queue.'
+              paginationMode='server'
+              rowCount={total}
+              paginationModel={{ page: page - 1, pageSize: limit }}
+              onPaginationModelChange={m => {
+                dispatch(setTraineeReviewPage({ page: m.page + 1, limit: m.pageSize }))
+                pushQuery({ search, page: m.page + 1 })
+              }}
+              pageSizeOptions={[10, 30, 50]}
             />
           </AdminGridContainer>
         </OpsSurfaceCard>

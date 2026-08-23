@@ -1,6 +1,8 @@
 import { Chip, Grid, Link as MuiLink, Stack, Typography } from '@mui/material'
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import toast from 'react-hot-toast'
 
 import {
   AdminDataGrid,
@@ -10,44 +12,70 @@ import {
   OpsSurfaceCard
 } from 'src/components/admin'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
-import { useCommon } from 'src/hooks/useCommon'
 import { updateTicketBaseUrl } from 'src/utils/utils'
 import TicketStatusComponent from 'src/pages/components/ticket-status'
 import { ops } from 'src/styles/opsSurface'
+import { useAppDispatch, useAppSelector } from 'src/store/hooks'
+import { useAdminListUrlSync } from 'src/hooks/useAdminListUrlSync'
+import {
+  fetchWriteUs,
+  selectWriteUs,
+  setWriteUsFilters,
+  setWriteUsPage,
+  setWriteUsSearch
+} from 'src/store/slices/supportSlice'
 
 const fmtInt = v => new Intl.NumberFormat('en-US').format(Number(v) || 0)
 
 export default function WriteByUsers() {
-  const common = useCommon()
-  const [search, setSearch] = React.useState('')
-  const [statusFilter, setStatusFilter] = React.useState('')
-  const { writeByUsers, getWriteByUsers } = common
+  const router = useRouter()
+  const dispatch = useAppDispatch()
+  const { items, total, page, limit, search, filters, counts, loading, error } = useAppSelector(selectWriteUs)
+  const searchTimer = useRef(null)
+  const [searchInput, setSearchInput] = useState('')
+  const statusFilter = filters.status || ''
+
+  const { pushQuery } = useAdminListUrlSync({
+    router,
+    pathname: '/apps/write-by-user',
+    queryMap: { status: 'status' },
+    onHydrate: values => {
+      if (values.search) {
+        setSearchInput(values.search)
+        dispatch(setWriteUsSearch(values.search))
+      }
+      if (values.status) dispatch(setWriteUsFilters({ status: values.status }))
+      if (values.page) dispatch(setWriteUsPage({ page: Number(values.page) }))
+    }
+  })
 
   useEffect(() => {
-    getWriteByUsers()
-  }, [])
+    setSearchInput(search)
+  }, [search])
 
-  const filteredRows = useMemo(() => {
-    let rows = writeByUsers ?? []
-    if (statusFilter) {
-      rows = rows.filter(r => String(r.ticket_status || '').toLowerCase() === statusFilter)
-    }
-    const q = search.trim().toLowerCase()
-    if (!q) return rows
-    return rows.filter(row => {
-      const hay = [row.name, row.email, row.company, row.kind, row.subject, row.description, row.user_info?.email, row.user_info?.fullName]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
-      return hay.includes(q)
-    })
-  }, [writeByUsers, search, statusFilter])
+  useEffect(() => {
+    void dispatch(fetchWriteUs())
+  }, [dispatch, page, limit, search, statusFilter])
 
-  const openCount = useMemo(() => {
-    return (writeByUsers ?? []).filter(r =>
-      ['open', 'in_progress', 'pending'].includes(String(r.ticket_status || '').toLowerCase())
-    ).length
-  }, [writeByUsers])
+  useEffect(() => {
+    if (error) toast.error(error)
+  }, [error])
+
+  const reload = () => void dispatch(fetchWriteUs())
+
+  const scheduleSearch = value => {
+    setSearchInput(value)
+    if (searchTimer.current) clearTimeout(searchTimer.current)
+    searchTimer.current = setTimeout(() => {
+      dispatch(setWriteUsSearch(value.trim()))
+      pushQuery({ search: value.trim(), status: statusFilter, page: 1 })
+    }, 400)
+  }
+
+  const setStatus = value => {
+    dispatch(setWriteUsFilters({ status: value }))
+    pushQuery({ search, status: value, page: 1 })
+  }
 
   const columns = [
     {
@@ -131,7 +159,7 @@ export default function WriteByUsers() {
       headerName: 'Status',
       width: 180,
       renderCell: params => (
-        <TicketStatusComponent params={params} base={updateTicketBaseUrl.constact_us} cb={getWriteByUsers} />
+        <TicketStatusComponent params={params} base={updateTicketBaseUrl.write_us} cb={reload} />
       )
     }
   ]
@@ -159,7 +187,7 @@ export default function WriteByUsers() {
           <OpsMetricTile
             icon='mdi:inbox-outline'
             label='Total'
-            value={fmtInt((writeByUsers ?? []).length)}
+            value={fmtInt(counts?.total)}
             hint='All feedback'
             tone='accent'
           />
@@ -168,13 +196,13 @@ export default function WriteByUsers() {
           <OpsMetricTile
             icon='mdi:alert-circle-outline'
             label='Open-ish'
-            value={fmtInt(openCount)}
+            value={fmtInt(counts?.open)}
             hint='open / in_progress / pending'
-            tone={openCount > 0 ? 'warn' : 'success'}
+            tone={(counts?.open || 0) > 0 ? 'warn' : 'success'}
           />
         </Grid>
         <Grid item xs={12} sm={4}>
-          <OpsMetricTile icon='mdi:filter-variant' label='Showing' value={fmtInt(filteredRows.length)} hint='After filters' />
+          <OpsMetricTile icon='mdi:filter-variant' label='Matching' value={fmtInt(total)} hint='After filters' />
         </Grid>
       </Grid>
 
@@ -182,11 +210,11 @@ export default function WriteByUsers() {
         <AdminPageSection>
           <AdminFilterBar
             searchPlaceholder='Name, email, subject…'
-            searchValue={search}
-            onSearchChange={e => setSearch(e.target.value)}
-            onRefresh={() => getWriteByUsers()}
-            resultCount={filteredRows.length}
-            helperText='Update ticket status inline; changes sync to the user record.'
+            searchValue={searchInput}
+            onSearchChange={e => scheduleSearch(e.target.value)}
+            onRefresh={reload}
+            resultCount={total}
+            helperText='Server-paginated. Update ticket status inline; changes sync to the user record.'
           >
             {[
               { v: '', l: 'Any status' },
@@ -200,7 +228,7 @@ export default function WriteByUsers() {
                 size='small'
                 clickable
                 label={s.l}
-                onClick={() => setStatusFilter(s.v)}
+                onClick={() => setStatus(s.v)}
                 sx={{
                   height: 28,
                   fontFamily: ops.mono,
@@ -215,10 +243,19 @@ export default function WriteByUsers() {
           <AdminGridContainer>
             <AdminDataGrid
               autoHeight={false}
-              rows={filteredRows}
+              rows={items}
               columns={columns}
+              loading={loading}
               getRowHeight={() => 64}
               emptyMessage='No feedback match'
+              paginationMode='server'
+              rowCount={total}
+              paginationModel={{ page: page - 1, pageSize: limit }}
+              onPaginationModelChange={m => {
+                dispatch(setWriteUsPage({ page: m.page + 1, limit: m.pageSize }))
+                pushQuery({ search, status: statusFilter, page: m.page + 1 })
+              }}
+              pageSizeOptions={[10, 25, 50]}
             />
           </AdminGridContainer>
         </AdminPageSection>

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Box,
   Button,
@@ -44,6 +44,7 @@ import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPa
 import { slugify } from 'src/utils/slugify'
 import {
   listCmsPages,
+  getCmsPage,
   createCmsPage,
   updateCmsPage,
   toggleCmsPage,
@@ -118,51 +119,60 @@ function audienceChip(audience) {
 export default function CmsBlogPage() {
   const { confirm, ConfirmDialog } = useAdminConfirm()
   const [rows, setRows] = useState([])
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(25)
   const [summary, setSummary] = useState(null)
+  const [listCounts, setListCounts] = useState(null)
   const [loading, setLoading] = useState(false)
   const [typeFilter, setTypeFilter] = useState('')
-  const [statusFilter, setStatusFilter] = useState('') // '' | active | inactive
+  const [statusFilter, setStatusFilter] = useState('')
   const [open, setOpen] = useState(false)
   const [editId, setEditId] = useState(null)
   const [form, setForm] = useState({ ...EMPTY })
   const [saving, setSaving] = useState(false)
   const [previewRow, setPreviewRow] = useState(null)
+  const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [slugTouched, setSlugTouched] = useState(false)
-
-  const filteredRows = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    return rows.filter(r => {
-      if (statusFilter === 'active' && !r.is_active) return false
-      if (statusFilter === 'inactive' && r.is_active) return false
-      if (!q) return true
-      return (
-        String(r.title || '').toLowerCase().includes(q) ||
-        String(r.slug || '').toLowerCase().includes(q) ||
-        String(r.excerpt || '').toLowerCase().includes(q)
-      )
-    })
-  }, [rows, search, statusFilter])
+  const searchTimer = useRef(null)
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
       const [res, sum] = await Promise.all([
-        listCmsPages(typeFilter || undefined),
+        listCmsPages({
+          page,
+          limit: pageSize,
+          type: typeFilter || undefined,
+          status: statusFilter || undefined,
+          search: search.trim() || undefined
+        }),
         getCmsSummary().catch(() => null)
       ])
-      setRows(res.data || [])
-      setSummary(sum?.data || null)
+      setRows(res.items || [])
+      setTotal(res.total || 0)
+      setListCounts(res.counts)
+      setSummary(sum?.data || sum || null)
     } catch (e) {
       toast.error(e.message || 'Failed to load pages')
     } finally {
       setLoading(false)
     }
-  }, [typeFilter])
+  }, [page, pageSize, typeFilter, statusFilter, search])
 
   useEffect(() => {
-    load()
+    void load()
   }, [load])
+
+  const scheduleSearch = value => {
+    setSearchInput(value)
+    if (searchTimer.current) clearTimeout(searchTimer.current)
+    searchTimer.current = setTimeout(() => {
+      setSearch(value)
+      setPage(1)
+    }, 400)
+  }
 
   const openCreate = () => {
     setEditId(null)
@@ -171,29 +181,35 @@ export default function CmsBlogPage() {
     setOpen(true)
   }
 
-  const openEdit = row => {
+  const openEdit = async row => {
     setEditId(row._id)
-    const pub = row.published_at ? String(row.published_at).slice(0, 10) : ''
     setSlugTouched(true)
-    setForm({
-      type: row.type === 'page' ? 'page' : 'blog',
-      title: row.title || '',
-      slug: row.slug || '',
-      excerpt: row.excerpt || '',
-      body_html: row.body_html || '',
-      cover_image_url: row.cover_image_url || '',
-      video_url: row.video_url || '',
-      cta_label: row.cta_label || '',
-      cta_url: row.cta_url || '',
-      audience: Array.isArray(row.audience) && row.audience.length ? row.audience : ['all'],
-      sort_order: String(row.sort_order ?? 0),
-      published_at: pub,
-      is_active: row.is_active !== false,
-      seo_title: row.seo_title || '',
-      seo_description: row.seo_description || '',
-      og_image_url: row.og_image_url || ''
-    })
     setOpen(true)
+    try {
+      const detail = await getCmsPage(row._id)
+      const pub = detail?.published_at ? String(detail.published_at).slice(0, 10) : ''
+      setForm({
+        type: detail?.type === 'page' ? 'page' : 'blog',
+        title: detail?.title || '',
+        slug: detail?.slug || '',
+        excerpt: detail?.excerpt || '',
+        body_html: detail?.body_html || '',
+        cover_image_url: detail?.cover_image_url || '',
+        video_url: detail?.video_url || '',
+        cta_label: detail?.cta_label || '',
+        cta_url: detail?.cta_url || '',
+        audience: Array.isArray(detail?.audience) && detail.audience.length ? detail.audience : ['all'],
+        sort_order: String(detail?.sort_order ?? 0),
+        published_at: pub,
+        is_active: detail?.is_active !== false,
+        seo_title: detail?.seo_title || '',
+        seo_description: detail?.seo_description || '',
+        og_image_url: detail?.og_image_url || ''
+      })
+    } catch (e) {
+      toast.error(e?.message || 'Failed to load page detail')
+      setOpen(false)
+    }
   }
 
   const handleSave = async () => {
@@ -363,9 +379,8 @@ export default function CmsBlogPage() {
     }
   ]
 
-  const blogCount = rows.filter(r => r.type === 'blog').length
-  const pageCount = rows.filter(r => r.type === 'page').length
-  const liveCount = rows.filter(r => r.is_active).length
+  const blogCount = listCounts?.blog_live ?? 0
+  const pageCount = listCounts?.page_live ?? 0
 
   return (
     <>
@@ -415,18 +430,8 @@ export default function CmsBlogPage() {
             <OpsMetricTile
               icon='mdi:check-circle-outline'
               label='Active in list'
-              value={fmtInt(liveCount)}
-              hint='is_active'
-              tone='success'
-              onClick={() => setStatusFilter('active')}
-            />
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <OpsMetricTile
-              icon='mdi:filter-variant'
-              label='Showing'
-              value={fmtInt(filteredRows.length)}
-              hint='After filters'
+              value={fmtInt(total)}
+              hint='Matching filters'
             />
           </Grid>
         </Grid>
@@ -436,36 +441,82 @@ export default function CmsBlogPage() {
             <ContentPlacementGuide kind='blog' defaultExpanded={false} />
             <AdminFilterBar
               searchPlaceholder='Title, slug, excerpt…'
-              searchValue={search}
-              onSearchChange={e => setSearch(e.target.value)}
+              searchValue={searchInput}
+              onSearchChange={e => scheduleSearch(e.target.value)}
               onRefresh={() => void load()}
               refreshLoading={loading}
-              resultCount={filteredRows.length}
-              helperText='Row click opens the editor. Type chips sync the server list.'
+              resultCount={total}
+              helperText='Server-paginated. Row click fetches full HTML for the editor.'
             >
-              <FilterChip active={typeFilter === ''} label='All types' onClick={() => setTypeFilter('')} />
-              <FilterChip active={typeFilter === 'blog'} label='Blog' onClick={() => setTypeFilter('blog')} />
-              <FilterChip active={typeFilter === 'page'} label='Page' onClick={() => setTypeFilter('page')} />
-              <FilterChip active={statusFilter === ''} label='Any status' onClick={() => setStatusFilter('')} />
-              <FilterChip active={statusFilter === 'active'} label='Active' onClick={() => setStatusFilter('active')} />
+              <FilterChip
+                active={typeFilter === ''}
+                label='All types'
+                onClick={() => {
+                  setTypeFilter('')
+                  setPage(1)
+                }}
+              />
+              <FilterChip
+                active={typeFilter === 'blog'}
+                label='Blog'
+                onClick={() => {
+                  setTypeFilter('blog')
+                  setPage(1)
+                }}
+              />
+              <FilterChip
+                active={typeFilter === 'page'}
+                label='Page'
+                onClick={() => {
+                  setTypeFilter('page')
+                  setPage(1)
+                }}
+              />
+              <FilterChip
+                active={statusFilter === ''}
+                label='Any status'
+                onClick={() => {
+                  setStatusFilter('')
+                  setPage(1)
+                }}
+              />
+              <FilterChip
+                active={statusFilter === 'active'}
+                label='Active'
+                onClick={() => {
+                  setStatusFilter('active')
+                  setPage(1)
+                }}
+              />
               <FilterChip
                 active={statusFilter === 'inactive'}
                 label='Inactive'
-                onClick={() => setStatusFilter('inactive')}
+                onClick={() => {
+                  setStatusFilter('inactive')
+                  setPage(1)
+                }}
               />
             </AdminFilterBar>
             <AdminGridContainer>
               <AdminDataGrid
                 autoHeight={false}
-                rows={filteredRows}
+                rows={rows}
                 columns={columns}
                 loading={loading}
                 getRowId={r => r._id}
                 getRowHeight={() => 64}
-                onRowClick={p => openEdit(p.row)}
+                onRowClick={p => void openEdit(p.row)}
                 clickableRows
                 emptyMessage='No pages match'
                 emptyDescription='Try clearing type or status chips.'
+                paginationMode='server'
+                rowCount={total}
+                paginationModel={{ page: page - 1, pageSize }}
+                onPaginationModelChange={m => {
+                  setPage(m.page + 1)
+                  setPageSize(m.pageSize)
+                }}
+                pageSizeOptions={[10, 25, 50]}
               />
             </AdminGridContainer>
           </AdminPageSection>

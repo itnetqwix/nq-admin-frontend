@@ -74,6 +74,16 @@ export async function deleteClipSubcategory(id) {
   return parseJson(res)
 }
 
+export async function listLibraryClipsPaged({ page = 1, limit = 24, search = '', category_id = '' } = {}) {
+  const params = new URLSearchParams()
+  params.set('page', String(page))
+  params.set('limit', String(limit))
+  if (search) params.set('search', search)
+  if (category_id) params.set('category_id', category_id)
+  const res = await fetch(api(`/admin/library/clips?${params}`), { headers: headers() })
+  return parseJson(res)
+}
+
 export async function getLibraryClipsGrouped() {
   const res = await fetch(api('/admin/library/clips'), { headers: headers() })
   return parseJson(res)

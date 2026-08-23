@@ -34,7 +34,6 @@ import Spinner from 'src/@core/components/spinner'
 // ** Contexts
 import { AuthProvider } from 'src/context/AuthContext'
 import { AdminRealtimeProvider } from 'src/context/AdminRealtimeContext'
-import { CommonProvider } from 'src/context/CommonContext'
 import { SettingsConsumer, SettingsProvider } from 'src/@core/context/settingsContext'
 import { Provider as ReduxProvider } from 'react-redux'
 import { store } from 'src/store'
@@ -123,7 +122,6 @@ const App = props => {
       <ReduxProvider store={store}>
       <AuthProvider>
         <AdminRealtimeProvider>
-        <CommonProvider>
           <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>
             <SettingsConsumer>
               {({ settings }) => {
@@ -142,7 +140,6 @@ const App = props => {
               }}
             </SettingsConsumer>
           </SettingsProvider>
-        </CommonProvider>
         </AdminRealtimeProvider>
       </AuthProvider>
       </ReduxProvider>

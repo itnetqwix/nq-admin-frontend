@@ -9,21 +9,6 @@ const headers = () => {
   }
 }
 
-async function fetchUserList(path, search = '') {
-  const base = getApiBaseUrl()
-  if (!base) throw new Error('API base URL is not configured')
-  const qs = search?.trim() ? `?search=${encodeURIComponent(search.trim())}` : ''
-  const res = await fetch(`${base}${path}${qs}`, { headers: headers() })
-  const data = await res.json()
-  if (!res.ok || data?.status === 'fail') {
-    throw new Error(data?.error || data?.message || 'Failed to load users')
-  }
-  return (data?.result || []).map(row => ({
-    ...row,
-    id: row._id || row.id
-  }))
-}
-
 /** Server-paginated unified user directory (trainers + trainees). */
 export async function listUsers({
   page = 1,
@@ -73,34 +58,40 @@ export async function listUsers({
   }
 }
 
-/** All trainer accounts for admin (pending / incomplete KYC included). Pages until exhausted. */
-export async function listTrainers(search = '', extra = {}) {
-  const all = []
-  let page = 1
-  let total = Infinity
-  while (all.length < total && page <= 50) {
-    const data = await listUsers({
-      page,
-      limit: 100,
-      search,
-      account_type: 'trainer',
-      kyc: extra.kyc || ''
-    })
-    all.push(...data.items)
-    total = Number(data.total) || 0
-    if (!data.items.length) break
-    page += 1
+export async function updateTrainerCommission(payload) {
+  const base = getApiBaseUrl()
+  if (!base) throw new Error('API base URL is not configured')
+  const trainerId = payload.trainer_id
+  const res = await fetch(`${base}/admin/users/${trainerId}/commission`, {
+    method: 'PUT',
+    headers: headers(),
+    body: JSON.stringify(payload)
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || data?.status === 'fail') {
+    throw new Error(data?.error || data?.message || 'Failed to update commission')
   }
-  return all
+  return data
 }
 
-export async function listTrainees(search) {
-  return fetchUserList('/user/get-all-trainee', search)
+export async function updateTrainerStatus(trainerId, status) {
+  const base = getApiBaseUrl()
+  if (!base) throw new Error('API base URL is not configured')
+  const res = await fetch(`${base}/admin/users/${trainerId}/status`, {
+    method: 'PATCH',
+    headers: headers(),
+    body: JSON.stringify({ status })
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || data?.status === 'fail') {
+    throw new Error(data?.error || data?.message || 'Failed to update status')
+  }
+  return data
 }
 
 export async function deleteUser(userId) {
   const base = getApiBaseUrl()
-  const res = await fetch(`${base}/user/delete-user/${userId}`, {
+  const res = await fetch(`${base}/admin/users/${userId}`, {
     method: 'DELETE',
     headers: headers()
   })

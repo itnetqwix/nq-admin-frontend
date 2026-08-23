@@ -30,23 +30,30 @@ import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPa
 import UserQuickPreviewModal from 'src/components/user360/UserQuickPreviewModal'
 import TraineeRejectActions from 'src/pages/components/trainee-reject/TraineeRejectActions'
 import { getUser360 } from 'src/services/user360Api'
-import { deleteUser, listUsers } from 'src/services/userAdminApi'
+import { deleteUser } from 'src/services/userAdminApi'
 import { getImageUrl } from 'src/utils/utils'
 import { formatOpsDateTime } from 'src/utils/opsDateTime'
 import { ops } from 'src/styles/opsSurface'
 import { FilterChip, fmtInt, STATUS_CHIPS, STATUS_TONE } from 'src/features/users/chips'
+import { useAppDispatch, useAppSelector } from 'src/store/hooks'
+import {
+  fetchUsersList,
+  selectUsersList,
+  setUsersFilters,
+  setUsersPage,
+  setUsersSearch
+} from 'src/store/slices/usersListSlice'
 
 export default function ManageTrainee() {
   const router = useRouter()
+  const dispatch = useAppDispatch()
   const searchTimerRef = useRef(null)
   const { confirm, ConfirmDialog } = useAdminConfirm()
 
-  const [rows, setRows] = useState([])
-  const [total, setTotal] = useState(0)
-  const [counts, setCounts] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const { items: rows, total, counts, loading, page, limit: pageSize, search, error } =
+    useAppSelector(selectUsersList)
+
   const [searchInput, setSearchInput] = useState('')
-  const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
@@ -60,8 +67,6 @@ export default function ManageTrainee() {
     min_sessions: '',
     max_sessions: ''
   })
-  const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(25)
   const [filtersOpen, setFiltersOpen] = useState(false)
 
   const [previewOpen, setPreviewOpen] = useState(false)
@@ -69,13 +74,29 @@ export default function ManageTrainee() {
   const [previewData, setPreviewData] = useState({})
   const [previewUserId, setPreviewUserId] = useState(null)
 
-  const load = useCallback(async () => {
-    setLoading(true)
-    try {
-      const data = await listUsers({
-        page,
-        limit: pageSize,
-        search,
+  const reload = useCallback(
+    () =>
+      void dispatch(
+        fetchUsersList({
+          account_type: 'trainee',
+          status: statusFilter,
+          country,
+          from: fromDate,
+          to: toDate,
+          min_sessions: minSessions,
+          max_sessions: maxSessions
+        })
+      ),
+    [dispatch, statusFilter, country, fromDate, toDate, minSessions, maxSessions]
+  )
+
+  useEffect(() => {
+    dispatch(setUsersFilters({ account_type: 'trainee' }))
+  }, [dispatch])
+
+  useEffect(() => {
+    void dispatch(
+      fetchUsersList({
         account_type: 'trainee',
         status: statusFilter,
         country,
@@ -84,27 +105,21 @@ export default function ManageTrainee() {
         min_sessions: minSessions,
         max_sessions: maxSessions
       })
-      setRows(data.items)
-      setTotal(data.total)
-      setCounts(data.counts)
-    } catch (e) {
-      toast.error(e?.message || 'Failed to load trainees')
-      setRows([])
-      setTotal(0)
-    } finally {
-      setLoading(false)
-    }
-  }, [page, pageSize, search, statusFilter, country, fromDate, toDate, minSessions, maxSessions])
+    )
+  }, [dispatch, page, pageSize, search, statusFilter, country, fromDate, toDate, minSessions, maxSessions])
 
   useEffect(() => {
-    void load()
-  }, [load])
+    if (error) toast.error(error)
+  }, [error])
+
+  useEffect(() => {
+    setSearchInput(search)
+  }, [search])
 
   const scheduleSearch = value => {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
     searchTimerRef.current = setTimeout(() => {
-      setSearch(value)
-      setPage(1)
+      dispatch(setUsersSearch(value))
     }, 400)
   }
 
@@ -114,7 +129,7 @@ export default function ManageTrainee() {
     setCountry(draft.country)
     setMinSessions(draft.min_sessions)
     setMaxSessions(draft.max_sessions)
-    setPage(1)
+    dispatch(setUsersPage({ page: 1 }))
   }
 
   const clearAdvanced = () => {
@@ -125,7 +140,7 @@ export default function ManageTrainee() {
     setCountry('')
     setMinSessions('')
     setMaxSessions('')
-    setPage(1)
+    dispatch(setUsersPage({ page: 1 }))
   }
 
   const openPreview = async (e, id) => {
@@ -157,7 +172,7 @@ export default function ManageTrainee() {
     try {
       await deleteUser(id)
       toast.success('Trainee deleted')
-      void load()
+      void reload()
     } catch (err) {
       toast.error(err?.message || 'Delete failed')
     }
@@ -217,7 +232,7 @@ export default function ManageTrainee() {
                 <TraineeRejectActions
                   userId={p.row.id || p.row._id}
                   status={p.row.status}
-                  onUpdated={() => void load()}
+                  onUpdated={reload}
                 />
               ) : null}
             </Stack>
@@ -300,7 +315,7 @@ export default function ManageTrainee() {
       }
     ],
     // load used in TraineeRejectActions callback
-    [load]
+    [reload]
   )
 
   return (
@@ -363,7 +378,7 @@ export default function ManageTrainee() {
               tone='warn'
               onClick={() => {
                 setStatusFilter('pending')
-                setPage(1)
+                dispatch(setUsersPage({ page: 1 }))
               }}
             />
           </Grid>
@@ -376,7 +391,7 @@ export default function ManageTrainee() {
               tone='success'
               onClick={() => {
                 setStatusFilter('approved')
-                setPage(1)
+                dispatch(setUsersPage({ page: 1 }))
               }}
             />
           </Grid>
@@ -394,7 +409,7 @@ export default function ManageTrainee() {
                 setFromDate(from)
                 setToDate(to)
                 setFiltersOpen(true)
-                setPage(1)
+                dispatch(setUsersPage({ page: 1 }))
               }}
             />
           </Grid>
@@ -409,7 +424,7 @@ export default function ManageTrainee() {
                 setSearchInput(e.target.value)
                 scheduleSearch(e.target.value)
               }}
-              onRefresh={() => void load()}
+              onRefresh={reload}
               refreshLoading={loading}
               resultCount={total}
               helperText='Approve / reject without leaving the list. Row click opens User 360.'
@@ -422,7 +437,7 @@ export default function ManageTrainee() {
                   count={s.value ? counts?.[s.value] : counts?.trainees}
                   onClick={() => {
                     setStatusFilter(s.value)
-                    setPage(1)
+                    dispatch(setUsersPage({ page: 1 }))
                   }}
                 />
               ))}
@@ -533,8 +548,7 @@ export default function ManageTrainee() {
                 paginationMode='server'
                 paginationModel={{ page: page - 1, pageSize }}
                 onPaginationModelChange={m => {
-                  setPage(m.page + 1)
-                  setPageSize(m.pageSize)
+                  dispatch(setUsersPage({ page: m.page + 1, limit: m.pageSize }))
                 }}
                 onRowClick={p => {
                   const id = p.row?.id || p.row?._id

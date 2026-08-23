@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Box,
   Button,
@@ -13,6 +13,7 @@ import {
   InputLabel,
   LinearProgress,
   MenuItem,
+  Pagination,
   Select,
   Stack,
   TextField,
@@ -40,8 +41,8 @@ import {
   deleteLibraryClip,
   getClipPlayUrl,
   getClipTaxonomyAdmin,
-  getLibraryClipsGrouped,
   getLibrarySubmissions,
+  listLibraryClipsPaged,
   presignLibraryClip,
   updateLibraryClip
 } from 'src/services/clipsAdminApi'
@@ -251,13 +252,18 @@ export default function NetqwixLibraryPage() {
   const theme = useTheme()
   const isPhone = useMediaQuery(theme.breakpoints.down('sm'))
   const { confirm, ConfirmDialog } = useAdminConfirm()
-  const [groups, setGroups] = useState([])
+  const searchTimer = useRef(null)
+  const [browseItems, setBrowseItems] = useState([])
+  const [browseTotal, setBrowseTotal] = useState(0)
+  const [browsePage, setBrowsePage] = useState(1)
+  const browseLimit = 24
   const [taxonomy, setTaxonomy] = useState([])
   const [pendingQueue, setPendingQueue] = useState(0)
   const [files, setFiles] = useState([])
   const [uploading, setUploading] = useState(false)
   const [uploadStep, setUploadStep] = useState('')
   const [loading, setLoading] = useState(true)
+  const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
   const [busyId, setBusyId] = useState('')
@@ -268,25 +274,46 @@ export default function NetqwixLibraryPage() {
   const [editSubcategoryId, setEditSubcategoryId] = useState('')
   const [savingEdit, setSavingEdit] = useState(false)
 
-  const load = useCallback(async () => {
+  const loadBrowse = useCallback(async () => {
     setLoading(true)
     try {
-      const [data, queue] = await Promise.all([
-        getLibraryClipsGrouped(),
-        getLibrarySubmissions({ limit: 1 }).catch(() => null)
-      ])
-      setGroups(Array.isArray(data) ? data : [])
-      setPendingQueue((queue?.pendingCount || 0) + (queue?.underReviewCount || 0))
+      const data = await listLibraryClipsPaged({
+        page: browsePage,
+        limit: browseLimit,
+        search: search.trim(),
+        category_id: categoryFilter
+      })
+      setBrowseItems(Array.isArray(data?.items) ? data.items : [])
+      setBrowseTotal(Number(data?.total) || 0)
     } catch (e) {
       toast.error(e?.message || 'Failed to load library')
-      setGroups([])
+      setBrowseItems([])
+      setBrowseTotal(0)
     } finally {
       setLoading(false)
     }
+  }, [browsePage, browseLimit, search, categoryFilter])
+
+  const loadMeta = useCallback(async () => {
+    try {
+      const queue = await getLibrarySubmissions({ limit: 1 }).catch(() => null)
+      setPendingQueue((queue?.pendingCount || 0) + (queue?.underReviewCount || 0))
+    } catch {
+      setPendingQueue(0)
+    }
   }, [])
 
+  const reloadAll = useCallback(() => {
+    void loadBrowse()
+    void loadMeta()
+  }, [loadBrowse, loadMeta])
+
   useEffect(() => {
-    void load()
+    void loadBrowse()
+  }, [loadBrowse])
+
+  useEffect(() => {
+    void loadMeta()
     void getClipTaxonomyAdmin()
       .then(rows => {
         const list = Array.isArray(rows) ? rows : []
@@ -296,43 +323,24 @@ export default function NetqwixLibraryPage() {
         toast.error('Could not load clip categories')
         setTaxonomy([])
       })
-  }, [load])
+  }, [loadMeta])
+
+  const scheduleSearch = value => {
+    setSearchInput(value)
+    if (searchTimer.current) clearTimeout(searchTimer.current)
+    searchTimer.current = setTimeout(() => {
+      setSearch(value.trim())
+      setBrowsePage(1)
+    }, 400)
+  }
 
   const activeCategories = useMemo(() => taxonomy.filter(c => c.is_active !== false), [taxonomy])
   const editCat = activeCategories.find(c => catIdOf(c) === editCategoryId)
   const editSubs = (editCat?.subcategories || []).filter(s => s.is_active !== false)
 
-  let clipCount = 0
-  const categoryCount = groups.length
-  for (const g of groups) {
-    for (const s of g.subcategories || []) clipCount += (s.clips || []).length
-  }
-
-  const filteredGroups = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    return groups
-      .filter(g => !categoryFilter || String(g.categoryId || g.categoryName) === categoryFilter)
-      .map(g => {
-        if (!q) return g
-        const subsFiltered = (g.subcategories || [])
-          .map(sub => ({
-            ...sub,
-            clips: (sub.clips || []).filter(c => String(c.title || '').toLowerCase().includes(q))
-          }))
-          .filter(
-            sub =>
-              (sub.clips || []).length > 0 || String(sub.subcategoryName || '').toLowerCase().includes(q)
-          )
-        if (!subsFiltered.length && !String(g.categoryName || '').toLowerCase().includes(q)) return null
-        return { ...g, subcategories: subsFiltered.length ? subsFiltered : g.subcategories }
-      })
-      .filter(Boolean)
-  }, [groups, search, categoryFilter])
-
-  const showingCount = filteredGroups.reduce(
-    (n, g) => n + (g.subcategories || []).reduce((m, s) => m + (s.clips || []).length, 0),
-    0
-  )
+  const clipCount = browseTotal
+  const categoryCount = activeCategories.length
+  const showingCount = browseTotal
 
   const addFiles = picked => {
     const incoming = Array.from(picked || [])
@@ -400,7 +408,7 @@ export default function NetqwixLibraryPage() {
       }
       toast.success(published === 1 ? 'Library clip published' : `${published} library clips published`)
       setFiles([])
-      void load()
+      void reloadAll()
     } catch (e) {
       toast.error(
         published
@@ -409,7 +417,7 @@ export default function NetqwixLibraryPage() {
       )
       if (published) {
         setFiles(prev => prev.slice(published))
-        void load()
+        void reloadAll()
       }
     } finally {
       setUploading(false)
@@ -417,11 +425,11 @@ export default function NetqwixLibraryPage() {
     }
   }
 
-  const openEdit = (clip, catGroup, subGroup) => {
+  const openEdit = clip => {
     setEditClip(clip)
     setEditTitle(String(clip?.title || ''))
-    setEditCategoryId(String(clip?.category_id || catGroup?.categoryId || ''))
-    setEditSubcategoryId(String(clip?.subcategory_id || subGroup?.subcategoryId || '') || '')
+    setEditCategoryId(String(clip?.category_id || ''))
+    setEditSubcategoryId(String(clip?.subcategory_id || '') || '')
   }
 
   const saveEdit = async () => {
@@ -439,7 +447,7 @@ export default function NetqwixLibraryPage() {
       })
       toast.success('Clip updated')
       setEditClip(null)
-      void load()
+      void reloadAll()
     } catch (e) {
       toast.error(e?.message || 'Update failed')
     } finally {
@@ -485,7 +493,7 @@ export default function NetqwixLibraryPage() {
     try {
       await deleteLibraryClip(id)
       toast.success('Clip deleted')
-      void load()
+      void reloadAll()
     } catch (e) {
       toast.error(e?.message || 'Delete failed')
     } finally {
@@ -511,7 +519,7 @@ export default function NetqwixLibraryPage() {
             size='small'
           />
           <Chip component={Link} href='/apps/clip-taxonomy' label='Categories' clickable variant='outlined' size='small' />
-          <AdminRefreshButton onClick={() => void load()} loading={loading} />
+          <AdminRefreshButton onClick={() => void reloadAll()} loading={loading} />
         </Stack>
       }
     >
@@ -707,21 +715,28 @@ export default function NetqwixLibraryPage() {
       <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden', mt: 2 }}>
         <AdminPageSection
           title='Browse published'
-          subtitle='Cards by category › subcategory — play, edit, download, or delete.'
+          subtitle='Server-paginated catalog — play, edit, download, or delete.'
         >
           <AdminFilterBar
             searchPlaceholder='Search clip titles…'
-            searchValue={search}
-            onSearchChange={e => setSearch(e.target.value)}
+            searchValue={searchInput}
+            onSearchChange={e => scheduleSearch(e.target.value)}
             resultCount={showingCount}
           >
             <FormControl size='small' sx={{ minWidth: { xs: '100%', sm: 200 } }}>
               <InputLabel>Category</InputLabel>
-              <Select label='Category' value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
+              <Select
+                label='Category'
+                value={categoryFilter}
+                onChange={e => {
+                  setCategoryFilter(e.target.value)
+                  setBrowsePage(1)
+                }}
+              >
                 <MenuItem value=''>All categories</MenuItem>
-                {groups.map(g => (
-                  <MenuItem key={g.categoryId || g.categoryName} value={String(g.categoryId || g.categoryName)}>
-                    {g.categoryName}
+                {activeCategories.map(c => (
+                  <MenuItem key={catIdOf(c)} value={catIdOf(c)}>
+                    {c.name}
                   </MenuItem>
                 ))}
               </Select>
@@ -730,135 +745,119 @@ export default function NetqwixLibraryPage() {
 
           {loading ? (
             <AdminLoadingState message='Loading library…' minHeight={200} />
-          ) : filteredGroups.length === 0 ? (
+          ) : browseItems.length === 0 ? (
             <Typography sx={{ color: ops.mute, fontSize: 13 }}>No clips match.</Typography>
           ) : (
-            <Stack spacing={3}>
-              {filteredGroups.map(cat => (
-                <Box key={cat.categoryId || cat.categoryName}>
-                  <Typography sx={{ fontWeight: 700, letterSpacing: '-0.32px', mb: 1.5, fontSize: 18 }}>
-                    {cat.categoryName}
-                  </Typography>
-                  <Stack spacing={2.5}>
-                    {(cat.subcategories || []).map(sub => (
-                      <Box key={sub.subcategoryId || sub.subcategoryName}>
-                        <Stack direction='row' spacing={1} alignItems='center' sx={{ mb: 1.25 }}>
-                          <Typography sx={{ fontSize: 14, color: ops.body, fontWeight: 600 }}>
-                            {sub.subcategoryName}
+            <>
+              <Grid container spacing={2}>
+                {browseItems.map(c => {
+                  const id = String(c._id)
+                  const busy = busyId === id
+                  return (
+                    <Grid item xs={12} sm={6} md={4} lg={3} key={id}>
+                      <OpsSurfaceCard
+                        sx={{
+                          p: 0,
+                          overflow: 'hidden',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          height: '100%',
+                          bgcolor: ops.canvas
+                        }}
+                      >
+                        <LibraryClipThumb clip={c} onPlay={() => setPlayClipId(id)} />
+                        <Box sx={{ p: 1.5, flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                          <Typography
+                            sx={{
+                              fontWeight: 600,
+                              letterSpacing: '-0.28px',
+                              lineHeight: 1.3,
+                              fontSize: 14
+                            }}
+                            noWrap
+                            title={c.title}
+                          >
+                            {c.title || 'Untitled'}
                           </Typography>
-                          <Chip
-                            size='small'
-                            label={(sub.clips || []).length}
-                            sx={{ fontFamily: ops.mono, fontSize: 11, height: 20 }}
-                          />
-                        </Stack>
-                        <Grid container spacing={2}>
-                          {(sub.clips || []).map(c => {
-                            const id = String(c._id)
-                            const busy = busyId === id
-                            return (
-                              <Grid item xs={12} sm={6} md={4} lg={3} key={id}>
-                                <OpsSurfaceCard
-                                  sx={{
-                                    p: 0,
-                                    overflow: 'hidden',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    height: '100%',
-                                    bgcolor: ops.canvas
-                                  }}
+                          <Typography sx={{ fontSize: 12, color: ops.mute }}>
+                            {c.category || '—'}
+                          </Typography>
+                          <Stack
+                            direction='row'
+                            spacing={0.5}
+                            sx={{ mt: 'auto', pt: 0.5 }}
+                            flexWrap='wrap'
+                            useFlexGap
+                            alignItems='center'
+                          >
+                            <Button
+                              size='small'
+                              variant='contained'
+                              startIcon={<PlayArrowRoundedIcon />}
+                              disabled={busy}
+                              onClick={() => setPlayClipId(id)}
+                              sx={{
+                                textTransform: 'none',
+                                bgcolor: ops.indigo,
+                                boxShadow: 'none',
+                                flex: { xs: 1, sm: 'none' }
+                              }}
+                            >
+                              Play
+                            </Button>
+                            <Tooltip title='Edit'>
+                              <span>
+                                <IconButton
+                                  size='small'
+                                  disabled={busy}
+                                  onClick={() => openEdit(c)}
+                                  aria-label='Edit clip'
                                 >
-                                  <LibraryClipThumb clip={c} onPlay={() => setPlayClipId(id)} />
-                                  <Box sx={{ p: 1.5, flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                    <Typography
-                                      sx={{
-                                        fontWeight: 600,
-                                        letterSpacing: '-0.28px',
-                                        lineHeight: 1.3,
-                                        fontSize: 14
-                                      }}
-                                      noWrap
-                                      title={c.title}
-                                    >
-                                      {c.title || 'Untitled'}
-                                    </Typography>
-                                    <Typography sx={{ fontSize: 12, color: ops.mute }}>
-                                      {cat.categoryName}
-                                      {sub.subcategoryName ? ` · ${sub.subcategoryName}` : ''}
-                                    </Typography>
-                                    <Stack
-                                      direction='row'
-                                      spacing={0.5}
-                                      sx={{ mt: 'auto', pt: 0.5 }}
-                                      flexWrap='wrap'
-                                      useFlexGap
-                                      alignItems='center'
-                                    >
-                                      <Button
-                                        size='small'
-                                        variant='contained'
-                                        startIcon={<PlayArrowRoundedIcon />}
-                                        disabled={busy}
-                                        onClick={() => setPlayClipId(id)}
-                                        sx={{
-                                          textTransform: 'none',
-                                          bgcolor: ops.indigo,
-                                          boxShadow: 'none',
-                                          flex: { xs: 1, sm: 'none' }
-                                        }}
-                                      >
-                                        Play
-                                      </Button>
-                                      <Tooltip title='Edit'>
-                                        <span>
-                                          <IconButton
-                                            size='small'
-                                            disabled={busy}
-                                            onClick={() => openEdit(c, cat, sub)}
-                                            aria-label='Edit clip'
-                                          >
-                                            <EditOutlinedIcon fontSize='small' />
-                                          </IconButton>
-                                        </span>
-                                      </Tooltip>
-                                      <Tooltip title='Download'>
-                                        <span>
-                                          <IconButton
-                                            size='small'
-                                            disabled={busy}
-                                            onClick={() => void onDownload(c)}
-                                            aria-label='Download clip'
-                                          >
-                                            <DownloadOutlinedIcon fontSize='small' />
-                                          </IconButton>
-                                        </span>
-                                      </Tooltip>
-                                      <Tooltip title='Delete permanently'>
-                                        <span>
-                                          <IconButton
-                                            size='small'
-                                            color='error'
-                                            disabled={busy}
-                                            onClick={() => void onDelete(c)}
-                                            aria-label='Delete clip'
-                                          >
-                                            <DeleteOutlineIcon fontSize='small' />
-                                          </IconButton>
-                                        </span>
-                                      </Tooltip>
-                                    </Stack>
-                                  </Box>
-                                </OpsSurfaceCard>
-                              </Grid>
-                            )
-                          })}
-                        </Grid>
-                      </Box>
-                    ))}
-                  </Stack>
-                </Box>
-              ))}
-            </Stack>
+                                  <EditOutlinedIcon fontSize='small' />
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+                            <Tooltip title='Download'>
+                              <span>
+                                <IconButton
+                                  size='small'
+                                  disabled={busy}
+                                  onClick={() => void onDownload(c)}
+                                  aria-label='Download clip'
+                                >
+                                  <DownloadOutlinedIcon fontSize='small' />
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+                            <Tooltip title='Delete permanently'>
+                              <span>
+                                <IconButton
+                                  size='small'
+                                  color='error'
+                                  disabled={busy}
+                                  onClick={() => void onDelete(c)}
+                                  aria-label='Delete clip'
+                                >
+                                  <DeleteOutlineIcon fontSize='small' />
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+                          </Stack>
+                        </Box>
+                      </OpsSurfaceCard>
+                    </Grid>
+                  )
+                })}
+              </Grid>
+              {browseTotal > browseLimit ? (
+                <Pagination
+                  count={Math.ceil(browseTotal / browseLimit)}
+                  page={browsePage}
+                  onChange={(_, p) => setBrowsePage(p)}
+                  sx={{ mt: 2.5, display: 'flex', justifyContent: 'center' }}
+                />
+              ) : null}
+            </>
           )}
         </AdminPageSection>
       </OpsSurfaceCard>

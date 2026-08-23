@@ -78,9 +78,26 @@ export const deleteTip = id =>
 
 /* ── Blog / CMS pages ─────────────────────────────────────────────── */
 
-export const listCmsPages = async type => {
-  const q = type ? `?type=${encodeURIComponent(type)}` : ''
-  return fetch(api(`/admin/cms/pages${q}`), { headers: headers() }).then(handleEnvelope)
+export const listCmsPages = async (query = {}) => {
+  const q = new URLSearchParams()
+  Object.entries(query).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && v !== '') q.set(k, String(v))
+  })
+  const suffix = q.toString() ? `?${q.toString()}` : ''
+  const envelope = await fetch(api(`/admin/cms/pages${suffix}`), { headers: headers() }).then(handleEnvelope)
+  const payload = envelope?.data || {}
+  return {
+    items: payload.items || [],
+    total: payload.total ?? 0,
+    page: payload.page ?? 1,
+    limit: payload.limit ?? 25,
+    counts: payload.counts || null
+  }
+}
+
+export const getCmsPage = async id => {
+  const envelope = await fetch(api(`/admin/cms/pages/${id}`), { headers: headers() }).then(handleEnvelope)
+  return envelope?.data
 }
 
 export const createCmsPage = async body =>

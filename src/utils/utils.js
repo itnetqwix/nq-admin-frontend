@@ -61,22 +61,22 @@ export const isCurrentDateBefore = (dateToCompare) => {
 };
 
 export const updateTicketBaseUrl = {
-    constact_us: '/update-contact-us-status',
-    raise_concern: '/update-raised-concern-ticket'
-}
-export const getSignedURL = (url) => {
-    return `https://data.netqwix.com/${url}`
+  write_us: 'write-us',
+  raise_concern: 'raise-concern'
 }
 
-// export const generateVideoURL = (clip) => {
-//     return `https://netquixnew.s3.ap-south-1.amazonaws.com/${clip?.file_name}`
-// }
+export const getSignedURL = url => {
+  return `https://data.netqwix.com/${url}`
+}
 
 export const statusColors = {
-    open: 'green',
-    in_progress: 'orange',
-    close: 'red',
-};
+  open: 'green',
+  in_progress: 'orange',
+  resolved: '#5c6bc0',
+  closed: 'red',
+  // legacy alias
+  close: 'red'
+}
 
 export const trainerStatusColors = {
     pending: 'orange',
