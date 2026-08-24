@@ -390,10 +390,28 @@ export default function BookingDetailDrawer({
                 <Typography variant='subtitle2' sx={{ mb: 1 }}>
                   Extensions
                 </Typography>
-                {s.extensions.map((ext, idx) => (
+                {s.extensions.map((ext, idx) => {
+                  const row = Array.isArray(detail?.extension_breakdown)
+                    ? detail.extension_breakdown.find(
+                        b => Number(b.extension_index) === idx
+                      ) || detail.extension_breakdown[idx]
+                    : null
+                  const traineePaid =
+                    row?.charge_total_minor != null
+                      ? Number(row.charge_total_minor) / 100
+                      : Number(ext.amount)
+                  const trainerNet =
+                    row?.trainer_net_minor != null
+                      ? Number(row.trainer_net_minor) / 100
+                      : null
+                  return (
                   <Box key={`ext-${idx}`} sx={{ mb: 1.5, pl: 1, borderLeft: 2, borderColor: 'divider' }}>
                     <Typography variant='body2' fontWeight={600}>
-                      +{ext.minutes} min — ${Number(ext.amount).toFixed(2)}
+                      +{ext.minutes} min
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary' display='block'>
+                      Trainee paid ${traineePaid.toFixed(2)}
+                      {trainerNet != null ? ` · Trainer net $${trainerNet.toFixed(2)}` : ''}
                     </Typography>
                     <Typography variant='caption' color='text.secondary'>
                       {ext.status}
@@ -414,7 +432,8 @@ export default function BookingDetailDrawer({
                       </Button>
                     ) : null}
                   </Box>
-                ))}
+                  )
+                })}
                 {s.total_extended_minutes ? (
                   <Typography variant='caption' color='primary'>
                     Total extended: {s.total_extended_minutes} min

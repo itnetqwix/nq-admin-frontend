@@ -170,7 +170,15 @@ export default function SessionTimelinePanel({ bookingId, refreshKey = 0 }) {
                   sx={{ mb: 1, pl: 1, borderLeft: 2, borderColor: 'warning.main' }}
                 >
                   <Typography variant='caption' fontWeight={600}>
-                    {req.status} · +{req.minutes} min · ${Number(req.amount).toFixed(2)}
+                    {req.status} · +{req.minutes} min
+                  </Typography>
+                  <Typography variant='caption' color='text.secondary' display='block'>
+                    {req.trainerNetCents != null
+                      ? `Trainer net $${(Number(req.trainerNetCents) / 100).toFixed(2)}`
+                      : `Subtotal $${Number(req.amount).toFixed(2)}`}
+                    {req.chargeTotalCents != null
+                      ? ` · Trainee $${(Number(req.chargeTotalCents) / 100).toFixed(2)}`
+                      : ''}
                   </Typography>
                   <Typography variant='caption' color='text.secondary' display='block'>
                     Requested {fmt(req.requestedAt)} · Expires {fmt(req.expiresAt)}
