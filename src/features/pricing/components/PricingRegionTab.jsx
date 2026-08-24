@@ -89,32 +89,46 @@ export default function PricingRegionTab({
       label: plan.label || planId,
       monthlyMinor: plan.monthlyMinor ?? 0,
       yearlyMinor: plan.yearlyMinor ?? 0,
-      quotaGb: plan.quotaBytes ? Number((plan.quotaBytes / (1024 ** 3)).toFixed(2)) : 0
+      quotaGb: plan.quotaBytes ? Number((plan.quotaBytes / (1024 ** 3)).toFixed(2)) : 0,
+      recordingEnabled: plan.recordingEnabled !== false && planId !== 'free'
     }
   })
 
   const storageCols = [
-    { field: 'label', headerName: 'Plan', width: 120 },
+    { field: 'id', headerName: 'Id', width: 110 },
+    {
+      field: 'label',
+      headerName: 'Label',
+      width: 110,
+      editable: true
+    },
     {
       field: 'quotaGb',
       headerName: 'Quota (GB)',
-      width: 120,
+      width: 110,
       editable: true,
       type: 'number'
     },
     {
       field: 'monthlyMinor',
       headerName: 'Monthly (¢)',
-      width: 130,
+      width: 120,
       editable: true,
       type: 'number'
     },
     {
       field: 'yearlyMinor',
       headerName: 'Yearly (¢)',
-      width: 130,
+      width: 120,
       editable: true,
       type: 'number'
+    },
+    {
+      field: 'recordingEnabled',
+      headerName: 'Recording',
+      width: 110,
+      editable: true,
+      type: 'boolean'
     }
   ]
 
@@ -271,22 +285,33 @@ export default function PricingRegionTab({
       ) : null}
 
       {showStorage ? (
-      <AdminPageSection title={section === 'storage' ? undefined : 'Storage plan prices'}>
+      <AdminPageSection title={section === 'storage' ? undefined : 'Locker & recording bundles'}>
+        <Typography variant='body2' color='text.secondary' sx={{ mb: 1.5 }}>
+          Live session recording only works when <strong>both</strong> trainee and trainer are on a
+          plan with Recording enabled. Turning Recording off for Plus in a region removes that
+          entitlement at the next gate (book / join / start / upload).
+        </Typography>
         <AdminGridContainer>
           <AdminDataGrid
             autoHeight
             rows={storageRows}
             columns={storageCols}
             hideFooter
-            isCellEditable={() => canEdit}
+            isCellEditable={params => canEdit && params.field !== 'id'}
             processRowUpdate={newRow => {
               const gb = Math.max(0, Number(newRow.quotaGb) || 0)
               onPatchStoragePlan(regionKey, newRow.id, {
+                label: String(newRow.label || newRow.id),
                 monthlyMinor: Number(newRow.monthlyMinor) || 0,
                 yearlyMinor: Number(newRow.yearlyMinor) || 0,
-                quotaBytes: Math.round(gb * 1024 * 1024 * 1024)
+                quotaBytes: Math.round(gb * 1024 * 1024 * 1024),
+                recordingEnabled: newRow.id === 'free' ? false : !!newRow.recordingEnabled
               })
-              return { ...newRow, quotaGb: gb }
+              return {
+                ...newRow,
+                quotaGb: gb,
+                recordingEnabled: newRow.id === 'free' ? false : !!newRow.recordingEnabled
+              }
             }}
             onProcessRowUpdateError={() => {}}
           />

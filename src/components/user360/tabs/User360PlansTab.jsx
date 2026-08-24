@@ -66,7 +66,7 @@ export default function User360PlansTab({
                 <TableCell>Session</TableCell>
                 <TableCell>Trainer</TableCell>
                 <TableCell>Trainee</TableCell>
-                <TableCell>Recording key</TableCell>
+                <TableCell>Recording</TableCell>
                 <TableCell align='right'>Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -77,7 +77,28 @@ export default function User360PlansTab({
                   <TableCell sx={{ fontFamily: 'monospace', fontSize: 12 }}>{item?.sessions?._id || '—'}</TableCell>
                   <TableCell>{item?.trainer?.fullname || '—'}</TableCell>
                   <TableCell>{item?.trainee?.fullname || '—'}</TableCell>
-                  <TableCell sx={{ maxWidth: 220, wordBreak: 'break-all', fontSize: 12 }}>{item?.sessionRecordingUrl || '—'}</TableCell>
+                  <TableCell sx={{ maxWidth: 280, wordBreak: 'break-all', fontSize: 12 }}>
+                    {(() => {
+                      const takes = Array.isArray(item?.session_recordings)
+                        ? item.session_recordings
+                        : []
+                      if (!takes.length) {
+                        return item?.sessionRecordingUrl
+                          ? `legacy · ${String(item.sessionRecordingUrl).slice(0, 40)}…`
+                          : '—'
+                      }
+                      return takes
+                        .map((t) => {
+                          const owner = t?.owner_id
+                            ? String(t.owner_id).slice(-6)
+                            : '?'
+                          const bytes = Number(t?.bytes || 0)
+                          const mb = bytes > 0 ? `${(bytes / (1024 * 1024)).toFixed(1)}MB` : '—'
+                          return `owner…${owner} · ${t?.status || '?'} · ${mb}`
+                        })
+                        .join('; ')
+                    })()}
+                  </TableCell>
                   <TableCell align='right'>
                     <DeleteActions entityType='report' entityId={item?._id} onDeleted={onRefresh} hardDeletePolicy={hardDeletePolicy} />
                   </TableCell>

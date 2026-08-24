@@ -48,12 +48,12 @@ export default function User360StoragePanel({ userId, storage, onRefresh }) {
 
   const save = async () => {
     const ok = await confirm({
-      title: 'Update storage plan?',
-      message: `Set this user to ${planId}${periodEnd ? ` through ${periodEnd}` : ''}.`,
-      confirmLabel: 'Update storage',
+      title: 'Update Locker & recording?',
+      message: `Set this user to ${planId}${periodEnd ? ` through ${periodEnd}` : ''}. Comp does not charge Stripe; a transaction row is written.`,
+      confirmLabel: 'Update bundle',
       variant: 'warning',
       reasonRequired: true,
-      reasonLabel: 'Why change storage?'
+      reasonLabel: 'Why change bundle?'
     })
     if (!ok) return
     setBusy(true)
@@ -65,10 +65,10 @@ export default function User360StoragePanel({ userId, storage, onRefresh }) {
         syncQuotaFromCatalog: true,
         sendEmail: planId !== 'free'
       })
-      toast.success('Storage updated')
+      toast.success('Locker & recording updated')
       onRefresh?.()
     } catch (e) {
-      toast.error(e?.message || 'Storage update failed')
+      toast.error(e?.message || 'Bundle update failed')
     } finally {
       setBusy(false)
     }
@@ -79,11 +79,15 @@ export default function User360StoragePanel({ userId, storage, onRefresh }) {
       {ConfirmDialog}
       <OpsSurfaceCard sx={{ mb: 3, bgcolor: ops.canvasSoft }}>
         <Typography sx={{ fontWeight: 600, mb: 1.5, letterSpacing: '-0.28px' }}>
-          Storage plan
+          Locker & recording
         </Typography>
         <Grid container spacing={1.5} sx={{ mb: 2 }}>
-          {KeyValueRow('Current', storage?.plan || 'free')}
+          {KeyValueRow('Current', storage?.plan === 'plus_5gb' ? 'Plus' : storage?.plan === 'pro_10gb' ? 'Pro' : storage?.plan === 'max_25gb' ? 'Max' : storage?.plan || 'Free')}
           {KeyValueRow('Usage', usedLabel)}
+          {KeyValueRow(
+            'Recording',
+            storage?.plan && storage.plan !== 'free' ? 'Included (peer must be Plus+ too)' : 'Off — upgrade to Plus'
+          )}
           {KeyValueRow(
             'Period end',
             storage?.periodEnd ? formatOpsDateTime(storage.periodEnd) : '—'
@@ -99,9 +103,9 @@ export default function User360StoragePanel({ userId, storage, onRefresh }) {
         </Grid>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 1.5 }}>
           <FormControl size='small' sx={{ minWidth: 160 }}>
-            <InputLabel>Plan</InputLabel>
+            <InputLabel>Bundle</InputLabel>
             <Select
-              label='Plan'
+              label='Bundle'
               value={planId}
               onChange={e => setPlanId(e.target.value)}
             >
@@ -144,7 +148,7 @@ export default function User360StoragePanel({ userId, storage, onRefresh }) {
             disabled={busy || !userId}
             onClick={() => void save()}
           >
-            {busy ? 'Saving…' : 'Save storage'}
+            {busy ? 'Saving…' : 'Save bundle'}
           </Button>
         </Box>
       </OpsSurfaceCard>

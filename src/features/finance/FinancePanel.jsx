@@ -189,6 +189,7 @@ export default function FinancePanel(p) {
               sx={{ minWidth: { xs: '100%', sm: 180 } }}
             >
               <MenuItem value=''>All</MenuItem>
+              <MenuItem value='storage_upgrade'>Locker & recording</MenuItem>
               <MenuItem value='topup'>topup</MenuItem>
               <MenuItem value='booking_escrow'>booking_escrow</MenuItem>
               <MenuItem value='escrow_release'>escrow_release</MenuItem>

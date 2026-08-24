@@ -4,7 +4,7 @@ export const PRODUCT_TYPES = [
   { value: 'session_booking', label: 'Scheduled session' },
   { value: 'instant_lesson', label: 'Instant lesson' },
   { value: 'session_extension', label: 'Session extension' },
-  { value: 'storage_subscription', label: 'Storage subscription' },
+  { value: 'storage_subscription', label: 'Locker & recording' },
   { value: 'wallet_topup', label: 'Wallet top-up' }
 ]
 
