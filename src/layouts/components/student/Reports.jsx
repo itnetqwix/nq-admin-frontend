@@ -47,7 +47,7 @@ export default function Reports({ accountType, activeCenterContainerTab, trainee
     };
   }
   const getMyClips = async () => {
-    const res3 = await reports({ user_id: trainee_id });
+    const res3 = await reports({ user_id: trainee_id, page: 1, limit: 50 });
     const savedSessions = await getAllSavedSessions({ user_id: trainee_id })
     const organizedData = savedSessions.data.reduce((acc, obj) => {
       const createdAtDate = extractDateParts(obj.createdAt);
@@ -74,7 +74,11 @@ export default function Reports({ accountType, activeCenterContainerTab, trainee
       show: true,
     }));
 
-    var temp = res3?.result
+    var temp = res3?.result ?? res3?.data
+    if (temp && !Array.isArray(temp) && Array.isArray(temp.groups)) {
+      temp = temp.groups
+    }
+    if (!Array.isArray(temp)) temp = []
 
     temp = temp.map(vl => {
       return { ...vl, show: true, date: vl?.report?.length ? new Date(vl?.report[0]?.createdAt) : new Date() }
