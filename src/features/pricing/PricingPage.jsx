@@ -19,10 +19,11 @@ import PricingRatesTab from './components/PricingRatesTab'
 import PricingProfitCheckTab from './components/PricingProfitCheckTab'
 import PricingHistoryTab from './components/PricingHistoryTab'
 import PricingSurgeTab from './components/PricingSurgeTab'
+import PricingLockerPlansTab from './components/PricingLockerPlansTab'
 import { PricingFlowStrip } from './components/PricingGuide'
 
-const TAB_LABELS = ['Rates & fees', 'Surge & peak', 'Profit check', 'History']
-const TAB_SLUGS = ['rates', 'surge', 'profit', 'history']
+const TAB_LABELS = ['Rates & fees', 'Locker plans', 'Surge & peak', 'Profit check', 'History']
+const TAB_SLUGS = ['rates', 'locker', 'surge', 'profit', 'history']
 
 const PricingPage = () => {
   const router = useRouter()
@@ -206,9 +207,16 @@ const PricingPage = () => {
           />
         ) : null}
         {tab === 1 ? (
-          <PricingSurgeTab config={config} canEdit={canEdit} onPatchGlobal={patchGlobal} isDirty={isDirty} />
+          <PricingLockerPlansTab
+            config={config}
+            canEdit={canEdit}
+            onPatchStoragePlan={patchStoragePlan}
+          />
         ) : null}
         {tab === 2 ? (
+          <PricingSurgeTab config={config} canEdit={canEdit} onPatchGlobal={patchGlobal} isDirty={isDirty} />
+        ) : null}
+        {tab === 3 ? (
           <PricingProfitCheckTab
             config={config}
             isDirty={isDirty}
@@ -216,7 +224,7 @@ const PricingPage = () => {
             onPatchRegion={patchRegion}
           />
         ) : null}
-        {tab === 3 ? <PricingHistoryTab /> : null}
+        {tab === 4 ? <PricingHistoryTab /> : null}
       </AdminPageShell>
 
       {isDirty && canEdit ? (
