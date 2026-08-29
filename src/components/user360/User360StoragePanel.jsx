@@ -21,9 +21,9 @@ import { KeyValueRow } from './user360Parts'
 
 const PLAN_OPTIONS = [
   { id: 'free', label: 'Free' },
-  { id: 'plus_5gb', label: 'Plus (5 GB)' },
-  { id: 'pro_10gb', label: 'Pro (10 GB)' },
-  { id: 'max_25gb', label: 'Max (25 GB)' }
+  { id: 'plus_5gb', label: 'Plus (50 GB)' },
+  { id: 'pro_10gb', label: 'Pro (500 GB)' },
+  { id: 'max_25gb', label: 'Max (1 TB)' }
 ]
 
 function formatGb(bytes) {

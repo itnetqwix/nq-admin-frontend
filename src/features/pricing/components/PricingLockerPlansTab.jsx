@@ -24,9 +24,9 @@ const ENTITLEMENT_FIELDS = [
   { key: 'recordingDownloadEnabled', label: 'Download recordings', type: 'bool', role: 'trainee', enforced: true },
   { key: 'recordingDownloadMaxLongEdge', label: 'Download max long edge', type: 'number', role: 'trainee', enforced: true },
   { key: 'sharableRecordingEnabled', label: 'Share session recording', type: 'bool', role: 'trainee', enforced: true },
-  { key: 'sharableRecordingExpiryDays', label: 'Share link expiry (days)', type: 'number', role: 'trainee', enforced: false },
+  { key: 'sharableRecordingExpiryDays', label: 'Share link expiry (days)', type: 'number', role: 'trainee', enforced: true },
   { key: 'gamePlanHistoryLimit', label: 'Game Plan history (0=∞)', type: 'number', role: 'both', enforced: true },
-  { key: 'toolsPack', label: 'Tools pack', type: 'select', options: ['basic', 'standard', 'pro', 'max'], role: 'both', enforced: true },
+  { key: 'toolsPack', label: 'Tools pack (client nav gate)', type: 'select', options: ['basic', 'standard', 'pro', 'max'], role: 'both', enforced: false },
   { key: 'analyticsLevel', label: 'Analytics level', type: 'select', options: ['basic', 'standard', 'advanced', 'full'], role: 'trainer', enforced: true },
   { key: 'featuredByNetqwix', label: 'Featured by NetQwix', type: 'bool', role: 'trainer', enforced: true },
   { key: 'listingBoost', label: 'Listing boost', type: 'number', role: 'trainer', enforced: true },
@@ -46,6 +46,33 @@ function readEnt(plan, key, fallback) {
   const e = plan?.entitlements || {}
   if (e[key] != null) return e[key]
   return fallback
+}
+
+function formatQuotaGb(quotaBytes) {
+  const gb = Number(quotaBytes || 0) / GB
+  if (gb >= 1024) return `${(gb / 1024).toFixed(gb >= 10240 ? 0 : 1)} TB`
+  return `${gb >= 10 ? Math.round(gb) : gb.toFixed(1)} GB`
+}
+
+function recordingLabelFromLongEdge(px) {
+  const long = Math.max(0, Math.round(Number(px) || 0))
+  if (long <= 0) return '—'
+  if (long <= 360) return '360p'
+  if (long <= 720) return '720p'
+  if (long <= 1080) return '1080p'
+  return '2K'
+}
+
+function entitlementPreview(plan) {
+  const ent = plan?.entitlements || {}
+  const quota = formatQuotaGb(plan?.quotaBytes)
+  const recEnabled = !!ent.recordingEnabled
+  const rec = recEnabled
+    ? recordingLabelFromLongEdge(ent.recordingMaxLongEdge)
+    : '—'
+  const clipTraineeMb = Math.round(Number(ent.maxClipFileBytes || 0) / MB)
+  const clipTrainerMb = Math.round(Number(ent.maxClipFileBytesTrainer || 0) / MB)
+  return { quota, rec, clipTraineeMb, clipTrainerMb, recEnabled }
 }
 
 export default function PricingLockerPlansTab({
@@ -81,6 +108,8 @@ export default function PricingLockerPlansTab({
     () => ENTITLEMENT_FIELDS.filter(f => f.role === 'both' || f.role === 'trainee' || f.role === 'trainer'),
     []
   )
+
+  const preview = useMemo(() => entitlementPreview(plan), [plan])
 
   return (
     <Stack spacing={3}>
@@ -186,6 +215,14 @@ export default function PricingLockerPlansTab({
             }
           />
         </Stack>
+
+        <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+          Live preview (from entitlements + quota):{' '}
+          <strong>
+            Storage {preview.quota} · Recording {preview.recEnabled ? preview.rec : 'off'} · Clip
+            max {preview.clipTraineeMb || '—'} MB trainee / {preview.clipTrainerMb || '—'} MB expert
+          </strong>
+        </Typography>
 
         <Typography variant='subtitle2' sx={{ mb: 1 }}>
           Entitlements
