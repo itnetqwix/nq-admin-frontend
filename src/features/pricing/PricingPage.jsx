@@ -127,7 +127,7 @@ const PricingPage = () => {
         eyebrow='Revenue · pricing'
         icon='mdi:currency-usd'
         title='Pricing.'
-        subtitle='Configure → preview → check profit → save. New rates apply on the next checkout.'
+        subtitle='Configure rates → Locker plans → surge → profit check → save. Promo codes live separately but link back here for extension % and fees.'
         actions={
           <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
             <Chip component={Link} href='/apps/finance' label='Finance' clickable variant='outlined' size='small' />

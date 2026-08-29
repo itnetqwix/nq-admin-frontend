@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
-  FormControl, FormControlLabel, Grid, IconButton, InputLabel, MenuItem,
-  Select, Switch, TextField, Tooltip, Typography
+  Grid, IconButton, Stack, Switch, TextField, Tooltip, Typography
 } from '@mui/material'
+import Link from 'next/link'
 import { DataGrid } from '@mui/x-data-grid'
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
@@ -15,6 +15,9 @@ import toast from 'react-hot-toast'
 import styles from 'styles/common.module.css'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import DeletePopup from 'src/pages/components/modal/DeletePopup'
+import PromoCodeFormDialog from 'src/features/promo/components/PromoCodeFormDialog'
+import { PromoFlowStrip } from 'src/features/promo/components/PromoFlowStrip'
+import { BOOKING_TYPE_OPTIONS, formatBookingTypes } from 'src/constants/revenueAdmin'
 import {
   listPromoCodes,
   createPromoCode,
@@ -64,6 +67,7 @@ export default function PromoCodesPage() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
+  const [bookingTypeFilter, setBookingTypeFilter] = useState('all')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
 
@@ -261,6 +265,18 @@ export default function PromoCodesPage() {
       }
     },
     {
+      field: 'booking_types',
+      headerName: 'Applies to',
+      width: 160,
+      headerClassName: styles['header-class'],
+      cellClassName: styles['cell-class'],
+      renderCell: p => (
+        <Typography variant='body2' sx={{ fontSize: 12 }}>
+          {formatBookingTypes(p.row.applicable_booking_types)}
+        </Typography>
+      )
+    },
+    {
       field: 'usage',
       headerName: 'Usage',
       width: 110,
@@ -359,27 +375,60 @@ export default function PromoCodesPage() {
     [usageData]
   )
 
+  const filteredPromos = useMemo(() => {
+    if (bookingTypeFilter === 'all') return promos
+    return promos.filter(p => {
+      const types = p.applicable_booking_types || ['all']
+      return types.includes('all') || types.includes(bookingTypeFilter)
+    })
+  }, [promos, bookingTypeFilter])
+
   return (
     <>
       <AdminPageShell
-        title='Promo Codes'
-        subtitle='Create and manage promotional codes for bookings. Control discounts, validity periods, usage limits, and user visibility.'
+        title='Promo codes'
+        subtitle='Discount codes for lesson checkout and live session extensions. Use presets or scope by booking type.'
         actions={
-          <Button variant='contained' startIcon={<AddIcon />} onClick={openCreate} sx={{ bgcolor: '#000080', '&:hover': { bgcolor: '#0000a0' } }}>
-            Create Promo Code
-          </Button>
+          <Stack direction='row' spacing={1}>
+            <Button component={Link} href='/apps/pricing?tab=locker' variant='outlined' size='small' sx={{ textTransform: 'none' }}>
+              Locker extension %
+            </Button>
+            <Button variant='contained' startIcon={<AddIcon />} onClick={openCreate} sx={{ bgcolor: '#000080', '&:hover': { bgcolor: '#0000a0' } }}>
+              Create promo
+            </Button>
+          </Stack>
         }
         contentSx={{ p: 0 }}
       >
         <AdminPageSection>
-          <TextField
-            size='small'
-            placeholder='Search by code, label, or description...'
-            onChange={handleSearchChange}
-            sx={{ width: { xs: '100%', sm: 320 }, mb: 2 }}
-          />
+          <PromoFlowStrip />
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2, alignItems: 'center' }}>
+            <TextField
+              size='small'
+              placeholder='Search code, label, description…'
+              onChange={handleSearchChange}
+              sx={{ width: { xs: '100%', sm: 320 } }}
+            />
+            <Chip
+              label='All'
+              size='small'
+              color={bookingTypeFilter === 'all' ? 'primary' : 'default'}
+              onClick={() => setBookingTypeFilter('all')}
+              sx={{ cursor: 'pointer' }}
+            />
+            {BOOKING_TYPE_OPTIONS.filter(o => o.value !== 'all').map(opt => (
+              <Chip
+                key={opt.value}
+                label={opt.label}
+                size='small'
+                color={bookingTypeFilter === opt.value ? 'primary' : 'default'}
+                onClick={() => setBookingTypeFilter(opt.value)}
+                sx={{ cursor: 'pointer' }}
+              />
+            ))}
+          </Box>
           <DataGrid
-            rows={promos}
+            rows={filteredPromos}
             columns={columns}
             loading={loading}
             rowCount={total}
@@ -395,118 +444,16 @@ export default function PromoCodesPage() {
         </AdminPageSection>
       </AdminPageShell>
 
-      {/* Create / Edit Dialog */}
-      <Dialog open={formOpen} onClose={() => setFormOpen(false)} maxWidth='md' fullWidth>
-        <DialogTitle>{editId ? 'Edit Promo Code' : 'Create Promo Code'}</DialogTitle>
-        <DialogContent dividers>
-          <Grid container spacing={2} sx={{ mt: 0.5 }}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label='Code'
-                fullWidth
-                size='small'
-                value={form.code}
-                onChange={e => handleFormChange('code', e.target.value.toUpperCase())}
-                disabled={!!editId}
-                InputProps={{
-                  endAdornment: !editId ? (
-                    <Button size='small' onClick={() => handleFormChange('code', generateCode())}>Generate</Button>
-                  ) : null
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField label='Display Label' fullWidth size='small' value={form.display_label} onChange={e => handleFormChange('display_label', e.target.value)} placeholder='e.g. Summer Sale 25% Off' />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField label='Description' fullWidth size='small' multiline rows={2} value={form.description} onChange={e => handleFormChange('description', e.target.value)} />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <FormControl fullWidth size='small'>
-                <InputLabel>Discount Type</InputLabel>
-                <Select label='Discount Type' value={form.discount_type} onChange={e => handleFormChange('discount_type', e.target.value)}>
-                  <MenuItem value='percentage'>Percentage (%)</MenuItem>
-                  <MenuItem value='fixed_amount'>Fixed Amount ($)</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                label={form.discount_type === 'percentage' ? 'Discount (%)' : 'Discount ($)'}
-                fullWidth size='small' type='number'
-                value={form.discount_value}
-                onChange={e => handleFormChange('discount_value', e.target.value)}
-                inputProps={{ min: 0, max: form.discount_type === 'percentage' ? 100 : undefined }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField label='Max Discount ($)' fullWidth size='small' type='number' value={form.max_discount_amount} onChange={e => handleFormChange('max_discount_amount', e.target.value)} helperText='0 = no cap (percentage only)' inputProps={{ min: 0 }} />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField label='Min Order Amount ($)' fullWidth size='small' type='number' value={form.min_order_amount} onChange={e => handleFormChange('min_order_amount', e.target.value)} inputProps={{ min: 0 }} />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField label='Start Date' fullWidth size='small' type='date' InputLabelProps={{ shrink: true }} value={form.start_date} onChange={e => handleFormChange('start_date', e.target.value)} />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField label='End Date' fullWidth size='small' type='date' InputLabelProps={{ shrink: true }} value={form.end_date} onChange={e => handleFormChange('end_date', e.target.value)} />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField label='Usage Limit' fullWidth size='small' type='number' value={form.usage_limit} onChange={e => handleFormChange('usage_limit', e.target.value)} helperText='0 = unlimited' inputProps={{ min: 0 }} />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField label='Per User Limit' fullWidth size='small' type='number' value={form.per_user_limit} onChange={e => handleFormChange('per_user_limit', e.target.value)} helperText='0 = unlimited' inputProps={{ min: 0 }} />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <FormControl fullWidth size='small'>
-                <InputLabel>User Types</InputLabel>
-                <Select label='User Types' multiple value={form.applicable_user_types} onChange={e => handleFormChange('applicable_user_types', e.target.value)} renderValue={v => v.join(', ')}>
-                  <MenuItem value='All'>All</MenuItem>
-                  <MenuItem value='Trainee'>Trainee</MenuItem>
-                  <MenuItem value='Trainer'>Trainer</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth size='small'>
-                <InputLabel>Booking Types</InputLabel>
-                <Select label='Booking Types' multiple value={form.applicable_booking_types} onChange={e => handleFormChange('applicable_booking_types', e.target.value)} renderValue={v => v.join(', ')}>
-                  <MenuItem value='all'>All</MenuItem>
-                  <MenuItem value='instant'>Instant</MenuItem>
-                  <MenuItem value='scheduled'>Scheduled</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label='Locations (comma-separated)'
-                fullWidth size='small'
-                value={(form.applicable_locations || []).join(', ')}
-                onChange={e => handleFormChange('applicable_locations', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                helperText='Leave empty for all locations'
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControlLabel
-                control={<Switch checked={form.is_active} onChange={e => handleFormChange('is_active', e.target.checked)} />}
-                label='Active'
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControlLabel
-                control={<Switch checked={form.is_visible} onChange={e => handleFormChange('is_visible', e.target.checked)} />}
-                label='Visible to users (shown as available promo)'
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setFormOpen(false)}>Cancel</Button>
-          <Button variant='contained' onClick={handleSave} disabled={saving} sx={{ bgcolor: '#000080', '&:hover': { bgcolor: '#0000a0' } }}>
-            {saving ? 'Saving...' : editId ? 'Update' : 'Create'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <PromoCodeFormDialog
+        open={formOpen}
+        editId={editId}
+        form={form}
+        saving={saving}
+        onClose={() => setFormOpen(false)}
+        onChange={handleFormChange}
+        onSave={handleSave}
+        onGenerateCode={() => handleFormChange('code', generateCode())}
+      />
 
       {/* Delete Confirmation */}
       <DeletePopup
