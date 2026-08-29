@@ -1,7 +1,4 @@
-const S3_BASE = (
-  process.env.NEXT_PUBLIC_S3_BASE_URL ||
-  'https://netqwix-prod.s3.us-east-2.amazonaws.com'
-).replace(/\/$/, '')
+import { resolvePublicMediaCdnBase } from 'src/utils/vercelEnv'
 
 /** Resolve CMS image key or absolute URL for previews and thumbnails. */
 export function resolveCmsImageUrl(url) {
@@ -10,5 +7,5 @@ export function resolveCmsImageUrl(url) {
   if (!normalized) return ''
   if (/^https?:\/\//i.test(normalized)) return normalized
   if (normalized.startsWith('//')) return `https:${normalized}`
-  return `${S3_BASE}/${normalized.replace(/^\/+/, '')}`
+  return `${resolvePublicMediaCdnBase()}/${normalized.replace(/^\/+/, '')}`
 }

@@ -1,5 +1,6 @@
 import {
   resolvePublicApiBaseUrl,
+  resolvePublicMediaCdnBase,
   resolveWebAppBaseUrl,
   resolveAdminPublicOrigin,
 } from '../src/utils/vercelEnv.js'
@@ -38,6 +39,17 @@ assert(
   resolveAdminPublicOrigin() ===
     'https://nq-admin-frontend-git-feature-x.vercel.app',
   'feature preview origin'
+)
+
+process.env.VERCEL_ENV = 'production'
+assert(
+  resolvePublicMediaCdnBase() === 'https://data.netqwix.com',
+  'prod cdn'
+)
+process.env.VERCEL_ENV = 'preview'
+assert(
+  resolvePublicMediaCdnBase() === 'https://data-staging.netqwix.com',
+  'preview cdn'
 )
 
 console.log('vercelEnv.selfcheck ok')

@@ -1,4 +1,5 @@
 import moment from "moment"
+import { resolvePublicMediaCdnBase } from "src/utils/vercelEnv"
 
 function debounce(func, delay) {
     let timeoutId
@@ -32,7 +33,7 @@ export const debouncedSearchMedicine = debounce(searchMedicine, 300)
 // }
 
 export const getImageUrl = image => {
-  const backendUrl = 'https://data.netqwix.com/'
+  const backendUrl = `${resolvePublicMediaCdnBase()}/`
 
   if (image && (String(image).startsWith('http://') || String(image).startsWith('https://'))) {
     return String(image)
@@ -66,7 +67,7 @@ export const updateTicketBaseUrl = {
 }
 
 export const getSignedURL = url => {
-  return `https://data.netqwix.com/${url}`
+  return `${resolvePublicMediaCdnBase()}/${url}`
 }
 
 export const statusColors = {

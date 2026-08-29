@@ -5,6 +5,8 @@ const STAGING_API = 'https://api-netqwix.online'
 const PROD_WEB = 'https://www.netqwix.com'
 const STAGING_WEB = 'https://staging-netqwix.com'
 const STAGING_ADMIN = 'https://admin-staging.netqwix.com'
+const PROD_CDN = 'https://data.netqwix.com'
+const STAGING_CDN = 'https://data-staging.netqwix.com'
 
 const trimSlash = (url) => String(url || '').trim().replace(/\/+$/, '')
 
@@ -44,4 +46,14 @@ export function resolveAdminPublicOrigin() {
     return trimSlash(STAGING_ADMIN)
   }
   return 'http://localhost:3001'
+}
+
+export function resolvePublicMediaCdnBase() {
+  const raw = process.env.NEXT_PUBLIC_S3_BASE_URL
+  if (typeof raw === 'string' && raw.trim()) return trimSlash(raw)
+
+  if (process.env.VERCEL_ENV === 'production') return trimSlash(PROD_CDN)
+  if (process.env.VERCEL_ENV === 'preview') return trimSlash(STAGING_CDN)
+  if (process.env.NODE_ENV === 'development') return trimSlash(STAGING_CDN)
+  return trimSlash(PROD_CDN)
 }
