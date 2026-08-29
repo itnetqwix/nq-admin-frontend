@@ -3,10 +3,10 @@
 #
 # Prerequisites: vercel login, ./scripts/vercel-link.sh
 # Staging API: https://api-netqwix.online (EC2 staging)
-# Staging admin URL: https://staging-admin.netqwix.com (add domain in Vercel → staging branch)
+# Staging admin URL: https://admin-staging.netqwix.com (Vercel staging branch)
 #
 # On staging EC2 .env:
-#   ADMIN_FRONTEND_URL=https://staging-admin.netqwix.com
+#   ADMIN_FRONTEND_URL=https://admin-staging.netqwix.com
 #   FRONTEND_URL=https://staging-netqwix.com
 set -euo pipefail
 
@@ -17,7 +17,7 @@ SCOPE="${VERCEL_SCOPE:-netqwixs-projects-459a7f1f}"
 
 STAGING_API="${STAGING_API:-https://api-netqwix.online}"
 STAGING_WEB="${STAGING_WEB:-https://staging-netqwix.com}"
-STAGING_ADMIN="${STAGING_ADMIN:-https://staging-admin.netqwix.com}"
+STAGING_ADMIN="${STAGING_ADMIN:-https://admin-staging.netqwix.com}"
 PROD_API="${PROD_API:-https://api-netqwix.com}"
 PROD_WEB="${PROD_WEB:-https://www.netqwix.com}"
 PROD_ADMIN="${PROD_ADMIN:-https://admin.netqwix.com}"
@@ -74,5 +74,5 @@ fi
 
 echo ""
 echo "Done. Push to staging branch or run: vercel deploy --scope $SCOPE"
-echo "Add domain staging-admin.netqwix.com → Git branch staging in Vercel Domains."
+echo "Staging admin URL: $STAGING_ADMIN (already on Vercel staging branch)."
 echo "Google OAuth: authorized JavaScript origins must include $STAGING_ADMIN"

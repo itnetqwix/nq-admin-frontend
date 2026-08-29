@@ -4,7 +4,7 @@ const PROD_API = 'https://api-netqwix.com'
 const STAGING_API = 'https://api-netqwix.online'
 const PROD_WEB = 'https://www.netqwix.com'
 const STAGING_WEB = 'https://staging-netqwix.com'
-const STAGING_ADMIN = 'https://staging-admin.netqwix.com'
+const STAGING_ADMIN = 'https://admin-staging.netqwix.com'
 
 const trimSlash = (url) => String(url || '').trim().replace(/\/+$/, '')
 
