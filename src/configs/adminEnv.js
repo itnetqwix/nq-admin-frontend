@@ -1,5 +1,10 @@
 /** Admin UI feature flags (Next.js: NEXT_PUBLIC_* only). */
 
+import {
+  resolvePublicApiBaseUrl,
+  resolveWebAppBaseUrl,
+} from 'src/utils/vercelEnv'
+
 /** LogRocket session replay app id (web admin). */
 export const LOGROCKET_APP_ID =
   String(process.env.NEXT_PUBLIC_LOGROCKET_APP_ID ?? 'kzg9vc/netqwix').trim()
@@ -21,7 +26,7 @@ export const adminRegisterEnvHint = () =>
 
 /** Short label for current API host (for environment banner). */
 export const getAdminApiEnvLabel = () => {
-  const raw = process.env.NEXT_PUBLIC_API_BASE_URL || ''
+  const raw = resolvePublicApiBaseUrl()
   if (!raw) return 'API URL not set'
   try {
     const u = new URL(raw)
@@ -36,7 +41,14 @@ export const getAdminApiEnvKind = () => {
   const host = getAdminApiEnvLabel().toLowerCase()
   if (!host || host === 'api url not set') return 'unknown'
   if (host.includes('localhost') || host.includes('127.0.0.1')) return 'local'
-  if (host.includes('staging') || host.includes('stg') || host.includes('dev')) return 'staging'
+  if (
+    host.includes('staging') ||
+    host.includes('stg') ||
+    host.includes('dev') ||
+    host.includes('api-netqwix.online')
+  ) {
+    return 'staging'
+  }
   if (host.includes('api.netqwix') || host.includes('prod')) return 'production'
   // Heuristic: non-local without staging keyword → treat as prod-risk
   return 'production'
@@ -50,8 +62,7 @@ export const getAdminApiEnvBannerCopy = () => {
   return { tag, host, kind }
 }
 
-export const getWebPreviewBase = () =>
-  (process.env.NEXT_PUBLIC_WEB_APP_URL || 'https://www.netqwix.com').replace(/\/$/, '')
+export const getWebPreviewBase = () => resolveWebAppBaseUrl()
 
 export const showAdminMfaNotice = () =>
   String(process.env.NEXT_PUBLIC_ADMIN_MFA_NOTICE || '').toLowerCase() === 'true'
