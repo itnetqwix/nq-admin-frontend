@@ -25,7 +25,7 @@ import {
   multiplierToBps,
   percentToBps
 } from 'src/constants/revenueAdmin'
-import AdminPageSection from 'src/components/admin/AdminPageSection'
+import { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 
 const MB = 1024 * 1024
 const GB = 1024 * MB
