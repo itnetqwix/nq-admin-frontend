@@ -22,8 +22,44 @@ import PricingSurgeTab from './components/PricingSurgeTab'
 import PricingLockerPlansTab from './components/PricingLockerPlansTab'
 import { PricingFlowStrip } from './components/PricingGuide'
 
-const TAB_LABELS = ['Rates & fees', 'Locker plans', 'Surge & peak', 'Profit check', 'History']
-const TAB_SLUGS = ['rates', 'locker', 'surge', 'profit', 'history']
+const TAB_DEFS = [
+  {
+    value: 0,
+    slug: 'rates',
+    label: 'Rates & fees',
+    description: 'Commission & lesson fees',
+    icon: 'mdi:percent-outline'
+  },
+  {
+    value: 1,
+    slug: 'locker',
+    label: 'Locker plans',
+    description: 'Storage & entitlements',
+    icon: 'mdi:package-variant-closed'
+  },
+  {
+    value: 2,
+    slug: 'surge',
+    label: 'Surge & peak',
+    description: 'Busy-hour multipliers',
+    icon: 'mdi:chart-timeline-variant'
+  },
+  {
+    value: 3,
+    slug: 'profit',
+    label: 'Profit check',
+    description: 'Unit economics',
+    icon: 'mdi:chart-box-outline'
+  },
+  {
+    value: 4,
+    slug: 'history',
+    label: 'History',
+    description: 'Published versions',
+    icon: 'mdi:history'
+  }
+]
+const TAB_SLUGS = TAB_DEFS.map(t => t.slug)
 
 const PricingPage = () => {
   const router = useRouter()
@@ -186,7 +222,12 @@ const PricingPage = () => {
         <AdminTabs
           value={tab}
           onChange={syncTab}
-          tabs={TAB_LABELS.map((label, i) => ({ value: i, label }))}
+          tabs={TAB_DEFS.map(({ value, label, description, icon }) => ({
+            value,
+            label,
+            description,
+            icon
+          }))}
           sx={{ mb: 2 }}
         />
 

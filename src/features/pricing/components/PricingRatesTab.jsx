@@ -1,21 +1,24 @@
 import { useState } from 'react'
-import Accordion from '@mui/material/Accordion'
-import AccordionDetails from '@mui/material/AccordionDetails'
-import AccordionSummary from '@mui/material/AccordionSummary'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { OpsSurfaceCard } from 'src/components/admin'
+import { AdminSubTabs, OpsSurfaceCard } from 'src/components/admin'
 import { ops } from 'src/styles/opsSurface'
 import PricingRegionTab from './PricingRegionTab'
 import PricingProductsTab from './PricingProductsTab'
 import PricingEscrowPolicyTab from './PricingEscrowPolicyTab'
 import PricingLessonSplit from './PricingLessonSplit'
 import { PRICING_REGIONS, PAYOUT_PROCESSING_FEES, fmtMoney, fmtPct, withdrawalSettlement } from 'src/constants/pricingAdmin'
+
+const RATES_SUB_TABS = [
+  { value: 'core', label: 'Core' },
+  { value: 'checkout', label: 'Checkout & escrow' },
+  { value: 'tax', label: 'Tax' },
+  { value: 'advanced', label: 'Payments & products' }
+]
 
 function TapeLine({ label, value, mute, strong }) {
   return (
@@ -80,10 +83,23 @@ export default function PricingRatesTab({
   onPatchEscrowPolicy
 }) {
   const [region, setRegion] = useState('US')
+  const [subTab, setSubTab] = useState('core')
   const regionMeta = PRICING_REGIONS.find(r => r.key === region) || PRICING_REGIONS[0]
   const title = regionMeta.label
   const currency = regionMeta.currency
   const regionData = config.regions?.[region]
+
+  const regionPatchProps = {
+    regionKey: region,
+    title,
+    currency,
+    region: regionData,
+    canEdit,
+    onPatchRegion,
+    onPatchPaymentMethod,
+    onPatchStoragePlan,
+    onPatchTaxRate
+  }
 
   return (
     <Stack spacing={2.5}>
@@ -110,110 +126,81 @@ export default function PricingRatesTab({
         ))}
       </ToggleButtonGroup>
 
-      <SettlementTape region={regionData} regionKey={region} currency={currency} />
+      <AdminSubTabs value={subTab} onChange={setSubTab} tabs={RATES_SUB_TABS} />
 
-      <OpsSurfaceCard>
-        <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', fontSize: 16, mb: 0.5 }}>
-          Configure · {title}
-        </Typography>
-        <Typography sx={{ fontSize: 13, color: ops.body, mb: 2, lineHeight: 1.5 }}>
-          Lesson fees hit the enthusiast at checkout. Cash-out processing is taken from the amount the coach withdraws — not a separate Admin rate.
-          Custom coach commission in Manage trainers still wins, down to the floor.
-        </Typography>
-        <PricingRegionTab
-          regionKey={region}
-          title={title}
-          currency={currency}
-          region={regionData}
-          canEdit={canEdit}
-          section='core'
-          onPatchRegion={onPatchRegion}
-          onPatchPaymentMethod={onPatchPaymentMethod}
-          onPatchStoragePlan={onPatchStoragePlan}
-          onPatchTaxRate={onPatchTaxRate}
-        />
-      </OpsSurfaceCard>
+      {subTab === 'core' ? (
+        <>
+          <SettlementTape region={regionData} regionKey={region} currency={currency} />
 
-      <OpsSurfaceCard>
-        <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', fontSize: 16, mb: 0.5 }}>
-          Preview · $60 lesson
-        </Typography>
-        <Typography sx={{ fontSize: 13, color: ops.body, mb: 2, lineHeight: 1.5 }}>
-          Nobody is charged. Profit check adds AWS/video on top.
-        </Typography>
-        <PricingLessonSplit
-          config={config}
-          isDirty={isDirty}
-          canEdit={false}
-          lockedRegion={region}
-          compact
-          showCommissionControls={false}
-        />
-      </OpsSurfaceCard>
+          <OpsSurfaceCard>
+            <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', fontSize: 16, mb: 0.5 }}>
+              Configure · {title}
+            </Typography>
+            <Typography sx={{ fontSize: 13, color: ops.body, mb: 2, lineHeight: 1.5 }}>
+              Lesson fees hit the enthusiast at checkout. Cash-out processing is taken from the amount the coach
+              withdraws — not a separate Admin rate. Custom coach commission in Manage trainers still wins, down to
+              the floor.
+            </Typography>
+            <PricingRegionTab {...regionPatchProps} section='core' />
+          </OpsSurfaceCard>
 
-      <Accordion disableGutters sx={{ boxShadow: 'none', '&:before': { display: 'none' }, border: `1px solid ${ops.hairline}`, borderRadius: ops.radiusMd }}>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography sx={{ fontWeight: 600 }}>Checkout, tax, and when the coach is paid</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
+          <OpsSurfaceCard>
+            <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', fontSize: 16, mb: 0.5 }}>
+              Preview · $60 lesson
+            </Typography>
+            <Typography sx={{ fontSize: 13, color: ops.body, mb: 2, lineHeight: 1.5 }}>
+              Nobody is charged. Profit check adds AWS/video on top.
+            </Typography>
+            <PricingLessonSplit
+              config={config}
+              isDirty={isDirty}
+              canEdit={false}
+              lockedRegion={region}
+              compact
+              showCommissionControls={false}
+            />
+          </OpsSurfaceCard>
+        </>
+      ) : null}
+
+      {subTab === 'checkout' ? (
+        <OpsSurfaceCard>
+          <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', fontSize: 16, mb: 0.5 }}>
+            Checkout & escrow · {title}
+          </Typography>
+          <Typography sx={{ fontSize: 13, color: ops.body, mb: 2, lineHeight: 1.5 }}>
+            When funds move and how long they sit before the coach can cash out.
+          </Typography>
           <Stack spacing={3}>
-            <PricingRegionTab
-              regionKey={region}
-              title={title}
-              currency={currency}
-              region={regionData}
-              canEdit={canEdit}
-              section='checkout'
-              onPatchRegion={onPatchRegion}
-              onPatchPaymentMethod={onPatchPaymentMethod}
-              onPatchStoragePlan={onPatchStoragePlan}
-              onPatchTaxRate={onPatchTaxRate}
-            />
-            <PricingRegionTab
-              regionKey={region}
-              title={title}
-              currency={currency}
-              region={regionData}
-              canEdit={canEdit}
-              section='tax'
-              onPatchRegion={onPatchRegion}
-              onPatchPaymentMethod={onPatchPaymentMethod}
-              onPatchStoragePlan={onPatchStoragePlan}
-              onPatchTaxRate={onPatchTaxRate}
-            />
+            <PricingRegionTab {...regionPatchProps} section='checkout' />
             <PricingEscrowPolicyTab policy={config.escrowPolicy} canEdit={canEdit} onPatch={onPatchEscrowPolicy} />
           </Stack>
-        </AccordionDetails>
-      </Accordion>
+        </OpsSurfaceCard>
+      ) : null}
 
-      <Accordion disableGutters sx={{ boxShadow: 'none', '&:before': { display: 'none' }, border: `1px solid ${ops.hairline}`, borderRadius: ops.radiusMd }}>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography sx={{ fontWeight: 600 }}>Advanced · cards, storage, per-product fees</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
+      {subTab === 'tax' ? (
+        <OpsSurfaceCard>
+          <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', fontSize: 16, mb: 0.5 }}>
+            Tax · {title}
+          </Typography>
+          <Typography sx={{ fontSize: 13, color: ops.body, mb: 2, lineHeight: 1.5 }}>
+            Tax rates applied at checkout for this region.
+          </Typography>
+          <PricingRegionTab {...regionPatchProps} section='tax' />
+        </OpsSurfaceCard>
+      ) : null}
+
+      {subTab === 'advanced' ? (
+        <OpsSurfaceCard>
+          <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', fontSize: 16, mb: 0.5 }}>
+            Payments & products · {title}
+          </Typography>
+          <Typography sx={{ fontSize: 13, color: ops.body, mb: 2, lineHeight: 1.5 }}>
+            Card processing costs, storage plan prices on the rates sheet, and per-product fee overrides.
+          </Typography>
           <Stack spacing={3}>
-            <PricingRegionTab
-              regionKey={region}
-              title={title}
-              currency={currency}
-              region={regionData}
-              canEdit={canEdit}
-              section='payments'
-              onPatchRegion={onPatchRegion}
-              onPatchPaymentMethod={onPatchPaymentMethod}
-              onPatchStoragePlan={onPatchStoragePlan}
-            />
-            <PricingRegionTab
-              regionKey={region}
-              title={title}
-              currency={currency}
-              region={regionData}
-              canEdit={canEdit}
-              section='storage'
-              onPatchRegion={onPatchRegion}
-              onPatchPaymentMethod={onPatchPaymentMethod}
-              onPatchStoragePlan={onPatchStoragePlan}
-            />
+            <PricingRegionTab {...regionPatchProps} section='payments' />
+            <PricingRegionTab {...regionPatchProps} section='storage' />
             <PricingProductsTab
               productFees={config.productFees}
               canEdit={canEdit}
@@ -231,8 +218,8 @@ export default function PricingRatesTab({
               helperText='Allowed drift between checkout preview and final charge'
             />
           </Stack>
-        </AccordionDetails>
-      </Accordion>
+        </OpsSurfaceCard>
+      ) : null}
     </Stack>
   )
 }

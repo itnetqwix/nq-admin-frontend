@@ -1,10 +1,6 @@
 import { useMemo, useState } from 'react'
-import Accordion from '@mui/material/Accordion'
-import AccordionDetails from '@mui/material/AccordionDetails'
-import AccordionSummary from '@mui/material/AccordionSummary'
 import Box from '@mui/material/Box'
 import Checkbox from '@mui/material/Checkbox'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import MenuItem from '@mui/material/MenuItem'
 import Paper from '@mui/material/Paper'
@@ -17,6 +13,12 @@ import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
+import {
+  AdminFieldGrid,
+  AdminPlanCard,
+  AdminSubTabs,
+  OpsSurfaceCard
+} from 'src/components/admin'
 import { PRICING_REGIONS, STORAGE_PLAN_IDS, centsToInput, inputToCents } from 'src/constants/pricingAdmin'
 import {
   bpsToMultiplier,
@@ -26,6 +28,7 @@ import {
   percentToBps
 } from 'src/constants/revenueAdmin'
 import { AdminPageSection } from 'src/layouts/components/AdminPageShell'
+import { ops } from 'src/styles/opsSurface'
 
 const MB = 1024 * 1024
 const GB = 1024 * MB
@@ -81,6 +84,11 @@ const ENTITLEMENT_GROUPS = [
       { key: 'maxPortfolioMedia', label: 'Portfolio media slots', type: 'number', role: 'trainer', enforced: true }
     ]
   }
+]
+
+const LOCKER_SUB_TABS = [
+  ...ENTITLEMENT_GROUPS.map(g => ({ value: g.id, label: g.title.split(' & ')[0] })),
+  { value: 'marketing', label: 'Marketing' }
 ]
 
 function readEnt(plan, key, fallback) {
@@ -243,8 +251,9 @@ function EntitlementField({ field, plan, canEdit, patchEnt }) {
 export default function PricingLockerPlansTab({ config, canEdit, onPatchStoragePlan }) {
   const [regionKey, setRegionKey] = useState('US')
   const [planId, setPlanId] = useState('plus_5gb')
-  const region = config?.regions?.[regionKey] || {}
-  const plan = region.storagePlans?.[planId] || {}
+  const [subTab, setSubTab] = useState('money')
+  const region = useMemo(() => config?.regions?.[regionKey] || {}, [config?.regions, regionKey])
+  const plan = useMemo(() => region.storagePlans?.[planId] || {}, [region.storagePlans, planId])
   const currency = region.currency || 'USD'
 
   const patchEnt = (key, value) => {
@@ -266,10 +275,9 @@ export default function PricingLockerPlansTab({ config, canEdit, onPatchStorageP
   }
 
   const preview = useMemo(() => entitlementPreview(plan), [plan])
-  const comparison = useMemo(
-    () => STORAGE_PLAN_IDS.map(id => compareRow(region, id)),
-    [region]
-  )
+  const comparison = useMemo(() => STORAGE_PLAN_IDS.map(id => compareRow(region, id)), [region])
+
+  const activeGroup = ENTITLEMENT_GROUPS.find(g => g.id === subTab)
 
   return (
     <Stack spacing={3}>
@@ -279,7 +287,22 @@ export default function PricingLockerPlansTab({ config, canEdit, onPatchStorageP
           recording, shares, and extension checkout. Click <strong>Save changes</strong> on the Pricing page to publish.
         </Typography>
 
-        <Paper variant='outlined' sx={{ mb: 3, overflow: 'auto' }}>
+        <TextField
+          select
+          label='Region'
+          size='small'
+          value={regionKey}
+          onChange={e => setRegionKey(e.target.value)}
+          sx={{ minWidth: 180, mb: 2 }}
+        >
+          {PRICING_REGIONS.map(r => (
+            <MenuItem key={r.key} value={r.key}>
+              {r.label}
+            </MenuItem>
+          ))}
+        </TextField>
+
+        <Paper variant='outlined' sx={{ mb: 3, overflow: 'auto', borderColor: ops.hairline }}>
           <Table size='small'>
             <TableHead>
               <TableRow>
@@ -310,113 +333,135 @@ export default function PricingLockerPlansTab({ config, canEdit, onPatchStorageP
           </Table>
         </Paper>
 
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 2 }}>
-          <TextField select label='Region' size='small' value={regionKey} onChange={e => setRegionKey(e.target.value)} sx={{ minWidth: 180 }}>
-            {PRICING_REGIONS.map(r => (
-              <MenuItem key={r.key} value={r.key}>
-                {r.label}
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField select label='Plan to edit' size='small' value={planId} onChange={e => setPlanId(e.target.value)} sx={{ minWidth: 180 }}>
-            {STORAGE_PLAN_IDS.map(id => (
-              <MenuItem key={id} value={id}>
-                {lockerPlanLabel(id)} ({id})
-              </MenuItem>
-            ))}
-          </TextField>
-        </Stack>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '220px minmax(0, 1fr)' },
+            gap: 2.5,
+            alignItems: 'start'
+          }}
+        >
+          <Stack spacing={1.25}>
+            {STORAGE_PLAN_IDS.map(id => {
+              const row = comparison.find(r => r.planId === id) || compareRow(region, id)
+              return (
+                <AdminPlanCard
+                  key={id}
+                  title={row.label}
+                  subtitle={id}
+                  selected={planId === id}
+                  onClick={() => setPlanId(id)}
+                  meta={[
+                    { label: 'Monthly', value: row.price },
+                    { label: 'Storage', value: row.storage },
+                    { label: 'Recording', value: row.recording }
+                  ]}
+                />
+              )
+            })}
+          </Stack>
 
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 2 }}>
-          <TextField
-            label='Display label'
-            size='small'
-            fullWidth
-            value={plan.label || ''}
-            disabled={!canEdit}
-            onChange={e => onPatchStoragePlan(regionKey, planId, { label: e.target.value })}
-          />
-          <TextField
-            label='Quota (GB)'
-            size='small'
-            type='number'
-            fullWidth
-            value={plan.quotaBytes ? Number((plan.quotaBytes / GB).toFixed(2)) : 0}
-            disabled={!canEdit}
-            onChange={e =>
-              onPatchStoragePlan(regionKey, planId, {
-                quotaBytes: Math.round(Number(e.target.value || 0) * GB)
-              })
-            }
-          />
-          <TextField
-            label={`Monthly (${currency})`}
-            size='small'
-            type='number'
-            fullWidth
-            value={centsToInput(plan.monthlyMinor)}
-            disabled={!canEdit}
-            onChange={e => onPatchStoragePlan(regionKey, planId, { monthlyMinor: inputToCents(e.target.value) })}
-          />
-          <TextField
-            label={`Yearly (${currency})`}
-            size='small'
-            type='number'
-            fullWidth
-            value={centsToInput(plan.yearlyMinor)}
-            disabled={!canEdit}
-            onChange={e => onPatchStoragePlan(regionKey, planId, { yearlyMinor: inputToCents(e.target.value) })}
-          />
-        </Stack>
+          <OpsSurfaceCard>
+            <Box
+              sx={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 1,
+                mb: 2,
+                mx: { xs: -1.5, sm: -2.5 },
+                mt: { xs: -1.5, sm: -2.5 },
+                px: { xs: 1.5, sm: 2.5 },
+                py: 1.5,
+                bgcolor: ops.canvasSoft,
+                borderBottom: `1px solid ${ops.hairline}`
+              }}
+            >
+              <Typography sx={{ fontWeight: 700, letterSpacing: '-0.28px' }}>
+                Editing · {lockerPlanLabel(planId)}
+              </Typography>
+              <Typography sx={{ fontSize: 12, color: ops.body, mt: 0.35, fontFamily: ops.mono }}>
+                Storage {preview.quota} · Recording {preview.recEnabled ? preview.rec : 'off'} · Extension{' '}
+                {preview.extensionPct > 0 ? `${preview.extensionPct}%` : 'none'}
+              </Typography>
+            </Box>
 
-        <Typography variant='body2' sx={{ mb: 2, p: 1.5, borderRadius: 1, bgcolor: 'action.hover' }}>
-          <strong>{lockerPlanLabel(planId)}</strong> preview: Storage {preview.quota} · Recording{' '}
-          {preview.recEnabled ? preview.rec : 'off'} · Extension discount{' '}
-          {preview.extensionPct > 0 ? `${preview.extensionPct}%` : 'none'}
-        </Typography>
+            <AdminFieldGrid columns={2} sx={{ mb: 2.5 }}>
+              <TextField
+                label='Display label'
+                size='small'
+                fullWidth
+                value={plan.label || ''}
+                disabled={!canEdit}
+                onChange={e => onPatchStoragePlan(regionKey, planId, { label: e.target.value })}
+              />
+              <TextField
+                label='Quota (GB)'
+                size='small'
+                type='number'
+                fullWidth
+                value={plan.quotaBytes ? Number((plan.quotaBytes / GB).toFixed(2)) : 0}
+                disabled={!canEdit}
+                onChange={e =>
+                  onPatchStoragePlan(regionKey, planId, {
+                    quotaBytes: Math.round(Number(e.target.value || 0) * GB)
+                  })
+                }
+              />
+              <TextField
+                label={`Monthly (${currency})`}
+                size='small'
+                type='number'
+                fullWidth
+                value={centsToInput(plan.monthlyMinor)}
+                disabled={!canEdit}
+                onChange={e => onPatchStoragePlan(regionKey, planId, { monthlyMinor: inputToCents(e.target.value) })}
+              />
+              <TextField
+                label={`Yearly (${currency})`}
+                size='small'
+                type='number'
+                fullWidth
+                value={centsToInput(plan.yearlyMinor)}
+                disabled={!canEdit}
+                onChange={e => onPatchStoragePlan(regionKey, planId, { yearlyMinor: inputToCents(e.target.value) })}
+              />
+            </AdminFieldGrid>
 
-        {ENTITLEMENT_GROUPS.map(group => (
-          <Accordion key={group.id} defaultExpanded={group.id === 'money'} disableGutters sx={{ mb: 1, '&:before': { display: 'none' } }}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography fontWeight={600}>{group.title}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-                  gap: 1.5
-                }}
-              >
-                {group.fields.map(f => (
+            <AdminSubTabs value={subTab} onChange={setSubTab} tabs={LOCKER_SUB_TABS} />
+
+            {activeGroup ? (
+              <AdminFieldGrid columns={2}>
+                {activeGroup.fields.map(f => (
                   <EntitlementField key={f.key} field={f} plan={plan} canEdit={canEdit} patchEnt={patchEnt} />
                 ))}
-              </Box>
-            </AccordionDetails>
-          </Accordion>
-        ))}
+              </AdminFieldGrid>
+            ) : null}
 
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mt: 3 }}>
-          <TextField
-            label='Enthusiast marketing bullets (one per line)'
-            multiline
-            minRows={4}
-            fullWidth
-            disabled={!canEdit}
-            value={(plan.marketing?.trainee || []).join('\n')}
-            onChange={e => patchMarketing('trainee', e.target.value)}
-            helperText='Shown in Settings · update if you change extension %'
-          />
-          <TextField
-            label='Expert marketing bullets (one per line)'
-            multiline
-            minRows={4}
-            fullWidth
-            disabled={!canEdit}
-            value={(plan.marketing?.trainer || []).join('\n')}
-            onChange={e => patchMarketing('trainer', e.target.value)}
-          />
-        </Stack>
+            {subTab === 'marketing' ? (
+              <AdminFieldGrid columns={2}>
+                <TextField
+                  label='Enthusiast marketing bullets (one per line)'
+                  multiline
+                  minRows={5}
+                  fullWidth
+                  disabled={!canEdit}
+                  value={(plan.marketing?.trainee || []).join('\n')}
+                  onChange={e => patchMarketing('trainee', e.target.value)}
+                  helperText='Shown in Settings · update if you change extension %'
+                />
+                <TextField
+                  label='Expert marketing bullets (one per line)'
+                  multiline
+                  minRows={5}
+                  fullWidth
+                  disabled={!canEdit}
+                  value={(plan.marketing?.trainer || []).join('\n')}
+                  onChange={e => patchMarketing('trainer', e.target.value)}
+                />
+              </AdminFieldGrid>
+            ) : null}
+          </OpsSurfaceCard>
+        </Box>
       </AdminPageSection>
     </Stack>
   )

@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
+import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined'
 import AdminDataGrid from 'src/components/admin/AdminDataGrid'
+import AdminEmptyState from 'src/components/admin/AdminEmptyState'
 import AdminGridContainer from 'src/components/admin/AdminGridContainer'
 import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
+import { OpsSurfaceCard } from 'src/components/admin'
 import { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import { fetchPricingHistory } from 'src/services/pricingApi'
 import { fmtMoney, fmtPct } from 'src/constants/pricingAdmin'
@@ -90,9 +93,20 @@ export default function PricingHistoryTab() {
       subtitle='The live row is what website and app quote now. Paid bookings keep their original snapshot.'
       action={<AdminRefreshButton onClick={() => void load()} loading={loading} />}
     >
-      <AdminGridContainer>
-        <AdminDataGrid autoHeight rows={rows} columns={cols} loading={loading} hideFooter />
-      </AdminGridContainer>
+      <OpsSurfaceCard sx={{ p: 0, overflow: 'hidden' }}>
+        {!loading && rows.length === 0 ? (
+          <AdminEmptyState
+            icon={HistoryOutlinedIcon}
+            title='No published versions yet'
+            description='Save pricing changes to create the first version history row.'
+            compact
+          />
+        ) : (
+          <AdminGridContainer>
+            <AdminDataGrid autoHeight rows={rows} columns={cols} loading={loading} hideFooter />
+          </AdminGridContainer>
+        )}
+      </OpsSurfaceCard>
     </AdminPageSection>
   )
 }

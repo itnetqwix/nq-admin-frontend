@@ -1,16 +1,18 @@
 import { useState } from 'react'
+import Accordion from '@mui/material/Accordion'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import AccordionSummary from '@mui/material/AccordionSummary'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
 import FormControlLabel from '@mui/material/FormControlLabel'
-import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-import DeleteIcon from '@mui/icons-material/Delete'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import AddIcon from '@mui/icons-material/Add'
 import toast from 'react-hot-toast'
 import { OpsSurfaceCard } from 'src/components/admin'
@@ -24,6 +26,7 @@ import {
   inputToCents,
   surgeCentsOnSubtotal
 } from 'src/constants/pricingAdmin'
+import SurgeRuleCard, { DemandRuleFields, TimeWindowFields } from './SurgeRuleCard'
 
 const SESSION_PRODUCTS = PRODUCT_TYPES.filter(
   p => p.value === 'session_booking' || p.value === 'instant_lesson' || p.value === 'session_extension'
@@ -34,16 +37,6 @@ const DEMAND_METRICS = [
   { value: 'active_lessons_ratio', label: 'Active lessons ratio' }
 ]
 
-const DAYS = [
-  { value: 0, label: 'Sun' },
-  { value: 1, label: 'Mon' },
-  { value: 2, label: 'Tue' },
-  { value: 3, label: 'Wed' },
-  { value: 4, label: 'Thu' },
-  { value: 5, label: 'Fri' },
-  { value: 6, label: 'Sat' }
-]
-
 function newId(prefix) {
   return `${prefix}_${Date.now().toString(36)}`
 }
@@ -51,7 +44,7 @@ function newId(prefix) {
 function ProductTypeChips({ value, onChange, disabled }) {
   const selected = value || []
   return (
-    <Stack direction='row' spacing={0.5} flexWrap='wrap' useFlexGap sx={{ mt: 1 }}>
+    <Stack direction='row' spacing={0.5} flexWrap='wrap' useFlexGap sx={{ mt: 0.5 }}>
       {SESSION_PRODUCTS.map(p => {
         const on = selected.includes(p.value)
         return (
@@ -81,6 +74,30 @@ function ProductTypeChips({ value, onChange, disabled }) {
         )
       })}
     </Stack>
+  )
+}
+
+function SurgeStatusChip({ surge }) {
+  const windows = surge.timeWindows || []
+  const demands = surge.demandRules || []
+  if (!surge.enabled) {
+    return <Chip size='small' label='Off' sx={{ fontFamily: ops.mono, bgcolor: ops.canvasSoft2 }} />
+  }
+  if (windows.length === 0 && demands.length === 0) {
+    return (
+      <Chip
+        size='small'
+        label='No rules'
+        sx={{ fontFamily: ops.mono, bgcolor: ops.softAmber, color: ops.clay }}
+      />
+    )
+  }
+  return (
+    <Chip
+      size='small'
+      label='Active'
+      sx={{ fontFamily: ops.mono, bgcolor: ops.softMint, color: ops.live }}
+    />
   )
 }
 
@@ -210,25 +227,27 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
         the trainee pays $69 plus fees. Saved rules apply on the next website and app quote.
       </Alert>
 
-      <SurgeWorkedExample surge={surge} />
-
       <OpsSurfaceCard>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={!!surge.enabled}
-                onChange={e => patchSurge({ enabled: e.target.checked })}
-                disabled={!canEdit}
-              />
-            }
-            label='Enable surge pricing'
-          />
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'center' }} justifyContent='space-between'>
+          <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap' useFlexGap>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={!!surge.enabled}
+                  onChange={e => patchSurge({ enabled: e.target.checked })}
+                  disabled={!canEdit}
+                />
+              }
+              label='Enable surge pricing'
+              sx={{ mr: 0 }}
+            />
+            <SurgeStatusChip surge={surge} />
+          </Stack>
           <TextField
             select
             label='Timezone'
             size='small'
-            fullWidth
-            sx={{ mt: 2, maxWidth: 360 }}
+            sx={{ minWidth: 260, maxWidth: 360 }}
             value={surge.timezone || 'America/New_York'}
             onChange={e => patchSurge({ timezone: e.target.value })}
             disabled={!canEdit}
@@ -240,243 +259,154 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
               </MenuItem>
             ))}
           </TextField>
-        </OpsSurfaceCard>
+        </Stack>
+      </OpsSurfaceCard>
+
+      <SurgeWorkedExample surge={surge} />
 
       <OpsSurfaceCard>
-          <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
-            <Box>
-              <Typography variant='h6' fontWeight={700}>
-                Time windows
-              </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                Weekday hours in the timezone above. Multiplier 15 = +15% on the session.
-              </Typography>
-            </Box>
-            {canEdit ? (
-              <Button
-                size='small'
-                startIcon={<AddIcon />}
-                onClick={() =>
-                  patchSurge({
-                    timeWindows: [
-                      ...(surge.timeWindows || []),
-                      {
-                        id: newId('tw'),
-                        label: 'Peak hours',
-                        daysOfWeek: [1, 2, 3, 4, 5],
-                        startHour: 17,
-                        endHour: 21,
-                        multiplierBps: 1500,
-                        productTypes: ['session_booking', 'instant_lesson']
-                      }
-                    ]
-                  })
-                }
-              >
-                Add window
-              </Button>
-            ) : null}
-          </Stack>
-          {(surge.timeWindows || []).map((win, idx) => (
-            <Box key={win.id || idx} sx={{ mb: 2, p: 2, borderRadius: ops.radiusMd, bgcolor: ops.canvasSoft, boxShadow: 'inset 0 0 0 1px ' + ops.hairline }}>
-              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-                <TextField
-                  label='Label'
-                  size='small'
-                  value={win.label || ''}
-                  onChange={e => updateTimeWindow(idx, 'label', e.target.value)}
-                  disabled={!canEdit}
-                  sx={{ minWidth: 160 }}
-                />
-                <TextField
-                  label='Uplift %'
-                  size='small'
-                  type='number'
-                  value={(win.multiplierBps || 0) / 100}
-                  onChange={e =>
-                    updateTimeWindow(idx, 'multiplierBps', Math.round(Number(e.target.value || 0) * 100))
-                  }
-                  disabled={!canEdit}
-                  sx={{ width: 140 }}
-                  helperText={`$60 → ${fmtMoney(6000 + surgeCentsOnSubtotal(6000, win.multiplierBps))}`}
-                />
-                <TextField
-                  label='Start hour'
-                  size='small'
-                  type='number'
-                  value={win.startHour ?? 0}
-                  onChange={e => updateTimeWindow(idx, 'startHour', Number(e.target.value))}
-                  disabled={!canEdit}
-                  sx={{ width: 100 }}
-                />
-                <TextField
-                  label='End hour'
-                  size='small'
-                  type='number'
-                  value={win.endHour ?? 0}
-                  onChange={e => updateTimeWindow(idx, 'endHour', Number(e.target.value))}
-                  disabled={!canEdit}
-                  sx={{ width: 100 }}
-                />
-                {canEdit ? (
-                  <IconButton
-                    color='error'
-                    onClick={() =>
-                      patchSurge({
-                        timeWindows: surge.timeWindows.filter((_, i) => i !== idx)
-                      })
+        <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
+          <Box>
+            <Typography variant='h6' fontWeight={700}>
+              Time windows
+            </Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Weekday hours in the timezone above. Multiplier 15 = +15% on the session.
+            </Typography>
+          </Box>
+          {canEdit ? (
+            <Button
+              size='small'
+              startIcon={<AddIcon />}
+              sx={{ textTransform: 'none' }}
+              onClick={() =>
+                patchSurge({
+                  timeWindows: [
+                    ...(surge.timeWindows || []),
+                    {
+                      id: newId('tw'),
+                      label: 'Peak hours',
+                      daysOfWeek: [1, 2, 3, 4, 5],
+                      startHour: 17,
+                      endHour: 21,
+                      multiplierBps: 1500,
+                      productTypes: ['session_booking', 'instant_lesson']
                     }
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                ) : null}
-              </Stack>
-              <Stack direction='row' spacing={0.5} flexWrap='wrap' sx={{ mt: 1 }}>
-                {DAYS.map(d => {
-                  const selected = (win.daysOfWeek || []).includes(d.value)
-                  return (
-                    <Button
-                      key={d.value}
-                      size='small'
-                      variant={selected ? 'contained' : 'outlined'}
-                      disabled={!canEdit}
-                      onClick={() => {
-                        const days = new Set(win.daysOfWeek || [])
-                        if (selected) days.delete(d.value)
-                        else days.add(d.value)
-                        updateTimeWindow(idx, 'daysOfWeek', [...days].sort())
-                      }}
-                    >
-                      {d.label}
-                    </Button>
-                  )
-                })}
-              </Stack>
-              <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1 }}>
-                Applies to
-              </Typography>
-              <ProductTypeChips
-                value={win.productTypes}
-                disabled={!canEdit}
-                onChange={next => updateTimeWindow(idx, 'productTypes', next)}
-              />
-            </Box>
-          ))}
-        </OpsSurfaceCard>
+                  ]
+                })
+              }
+            >
+              Add window
+            </Button>
+          ) : null}
+        </Stack>
+        {(surge.timeWindows || []).length === 0 ? (
+          <Typography sx={{ fontSize: 13, color: ops.mute }}>No time windows yet.</Typography>
+        ) : null}
+        {(surge.timeWindows || []).map((win, idx) => (
+          <SurgeRuleCard
+            key={win.id || idx}
+            title={win.label || `Window ${idx + 1}`}
+            upliftBps={win.multiplierBps}
+            canEdit={canEdit}
+            onDelete={() =>
+              patchSurge({
+                timeWindows: surge.timeWindows.filter((_, i) => i !== idx)
+              })
+            }
+          >
+            <TimeWindowFields
+              win={win}
+              idx={idx}
+              canEdit={canEdit}
+              updateTimeWindow={updateTimeWindow}
+              ProductTypeChips={ProductTypeChips}
+            />
+          </SurgeRuleCard>
+        ))}
+      </OpsSurfaceCard>
 
       <OpsSurfaceCard>
-          <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
-            <Box>
-              <Typography variant='h6' fontWeight={700}>
-                Demand rules
-              </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                Fires when the metric is at or above the threshold. Highest matching % wins with time windows.
-              </Typography>
-            </Box>
-            {canEdit ? (
-              <Button
-                size='small'
-                startIcon={<AddIcon />}
-                onClick={() =>
-                  patchSurge({
-                    demandRules: [
-                      ...(surge.demandRules || []),
-                      {
-                        id: newId('dr'),
-                        label: 'High instant demand',
-                        metric: 'instant_queue_depth',
-                        threshold: 5,
-                        multiplierBps: 1000,
-                        productTypes: ['instant_lesson']
-                      }
-                    ]
-                  })
-                }
-              >
-                Add rule
-              </Button>
-            ) : null}
-          </Stack>
-          {(surge.demandRules || []).map((rule, idx) => (
-            <Box key={rule.id || idx} sx={{ mb: 2, p: 2, borderRadius: ops.radiusMd, bgcolor: ops.canvasSoft, boxShadow: 'inset 0 0 0 1px ' + ops.hairline }}>
-              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-                <TextField
-                  label='Label'
-                  size='small'
-                  value={rule.label || ''}
-                  onChange={e => updateDemandRule(idx, 'label', e.target.value)}
-                  disabled={!canEdit}
-                />
-                <TextField
-                  select
-                  label='Metric'
-                  size='small'
-                  value={rule.metric || 'instant_queue_depth'}
-                  onChange={e => updateDemandRule(idx, 'metric', e.target.value)}
-                  disabled={!canEdit}
-                  sx={{ minWidth: 180 }}
-                >
-                  {DEMAND_METRICS.map(m => (
-                    <MenuItem key={m.value} value={m.value}>
-                      {m.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                <TextField
-                  label='Threshold'
-                  size='small'
-                  type='number'
-                  value={rule.threshold ?? 0}
-                  onChange={e => updateDemandRule(idx, 'threshold', Number(e.target.value))}
-                  disabled={!canEdit}
-                  sx={{ width: 100 }}
-                />
-                <TextField
-                  label='Uplift %'
-                  size='small'
-                  type='number'
-                  value={(rule.multiplierBps || 0) / 100}
-                  onChange={e =>
-                    updateDemandRule(idx, 'multiplierBps', Math.round(Number(e.target.value || 0) * 100))
-                  }
-                  disabled={!canEdit}
-                  sx={{ width: 140 }}
-                  helperText={`$60 → ${fmtMoney(6000 + surgeCentsOnSubtotal(6000, rule.multiplierBps))}`}
-                />
-                {canEdit ? (
-                  <IconButton
-                    color='error'
-                    onClick={() =>
-                      patchSurge({
-                        demandRules: surge.demandRules.filter((_, i) => i !== idx)
-                      })
+        <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
+          <Box>
+            <Typography variant='h6' fontWeight={700}>
+              Demand rules
+            </Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Fires when the metric is at or above the threshold. Highest matching % wins with time windows.
+            </Typography>
+          </Box>
+          {canEdit ? (
+            <Button
+              size='small'
+              startIcon={<AddIcon />}
+              sx={{ textTransform: 'none' }}
+              onClick={() =>
+                patchSurge({
+                  demandRules: [
+                    ...(surge.demandRules || []),
+                    {
+                      id: newId('dr'),
+                      label: 'High instant demand',
+                      metric: 'instant_queue_depth',
+                      threshold: 5,
+                      multiplierBps: 1000,
+                      productTypes: ['instant_lesson']
                     }
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                ) : null}
-              </Stack>
-              <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1 }}>
-                Applies to
-              </Typography>
-              <ProductTypeChips
-                value={rule.productTypes}
-                disabled={!canEdit}
-                onChange={next => updateDemandRule(idx, 'productTypes', next)}
-              />
-            </Box>
-          ))}
-        </OpsSurfaceCard>
+                  ]
+                })
+              }
+            >
+              Add rule
+            </Button>
+          ) : null}
+        </Stack>
+        {(surge.demandRules || []).length === 0 ? (
+          <Typography sx={{ fontSize: 13, color: ops.mute }}>No demand rules yet.</Typography>
+        ) : null}
+        {(surge.demandRules || []).map((rule, idx) => (
+          <SurgeRuleCard
+            key={rule.id || idx}
+            title={rule.label || `Demand ${idx + 1}`}
+            upliftBps={rule.multiplierBps}
+            canEdit={canEdit}
+            onDelete={() =>
+              patchSurge({
+                demandRules: surge.demandRules.filter((_, i) => i !== idx)
+              })
+            }
+          >
+            <DemandRuleFields
+              rule={rule}
+              idx={idx}
+              canEdit={canEdit}
+              updateDemandRule={updateDemandRule}
+              ProductTypeChips={ProductTypeChips}
+              metrics={DEMAND_METRICS}
+            />
+          </SurgeRuleCard>
+        ))}
+      </OpsSurfaceCard>
 
-      <OpsSurfaceCard>
-          <Typography variant='h6' fontWeight={700} gutterBottom>
-            Quote at a date & time
-          </Typography>
-          <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
-            Pick a $60 lesson and a clock time. If it lands in a window, peak shows in the breakdown —
-            the same quote website and app will charge.
-          </Typography>
+      <Accordion
+        disableGutters
+        sx={{
+          boxShadow: 'none',
+          '&:before': { display: 'none' },
+          border: `1px solid ${ops.hairline}`,
+          borderRadius: ops.radiusMd,
+          bgcolor: ops.canvas
+        }}
+      >
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Box>
+            <Typography sx={{ fontWeight: 600 }}>Test a quote</Typography>
+            <Typography sx={{ fontSize: 12, color: ops.mute }}>
+              Pick a lesson price and clock time — same quote website and app will charge.
+            </Typography>
+          </Box>
+        </AccordionSummary>
+        <AccordionDetails>
           <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
             <TextField
               select
@@ -508,7 +438,12 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
               onChange={e => setSimAt(e.target.value)}
               InputLabelProps={{ shrink: true }}
             />
-            <Button variant='contained' onClick={() => void runSimulator()} disabled={simBusy}>
+            <Button
+              variant='contained'
+              onClick={() => void runSimulator()}
+              disabled={simBusy}
+              sx={{ textTransform: 'none', bgcolor: ops.ink, '&:hover': { bgcolor: '#000' } }}
+            >
               {simBusy ? 'Running…' : 'Preview quote'}
             </Button>
           </Stack>
@@ -530,7 +465,8 @@ export default function PricingSurgeTab({ config, canEdit, onPatchGlobal, isDirt
               ))}
             </Box>
           ) : null}
-        </OpsSurfaceCard>
+        </AccordionDetails>
+      </Accordion>
     </Stack>
   )
 }
