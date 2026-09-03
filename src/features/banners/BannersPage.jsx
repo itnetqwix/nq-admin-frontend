@@ -262,10 +262,10 @@ export default function BannersPage() {
       }
       if (editId) {
         await updateBanner(editId, body)
-        toast.success('Banner updated.')
+        toast.success('Banner updated — live in mobile app.')
       } else {
         await createBanner(body)
-        toast.success('Banner created.')
+        toast.success('Banner created — live in mobile app.')
       }
       setFormOpen(false)
       void fetchData()

@@ -255,10 +255,10 @@ export default function TipsPage() {
       }
       if (editId) {
         await updateTip(editId, body)
-        toast.success('Tip updated.')
+        toast.success('Tip updated — live in mobile offers carousel.')
       } else {
         await createTip(body)
-        toast.success('Tip created.')
+        toast.success('Tip created — live in mobile offers carousel.')
       }
       setFormOpen(false)
       refreshAll()

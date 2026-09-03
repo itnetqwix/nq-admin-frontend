@@ -131,7 +131,7 @@ export default function CmsBannersPage() {
       }
       if (editing) await updateBanner(editing._id, body)
       else await createBanner(body)
-      toast.success(editing ? 'Banner updated' : 'Banner published')
+      toast.success(editing ? 'Banner updated — live in mobile app' : 'Banner published — live in mobile app')
       setDialogOpen(false)
       await load()
     } catch (e) {
