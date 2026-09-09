@@ -53,6 +53,7 @@ const ENTITLEMENT_GROUPS = [
     fields: [
       { key: 'sharableRecordingEnabled', label: 'Share session recording', type: 'bool', role: 'trainee', enforced: true },
       { key: 'sharableRecordingExpiryDays', label: 'Share link expiry (days)', type: 'number', role: 'trainee', enforced: true },
+      { key: 'sharableRecordingPasswordAllowed', label: 'Password-protect shared recordings (Max)', type: 'bool', role: 'trainee', enforced: true },
       { key: 'friendShareDailyLimit', label: 'Friend shares / day (0=∞)', type: 'number', role: 'both', enforced: true },
       { key: 'emailShareDailyLimit', label: 'Email shares / day (0=∞)', type: 'number', role: 'both', enforced: true },
       { key: 'gamePlanPdfDownloadEnabled', label: 'Download Game Plan PDF', type: 'bool', role: 'trainee', enforced: true },
@@ -76,7 +77,7 @@ const ENTITLEMENT_GROUPS = [
     id: 'discovery',
     title: 'Discovery & tools',
     fields: [
-      { key: 'toolsPack', label: 'Tools pack (client nav gate)', type: 'select', options: ['basic', 'standard', 'pro', 'max'], role: 'both', enforced: false },
+      { key: 'toolsPack', label: 'Tools pack (Practice Session gate)', type: 'select', options: ['basic', 'standard', 'pro', 'max'], role: 'both', enforced: true },
       { key: 'analyticsLevel', label: 'Analytics level', type: 'select', options: ['basic', 'standard', 'advanced', 'full'], role: 'trainer', enforced: true },
       { key: 'featuredByNetqwix', label: 'Featured by NetQwix', type: 'bool', role: 'trainer', enforced: true },
       { key: 'listingBoost', label: 'Listing boost', type: 'number', role: 'trainer', enforced: true },
@@ -283,8 +284,9 @@ export default function PricingLockerPlansTab({ config, canEdit, onPatchStorageP
     <Stack spacing={3}>
       <AdminPageSection title='Locker plans'>
         <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
-          Configure subscription tiers per region. <strong>Enforced</strong> fields gate live quotes, locker,
-          recording, shares, and extension checkout. Click <strong>Save changes</strong> on the Pricing page to publish.
+          Configure subscription tiers per region. US code defaults: Plus $3.99 / 50 GB, Pro $8.99 / 200 GB,
+          Max $13.99 / 500 GB. <strong>Enforced</strong> fields gate live quotes, locker, recording, shares, and
+          extension checkout. Click <strong>Save changes</strong> on the Pricing page to publish.
         </Typography>
 
         <TextField

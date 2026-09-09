@@ -5,7 +5,7 @@ export { PRICING_TAB_FLOW as PRICING_FLOW }
 
 const COPY_BY_TAB = {
   0: 'Set commission, product fees, and payment-method costs per region. Use the settlement tape to sanity-check coach payouts before you save.',
-  1: 'Edit Locker tiers (Free → Max): storage, recording quality, extension discount %, and marketing bullets shown in Settings. Enforced fields gate live product behavior.',
+  1: 'Edit Locker tiers (Free → Max). US defaults: Plus $3.99/50 GB, Pro $8.99/200 GB, Max $13.99/500 GB. Marketing bullets show in Settings and on the locker plan strip. Save to publish.',
   2: 'Peak pricing adds an optional % on busy hours. Coaches can opt out individually in Manage trainers.',
   3: 'Run a $60 lesson through infra costs. Confirm margin before publishing.',
   4: 'Every Save creates a version. Existing bookings keep the snapshot they were charged under.'

@@ -280,6 +280,7 @@ export default function PricingUnitEconomicsTab({ config, isDirty, lesson }) {
   }, [report?.infraCatalog])
 
   const actuals = report?.actuals
+  const locker = report?.locker
   const scenarios = report?.scenarios || []
   const customRow = report?.custom
   const monthlyBurn = report?.monthlyBurn
@@ -626,6 +627,87 @@ export default function PricingUnitEconomicsTab({ config, isDirty, lesson }) {
                   <Typography color='text.secondary'>Calculating…</Typography>
                 )}
               </OpsSurfaceCard>
+
+            {locker ? (
+              <OpsSurfaceCard>
+                <Stack direction='row' alignItems='center' justifyContent='space-between' sx={{ mb: 2 }}>
+                  <Box>
+                    <Typography variant='h6' fontWeight={600}>
+                      Locker economics
+                    </Typography>
+                    <Typography variant='body2' color='text.secondary'>
+                      Read-only locker ARR, storage usage, and modeled storage COGS.
+                    </Typography>
+                  </Box>
+                </Stack>
+
+                <Grid container spacing={2}>
+                  <Grid item xs={6} md={2.4}>
+                    <Typography variant='caption' color='text.secondary'>Paid users</Typography>
+                    <Typography variant='h6' fontWeight={700}>{locker.activePaidUsers}</Typography>
+                  </Grid>
+                  <Grid item xs={6} md={2.4}>
+                    <Typography variant='caption' color='text.secondary'>MRR run-rate</Typography>
+                    <Typography variant='h6' fontWeight={700}>{fmtMoney(locker.monthlyRunRateCents, 'USD')}</Typography>
+                  </Grid>
+                  <Grid item xs={6} md={2.4}>
+                    <Typography variant='caption' color='text.secondary'>Storage COGS</Typography>
+                    <Typography variant='h6' fontWeight={700}>{fmtMoney(locker.estimatedStorageCogsCents, 'USD')}</Typography>
+                  </Grid>
+                  <Grid item xs={6} md={2.4}>
+                    <Typography variant='caption' color='text.secondary'>Storage margin</Typography>
+                    <Typography variant='h6' fontWeight={700} color={locker.estimatedMarginCents >= 0 ? 'success.main' : 'error.main'}>
+                      {fmtMoney(locker.estimatedMarginCents, 'USD')}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6} md={2.4}>
+                    <Typography variant='caption' color='text.secondary'>Avg utilization</Typography>
+                    <Typography variant='h6' fontWeight={700}>{locker.averageUtilizationPct}%</Typography>
+                  </Grid>
+                </Grid>
+
+                <Divider sx={{ my: 2 }} />
+                <Grid container spacing={2}>
+                  <Grid item xs={6} md={3}>
+                    <Typography variant='caption' color='text.secondary'>P50 used</Typography>
+                    <Typography variant='body1' fontWeight={700}>{(locker.p50UsedBytes / (1024 ** 3)).toFixed(1)} GB</Typography>
+                  </Grid>
+                  <Grid item xs={6} md={3}>
+                    <Typography variant='caption' color='text.secondary'>P95 used</Typography>
+                    <Typography variant='body1' fontWeight={700}>{(locker.p95UsedBytes / (1024 ** 3)).toFixed(1)} GB</Typography>
+                  </Grid>
+                  <Grid item xs={6} md={3}>
+                    <Typography variant='caption' color='text.secondary'>Total used</Typography>
+                    <Typography variant='body1' fontWeight={700}>{(locker.totalUsedBytes / (1024 ** 3)).toFixed(1)} GB</Typography>
+                  </Grid>
+                  <Grid item xs={6} md={3}>
+                    <Typography variant='caption' color='text.secondary'>Total quota</Typography>
+                    <Typography variant='body1' fontWeight={700}>{(locker.totalQuotaBytes / (1024 ** 3)).toFixed(1)} GB</Typography>
+                  </Grid>
+                </Grid>
+
+                {locker.fairUse ? (
+                  <>
+                    <Divider sx={{ my: 2 }} />
+                    <Typography variant='subtitle2' fontWeight={700} sx={{ mb: 1 }}>
+                      Fair-use (warn only)
+                    </Typography>
+                    <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
+                      {locker.fairUse.candidateCount} locker(s) at ≥{locker.fairUse.thresholdPct}% —
+                      reporting only; no purge action in this release.
+                    </Typography>
+                    {(locker.fairUse.candidates || []).slice(0, 8).map((row, i) => (
+                      <Stack key={`${row.planId}-${i}`} direction='row' justifyContent='space-between' sx={{ py: 0.25 }}>
+                        <Typography variant='body2' color='text.secondary'>
+                          {row.planId} · {(row.usedBytes / (1024 ** 3)).toFixed(1)} / {(row.quotaBytes / (1024 ** 3)).toFixed(1)} GB
+                        </Typography>
+                        <Typography variant='body2' fontWeight={700}>{row.utilizationPct}%</Typography>
+                      </Stack>
+                    ))}
+                  </>
+                ) : null}
+              </OpsSurfaceCard>
+            ) : null}
 
             {customRow ? (
               <OpsSurfaceCard>
