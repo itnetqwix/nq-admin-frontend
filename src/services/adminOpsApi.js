@@ -27,7 +27,7 @@ export async function listFailedJobs({ page = 1, limit = 25, search = '', queue 
     failedReason: j.failedReason || '—',
     attemptsMade: j.attemptsMade,
     at: j.timestamp ? new Date(j.timestamp).toISOString() : null,
-    data: j.data
+    dataPreview: j.dataPreview || undefined
   }))
   return {
     available: !!data.available,

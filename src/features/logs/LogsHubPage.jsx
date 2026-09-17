@@ -266,7 +266,7 @@ export default function LogsHubPage() {
         eyebrow='Logs · hub'
         icon='mdi:text-box-search-outline'
         title='Platform logs.'
-        subtitle='Who, when, IP, device, location. Admin access = invites + admin/sub-admin logins. Logins 7 days · invites 1 year.'
+        subtitle='Technical access trails: API hits, admin access, logins, security, notifications, files. Not the place to resolve incidents — use Ops center. Product feed = Platform activity · mutations = Audit log.'
       actions={
         <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
           {lastRefresh ? (

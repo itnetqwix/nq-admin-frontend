@@ -158,7 +158,7 @@ export default function AuditLogsPage() {
   return (
     <AdminPageShell
       title='Audit log'
-      subtitle='Admin actions. Filter by actor, action, date, or target user (deep-link from User 360).'
+      subtitle='Admin mutations only (invite, role, delete, refund). Product events → Platform activity · incidents → Ops center.'
       actions={
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
           <Button variant='outlined' onClick={() => void load()}>

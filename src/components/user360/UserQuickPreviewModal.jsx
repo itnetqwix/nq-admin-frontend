@@ -3,6 +3,7 @@ import Link from 'next/link'
 import MModal from 'src/pages/components/modal/Modal'
 
 export default function UserQuickPreviewModal({ open, handleClose, loading, user360Data, userId }) {
+  const identity = user360Data?.overview?.identity || {}
   const user = user360Data?.user || {}
   const summary = user360Data?.summary || {}
   const resolvedId =
@@ -14,6 +15,10 @@ export default function UserQuickPreviewModal({ open, handleClose, loading, user
           ? String(user.id)
           : ''
   const fullPageHref = resolvedId ? `/apps/users/${resolvedId}` : '/apps/manage-trainer'
+  const displayName = user?.fullname || identity.fullname || '-'
+  const displayEmail = user?.email || identity.email || '-'
+  const displayType = user?.account_type || identity.account_type || '-'
+  const displayStatus = user?.status ?? identity.status ?? '-'
 
   return (
     <MModal open={open} handleClose={handleClose} maxWidth='md'>
@@ -26,10 +31,10 @@ export default function UserQuickPreviewModal({ open, handleClose, loading, user
         ) : (
           <>
             <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
-              <Chip label={`Name: ${user?.fullname || '-'}`} />
-              <Chip label={`Email: ${user?.email || '-'}`} />
-              <Chip label={`Type: ${user?.account_type || '-'}`} />
-              <Chip label={`Status: ${user?.status ?? '-'}`} />
+              <Chip label={`Name: ${displayName}`} />
+              <Chip label={`Email: ${displayEmail}`} />
+              <Chip label={`Type: ${displayType}`} />
+              <Chip label={`Status: ${displayStatus}`} />
             </Stack>
             <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
               <Chip label={`Lessons: ${summary?.lessonsCount || 0}`} />

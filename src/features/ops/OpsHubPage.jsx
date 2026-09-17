@@ -38,12 +38,12 @@ const TAB_COPY = {
   events: {
     eyebrow: 'Ops · events',
     title: 'Ops events.',
-    subtitle: 'Instant lessons, calls, wallet, support — resolve from the drawer.'
+    subtitle: 'Actionable incidents (instant, calls, wallet, support). Resolve here — not in Platform logs.'
   },
   jobs: {
     eyebrow: 'Ops · jobs',
     title: 'Failed jobs.',
-    subtitle: 'BullMQ dead-letter visibility — retry after fixing root cause.'
+    subtitle: 'BullMQ dead-letter visibility — retry after fixing root cause. List omits raw job payloads.'
   },
   calls: {
     eyebrow: 'Ops · calls',

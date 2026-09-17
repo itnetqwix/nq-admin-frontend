@@ -80,7 +80,7 @@ export default function PlatformActivityPage() {
       const items = data?.items || []
       setRows(items.map((r, i) => ({ id: r.id || `row-${i}`, ...r })))
       setTotal(data?.pagination?.total ?? items.length)
-      setCounts(data?.counts || {})
+      setCounts(prev => ({ ...prev, ...(data?.counts || {}) }))
     } catch (e) {
       toast.error(e?.message || 'Failed to load platform activity')
       setRows([])
@@ -481,7 +481,7 @@ export default function PlatformActivityPage() {
           </Box>
         </Box>
       }
-      subtitle='Who did what, when — logins, uploads, bookings, invites, referrals, transactions, admin actions, and authenticated API hits (IP · device · path). Filters sync to the URL.'
+      subtitle='Unified product feed (7-day window): logins, uploads, bookings, invites, referrals, transactions, admin actions, API hits. Resolve incidents in Ops center · compliance mutations in Audit log.'
       actions={
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
           <AdminRefreshButton onClick={() => void load()} loading={loading} />
