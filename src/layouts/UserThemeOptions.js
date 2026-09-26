@@ -102,13 +102,18 @@ const UserThemeOptions = () => {
           elevation: 0
         },
         styleOverrides: {
-          root: {
+          root: ({ theme }) => ({
             borderRadius: 12,
-            boxShadow: cardShadow,
-            border: 'none',
+            boxShadow: theme.palette.mode === 'dark' ? ops.shadowCard : cardShadow,
+            border: theme.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.06)',
             backgroundImage: 'none',
-            backgroundColor: ops.canvas
-          }
+            backgroundColor: theme.palette.mode === 'dark' ? '#121826' : ops.canvas,
+            color: theme.palette.text.primary,
+            transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+            '&:hover': {
+              borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.16)' : 'rgba(0, 0, 0, 0.12)'
+            }
+          })
         }
       },
       MuiPaper: {
@@ -116,13 +121,15 @@ const UserThemeOptions = () => {
           elevation: 0
         },
         styleOverrides: {
-          root: {
-            backgroundImage: 'none'
-          },
-          outlined: {
-            border: 'none',
+          root: ({ theme }) => ({
+            backgroundImage: 'none',
+            backgroundColor: theme.palette.mode === 'dark' ? '#121826' : theme.palette.background.paper,
+            color: theme.palette.text.primary
+          }),
+          outlined: ({ theme }) => ({
+            border: theme.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.06)',
             boxShadow: cardShadow
-          }
+          })
         }
       },
       MuiOutlinedInput: {
@@ -176,15 +183,15 @@ const UserThemeOptions = () => {
           elevation: 0
         },
         styleOverrides: {
-          root: {
+          root: ({ theme }) => ({
             borderRadius: `${ops.radiusLg} !important`,
             boxShadow: cardShadow,
-            border: 'none',
-            backgroundColor: ops.canvas,
+            border: theme.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.06)',
+            backgroundColor: theme.palette.mode === 'dark' ? '#121826' : ops.canvas,
             '&:before': { display: 'none' },
             '&.Mui-expanded': { margin: 0 },
             '& + &': { marginTop: 12 }
-          }
+          })
         }
       },
       MuiAccordionSummary: {
@@ -201,7 +208,7 @@ const UserThemeOptions = () => {
               margin: '12px 0',
               fontWeight: 600,
               letterSpacing: '-0.28px',
-              color: ops.ink
+              color: theme.palette.text.primary
             }
           })
         }
@@ -210,7 +217,7 @@ const UserThemeOptions = () => {
         styleOverrides: {
           root: ({ theme }) => ({
             padding: '8px 20px 20px',
-            borderTop: `1px solid ${ops.hairline}`,
+            borderTop: `1px solid ${theme.palette.divider}`,
             [theme.breakpoints.down('sm')]: {
               padding: '8px 12px 16px'
             }
@@ -297,17 +304,25 @@ const UserThemeOptions = () => {
             backgroundImage: 'none',
             boxShadow: 'none',
             borderBottom: `1px solid ${theme.palette.divider}`,
-            backgroundColor: theme.palette.background.paper
+            backgroundColor: theme.palette.mode === 'dark' ? 'rgba(14, 19, 31, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+            backdropFilter: 'blur(12px)'
           })
         }
       },
       MuiTooltip: {
         styleOverrides: {
-          tooltip: {
+          tooltip: ({ theme }) => ({
             borderRadius: 6,
             fontSize: '0.75rem',
-            fontWeight: 400
-          }
+            fontWeight: 500,
+            backgroundColor: theme.palette.mode === 'dark' ? '#1E293B' : '#0F172A',
+            color: '#F8FAFC',
+            border: theme.palette.mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)'
+          }),
+          arrow: ({ theme }) => ({
+            color: theme.palette.mode === 'dark' ? '#1E293B' : '#0F172A'
+          })
         }
       },
       MuiListItemButton: {

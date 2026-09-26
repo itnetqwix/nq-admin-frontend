@@ -53,62 +53,68 @@ const VerticalNavSectionTitle = props => {
     }
   }
 
+  const isCollapsed = navCollapsed && !navHover
+
   return (
     <CanViewNavSectionTitle navTitle={item}>
       <ListSubheader
         className='nav-section-title'
         sx={{
-          ...(navCollapsed && !navHover
-            ? { py: 4.75, px: (collapsedNavWidth - navigationBorderWidth - 22) / 8 }
-            : { pl: 0 })
+          py: isCollapsed ? 2 : 1.5,
+          mt: 2,
+          mb: 0.5,
+          px: isCollapsed ? 2 : 3,
+          justifyContent: isCollapsed ? 'center' : 'flex-start'
         }}
       >
-        <Divider
-          textAlign='left'
-          sx={{
-            m: '0 !important',
-            lineHeight: 'normal',
-            ...conditionalBorderColor(),
-            '&:after': { display: 'none' },
-            ...(navCollapsed && !navHover
-              ? { width: 22 }
-              : {
-                  width: '100%',
-                  '&:before': { top: 7, transform: 'none', width: theme.spacing(4) },
-                  '& .MuiDivider-wrapper': {
-                    px: 4,
-                    fontSize: '0.6875rem',
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
-                    fontFamily:
-                      'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-                    fontWeight: 500
-                  }
-                })
-          }}
-        >
-          {navCollapsed && !navHover ? null : (
+        {isCollapsed ? (
+          <Box
+            sx={{
+              width: 16,
+              height: 2,
+              borderRadius: 1,
+              bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)'
+            }}
+          />
+        ) : (
+          <Box
+            sx={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1
+            }}
+          >
             <Typography
               noWrap
               variant='caption'
               sx={{
-                ...conditionalColor(),
+                fontSize: '0.6875rem',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                color: theme.palette.mode === 'dark' ? '#64748B' : '#94A3B8',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 0.75,
-                color: '#6b6b6b !important',
-                fontWeight: 600
+                gap: 0.75
               }}
             >
               {item.icon ? (
-                <Box component='span' sx={{ display: 'inline-flex', color: '#533afd', opacity: 0.85 }}>
-                  <Icon icon={item.icon} fontSize={14} />
+                <Box component='span' sx={{ display: 'inline-flex', color: '#818CF8' }}>
+                  <Icon icon={item.icon} fontSize={13} />
                 </Box>
               ) : null}
               <Translations text={item.sectionTitle} />
             </Typography>
-          )}
-        </Divider>
+            <Box
+              sx={{
+                flex: 1,
+                height: '1px',
+                bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)'
+              }}
+            />
+          </Box>
+        )}
       </ListSubheader>
     </CanViewNavSectionTitle>
   )

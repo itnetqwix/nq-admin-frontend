@@ -22,6 +22,7 @@ import AnalyticsTotalRevenue from 'src/views/dashboards/analytics/AnalyticsTotal
 
 import { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import { useTheme } from '@mui/material/styles'
 import authConfig from 'src/configs/auth'
 import { AbilityContext } from 'src/layouts/components/acl/Can'
 import { getAdminApiEnvLabel } from 'src/configs/adminEnv'
@@ -34,6 +35,7 @@ import ActiveUsersTable from '../components/tables/UsersTable'
 import { useAdminRealtime } from 'src/context/AdminRealtimeContext'
 
 const Home = () => {
+  const theme = useTheme()
   const router = useRouter()
   const ability = useContext(AbilityContext)
   const canEditCommission = ability?.can('update', 'admin-action-commission') ?? true
@@ -90,213 +92,329 @@ const Home = () => {
   return (
     <>
       <ApexChartWrapper>
-        <Grid container spacing={4} className='match-height' sx={{ mb: 2 }}>
+        {/* Realtime API Telemetry Status Banner */}
+        <Grid container spacing={3} sx={{ mb: 3 }}>
           <Grid item xs={12}>
-            <Alert severity='info' icon={false} sx={{ py: 0.5 }}>
+            <Box
+              sx={theme => ({
+                display: 'flex',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: 1.5,
+                px: { xs: 2, sm: 2.5 },
+                py: 1.5,
+                borderRadius: '14px',
+                border: `1px solid ${
+                  theme.palette.mode === 'dark' ? 'rgba(51, 65, 85, 0.6)' : 'rgba(226, 232, 240, 0.9)'
+                }`,
+                background:
+                  theme.palette.mode === 'dark'
+                    ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(17, 24, 39, 0.7) 100%)'
+                    : 'rgba(248, 250, 252, 0.9)',
+                backdropFilter: 'blur(12px)',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
+              })}
+            >
               <Chip
                 component='span'
                 size='small'
                 label={socketConnected ? 'Realtime connected' : 'Realtime connecting'}
-                color={socketConnected ? 'success' : 'default'}
-                sx={{ verticalAlign: 'middle' }}
+                sx={theme => ({
+                  height: 24,
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  fontFamily: '"IBM Plex Mono", ui-monospace, monospace',
+                  borderRadius: '9999px',
+                  border: `1px solid ${
+                    socketConnected
+                      ? 'rgba(16, 185, 129, 0.35)'
+                      : theme.palette.mode === 'dark'
+                      ? 'rgba(71, 85, 105, 0.5)'
+                      : 'rgba(203, 213, 225, 0.8)'
+                  }`,
+                  bgcolor: socketConnected
+                    ? 'rgba(16, 185, 129, 0.12)'
+                    : theme.palette.mode === 'dark'
+                    ? 'rgba(30, 41, 59, 0.6)'
+                    : 'rgba(241, 245, 249, 0.9)',
+                  color: socketConnected
+                    ? '#34D399'
+                    : theme.palette.mode === 'dark'
+                    ? '#94A3B8'
+                    : '#64748B'
+                })}
               />
-              <Typography component='span' variant='body2' sx={{ ml: 1 }}>
-                Env banner (top) shows API host — {getAdminApiEnvLabel()}
+              <Typography
+                variant='body2'
+                sx={theme => ({
+                  color: theme.palette.mode === 'dark' ? '#94A3B8' : '#64748B',
+                  fontSize: '0.85rem'
+                })}
+              >
+                Env banner (top) shows API host — <strong style={{ color: theme.palette.mode === 'dark' ? '#E2E8F0' : '#1E293B' }}>{getAdminApiEnvLabel()}</strong>
               </Typography>
-            </Alert>
+            </Box>
           </Grid>
         </Grid>
 
-        <Grid container spacing={4} className='match-height'>
-
+        <Grid container spacing={3} className='match-height'>
+          {/* Global Commission Banner (Hero Slate-Glass Card) */}
           <Grid item xs={12}>
-            <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
-              <Grid container alignItems='center' spacing={2} sx={{ px: 2, py: 1 }}>
-                <Grid item xs={12} sm={10}>
-                  <CardHeader title='Global commission' sx={{ px: 0, py: 1 }} titleTypographyProps={{ variant: 'h6', fontWeight: 600 }} />
-                  <CardContent sx={{ pt: 0, px: 0, pb: 2 }}>
-                    <Typography variant='body2' color='text.secondary'>
-                      Applies to all trainers. Use the edit control to update the rate.
-                    </Typography>
-                  </CardContent>
-                </Grid>
-                <Grid item xs={12} sm={2}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', sm: 'flex-end' }, gap: 1 }}>
-                    <Typography variant='h6' fontWeight={600}>
-                      {comission?.commission ?? 0}%
-                    </Typography>
-                    {canEditCommission ? (
-                      <CustomAvatar skin='light' variant='rounded' color='primary' onClick={openComissionModal}>
-                        <Icon icon='tabler:edit' />
-                      </CustomAvatar>
-                    ) : null}
+            <Box
+              sx={theme => ({
+                borderRadius: '16px',
+                border: `1px solid ${
+                  theme.palette.mode === 'dark' ? 'rgba(51, 65, 85, 0.8)' : 'rgba(226, 232, 240, 0.9)'
+                }`,
+                background:
+                  theme.palette.mode === 'dark'
+                    ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(17, 24, 39, 0.92) 50%, rgba(30, 27, 75, 0.45) 100%)'
+                    : 'linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%)',
+                backdropFilter: 'blur(20px)',
+                p: { xs: 2.5, sm: 3 },
+                boxShadow:
+                  theme.palette.mode === 'dark'
+                    ? '0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3)'
+                    : '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
+                display: 'flex',
+                flexDirection: { xs: 'column', sm: 'row' },
+                alignItems: { xs: 'flex-start', sm: 'center' },
+                justifyContent: 'space-between',
+                gap: 2.5
+              })}
+            >
+              {/* Left Side: Title & Subtitle */}
+              <Box sx={{ maxWidth: { sm: '70%', md: '75%' } }}>
+                <Typography
+                  sx={theme => ({
+                    color: theme.palette.mode === 'dark' ? '#F8FAFC' : '#0F172A',
+                    fontWeight: 600,
+                    fontSize: '1.125rem',
+                    letterSpacing: '-0.01em',
+                    mb: 0.5
+                  })}
+                >
+                  Global commission
+                </Typography>
+                <Typography
+                  sx={theme => ({
+                    color: theme.palette.mode === 'dark' ? '#94A3B8' : '#64748B',
+                    fontSize: '0.875rem',
+                    lineHeight: 1.45
+                  })}
+                >
+                  Applies to all trainers across the platform. Use the edit control to update the platform commission rate.
+                </Typography>
+              </Box>
+
+              {/* Right Side: Rate Display & Edit Button */}
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  alignSelf: { xs: 'flex-start', sm: 'center' }
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: { xs: '1.85rem', sm: '2.25rem' },
+                    fontWeight: 800,
+                    fontFamily: '"IBM Plex Mono", ui-monospace, monospace',
+                    letterSpacing: '-0.03em',
+                    background: 'linear-gradient(135deg, #818CF8 0%, #38BDF8 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent'
+                  }}
+                >
+                  {comission?.commission ?? 0}%
+                </Typography>
+                {canEditCommission ? (
+                  <Box
+                    component='button'
+                    onClick={openComissionModal}
+                    title='Edit Global Commission'
+                    sx={theme => ({
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      p: 1.25,
+                      borderRadius: '12px',
+                      cursor: 'pointer',
+                      border: `1px solid ${
+                        theme.palette.mode === 'dark' ? 'rgba(51, 65, 85, 0.7)' : 'rgba(203, 213, 225, 0.9)'
+                      }`,
+                      bgcolor:
+                        theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 0.8)' : 'rgba(241, 245, 249, 0.9)',
+                      color: theme.palette.mode === 'dark' ? '#CBD5E1' : '#334155',
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        bgcolor:
+                          theme.palette.mode === 'dark' ? 'rgba(51, 65, 85, 0.9)' : 'rgba(226, 232, 240, 1)',
+                        borderColor:
+                          theme.palette.mode === 'dark' ? 'rgba(99, 102, 241, 0.5)' : 'rgba(99, 102, 241, 0.4)',
+                        color: theme.palette.mode === 'dark' ? '#FFFFFF' : '#0F172A',
+                        transform: 'scale(1.04)'
+                      },
+                      '&:active': {
+                        transform: 'scale(0.98)'
+                      }
+                    })}
+                  >
+                    <Icon icon='tabler:edit' fontSize={20} />
                   </Box>
-                </Grid>
-              </Grid>
-            </Card>
+                ) : null}
+              </Box>
+            </Box>
           </Grid>
 
-          <Grid item xs={12} container spacing={3}>
-            <Grid item xs={6} sm={3}>
-              <CardStatisticsVertical
-                color='warning'
-                stats={metrics != null ? fmtInt(metrics.openSupportTickets ?? 0) : '—'}
-                trendNumber='Queue'
-                trend='positive'
-                title='Open support tickets'
-                chipText='raise_concern'
-                icon={<Icon icon='mdi:lifebuoy' />}
-                onCardClick={() => router.push('/apps/concern-by-user')}
-              />
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <CardStatisticsVertical
-                color='secondary'
-                stats={metrics != null ? fmtInt(metrics.openUserFeedback ?? 0) : '—'}
-                trendNumber='Queue'
-                trend='positive'
-                title='Open user feedback'
-                chipText='write_us'
-                icon={<Icon icon='mdi:account-question' />}
-                onCardClick={() => router.push('/apps/write-by-user')}
-              />
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <CardStatisticsVertical
-                color='error'
-                stats={metrics != null ? fmtInt(metrics.bookingsPendingRefund ?? 0) : '—'}
-                trendNumber='Action'
-                trend='positive'
-                title='Bookings pending refund'
-                chipText='Canceled w/ payment'
-                icon={<Icon icon='mdi:cash-refund' />}
-                onCardClick={() => router.push('/apps/booking')}
-              />
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <CardStatisticsVertical
-                color='info'
-                stats={metrics != null ? fmtInt(metrics.newUsersLast7Days ?? 0) : '—'}
-                trendNumber='7d'
-                trend='positive'
-                title='New trainers + trainees'
-                chipText='Last 7 days'
-                icon={<Icon icon='mdi:account-multiple-plus' />}
-                onCardClick={() => router.push('/apps/manage-trainer')}
-              />
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <CardStatisticsVertical
-                color='error'
-                stats={metrics != null ? fmtInt(metrics.opsCallPreflightFailures24h ?? 0) : '—'}
-                trendNumber='24h'
-                trend='positive'
-                title='ICE / call failures'
-                chipText='Preflight & call errors'
-                icon={<Icon icon='mdi:video-off-outline' />}
-                onCardClick={() => router.push('/apps/ops?tab=calls&eventType=CLIENT_PRECALL_CHECK')}
-              />
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <CardStatisticsVertical
-                color='warning'
-                stats={metrics != null ? fmtInt(metrics.pendingTrainerReview ?? 0) : '—'}
-                trendNumber='Review'
-                trend='positive'
-                title='Pending trainer review'
-                chipText='Profile approval'
-                icon={<Icon icon='mdi:account-clock-outline' />}
-                onCardClick={() => router.push('/apps/manage-trainer?status=pending')}
-              />
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <CardStatisticsVertical
-                color='error'
-                stats='Open'
-                trendNumber='BullMQ'
-                trend='positive'
-                title='Failed jobs'
-                chipText='PDF / reminders'
-                icon={<Icon icon='mdi:alert-octagon-outline' />}
-                onCardClick={() => router.push('/apps/ops?tab=jobs')}
-              />
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <CardStatisticsVertical
-                color='primary'
-                stats='Open'
-                trendNumber=' '
-                trend='positive'
-                title='Call diagnostics'
-                chipText='Quality & events'
-                icon={<Icon icon='mdi:video-outline' />}
-                onCardClick={() => router.push('/apps/ops?tab=calls')}
-              />
-            </Grid>
+          {/* Operational & Metric Cards (4-Column Grid) */}
+          <Grid item xs={12} sm={6} md={3}>
+            <CardStatisticsVertical
+              color='warning'
+              stats={metrics != null ? fmtInt(metrics.openSupportTickets ?? 0) : '—'}
+              trendNumber='Queue'
+              trend='positive'
+              title='Open support tickets'
+              chipText='raise_concern'
+              icon={<Icon icon='mdi:lifebuoy' />}
+              onCardClick={() => router.push('/apps/concern-by-user')}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <CardStatisticsVertical
+              color='secondary'
+              stats={metrics != null ? fmtInt(metrics.openUserFeedback ?? 0) : '—'}
+              trendNumber='Queue'
+              trend='positive'
+              title='Open user feedback'
+              chipText='write_us'
+              icon={<Icon icon='mdi:account-question' />}
+              onCardClick={() => router.push('/apps/write-by-user')}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <CardStatisticsVertical
+              color='error'
+              stats={metrics != null ? fmtInt(metrics.bookingsPendingRefund ?? 0) : '—'}
+              trendNumber='Action'
+              trend='positive'
+              title='Bookings pending refund'
+              chipText='Canceled w/ payment'
+              icon={<Icon icon='mdi:cash-refund' />}
+              onCardClick={() => router.push('/apps/booking')}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <CardStatisticsVertical
+              color='info'
+              stats={metrics != null ? fmtInt(metrics.newUsersLast7Days ?? 0) : '—'}
+              trendNumber='7d'
+              trend='positive'
+              title='New trainers + trainees'
+              chipText='Last 7 days'
+              icon={<Icon icon='mdi:account-multiple-plus' />}
+              onCardClick={() => router.push('/apps/manage-trainer')}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <CardStatisticsVertical
+              color='error'
+              stats={metrics != null ? fmtInt(metrics.opsCallPreflightFailures24h ?? 0) : '—'}
+              trendNumber='24h'
+              trend='positive'
+              title='ICE / call failures'
+              chipText='Preflight & call errors'
+              icon={<Icon icon='mdi:video-off-outline' />}
+              onCardClick={() => router.push('/apps/ops?tab=calls&eventType=CLIENT_PRECALL_CHECK')}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <CardStatisticsVertical
+              color='warning'
+              stats={metrics != null ? fmtInt(metrics.pendingTrainerReview ?? 0) : '—'}
+              trendNumber='Review'
+              trend='positive'
+              title='Pending trainer review'
+              chipText='Profile approval'
+              icon={<Icon icon='mdi:account-clock-outline' />}
+              onCardClick={() => router.push('/apps/manage-trainer?status=pending')}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <CardStatisticsVertical
+              color='error'
+              stats='Open'
+              trendNumber='BullMQ'
+              trend='positive'
+              title='Failed jobs'
+              chipText='PDF / reminders'
+              icon={<Icon icon='mdi:alert-octagon-outline' />}
+              onCardClick={() => router.push('/apps/ops?tab=jobs')}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <CardStatisticsVertical
+              color='primary'
+              stats='Open'
+              trendNumber=' '
+              trend='positive'
+              title='Call diagnostics'
+              chipText='Quality & events'
+              icon={<Icon icon='mdi:video-outline' />}
+              onCardClick={() => router.push('/apps/ops?tab=calls')}
+            />
           </Grid>
 
-          <Grid item xs={12} md={8} container spacing={6}>
-            <Grid item xs={6}>
-              <AnalyticsTotalRevenue
-                valueText={metrics ? fmtMoney(metrics.totalRevenue) : '—'}
-                trendText={liveHint}
-                trendPositive={socketConnected}
-                chipSubtext='Paid bookings (excl. canceled)'
-                onClick={() => router.push('/apps/booking?focus=paid')}
-              />
-            </Grid>
-            {/* <Grid item xs={3}>
-              <CardStatisticsVertical
-                stats='$13.4k'
-                color='success'
-                trendNumber='+38%'
-                title={`Global Commission: ${comission?.commission ?? 0}%`}
-                chipText='Last Six Month'
-                icon={<Icon icon='tabler:edit' />}
-                isCommission={true}
-                onClick={openComissionModal}
-              />
-            </Grid> */}
-            <Grid item xs={3}>
-              <CardStatisticsVertical
-                color='info'
-                stats={metrics ? fmtInt(metrics.totalImpressions) : '—'}
-                trendNumber={liveHint}
-                trend='positive'
-                chipText='Published clips (live)'
-                title='Total Impressions'
-                icon={<Icon icon='mdi:link' />}
-                onCardClick={() => router.push('/apps/manage-trainer')}
-              />
-            </Grid>
-            <Grid item xs={3}>
-              <AnalyticsOverview
-                valueText={
-                  metrics
-                    ? `${fmtInt(metrics.trainersCount)} / ${fmtInt(metrics.traineesCount)}`
-                    : '—'
-                }
-                trendText={liveHint}
-                trendPositive={socketConnected}
-                radialPercent={metrics?.overviewCompletionPercent ?? 0}
-                caption='Session completion rate'
-                onClick={() => router.push('/apps/booking')}
-              />
-            </Grid>
+          {/* Live Session & Financial Metric Cards (Bottom Row) */}
+          <Grid item xs={12} sm={6} lg={4}>
+            <AnalyticsTotalRevenue
+              valueText={metrics ? fmtMoney(metrics.totalRevenue) : '—'}
+              trendText={liveHint}
+              trendPositive={socketConnected}
+              chipSubtext='Paid bookings (excl. canceled)'
+              onClick={() => router.push('/apps/booking?focus=paid')}
+            />
           </Grid>
-          <Grid item xs={6} md={2}>
+          <Grid item xs={12} sm={6} lg={2}>
+            <CardStatisticsVertical
+              color='info'
+              stats={metrics ? fmtInt(metrics.totalImpressions) : '—'}
+              trendNumber={liveHint}
+              trend='positive'
+              chipText='Published clips'
+              title='Total Impressions'
+              icon={<Icon icon='mdi:link' />}
+              onCardClick={() => router.push('/apps/manage-trainer')}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} lg={2}>
+            <AnalyticsOverview
+              valueText={
+                metrics
+                  ? `${fmtInt(metrics.trainersCount)} / ${fmtInt(metrics.traineesCount)}`
+                  : '—'
+              }
+              trendText={liveHint}
+              trendPositive={socketConnected}
+              radialPercent={metrics?.overviewCompletionPercent ?? 0}
+              caption='Session completion rate'
+              onClick={() => router.push('/apps/booking')}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} lg={2}>
             <CardStatisticsVertical
               stats={metrics ? fmtInt(metrics.totalOrders) : '—'}
               color='primary'
               trendNumber={liveHint}
               trend='positive'
               title='Total Orders'
-              chipText='Paid bookings (live)'
+              chipText='Paid bookings'
               icon={<Icon icon='mdi:cart-plus' />}
               onCardClick={() => router.push('/apps/booking')}
             />
           </Grid>
-          <Grid item xs={6} md={2}>
+          <Grid item xs={12} sm={6} lg={2}>
             <AnalyticsSessions
               valueText={metrics ? fmtInt(metrics.totalSessions) : '—'}
               trendText={liveHint}

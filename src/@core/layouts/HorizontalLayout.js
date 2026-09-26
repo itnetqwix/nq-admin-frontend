@@ -21,19 +21,22 @@ import AppBarContent from './components/horizontal/app-bar-content'
 // ** Util Import
 import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
 
-const HorizontalLayoutWrapper = styled('div')({
+const HorizontalLayoutWrapper = styled('div')(({ theme }) => ({
   height: '100%',
   display: 'flex',
+  minHeight: '100vh',
+  backgroundColor: theme.palette.background.default,
   ...(themeConfig.horizontalMenuAnimation && { overflow: 'clip' })
-})
+}))
 
-const MainContentWrapper = styled(Box)({
+const MainContentWrapper = styled(Box)(({ theme }) => ({
   flexGrow: 1,
   minWidth: 0,
   display: 'flex',
   minHeight: '100dvh',
-  flexDirection: 'column'
-})
+  flexDirection: 'column',
+  backgroundColor: theme.palette.background.default
+}))
 
 const Toolbar = styled(MuiToolbar)(({ theme }) => ({
   width: '100%',
@@ -51,11 +54,18 @@ const Toolbar = styled(MuiToolbar)(({ theme }) => ({
 const ContentWrapper = styled('main')(({ theme }) => ({
   flexGrow: 1,
   width: '100%',
+  maxWidth: 1600,
+  marginLeft: 'auto',
+  marginRight: 'auto',
   minWidth: 0,
-  padding: theme.spacing(6),
+  padding: theme.spacing(4),
   transition: 'padding .25s ease-in-out',
+  backgroundColor: 'transparent',
+  [theme.breakpoints.down('lg')]: {
+    padding: theme.spacing(3)
+  },
   [theme.breakpoints.down('sm')]: {
-    padding: theme.spacing(1.5, 1.25, 2)
+    padding: theme.spacing(2, 1.5, 3)
   }
 }))
 

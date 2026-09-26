@@ -2,9 +2,9 @@
 import { styled } from '@mui/material/styles'
 import MuiSwipeableDrawer from '@mui/material/SwipeableDrawer'
 
-const SwipeableDrawer = styled(MuiSwipeableDrawer)({
+const SwipeableDrawer = styled(MuiSwipeableDrawer)(({ theme }) => ({
   overflowX: 'hidden',
-  transition: 'width .25s ease-in-out',
+  transition: 'width .25s cubic-bezier(0.4, 0, 0.2, 1)',
   '& ul': {
     listStyle: 'none'
   },
@@ -13,12 +13,16 @@ const SwipeableDrawer = styled(MuiSwipeableDrawer)({
     paddingRight: 4
   },
   '& .MuiDrawer-paper': {
-    left: 'unset',
+    left: 0,
     right: 'unset',
     overflowX: 'hidden',
-    transition: 'width .25s ease-in-out, box-shadow .25s ease-in-out'
+    borderRight: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : theme.palette.divider}`,
+    transition: 'width .25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow .25s ease, background-color .25s ease',
+    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(14, 19, 31, 0.95)' : '#ffffff',
+    backdropFilter: 'blur(16px)',
+    backgroundImage: 'none'
   }
-})
+}))
 
 const Drawer = props => {
   // ** Props
@@ -46,7 +50,13 @@ const Drawer = props => {
     onOpen: () => setNavVisible(true),
     onClose: () => setNavVisible(false),
     ModalProps: {
-      keepMounted: true // Better open performance on mobile.
+      keepMounted: true,
+      BackdropProps: {
+        sx: {
+          backgroundColor: 'rgba(0, 0, 0, 0.65)',
+          backdropFilter: 'blur(8px)'
+        }
+      }
     }
   }
 
@@ -80,6 +90,8 @@ const Drawer = props => {
   delete userNavMenuProps.sx
   delete userNavMenuProps.PaperProps
 
+  const currentNavWidth = navCollapsed && !navHover ? collapsedNavWidth : navWidth
+
   return (
     <SwipeableDrawer
       className='layout-vertical-nav'
@@ -87,18 +99,15 @@ const Drawer = props => {
       {...(hidden ? { ...MobileDrawerProps } : { ...DesktopDrawerProps })}
       PaperProps={{
         sx: {
-          backgroundColor: 'background.paper',
-          width: navCollapsed && !navHover ? collapsedNavWidth : navWidth,
-          maxWidth: hidden ? 'min(280px, calc(100vw - 40px))' : undefined,
-          ...(!hidden && navCollapsed && navHover ? { boxShadow: 10 } : {}),
-          borderRight: theme =>
-            navigationBorderWidth === 0 ? 0 : `${navigationBorderWidth}px solid ${theme.palette.divider}`,
+          width: hidden ? 280 : currentNavWidth,
+          maxWidth: hidden ? 'calc(100vw - 32px)' : undefined,
+          ...(!hidden && navCollapsed && navHover ? { boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4)' } : {}),
           ...userNavMenuPaperStyle
         },
         ...navMenuProps?.PaperProps
       }}
       sx={{
-        ...(hidden ? { width: 'auto' } : { width: navCollapsed ? collapsedNavWidth : navWidth, flexShrink: 0 }),
+        ...(hidden ? { width: 'auto' } : { width: currentNavWidth, flexShrink: 0 }),
         ...userNavMenuStyle
       }}
       {...userNavMenuProps}
