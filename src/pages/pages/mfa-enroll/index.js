@@ -88,12 +88,32 @@ const MfaEnrollPage = () => {
     >
       {recoveryCodes ? (
         <Box>
-          <Alert severity='success' sx={{ mb: 2, borderRadius: ops.radiusSm }}>
+          <Alert
+            severity='success'
+            sx={{
+              mb: 2,
+              borderRadius: '10px',
+              bgcolor: 'rgba(16, 185, 129, 0.12)',
+              border: '1px solid rgba(16, 185, 129, 0.25)',
+              color: '#A7F3D0',
+              '& .MuiAlert-icon': { color: '#34D399' }
+            }}
+          >
             Store these recovery codes offline. They are shown once.
           </Alert>
           <Box
             component='ul'
-            sx={{ fontFamily: ops.mono, fontSize: 13, pl: 2.5, mb: 2.5, color: ops.ink }}
+            sx={{
+              fontFamily: ops.mono,
+              fontSize: 13,
+              pl: 2.5,
+              mb: 2.5,
+              color: '#E2E8F0',
+              bgcolor: 'rgba(11, 15, 23, 0.5)',
+              p: 2,
+              borderRadius: '10px',
+              border: '1px solid rgba(255, 255, 255, 0.08)'
+            }}
           >
             {(recoveryCodes.length ? recoveryCodes : ['(none returned)']).map(c => (
               <li key={c}>{c}</li>
@@ -107,7 +127,23 @@ const MfaEnrollPage = () => {
               auth.clearMfaEnrollment?.()
               void router.replace('/home')
             }}
-            sx={{ bgcolor: ops.ink, '&:hover': { bgcolor: '#000' }, textTransform: 'none', fontWeight: 600 }}
+            sx={{
+              height: 48,
+              background: 'linear-gradient(135deg, #6366F1 0%, #3B82F6 100%)',
+              color: '#FFFFFF',
+              fontSize: '14px',
+              fontWeight: 600,
+              borderRadius: '12px',
+              textTransform: 'none',
+              boxShadow: '0 4px 14px 0 rgba(99, 102, 241, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #4F46E5 0%, #2563EB 100%)',
+                boxShadow: '0 6px 20px 0 rgba(99, 102, 241, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+                transform: 'translateY(-1px)'
+              },
+              '&:active': { transform: 'translateY(0px)' }
+            }}
           >
             Continue to admin
           </Button>
@@ -115,28 +151,47 @@ const MfaEnrollPage = () => {
       ) : (
         <form onSubmit={confirm}>
           {setupError ? (
-            <Alert severity='error' sx={{ mb: 2, borderRadius: ops.radiusSm }}>
+            <Alert
+              severity='error'
+              sx={{
+                mb: 2,
+                borderRadius: '10px',
+                bgcolor: 'rgba(239, 68, 68, 0.12)',
+                border: '1px solid rgba(239, 68, 68, 0.25)',
+                color: '#FCA5A5',
+                '& .MuiAlert-icon': { color: '#F87171' }
+              }}
+            >
               {setupError}
             </Alert>
           ) : null}
           {otpauthUrl ? (
             <Box sx={{ textAlign: 'center', mb: 2 }}>
-              {/* ponytail: public QR endpoint, no extra npm */}
               <Box
-                component='img'
-                alt='Authenticator QR'
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(otpauthUrl)}`}
-                sx={{ width: 180, height: 180, borderRadius: 1, border: `1px solid ${ops.hairline}` }}
-              />
+                sx={{
+                  display: 'inline-block',
+                  p: 1.5,
+                  bgcolor: '#FFFFFF',
+                  borderRadius: '12px',
+                  boxShadow: '0 8px 24px -4px rgba(0, 0, 0, 0.4)'
+                }}
+              >
+                <Box
+                  component='img'
+                  alt='Authenticator QR'
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(otpauthUrl)}`}
+                  sx={{ width: 180, height: 180, display: 'block', borderRadius: '4px' }}
+                />
+              </Box>
             </Box>
           ) : null}
           {secret ? (
-            <Typography sx={{ mb: 2, fontFamily: ops.mono, fontSize: 12, color: ops.body, wordBreak: 'break-all' }}>
+            <Typography sx={{ mb: 2, fontFamily: ops.mono, fontSize: 12, color: '#A5B4FC', wordBreak: 'break-all', textAlign: 'center' }}>
               Secret: {secret}
             </Typography>
           ) : null}
           {busy && !secret && !setupError ? (
-            <Typography sx={{ mb: 2, color: ops.mute, fontSize: 13 }}>Starting authenticator setup…</Typography>
+            <Typography sx={{ mb: 2, color: '#94A3B8', fontSize: 13, textAlign: 'center' }}>Starting authenticator setup…</Typography>
           ) : null}
           <TextField
             fullWidth
@@ -146,13 +201,38 @@ const MfaEnrollPage = () => {
             inputProps={{ autoComplete: 'one-time-code', inputMode: 'numeric' }}
             sx={{
               mb: 2.5,
+              bgcolor: 'rgba(15, 23, 42, 0.8)',
+              borderRadius: '12px',
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'rgba(15, 23, 42, 0.8)',
+                borderRadius: '12px',
+                color: '#F8FAFC',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                '& fieldset': { borderColor: 'rgba(51, 65, 85, 0.6)', borderWidth: '1px' },
+                '&:hover fieldset': { borderColor: 'rgba(71, 85, 105, 0.85)' },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#6366F1',
+                  borderWidth: '2px',
+                  boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.2)'
+                },
+                '&.Mui-error fieldset': {
+                  borderColor: 'rgba(244, 63, 94, 0.85) !important'
+                }
+              },
               '& input': {
                 textAlign: 'center',
                 letterSpacing: '0.42em',
                 fontFamily: ops.mono,
                 fontSize: 22,
                 fontWeight: 700,
-                py: 1.75
+                py: 1.75,
+                color: '#FFFFFF',
+                caretColor: '#6366F1',
+                '&::placeholder': {
+                  color: '#64748B',
+                  opacity: '1 !important',
+                  WebkitTextFillColor: '#64748B'
+                }
               }
             }}
           />
@@ -162,7 +242,25 @@ const MfaEnrollPage = () => {
             type='submit'
             variant='contained'
             disabled={busy || code.trim().length < 6 || !secret}
-            sx={{ mb: 1.5, bgcolor: ops.ink, '&:hover': { bgcolor: '#000' }, textTransform: 'none', fontWeight: 600 }}
+            sx={{
+              height: 48,
+              mb: 1.5,
+              background: 'linear-gradient(135deg, #6366F1 0%, #3B82F6 100%)',
+              color: '#FFFFFF',
+              fontSize: '14px',
+              fontWeight: 600,
+              borderRadius: '12px',
+              textTransform: 'none',
+              boxShadow: '0 4px 14px 0 rgba(99, 102, 241, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #4F46E5 0%, #2563EB 100%)',
+                boxShadow: '0 6px 20px 0 rgba(99, 102, 241, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+                transform: 'translateY(-1px)'
+              },
+              '&:active': { transform: 'translateY(0px)' },
+              '&.Mui-disabled': { background: 'rgba(255, 255, 255, 0.08)', color: 'rgba(255, 255, 255, 0.35)', boxShadow: 'none' }
+            }}
           >
             {busy ? 'Working…' : 'Confirm and enable'}
           </Button>
@@ -173,7 +271,28 @@ const MfaEnrollPage = () => {
         size='large'
         variant='outlined'
         onClick={() => auth.logout?.()}
-        sx={{ mt: 1, textTransform: 'none', borderColor: ops.hairline, color: ops.ink }}
+        sx={{
+          height: 46,
+          mt: 1,
+          textTransform: 'none',
+          fontSize: '14px',
+          fontWeight: 600,
+          letterSpacing: '-0.01em',
+          borderColor: 'rgba(255, 255, 255, 0.12)',
+          color: '#F1F5F9',
+          bgcolor: 'rgba(255, 255, 255, 0.05)',
+          borderRadius: '12px',
+          boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+          '&:hover': {
+            borderColor: 'rgba(255, 255, 255, 0.25)',
+            bgcolor: 'rgba(255, 255, 255, 0.09)',
+            color: '#FFFFFF',
+            transform: 'translateY(-1px)',
+            boxShadow: '0 4px 12px 0 rgba(0, 0, 0, 0.35)'
+          },
+          '&:active': { transform: 'translateY(0)' }
+        }}
       >
         Sign out
       </Button>
