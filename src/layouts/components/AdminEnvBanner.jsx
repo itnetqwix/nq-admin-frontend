@@ -17,7 +17,16 @@ export default function AdminEnvBanner() {
         size='small'
         label={tag}
         color={color}
-        sx={{ height: 22, fontWeight: 700, fontSize: 10, letterSpacing: '0.04em', flexShrink: 0 }}
+        variant='outlined'
+        sx={{
+          height: 26,
+          fontWeight: 700,
+          fontSize: '0.6875rem',
+          letterSpacing: '0.06em',
+          flexShrink: 0,
+          borderRadius: '6px',
+          borderWidth: '1px'
+        }}
       />
     </Tooltip>
   )

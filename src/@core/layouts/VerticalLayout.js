@@ -20,33 +20,44 @@ import Navigation from './components/vertical/navigation'
 import Footer from './components/shared-components/footer'
 import ScrollToTop from 'src/@core/components/scroll-to-top'
 
-const VerticalLayoutWrapper = styled('div')({
+const VerticalLayoutWrapper = styled('div')(({ theme }) => ({
   height: '100%',
+  minHeight: '100vh',
+  width: '100%',
   display: 'flex',
   minWidth: 0,
-  overflowX: 'clip'
-})
+  overflowX: 'clip',
+  backgroundColor: theme.palette.background.default
+}))
 
-const MainContentWrapper = styled(Box)({
-  flexGrow: 1,
+const MainContentWrapper = styled(Box)(({ theme }) => ({
+  flex: '1 1 auto',
+  width: '100%',
   minWidth: 0,
   display: 'flex',
   minHeight: '100dvh',
-  flexDirection: 'column'
-})
+  height: '100dvh',
+  flexDirection: 'column',
+  overflowY: 'auto',
+  overflowX: 'hidden',
+  backgroundColor: theme.palette.background.default
+}))
 
 const ContentWrapper = styled('main')(({ theme }) => ({
   flexGrow: 1,
   width: '100%',
+  maxWidth: 1600,
+  marginLeft: 'auto',
+  marginRight: 'auto',
   minWidth: 0,
-  padding: theme.spacing(3, 4, 4),
+  padding: theme.spacing(4),
   transition: 'padding .25s ease-in-out',
-  backgroundColor: theme.palette.background.default,
-  [theme.breakpoints.down('md')]: {
-    padding: theme.spacing(2)
+  backgroundColor: 'transparent',
+  [theme.breakpoints.down('lg')]: {
+    padding: theme.spacing(3)
   },
   [theme.breakpoints.down('sm')]: {
-    padding: theme.spacing(1.5, 1.25, 2)
+    padding: theme.spacing(2, 1.5, 3)
   }
 }))
 
@@ -55,7 +66,7 @@ const VerticalLayout = props => {
   const { hidden, settings, children, scrollToTop, footerProps, contentHeightFixed, verticalLayoutProps } = props
 
   // ** Vars
-  const { skin, navHidden, contentWidth } = settings
+  const { navHidden } = settings
   const { navigationSize, disableCustomizer, collapsedNavigationSize } = themeConfig
   const navWidth = navigationSize
   const navigationBorderWidth = 1
@@ -111,15 +122,9 @@ const VerticalLayout = props => {
           <ContentWrapper
             className='layout-page-content'
             sx={{
-              backgroundColor: '#f6f7f9',
               ...(contentHeightFixed && {
                 overflow: 'hidden',
                 '& > :first-of-type': { height: '100%' }
-              }),
-              ...(contentWidth === 'boxed' && {
-                mx: 'auto',
-                '@media (min-width:1440px)': { maxWidth: 1440 },
-                '@media (min-width:1200px)': { maxWidth: '100%' }
               })
             }}
           >

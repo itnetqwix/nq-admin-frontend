@@ -207,7 +207,7 @@ const Navigation = props => {
       <Drawer {...props} navHover={navHover} setNavHover={setNavHover}>
         <VerticalNavHeader {...props} navHover={navHover} />
         {showSearch ? (
-          <Box sx={{ px: 3.5, pb: 2, pt: 0.5 }}>
+          <Box sx={{ px: 3, pb: 2, pt: 1 }}>
             <TextField
               size='small'
               fullWidth
@@ -225,7 +225,15 @@ const Navigation = props => {
                 '& .MuiOutlinedInput-root': {
                   height: 36,
                   borderRadius: '8px',
-                  fontSize: 13
+                  fontSize: 13,
+                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                  borderColor: 'rgba(255, 255, 255, 0.08)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.07)'
+                  },
+                  '&.Mui-focused': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.08)'
+                  }
                 }
               }}
             />

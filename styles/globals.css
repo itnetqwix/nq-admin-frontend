@@ -1,19 +1,23 @@
 html,
 body {
   min-height: 100%;
+  background-color: #0B0F19;
+  color: #F8FAFC;
 }
 
 #__next {
   height: 100%;
+  background-color: inherit;
 }
 
 code {
   font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  padding: 0.1rem 0.4rem;
-  font-size: 90%;
-  color: #12161C;
+  padding: 0.15rem 0.45rem;
+  font-size: 88%;
+  color: #818CF8;
   border-radius: 6px;
-  background: #F3F4F6;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
 code:not([class*='language-']):before,

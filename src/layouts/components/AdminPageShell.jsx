@@ -130,11 +130,15 @@ export default function AdminPageShell({
         elevation={0}
         sx={{
           borderRadius: `${ops.radiusLg}`,
-          border: 'none',
+          border: theme => `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)'}`,
           overflowX: 'auto',
           overflowY: 'visible',
           bgcolor: 'background.paper',
-          boxShadow: ops.shadowCard,
+          boxShadow: theme => theme.palette.mode === 'dark' ? '0 1px 3px 0 rgba(0, 0, 0, 0.35)' : ops.shadowCard,
+          transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+          '&:hover': {
+            borderColor: theme => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.14)' : 'rgba(0, 0, 0, 0.1)'
+          },
           ...contentSx
         }}
       >
