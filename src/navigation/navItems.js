@@ -44,7 +44,9 @@ const navigation = () => [
     title: 'Money',
     icon: 'mdi:cash-multiple',
     children: [
+      link('KPIs', '/apps/kpis', 'mdi:chart-timeline-variant', 'admin-nav-kpis'),
       link('Bookings', '/apps/booking', 'mdi:briefcase-arrow-left-right-outline', 'admin-nav-bookings'),
+      link('Lesson packages', '/apps/package-credits', 'mdi:package-variant-closed', 'admin-nav-package-credits'),
       link('Finance', '/apps/finance', 'mdi:bank-outline', 'admin-nav-finance'),
       link(
         'Stripe Connect',
@@ -96,7 +98,8 @@ const navigation = () => [
     icon: 'mdi:lifebuoy',
     children: [
       link('Support tickets', '/apps/concern-by-user', 'mdi:lifebuoy', 'admin-nav-support-tickets'),
-      link('User feedback', '/apps/write-by-user', 'mdi:account-question', 'admin-nav-user-feedback')
+      link('User feedback', '/apps/write-by-user', 'mdi:account-question', 'admin-nav-user-feedback'),
+      link('Product feedback', '/apps/product-feedback', 'mdi:message-draw', 'admin-nav-product-feedback')
     ]
   },
   {
@@ -113,6 +116,7 @@ const navigation = () => [
       ),
       link('Audit log', '/apps/audit-logs', 'mdi:clipboard-text-clock-outline', 'admin-nav-audit-logs'),
       link('Live lessons', '/apps/live-lessons', 'mdi:record-rec', 'admin-nav-call-diagnostics'),
+      link('Feature flags', '/apps/feature-flags', 'mdi:flag-variant-outline', 'admin-nav-feature-flags'),
       link('Admin roles', '/apps/admin-roles', 'mdi:shield-account-outline', 'admin-nav-admin-settings')
     ]
   }

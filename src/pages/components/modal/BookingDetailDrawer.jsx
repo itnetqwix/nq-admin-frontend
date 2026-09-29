@@ -35,6 +35,13 @@ function DetailRow({ label, value }) {
   )
 }
 
+const CANCELLED_BY_LABEL = {
+  trainee: 'Enthusiast',
+  trainer: 'Coach',
+  admin: 'Admin / support',
+  system: 'System (automatic)'
+}
+
 function formatEscrowMinor(minor) {
   if (minor == null) return null
   return `$${(Number(minor) / 100).toFixed(2)}`
@@ -78,7 +85,8 @@ export default function BookingDetailDrawer({
   onConfirm,
   onRequestCancel,
   onRequestRefund,
-  onActionComplete
+  onActionComplete,
+  refreshKey = 0
 }) {
   const [loading, setLoading] = useState(false)
   const [detail, setDetail] = useState(null)
@@ -101,7 +109,7 @@ export default function BookingDetailDrawer({
   useEffect(() => {
     if (!open || !bookingId) return
     loadDetail()
-  }, [open, bookingId])
+  }, [open, bookingId, refreshKey])
 
   const s = detail?.session
   const fmt = v => (v ? moment(v).format('MMM D, YYYY h:mm A') : '—')
@@ -439,6 +447,65 @@ export default function BookingDetailDrawer({
                     Total extended: {s.total_extended_minutes} min
                   </Typography>
                 ) : null}
+              </>
+            ) : null}
+
+            {detail?.cancellation ? (
+              <>
+                <Divider sx={{ my: 2 }} />
+                <Typography variant='subtitle2' sx={{ mb: 1 }}>
+                  Cancellation
+                </Typography>
+                <DetailRow label='Cancelled by' value={CANCELLED_BY_LABEL[detail.cancellation.cancelled_by] || detail.cancellation.cancelled_by} />
+                <DetailRow label='Cancelled at' value={fmt(detail.cancellation.cancelled_at)} />
+                <DetailRow
+                  label='Refund percent'
+                  value={
+                    detail.cancellation.refund_percent != null
+                      ? `${detail.cancellation.refund_percent}%${detail.cancellation.late_cancel ? ' (late cancel)' : ''}`
+                      : null
+                  }
+                />
+                <DetailRow
+                  label='Refunded to enthusiast'
+                  value={
+                    detail.cancellation.refunded_amount != null
+                      ? `$${Number(detail.cancellation.refunded_amount).toFixed(2)}`
+                      : null
+                  }
+                />
+                <DetailRow
+                  label='Paid to coach'
+                  value={
+                    detail.cancellation.coach_payout_amount != null
+                      ? `$${Number(detail.cancellation.coach_payout_amount).toFixed(2)}`
+                      : null
+                  }
+                />
+              </>
+            ) : null}
+
+            {detail?.reschedule?.request?.status === 'pending' || detail?.reschedule_history?.length ? (
+              <>
+                <Divider sx={{ my: 2 }} />
+                <Typography variant='subtitle2' sx={{ mb: 1 }}>
+                  Reschedules ({detail?.reschedule?.count ?? 0}/{detail?.reschedule?.max ?? '—'} accepted)
+                </Typography>
+                {detail?.reschedule?.request?.status === 'pending' ? (
+                  <DetailRow
+                    label='Pending request'
+                    value={`${fmt(detail.reschedule.request.start_time)} (asked ${fmt(detail.reschedule.request.requested_at)})`}
+                  />
+                ) : null}
+                {(detail?.reschedule_history || []).map((h, i) => (
+                  <DetailRow
+                    key={`${h.at}-${i}`}
+                    label={fmt(h.at)}
+                    value={`${fmt(h.from_start_time)} → ${fmt(h.to_start_time)} · ${
+                      h.mode === 'accepted_request' ? 'coach accepted request' : 'moved before confirm'
+                    }`}
+                  />
+                ))}
               </>
             ) : null}
 

@@ -9,8 +9,7 @@ import {
   AdminFilterBar,
   AdminGridContainer,
   OpsMetricTile,
-  OpsSurfaceCard,
-  useAdminConfirm
+  OpsSurfaceCard
 } from 'src/components/admin'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import RefundPopups from 'src/pages/components/modal/RefundPopups'
@@ -92,7 +91,6 @@ export default function Booking() {
   const router = useRouter()
   const ability = useContext(AbilityContext)
   const canRefund = ability?.can('update', 'admin-action-refund') ?? true
-  const { confirm, ConfirmDialog } = useAdminConfirm()
   const dispatch = useAppDispatch()
   const { items, total, page, limit, search, filters, counts, loading, error } = useAppSelector(selectBookings)
   const searchTimer = useRef(null)
@@ -101,6 +99,8 @@ export default function Booking() {
   const [openRefundPopup, setOpenRefundPopup] = useState(false)
   const [paymentIntentDetails, setPaymentIntentDetails] = useState({})
   const [refundRow, setRefundRow] = useState(null)
+  const [refundMode, setRefundMode] = useState('refund')
+  const [detailRefresh, setDetailRefresh] = useState(0)
   const [detailId, setDetailId] = useState(null)
 
   const statusFilter = filters.status || ''
@@ -183,6 +183,7 @@ export default function Booking() {
       toast.error('Refund already completed or in progress for this booking')
       return
     }
+    setRefundMode('refund')
     setRefundRow(row)
     setOpenRefundPopup(true)
     setPaymentIntentDetails({})
@@ -191,40 +192,60 @@ export default function Booking() {
     }
   }
 
-  const requestCancel = async id => {
-    const ok = await confirm({
-      title: 'Cancel this session?',
-      message:
-        'Cancels the booking and starts a refund to the enthusiast. Wallet credits are usually instant; card refunds take 5–10 business days. The coach cannot take this slot afterward.',
-      detail: `Booking: ${id}`,
-      confirmLabel: 'Cancel and refund',
-      variant: 'danger',
-      reasonRequired: true,
-      reasonLabel: 'Why is ops canceling?'
-    })
-    if (!ok) return
+  const requestCancel = id => {
+    if (!id) return
+    const row = items.find(r => String(r._id || r.id) === String(id)) || { _id: String(id) }
+    setRefundMode('cancel')
+    setRefundRow(row)
+    setOpenRefundPopup(true)
+    setPaymentIntentDetails({})
+    if (row.payment_intent_id) {
+      void getPaymentIntentDetails(row.payment_intent_id).then(setPaymentIntentDetails).catch(() => setPaymentIntentDetails({}))
+    }
+  }
+
+  const closeRefundPopup = () => {
+    setDetailRefresh(n => n + 1)
+    setOpenRefundPopup(false)
+    setRefundRow(null)
+    setRefundMode('refund')
+  }
+
+  const onConformCancel = async (reason, { refundPercent = 100, destination = 'original' } = {}) => {
     try {
-      const result = await cancelAdminBooking(id, ok.reason)
-      if (result?.refunded) toast.success('Session canceled and refund started')
-      else if (result?.refundError) toast.error(`Canceled, but refund failed: ${result.refundError}`)
+      const result = await cancelAdminBooking(refundRow._id, reason, { refundPercent, destination })
+      if (result?.refunded) {
+        toast.success(
+          refundPercent < 100 || destination === 'wallet'
+            ? `Session canceled. ${refundPercent}% refund ${destination === 'wallet' ? 'credited to the wallet' : 'started'}.`
+            : 'Session canceled and full refund started'
+        )
+      } else if (result?.refundError) toast.error(`Canceled, but refund failed: ${result.refundError}`)
       else toast.success('Session canceled')
+      closeRefundPopup()
       reload()
     } catch (e) {
       toast.error(e?.message || 'Cancel failed')
     }
   }
 
-  const onConformRefund = async (paymentIntentId, reason) => {
+  const onConformRefund = async (paymentIntentId, reason, { refundPercent = 100, destination = 'original' } = {}) => {
     if (!refundRow?._id) return
+    if (refundMode === 'cancel') return onConformCancel(reason, { refundPercent, destination })
     try {
       await createAdminRefund({
         bookingId: refundRow._id,
         paymentIntentId,
-        reason
+        reason,
+        refundPercent,
+        destination
       })
-      toast.success('Refund submitted. Wallet is instant; cards take 5–10 business days.')
-      setOpenRefundPopup(false)
-      setRefundRow(null)
+      toast.success(
+        destination === 'wallet'
+          ? `${refundPercent}% refund credited to the enthusiast's wallet.`
+          : 'Refund submitted. Wallet is instant; cards take 5–10 business days.'
+      )
+      closeRefundPopup()
       reload()
     } catch (e) {
       toast.error(e?.message || 'Refund was not completed')
@@ -457,19 +478,17 @@ export default function Booking() {
         onRequestCancel={requestCancel}
         onRequestRefund={showRefundPopup}
         onActionComplete={reload}
+        refreshKey={detailRefresh}
       />
 
       <RefundPopups
         paymentIntentDetails={paymentIntentDetails}
         bookingPreview={refundRow}
-        handleClose={() => {
-          setOpenRefundPopup(false)
-          setRefundRow(null)
-        }}
+        handleClose={closeRefundPopup}
         open={openRefundPopup}
         onConform={onConformRefund}
+        mode={refundMode}
       />
-      {ConfirmDialog}
     </>
   )
 }

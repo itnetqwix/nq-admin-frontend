@@ -50,9 +50,13 @@ const required = [
   '/apps/platform-activity',
   '/apps/concern-by-user',
   '/apps/write-by-user',
+  '/apps/product-feedback',
   '/apps/audit-logs',
   '/apps/live-lessons',
-  '/apps/admin-roles'
+  '/apps/admin-roles',
+  '/apps/kpis',
+  '/apps/feature-flags',
+  '/apps/package-credits'
 ]
 
 for (const p of required) {

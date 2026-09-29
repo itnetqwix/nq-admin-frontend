@@ -7,7 +7,7 @@ export const REFUND_REASON_LABELS = {
   trainer_cancelled: 'Coach cancelled',
   trainer_cancelled_scheduled: 'Coach cancelled',
   trainee_cancelled: 'Enthusiast cancelled',
-  trainee_cancelled_scheduled: 'Cancelled before confirmation',
+  trainee_cancelled_scheduled: 'Enthusiast cancelled',
   scheduled_unconfirmed_expired: 'Unconfirmed — expired at start',
   scheduled_overlap_superseded: 'Overlap — another session confirmed first',
   duplicate_charge: 'Duplicate charge',
