@@ -4,6 +4,7 @@ import { createAdminListSlice } from '../createAdminListSlice'
 const writeUsPkg = createAdminListSlice({
   name: 'supportWriteUs',
   listPath: '/admin/write-us',
+  selectState: state => state.support.writeUs,
   initialFilters: { status: '' },
   buildQuery: (cur, params) => ({
     page: params?.page ?? cur.page,
@@ -17,6 +18,7 @@ const writeUsPkg = createAdminListSlice({
 const raiseConcernPkg = createAdminListSlice({
   name: 'supportRaiseConcern',
   listPath: '/admin/raise-concern',
+  selectState: state => state.support.raiseConcern,
   initialFilters: { status: '', reason: '' },
   buildQuery: (cur, params) => ({
     page: params?.page ?? cur.page,
@@ -47,8 +49,8 @@ export const {
   setPage: setRaiseConcernPage
 } = raiseConcernPkg.actions
 
-export const selectWriteUs = state => state.support.writeUs
-export const selectRaiseConcern = state => state.support.raiseConcern
+export const selectWriteUs = writeUsPkg.select
+export const selectRaiseConcern = raiseConcernPkg.select
 
 export default combineReducers({
   writeUs: writeUsPkg.reducer,

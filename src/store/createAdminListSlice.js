@@ -9,10 +9,12 @@ export function createAdminListSlice({
   listPath,
   buildQuery,
   initialFilters = {},
-  mapQueryToFilters
+  mapQueryToFilters,
+  // Must match where the reducer is mounted in the store (nested slices differ from `name`).
+  selectState = state => state[name]
 }) {
   const fetchList = createAsyncThunk(`${name}/fetchList`, async (params, { getState }) => {
-    const cur = getState()[name]
+    const cur = selectState(getState())
     const query = buildQuery(cur, params)
     const data = await fetchAdminList(listPath, query)
     return { ...data, query }
@@ -73,6 +75,6 @@ export function createAdminListSlice({
     reducer: slice.reducer,
     actions: slice.actions,
     fetchList,
-    select: state => state[name]
+    select: selectState
   }
 }
