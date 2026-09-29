@@ -44,6 +44,7 @@ import ReactHotToast from 'src/@core/styles/libs/react-hot-toast'
 // ** Utils Imports
 import { createEmotionCache } from 'src/@core/utils/create-emotion-cache'
 import { initLogRocket } from 'src/lib/logrocket'
+import { initSentry } from 'src/lib/sentry'
 import { initClarity, reidentifyClarityPage } from 'src/lib/clarity'
 
 // ** Prismjs Styles
@@ -101,6 +102,7 @@ const App = props => {
   const aclAbilities = Component.acl ?? defaultACLObj
 
   useEffect(() => {
+    initSentry()
     initLogRocket()
     initClarity()
   }, [])

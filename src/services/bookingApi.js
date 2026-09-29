@@ -44,24 +44,31 @@ async function parseJson(res) {
   return data?.data ?? data
 }
 
-export async function createAdminRefund({ bookingId, paymentIntentId, reason }) {
+export async function createAdminRefund({ bookingId, paymentIntentId, reason, refundPercent, destination }) {
   const res = await fetch(apiUrl('/transaction/create-refund'), {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify({
       booking_id: bookingId,
       payment_intent_id: paymentIntentId || undefined,
-      reason
+      reason,
+      refund_percent: refundPercent,
+      destination
     })
   })
   return parseJson(res)
 }
 
-export async function cancelAdminBooking(bookingId, reason) {
+/** `split` = { refundPercent (0–100), destination ('original' | 'wallet') }; omit for a full refund to the original method. */
+export async function cancelAdminBooking(bookingId, reason, split = {}) {
   const res = await fetch(apiUrl(`/admin/booking/${bookingId}/cancel`), {
     method: 'POST',
     headers: getAuthHeaders(),
-    body: JSON.stringify({ reason })
+    body: JSON.stringify({
+      reason,
+      ...(split.refundPercent != null ? { refund_percent: split.refundPercent } : {}),
+      ...(split.destination ? { destination: split.destination } : {})
+    })
   })
   return parseJson(res)
 }

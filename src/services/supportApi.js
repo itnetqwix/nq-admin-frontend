@@ -21,6 +21,19 @@ export async function patchWriteUsTicket(id, ticket_status, note = '') {
   return data?.data ?? data
 }
 
+export async function patchFeedbackStatus(id, ticket_status) {
+  const res = await fetch(api(`/admin/feedback/${id}`), {
+    method: 'PATCH',
+    headers: headers(),
+    body: JSON.stringify({ ticket_status })
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || String(data?.status || '').toLowerCase() === 'fail') {
+    throw new Error(data?.error || data?.message || 'Update failed')
+  }
+  return data?.data ?? data
+}
+
 export async function patchRaiseConcernTicket(id, ticket_status, note = '') {
   const res = await fetch(api(`/admin/raise-concern/${id}`), {
     method: 'PATCH',

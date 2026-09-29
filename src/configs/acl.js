@@ -57,6 +57,10 @@ const defineRulesFor = (role, user) => {
     if (ok(key)) can('read', subject)
   })
 
+  if (ok('nav_user_feedback')) can('read', 'admin-nav-product-feedback')
+  if (ok('nav_kpis') || ok('nav_finance')) can('read', 'admin-nav-kpis')
+  if (ok('nav_feature_flags') || ok('nav_admin_settings')) can('read', 'admin-nav-feature-flags')
+  if (ok('nav_finance')) can('read', 'admin-nav-package-credits')
   if (ok('nav_trainer_verifications') || ok('nav_trainers')) {
     can('read', 'admin-nav-trainer-verifications')
   }

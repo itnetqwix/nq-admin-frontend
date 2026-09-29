@@ -10,12 +10,14 @@ import { ops } from 'src/styles/opsSurface'
 import PricingRegionTab from './PricingRegionTab'
 import PricingProductsTab from './PricingProductsTab'
 import PricingEscrowPolicyTab from './PricingEscrowPolicyTab'
+import PricingCancellationPolicyTab from './PricingCancellationPolicyTab'
 import PricingLessonSplit from './PricingLessonSplit'
 import { PRICING_REGIONS, PAYOUT_PROCESSING_FEES, fmtMoney, fmtPct, withdrawalSettlement } from 'src/constants/pricingAdmin'
 
 const RATES_SUB_TABS = [
   { value: 'core', label: 'Core' },
   { value: 'checkout', label: 'Checkout & escrow' },
+  { value: 'cancellation', label: 'Cancellations' },
   { value: 'tax', label: 'Tax' },
   { value: 'advanced', label: 'Payments & products' }
 ]
@@ -175,6 +177,22 @@ export default function PricingRatesTab({
             <PricingRegionTab {...regionPatchProps} section='checkout' />
             <PricingEscrowPolicyTab policy={config.escrowPolicy} canEdit={canEdit} onPatch={onPatchEscrowPolicy} />
           </Stack>
+        </OpsSurfaceCard>
+      ) : null}
+
+      {subTab === 'cancellation' ? (
+        <OpsSurfaceCard>
+          <Typography sx={{ fontWeight: 600, letterSpacing: '-0.28px', fontSize: 16, mb: 0.5 }}>
+            Cancellation & refund policy
+          </Typography>
+          <Typography sx={{ fontSize: 13, color: ops.body, mb: 2, lineHeight: 1.5 }}>
+            How much an enthusiast gets back when they cancel a confirmed lesson, by how far ahead they cancel.
+          </Typography>
+          <PricingCancellationPolicyTab
+            policy={config.cancellationPolicy}
+            canEdit={canEdit}
+            onChange={cancellationPolicy => onPatchGlobal({ cancellationPolicy })}
+          />
         </OpsSurfaceCard>
       ) : null}
 
