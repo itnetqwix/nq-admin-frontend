@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path')
+const { withSentryConfig } = require('@sentry/nextjs/config')
 
 /** @type {import('next').NextConfig} */
 
-module.exports = {
+const nextConfig = {
   trailingSlash: true,
   reactStrictMode: false,
   eslint: {
@@ -19,3 +20,14 @@ module.exports = {
     return config
   }
 }
+
+module.exports = withSentryConfig(nextConfig, {
+  org: 'netqwix',
+  project: 'admin-portal',
+  // Source maps upload only when SENTRY_AUTH_TOKEN is set (CI); local builds skip it.
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  sourcemaps: { deleteSourcemapsAfterUpload: true },
+  telemetry: false
+})
