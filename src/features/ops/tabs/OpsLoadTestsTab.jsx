@@ -16,6 +16,7 @@ import {
 } from 'recharts'
 import { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import { fetchLoadTestRun, fetchLoadTestRuns } from 'src/services/loadTestApi'
+import LoadTestControlPanel from './LoadTestControlPanel'
 
 const STATUS_COLOR = { passed: 'success', failed: 'error', aborted: 'warning' }
 
@@ -34,9 +35,9 @@ function RunDetail({ run }) {
   const rows = useMemo(
     () =>
       (run.stages || []).map(s => {
-        const total = (s.httpOk || 0) + (s.httpFail || 0)
+        const total = (s.httpOk || 0) + (s.httpFail || 0) + (s.http429 || 0)
         return {
-          name: s.name,
+          name: s.scenario ? `${s.scenario} ${s.users}` : s.name,
           users: s.users,
           p50: s.latencyMs?.p50 ?? null,
           p95: s.latencyMs?.p95 ?? null,
@@ -71,7 +72,7 @@ function RunDetail({ run }) {
         <ResponsiveContainer>
           <LineChart data={rows}>
             <CartesianGrid strokeDasharray='3 3' />
-            <XAxis dataKey='users' />
+            <XAxis dataKey='name' />
             <YAxis />
             <Tooltip />
             <Legend />
@@ -87,7 +88,7 @@ function RunDetail({ run }) {
         <ResponsiveContainer>
           <BarChart data={rows}>
             <CartesianGrid strokeDasharray='3 3' />
-            <XAxis dataKey='users' />
+            <XAxis dataKey='name' />
             <YAxis />
             <Tooltip />
             <Legend />
@@ -150,6 +151,8 @@ export default function OpsLoadTestsTab({ refreshTick = 0 }) {
   ]
 
   return (
+    <>
+    <LoadTestControlPanel onFinished={load} />
     <AdminPageSection title='Load test runs'>
       {error ? (
         <Alert severity='error' sx={{ mb: 2 }}>
@@ -182,5 +185,6 @@ export default function OpsLoadTestsTab({ refreshTick = 0 }) {
         </Typography>
       )}
     </AdminPageSection>
+    </>
   )
 }
