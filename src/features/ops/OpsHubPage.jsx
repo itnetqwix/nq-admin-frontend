@@ -21,12 +21,14 @@ import OpsHealthTab from './tabs/OpsHealthTab'
 import OpsEventsTab from './tabs/OpsEventsTab'
 import OpsJobsTab from './tabs/OpsJobsTab'
 import OpsCallsTab from './tabs/OpsCallsTab'
+import OpsLoadTestsTab from './tabs/OpsLoadTestsTab'
 
 const TABS = [
   { value: 'health', label: 'Health' },
   { value: 'events', label: 'Events' },
   { value: 'jobs', label: 'Failed jobs' },
-  { value: 'calls', label: 'Calls' }
+  { value: 'calls', label: 'Calls' },
+  { value: 'loadtests', label: 'Load tests' }
 ]
 
 const TAB_COPY = {
@@ -49,6 +51,11 @@ const TAB_COPY = {
     eyebrow: 'Ops · calls',
     title: 'Call diagnostics.',
     subtitle: 'Preflight, in-call quality, clip playback, and lesson actions.'
+  },
+  loadtests: {
+    eyebrow: 'Ops · load tests',
+    title: 'Load tests.',
+    subtitle: 'Stress-test runs: latency, errors and the point where the system broke.'
   }
 }
 
@@ -92,7 +99,7 @@ export default function OpsHubPage() {
         await dispatch(
           fetchFailedJobsList({ page: jobsState.page, limit: jobsState.limit, search: jobsState.search })
         )
-      } else if (tab === 'calls') {
+      } else if (tab === 'calls' || tab === 'loadtests') {
         setRefreshTick(t => t + 1)
       }
     } finally {
@@ -124,6 +131,7 @@ export default function OpsHubPage() {
       {tab === 'events' ? <OpsEventsTab hub /> : null}
       {tab === 'jobs' ? <OpsJobsTab hub /> : null}
       {tab === 'calls' ? <OpsCallsTab hub refreshTick={refreshTick} /> : null}
+      {tab === 'loadtests' ? <OpsLoadTestsTab refreshTick={refreshTick} /> : null}
     </AdminPageShell>
   )
 }

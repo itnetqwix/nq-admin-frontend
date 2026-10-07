@@ -72,16 +72,16 @@ export default function CmsLegalPage() {
 
   const handleSeed = async () => {
     const ok = await confirm({
-      title: 'Seed legal templates?',
-      message: 'Loads starter Terms, Privacy, Cancellation & Refund HTML. Skips documents that already exist unless you force overwrite.',
-      confirmLabel: 'Seed',
+      title: 'Restore detailed legal template?',
+      message: 'Replaces this document’s current draft with the detailed system template. The live document is unchanged until you review and publish it.',
+      confirmLabel: 'Restore template',
       variant: 'info'
     })
     if (!ok) return
     setSeeding(true)
     try {
-      await seedLegalDocuments({ slug })
-      toast.success('Template loaded — review and publish when ready')
+      await seedLegalDocuments({ slug, force: true })
+      toast.success('Detailed template restored — review and publish when ready')
       await load()
     } catch (e) {
       toast.error(e.message || 'Seed failed')
@@ -248,7 +248,7 @@ export default function CmsLegalPage() {
               />
               <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                 <Button variant='outlined' onClick={() => void handleSeed()} disabled={seeding} sx={{ textTransform: 'none' }}>
-                  {seeding ? 'Loading…' : 'Load template'}
+                  {seeding ? 'Restoring…' : 'Restore detailed template'}
                 </Button>
                 <Button
                   variant='outlined'
