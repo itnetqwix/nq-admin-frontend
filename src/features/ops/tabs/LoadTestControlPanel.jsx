@@ -34,6 +34,7 @@ export default function LoadTestControlPanel({ onFinished }) {
   const [maxP95Ms, setMaxP95Ms] = useState(5000)
   const [mix, setMix] = useState({})
   const [confirm, setConfirm] = useState('')
+  const [remote, setRemote] = useState(false)
   const [busy, setBusy] = useState(false)
   const wasRunning = useRef(false)
 
@@ -58,6 +59,8 @@ export default function LoadTestControlPanel({ onFinished }) {
 
   const running = ctl && ctl.status !== 'idle'
   const limits = ctl?.limits || {}
+  const agent = ctl?.agent || {}
+  const useRemote = remote && agent.online
   const toggleScenario = id => {
     setScenarios(s => (s.includes(id) ? s.filter(x => x !== id) : [...s, id]))
     setMix({}) // reset to an equal split whenever the selection changes
@@ -83,7 +86,10 @@ export default function LoadTestControlPanel({ onFinished }) {
         const drift = 100 - Object.values(mixOut).reduce((a, b) => a + b, 0)
         mixOut[scenarios[0]] = Math.round((mixOut[scenarios[0]] + drift) * 10) / 10
       }
-      await startLoadTest({ label, scenarios, stages, abort: { maxErrorPct, maxP95Ms }, mix: mixOut }, confirm)
+      await startLoadTest(
+        { label, source: useRemote ? 'remote' : 'api-host', scenarios, stages, abort: { maxErrorPct, maxP95Ms }, mix: mixOut },
+        confirm
+      )
       toast.success('Stress test started')
       setConfirm('')
       setArmed(false)
@@ -124,7 +130,10 @@ export default function LoadTestControlPanel({ onFinished }) {
   const progress = running && ctl.totalStages ? ((ctl.currentStage + 1) / ctl.totalStages) * 100 : 0
 
   return (
-    <AdminPageSection title='Stress test control' subtitle='Runs against this server. Load comes from the API host itself, so results are a pessimistic floor.'>
+    <AdminPageSection
+      title='Stress test control'
+      subtitle='Runs against this server. Load comes from the API host itself (a pessimistic floor) unless a remote load agent is connected and selected.'
+    >
       {error ? <Alert severity='error' sx={{ mb: 2 }}>{error}</Alert> : null}
 
       {running ? (
@@ -155,6 +164,21 @@ export default function LoadTestControlPanel({ onFinished }) {
       {armed && !running ? (
         <Stack spacing={2} sx={{ mt: 2 }}>
           <TextField size='small' label='Run label' value={label} onChange={e => setLabel(e.target.value)} />
+
+          <Box>
+            <FormControlLabel
+              disabled={!agent.online}
+              control={<Switch checked={useRemote} onChange={e => setRemote(e.target.checked)} />}
+              label='Generate load from the remote agent'
+            />
+            <Typography variant='caption' color='text.secondary' sx={{ display: 'block', ml: 6 }}>
+              {!agent.configured
+                ? 'Remote agent not configured on this server (LOADTEST_AGENT_KEY).'
+                : agent.online
+                  ? `Agent online: ${agent.host}`
+                  : 'No agent connected. Start scripts/load-test/agent.mjs on a separate machine.'}
+            </Typography>
+          </Box>
 
           <Box>
             <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap sx={{ mb: 0.5 }}>

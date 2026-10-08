@@ -60,7 +60,14 @@ function RunDetail({ run }) {
           <Tile label='Breaking point' value={run.breaking_point_users ? `${run.breaking_point_users} users` : 'none reached'} />
         </Grid>
         <Grid item xs={6} md={3}>
-          <Tile label='Environment' value={run.environment} />
+          <Tile
+            label='Environment'
+            value={
+              run.summary?.loadSource
+                ? `${run.environment} · load from ${run.summary.loadSource === 'remote' ? `agent ${run.summary.agentHost || ''}` : 'API host'}`
+                : run.environment
+            }
+          />
         </Grid>
         <Grid item xs={6} md={3}>
           <Tile label='Commit' value={run.commit_sha ? run.commit_sha.slice(0, 8) : '—'} />
