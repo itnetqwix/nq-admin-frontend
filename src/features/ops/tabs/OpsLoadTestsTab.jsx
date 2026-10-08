@@ -97,6 +97,63 @@ function RunDetail({ run }) {
           </BarChart>
         </ResponsiveContainer>
       </Box>
+
+      <Typography variant='subtitle2'>Slowest endpoints (by p95)</Typography>
+      {(run.stages || []).filter(s => s.endpoints?.length).length === 0 ? (
+        <Typography variant='body2' color='text.secondary'>No per-endpoint data for this run.</Typography>
+      ) : (
+        (run.stages || [])
+          .filter(s => s.endpoints?.length)
+          .map(s => (
+            <Box key={s.name} sx={{ mb: 1 }}>
+              <Typography variant='caption' color='text.secondary'>
+                {s.scenario} · {s.users} users
+              </Typography>
+              {s.endpoints.slice(0, 6).map(e => (
+                <Typography key={e.path} variant='body2' sx={{ fontFamily: 'monospace' }}>
+                  {e.path} — p50 {e.p50}ms · p95 {e.p95}ms · max {e.max}ms · {e.count} req · {e.fail} failed
+                </Typography>
+              ))}
+            </Box>
+          ))
+      )}
+
+      {(run.stages || []).some(s => s.failures && Object.keys(s.failures).length) ? (
+        <>
+          <Typography variant='subtitle2'>Failure signatures</Typography>
+          {(run.stages || []).flatMap(s =>
+            Object.entries(s.failures || {}).map(([k, n]) => (
+              <Typography key={`${s.name}-${k}`} variant='body2' sx={{ fontFamily: 'monospace' }}>
+                {s.scenario}: {k} × {n}
+              </Typography>
+            ))
+          )}
+        </>
+      ) : null}
+
+      <Typography variant='subtitle2'>Server CPU / memory during the run</Typography>
+      {(() => {
+        const samples = (run.stages || []).find(s => s.samples?.length)?.samples || []
+        if (!samples.length) return <Typography variant='body2' color='text.secondary'>No samples recorded.</Typography>
+        const t0 = samples[0].t
+        const data = samples.map(x => ({ sec: Math.round((x.t - t0) / 1000), load: x.cpuLoad1, rssMb: x.rssMb }))
+        return (
+          <Box sx={{ height: 200 }}>
+            <ResponsiveContainer>
+              <LineChart data={data}>
+                <CartesianGrid strokeDasharray='3 3' />
+                <XAxis dataKey='sec' />
+                <YAxis yAxisId='l' />
+                <YAxis yAxisId='r' orientation='right' />
+                <Tooltip />
+                <Legend />
+                <Line yAxisId='l' dataKey='load' name='CPU load (1m)' stroke='#ed6c02' dot={false} />
+                <Line yAxisId='r' dataKey='rssMb' name='Memory RSS (MB)' stroke='#1976d2' dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </Box>
+        )
+      })()}
     </Stack>
   )
 }
