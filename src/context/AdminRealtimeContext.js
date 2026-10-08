@@ -128,12 +128,14 @@ export const AdminRealtimeProvider = ({ children }) => {
     if (!token) return undefined
 
     const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '')
-    // ponytail: Cloudflare/ALB returns 400 on WS upgrade; website already uses polling-only
+    // Start on polling, then upgrade to websocket. If the upgrade is blocked the client stays on
+    // polling. (The old 400s on upgrade came from a PeerJS ws server in the API, removed 2026-10-08.)
     const next = io(baseUrl, {
       path: '/socket.io',
       auth: { authorization: token, token },
-      transports: ['polling'],
-      upgrade: false,
+      transports: ['polling', 'websocket'],
+      upgrade: true,
+      rememberUpgrade: false,
       withCredentials: true,
       reconnection: true,
       reconnectionAttempts: 10
