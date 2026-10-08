@@ -186,12 +186,15 @@ export default function PricingRatesTab({
             Cancellation & refund policy
           </Typography>
           <Typography sx={{ fontSize: 13, color: ops.body, mb: 2, lineHeight: 1.5 }}>
-            How much an enthusiast gets back when they cancel a confirmed lesson, by how far ahead they cancel.
+            How much an enthusiast gets back when they cancel a confirmed lesson, by how far ahead they cancel, and
+            the fine for coaches who keep cancelling accepted lessons.
           </Typography>
           <PricingCancellationPolicyTab
             policy={config.cancellationPolicy}
+            penalty={config.coachCancellationPenalty}
             canEdit={canEdit}
             onChange={cancellationPolicy => onPatchGlobal({ cancellationPolicy })}
+            onPenaltyChange={coachCancellationPenalty => onPatchGlobal({ coachCancellationPenalty })}
           />
         </OpsSurfaceCard>
       ) : null}

@@ -1,9 +1,11 @@
 import Link from 'next/link'
 import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
+import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
+import Switch from '@mui/material/Switch'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import AddIcon from '@mui/icons-material/Add'
@@ -12,10 +14,24 @@ import { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 
 const MAX_TIERS = 6
 const DEFAULT_TIERS = [
-  { minHoursBefore: 24, refundPercent: 100 },
-  { minHoursBefore: 12, refundPercent: 50 },
+  { minHoursBefore: 12, refundPercent: 100 },
+  { minHoursBefore: 6, refundPercent: 75 },
+  { minHoursBefore: 1, refundPercent: 50 },
   { minHoursBefore: 0, refundPercent: 0 }
 ]
+const DEFAULT_PENALTY = { enabled: false, freeCancelsPerMonth: 8, finePercent: null }
+
+/** Mirrors backend parseCoachCancellationPenalty (server still enforces). */
+export function coachPenaltyError(penalty) {
+  const free = Number(penalty?.freeCancelsPerMonth)
+  if (!Number.isInteger(free) || free < 0 || free > 100) return 'Free cancels per month must be a whole number 0–100.'
+  const fine = penalty?.finePercent
+  if (fine != null && fine !== '') {
+    const n = Number(fine)
+    if (!Number.isInteger(n) || n < 1 || n > 100) return 'Fine % must be a whole number 1–100, or empty to use commission.'
+  }
+  return null
+}
 
 /** Mirrors backend parseCancellationPolicy so admins see problems before Save (server still enforces). */
 export function cancellationPolicyError(tiers) {
@@ -50,20 +66,24 @@ function describeTiers(tiers) {
   })
 }
 
-export default function PricingCancellationPolicyTab({ policy, canEdit, onChange }) {
+export default function PricingCancellationPolicyTab({ policy, penalty, canEdit, onChange, onPenaltyChange }) {
   const tiers = policy?.tiers?.length ? policy.tiers : DEFAULT_TIERS
   const error = cancellationPolicyError(tiers)
+  const fine = { ...DEFAULT_PENALTY, ...(penalty || {}) }
+  const fineError = coachPenaltyError(fine)
 
   const setTiers = next => onChange({ tiers: next })
   const patchTier = (index, partial) => setTiers(tiers.map((t, i) => (i === index ? { ...t, ...partial } : t)))
+  const patchFine = partial => onPenaltyChange({ ...fine, ...partial })
 
   return (
     <Stack spacing={2}>
       <Alert severity='info'>
         Platform-wide, all regions. Applies when an enthusiast cancels a <strong>confirmed</strong> scheduled lesson.
-        Requests the coach hasn&apos;t confirmed yet and coach cancellations are always refunded in full. The
-        non-refunded part goes to the coach (minus commission). Changes apply to <strong>new bookings only</strong> —
-        existing bookings keep the policy they were booked under.
+        Requests the coach hasn&apos;t confirmed yet are always refunded in full, and so is any booking cancelled within
+        15 minutes of being made (when the lesson is more than 1 hour away). The non-refunded part goes to the coach
+        (minus commission). Changes apply to <strong>new bookings only</strong> — existing bookings keep the policy they
+        were booked under.
       </Alert>
 
       <AdminPageSection title='Refund tiers'>
@@ -121,7 +141,7 @@ export default function PricingCancellationPolicyTab({ policy, canEdit, onChange
               disabled={!canEdit}
               sx={{ textTransform: 'none' }}
             >
-              Reset to 24h / 12h defaults
+              Reset to 12h / 6h / 1h defaults
             </Button>
           </Stack>
         </Stack>
@@ -140,6 +160,52 @@ export default function PricingCancellationPolicyTab({ policy, canEdit, onChange
           </Stack>
         </AdminPageSection>
       )}
+
+      <AdminPageSection title='Coach cancellation fine'>
+        <Stack spacing={1.5}>
+          <Typography variant='body2' color='text.secondary'>
+            When a coach cancels a lesson they already accepted, the enthusiast is always refunded in full. Beyond the
+            free allowance each calendar month (UTC), every further cancel fines the coach a percentage of the lesson
+            amount — taken from their wallet, and from future payouts if the wallet is short. Declining a request that
+            was never accepted doesn&apos;t count.
+          </Typography>
+          <FormControlLabel
+            control={
+              <Switch checked={!!fine.enabled} onChange={e => patchFine({ enabled: e.target.checked })} disabled={!canEdit} />
+            }
+            label='Fine coaches for repeated cancellations'
+          />
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                size='small'
+                type='number'
+                label='Free cancels per month'
+                inputProps={{ min: 0, max: 100, step: 1 }}
+                value={fine.freeCancelsPerMonth}
+                onChange={e => patchFine({ freeCancelsPerMonth: Number(e.target.value) })}
+                disabled={!canEdit || !fine.enabled}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                size='small'
+                type='number'
+                label='Fine % of lesson amount'
+                placeholder='Commission rate'
+                helperText='Leave empty to use the coach’s commission rate'
+                inputProps={{ min: 1, max: 100, step: 1 }}
+                value={fine.finePercent ?? ''}
+                onChange={e => patchFine({ finePercent: e.target.value === '' ? null : Number(e.target.value) })}
+                disabled={!canEdit || !fine.enabled}
+              />
+            </Grid>
+          </Grid>
+          {fineError ? <Alert severity='error'>{fineError}</Alert> : null}
+        </Stack>
+      </AdminPageSection>
 
       <Alert severity='warning'>
         Keep the published Cancellation &amp; Refund Policy text in sync. After saving, update it in{' '}
