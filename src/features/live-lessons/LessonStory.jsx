@@ -27,6 +27,16 @@ export default function LessonStory(p) {
                       {detail.live ? <Chip size='small' label='LIVE NOW' sx={{ bgcolor: ops.softMint, color: ops.live, fontWeight: 700 }} /> : <Chip size='small' label='Ended' />}
                       {detail.isInstant ? <Chip size='small' variant='outlined' label='Instant' /> : null}
                       <Chip size='small' variant='outlined' label={detail.status || '—'} />
+                      {detail.transcript && detail.transcript.status !== 'off' ? (
+                        <Chip
+                          size='small'
+                          variant='outlined'
+                          color={detail.transcript.status === 'failed' ? 'error' : detail.transcript.status === 'ready' ? 'success' : 'default'}
+                          label={`Transcript: ${detail.transcript.status}${
+                            detail.transcript.failedReason ? ` (${detail.transcript.failedReason})` : ''
+                          }${detail.transcript.costEstimateUsd != null ? ` · ~$${detail.transcript.costEstimateUsd}` : ''}`}
+                        />
+                      ) : null}
                     </Stack>
                     <Typography sx={{ fontWeight: 700, fontSize: { xs: 20, md: 24 }, mt: 1, letterSpacing: '-0.5px' }}>
                       {personLabel(detail.trainer)} ↔ {personLabel(detail.trainee)}

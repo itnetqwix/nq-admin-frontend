@@ -96,3 +96,23 @@ export async function fetchPricingHistory(limit = 10) {
   if (!res.ok) throw new Error(json?.msg || json?.error || 'Failed to load history')
   return json?.data
 }
+
+export async function fetchSessionTips({ page = 1, limit = 25, status } = {}) {
+  const qs = new URLSearchParams({ page: String(page), limit: String(limit) })
+  if (status) qs.set('status', status)
+  const res = await fetch(apiUrl(`/admin/session-tips?${qs}`), { headers: getAuthHeaders() })
+  const json = await res.json()
+  if (!res.ok) throw new Error(json?.msg || json?.error || 'Failed to load tips')
+  return json?.data
+}
+
+export async function refundSessionTip(id, reason) {
+  const res = await fetch(apiUrl(`/admin/session-tips/${encodeURIComponent(id)}/refund`), {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ reason })
+  })
+  const json = await res.json()
+  if (!res.ok) throw new Error(json?.msg || json?.error || 'Refund failed')
+  return json?.data
+}

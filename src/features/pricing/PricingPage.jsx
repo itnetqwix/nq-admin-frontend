@@ -18,6 +18,7 @@ import { formatDiffValue, pricingConfigDiff } from 'src/utils/pricingDiff'
 import PricingRatesTab from './components/PricingRatesTab'
 import PricingProfitCheckTab from './components/PricingProfitCheckTab'
 import PricingHistoryTab from './components/PricingHistoryTab'
+import PricingTipsLedgerTab from './components/PricingTipsLedgerTab'
 import PricingSurgeTab from './components/PricingSurgeTab'
 import PricingLockerPlansTab from './components/PricingLockerPlansTab'
 import { PricingFlowStrip } from './components/PricingGuide'
@@ -57,6 +58,13 @@ const TAB_DEFS = [
     label: 'History',
     description: 'Published versions',
     icon: 'mdi:history'
+  },
+  {
+    value: 5,
+    slug: 'tips',
+    label: 'Tips',
+    description: 'Tips sent to coaches',
+    icon: 'mdi:heart-outline'
   }
 ]
 const TAB_SLUGS = TAB_DEFS.map(t => t.slug)
@@ -266,6 +274,7 @@ const PricingPage = () => {
           />
         ) : null}
         {tab === 4 ? <PricingHistoryTab /> : null}
+        {tab === 5 ? <PricingTipsLedgerTab canEdit={canEdit} /> : null}
       </AdminPageShell>
 
       {isDirty && canEdit ? (
