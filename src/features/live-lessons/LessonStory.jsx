@@ -71,6 +71,8 @@ export default function LessonStory(p) {
                 </Stack>
                 <ObservabilityLinks sessionId={detail.sessionId} dense />
 
+                {detail.tips ? <LessonTips tips={detail.tips} /> : null}
+
                 {(detail.heuristics || []).length > 0 ? (
                   <Box sx={{ mt: 2, p: 1.5, borderRadius: ops.radiusMd, bgcolor: ops.softAmber }}>
                     <Typography sx={{ fontWeight: 600, mb: 0.5 }}>Auto hints</Typography>
@@ -196,5 +198,42 @@ export default function LessonStory(p) {
             </Box>
           ) : null}
         </Stack>
+  )
+}
+
+const money = (minor, currency) => `${((minor || 0) / 100).toFixed(2)} ${currency || 'USD'}`
+
+function LessonTips({ tips }) {
+  const e = tips.eligibility
+  const items = tips.items || []
+  if (!items.length && (!e || e.code === 'TIPS_DISABLED')) return null
+
+  return (
+    <Box sx={{ mt: 2, p: 1.5, borderRadius: ops.radiusMd, border: `1px solid ${ops.hairline}` }}>
+      <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap sx={{ mb: items.length ? 1 : 0 }}>
+        <Typography sx={{ fontWeight: 600 }}>Tips</Typography>
+        {e ? (
+          <Chip
+            size='small'
+            variant='outlined'
+            color={e.eligible ? 'success' : e.code === 'TIP_BLOCKED_DISPUTE' ? 'warning' : 'default'}
+            label={
+              e.eligible
+                ? `Open until ${moment(e.windowEndsAt).format('MMM D HH:mm')}`
+                : `Closed: ${e.code}`
+            }
+            title={e.reason || ''}
+          />
+        ) : null}
+      </Stack>
+      {items.map(t => (
+        <Typography key={t.id} variant='body2' sx={{ fontFamily: ops.mono, fontSize: 12 }}>
+          {moment(t.createdAt).format('MMM D HH:mm')} · {money(t.tipMinor, t.currency)} (coach nets{' '}
+          {money(t.trainerNetMinor, t.currency)}) · {t.fundingSource} · {t.status}
+          {t.refundedAt ? ` ${moment(t.refundedAt).format('MMM D')}` : ''}
+          {t.lastError ? ` · ${t.lastError}` : ''}
+        </Typography>
+      ))}
+    </Box>
   )
 }
