@@ -4,13 +4,14 @@ import Typography from '@mui/material/Typography'
 import { ops } from 'src/styles/opsSurface'
 import Money from 'src/components/admin/Money'
 import { formatInt } from 'src/utils/format'
+import { financeLink } from 'src/features/money/financeLinks'
 
 const ROWS = [
-  { key: 'heldMinor', label: 'Held in escrow', hint: 'Waiting for the lesson and clearance', href: '/apps/finance?tab=escrow&escrowStatus=held' },
-  { key: 'releasingMinor', label: 'Releasing to coaches', hint: 'In flight', href: '/apps/finance?tab=escrow&escrowStatus=releasing' },
-  { key: 'disputedMinor', label: 'Disputed', hint: 'Frozen until resolved', href: '/apps/finance?tab=escrow&escrowStatus=disputed', danger: true },
-  { key: 'pendingPayoutMinor', label: 'Payouts awaiting action', hint: 'countKey:pendingPayoutCount', href: '/apps/finance?tab=payouts' },
-  { key: 'openRefundMinor', label: 'Open refunds', hint: 'countKey:openRefundCount', href: '/apps/finance?tab=refunds' }
+  { key: 'heldMinor', label: 'Held in escrow', hint: 'Waiting for the lesson and clearance', href: financeLink({ tab: 'escrow', status: 'held' }) },
+  { key: 'releasingMinor', label: 'Releasing to coaches', hint: 'In flight', href: financeLink({ tab: 'escrow', status: 'releasing' }) },
+  { key: 'disputedMinor', label: 'Disputed', hint: 'Frozen until resolved', href: '/apps/finance/disputes', danger: true },
+  { key: 'pendingPayoutMinor', label: 'Payouts awaiting action', hint: 'countKey:pendingPayoutCount', href: financeLink({ tab: 'payouts' }) },
+  { key: 'openRefundMinor', label: 'Open refunds', hint: 'countKey:openRefundCount', href: financeLink({ tab: 'refunds' }) }
 ]
 
 /** Where the money is that has not settled, split by why, each line linking to the queue. */

@@ -100,7 +100,7 @@ export default function CmsUploadsPage() {
         <Button
           size='small'
           component={Link}
-          href={p.row.source === 'tip' ? '/apps/cms/tips' : '/apps/cms/banners'}
+          href={p.row.source === 'tip' ? '/apps/tips' : '/apps/banners'}
         >
           Fix
         </Button>

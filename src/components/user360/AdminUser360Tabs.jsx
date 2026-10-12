@@ -15,6 +15,7 @@ import User360ReviewsTab from './tabs/User360ReviewsTab'
 import User360ClipsTab from './tabs/User360ClipsTab'
 import User360PlansTab from './tabs/User360PlansTab'
 import User360ActivityTab from './tabs/User360ActivityTab'
+import User360JourneyTab from './tabs/User360JourneyTab'
 import { ClipPlayDialog } from './user360Parts'
 import { SectionShell } from './user360Shared'
 
@@ -170,6 +171,7 @@ export default function AdminUser360Tabs({
 
         {tab === 8 ? <User360TicketsTab userId={userId} /> : null}
         {tab === 9 ? <User360ReferralsTab userId={userId} /> : null}
+        {tab === 10 ? <User360JourneyTab userId={userId} /> : null}
       </Box>
 
       <LessonTimelineDialog

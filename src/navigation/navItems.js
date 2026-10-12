@@ -26,8 +26,10 @@ const navigation = () => [
     title: 'Money',
     icon: 'mdi:cash-multiple',
     children: [
+      link('Overview', '/apps/money', 'mdi:cash-multiple', 'admin-nav-finance'),
       link('KPIs', '/apps/kpis', 'mdi:chart-timeline-variant', 'admin-nav-kpis'),
       link('Finance', '/apps/finance', 'mdi:bank-outline', 'admin-nav-finance'),
+      link('Disputes', '/apps/finance/disputes', 'mdi:gavel', 'admin-nav-finance'),
       link(
         'Stripe Connect',
         '/apps/finance/connect',
@@ -45,6 +47,7 @@ const navigation = () => [
     icon: 'mdi:account-group-outline',
     children: [
       link('Users', '/apps/users', 'mdi:account-search-outline', 'admin-nav-users-directory'),
+      link('Growth', '/apps/growth', 'mdi:chart-line', 'admin-nav-growth'),
       link('Trainers', '/apps/manage-trainer', 'mdi:human-male-board', 'admin-nav-trainers'),
       link(
         'Trainer verifications',
@@ -84,6 +87,7 @@ const navigation = () => [
     title: 'Support',
     icon: 'mdi:lifebuoy',
     children: [
+      link('Inbox', '/apps/support', 'mdi:inbox-multiple-outline', 'admin-nav-support-tickets'),
       link('Support tickets', '/apps/concern-by-user', 'mdi:lifebuoy', 'admin-nav-support-tickets'),
       link('User feedback', '/apps/write-by-user', 'mdi:account-question', 'admin-nav-user-feedback'),
       link('Product feedback', '/apps/product-feedback', 'mdi:message-draw', 'admin-nav-product-feedback')
@@ -135,6 +139,7 @@ const navigation = () => [
         'admin-nav-platform-activity'
       ),
       link('Audit log', '/apps/audit-logs', 'mdi:clipboard-text-clock-outline', 'admin-nav-audit-logs'),
+      link('Delivery log', '/apps/delivery', 'mdi:email-fast-outline', 'admin-nav-logs'),
       link('Feature flags', '/apps/feature-flags', 'mdi:flag-variant-outline', 'admin-nav-feature-flags'),
       link('Admin roles', '/apps/admin-roles', 'mdi:shield-account-outline', 'admin-nav-admin-settings')
     ]

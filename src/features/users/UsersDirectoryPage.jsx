@@ -16,7 +16,10 @@ import { ops } from 'src/styles/opsSurface'
 import { useAppDispatch, useAppSelector } from 'src/store/hooks'
 import { fetchUsersList, selectUsersList, setUsersPage, setUsersSearch } from 'src/store/slices/usersListSlice'
 
+import { useQuery } from '@tanstack/react-query'
+import { getUserMetrics } from 'src/services/peopleApi'
 import { buildUserColumns } from './columns'
+import { pageIds } from './userMetricCells'
 import DirectoryBody from './DirectoryBody'
 
 
@@ -348,9 +351,19 @@ export default function UsersDirectoryPage() {
     fromDate || toDate || country || timeZone || category || loginType || minSessions || maxSessions
   )
 
+  // One batched call for the visible page (never one per row). Failing is fine: cells stay blank.
+  const idsOnPage = useMemo(() => pageIds(rows), [rows])
+  const metricsQuery = useQuery({
+    queryKey: ['user-metrics', idsOnPage.join(',')],
+    queryFn: () => getUserMetrics(idsOnPage),
+    enabled: idsOnPage.length > 0,
+    staleTime: 60_000,
+    retry: false
+  })
+
   const columns = useMemo(
-    () => buildUserColumns({ copyId, openPreview, requestDelete }),
-    [copyId, openPreview, requestDelete]
+    () => buildUserColumns({ copyId, openPreview, requestDelete, metrics: metricsQuery.data }),
+    [copyId, openPreview, requestDelete, metricsQuery.data]
   )
 
 

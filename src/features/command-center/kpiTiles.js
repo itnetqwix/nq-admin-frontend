@@ -1,3 +1,4 @@
+import { financeLink } from 'src/features/money/financeLinks'
 import { formatDelta, formatInt, formatMinor, formatPct, formatPoints } from 'src/utils/format'
 
 /**
@@ -83,7 +84,7 @@ export function buildKpiTiles(kpis, daily = []) {
       delta: d.refundRate,
       deltaLabel: formatPoints(d.refundRate),
       higherIsBetter: false,
-      href: '/apps/finance?tab=refunds'
+      href: financeLink({ tab: 'refunds' })
     }
   ]
   return tiles.filter(t => moneyVisible || !t.money)

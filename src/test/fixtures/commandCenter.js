@@ -34,7 +34,7 @@ export const commandCenterFixture = (over = {}) => ({
     ]
   },
   attention: [
-    { key: 'disputes', severity: 'critical', label: 'Open payment disputes / chargebacks', count: 2, href: '/apps/finance?tab=escrow&escrowStatus=disputed' },
+    { key: 'disputes', severity: 'critical', label: 'Open payment disputes / chargebacks', count: 2, href: '/apps/finance/disputes' },
     { key: 'trainer_review', severity: 'warning', label: 'Trainers waiting for review', count: 5, href: '/apps/trainer-verifications', oldestAt: '2026-10-08T12:00:00.000Z' },
     { key: 'tickets', severity: 'info', label: 'Open support tickets', count: 9, href: '/apps/concern-by-user', oldestAt: null }
   ],

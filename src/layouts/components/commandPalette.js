@@ -24,7 +24,7 @@ export function pagesFromNav(navItems, can = () => true) {
 export const EXTRA_PAGES = [
   { label: 'Failed jobs', path: '/apps/ops?tab=jobs', subject: 'admin-nav-ops-logs', group: 'System' },
   { label: 'Call diagnostics', path: '/apps/ops?tab=calls', subject: 'admin-nav-ops-logs', group: 'System' },
-  { label: 'Open disputes', path: '/apps/finance?tab=escrow&escrowStatus=disputed', subject: 'admin-nav-finance', group: 'Money' },
+  { label: 'Open disputes', path: '/apps/finance/disputes', subject: 'admin-nav-finance', group: 'Money' },
   { label: 'Pending refunds', path: '/apps/finance?tab=refunds', subject: 'admin-nav-finance', group: 'Money' }
 ]
 

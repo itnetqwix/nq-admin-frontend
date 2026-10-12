@@ -7,8 +7,9 @@ import { formatOpsDateTime } from 'src/utils/opsDateTime'
 import { ops } from 'src/styles/opsSurface'
 import moment from 'moment'
 import { fmtInt, STATUS_TONE } from './chips'
+import { lastBookedCell, spendCell } from './userMetricCells'
 
-export function buildUserColumns({ copyId, openPreview, requestDelete }) {
+export function buildUserColumns({ copyId, openPreview, requestDelete, metrics }) {
   return [
       {
         field: 'identity',
@@ -111,6 +112,24 @@ export function buildUserColumns({ copyId, openPreview, requestDelete }) {
           <Typography sx={{ fontFamily: ops.mono, fontSize: 12, fontVariantNumeric: 'tabular-nums' }}>
             {fmtInt(p.row.session_count ?? 0)}
           </Typography>
+        )
+      },
+      {
+        field: 'last_booked',
+        headerName: 'Last booked',
+        width: 120,
+        sortable: false,
+        renderCell: p => (
+          <Typography sx={{ fontSize: 12, color: ops.body }}>{lastBookedCell(metrics ? metrics[String(p.row.id)] : undefined)}</Typography>
+        )
+      },
+      {
+        field: 'lifetime_spend',
+        headerName: 'Spent',
+        width: 100,
+        sortable: false,
+        renderCell: p => (
+          <Typography sx={{ fontSize: 12, fontVariantNumeric: 'tabular-nums' }}>{spendCell(metrics ? metrics[String(p.row.id)] : undefined)}</Typography>
         )
       },
       {

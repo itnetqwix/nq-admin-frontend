@@ -8,7 +8,9 @@ export const USER360_TAB = {
   WALLET: 6,
   ISSUES: 7,
   TICKETS: 8,
-  REFERRALS: 9
+  REFERRALS: 9,
+  // Appended (not inserted): the page loads data by numeric tab index, so existing tabs must not shift.
+  JOURNEY: 10
 }
 
 export const USER360_TAB_LABELS = [
@@ -21,7 +23,8 @@ export const USER360_TAB_LABELS = [
   'Wallet',
   'Issues & Logs',
   'Support tickets',
-  'Referrals'
+  'Referrals',
+  'Journey'
 ]
 
 /** User 360 Activity timeline category chips (matches backend TimelineCategory). */

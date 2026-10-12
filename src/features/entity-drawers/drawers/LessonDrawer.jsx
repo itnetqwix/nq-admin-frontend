@@ -218,8 +218,8 @@ function Money({ id }) {
 
 const PANES = { overview: Overview, journey: Journey, quality: Quality, errors: Errors, money: Money }
 
-export default function LessonDrawer({ id }) {
-  const [tab, setTab] = useState('overview')
+export default function LessonDrawer({ id, initialTab = 'overview' }) {
+  const [tab, setTab] = useState(initialTab)
   const Pane = PANES[tab]
   return (
     <Box>
