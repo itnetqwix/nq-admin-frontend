@@ -45,7 +45,6 @@ const required = [
   '/apps/netqwix-library',
   '/apps/clip-taxonomy',
   '/apps/library-submissions',
-  '/apps/logs',
   '/apps/ops',
   '/apps/platform-activity',
   '/apps/concern-by-user',
@@ -53,6 +52,9 @@ const required = [
   '/apps/product-feedback',
   '/apps/audit-logs',
   '/apps/live-lessons',
+  '/apps/live-lessons/history',
+  '/apps/alerts',
+  '/apps/system-health',
   '/apps/admin-roles',
   '/apps/kpis',
   '/apps/feature-flags',
@@ -70,5 +72,8 @@ assert(subjects.includes("'/apps/careers'"), 'aclRouteSubjects must map Careers'
 assert(acl.includes('admin-nav-careers'), 'acl.js must grant Careers')
 assert(subjects.includes("'/apps/admin-roles'"), 'aclRouteSubjects must map Admin roles')
 assert(subjects.includes("'/apps/live-lessons'"), 'aclRouteSubjects must map live lessons')
+assert(subjects.includes("'/apps/alerts'"), 'aclRouteSubjects must map alerts')
+assert(subjects.includes("'/apps/system-health'"), 'aclRouteSubjects must map system health')
+assert(acl.includes('admin-nav-alerts'), 'acl.js must grant the alerts inbox')
 
 console.log('navItems.selfcheck ok')

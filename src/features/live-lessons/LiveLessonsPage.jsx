@@ -163,7 +163,7 @@ export default function LiveLessonsPage() {
   const selectSession = id => {
     void router.push(
       {
-        pathname: '/apps/live-lessons',
+        pathname: '/apps/live-lessons/history',
         query: id ? { sessionId: id } : {}
       },
       undefined,
@@ -228,8 +228,8 @@ export default function LiveLessonsPage() {
 
   return (
     <AdminPageShell
-      title='Live lessons'
-      eyebrow='OPS · LESSONS'
+      title='Lesson history & debug'
+      eyebrow='LESSONS · HISTORY'
       icon='mdi:record-rec'
       subtitle={
         listView
@@ -239,6 +239,9 @@ export default function LiveLessonsPage() {
       bare
       actions={
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+          <Button variant='outlined' startIcon={<Icon icon='mdi:broadcast' />} onClick={() => router.push('/apps/live-lessons')}>
+            Live board
+          </Button>
           {!listView ? (
             <Button variant='outlined' startIcon={<Icon icon='mdi:arrow-left' />} onClick={() => selectSession('')}>
               All lessons

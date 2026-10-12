@@ -63,3 +63,43 @@ export async function getOpsPlaybook() {
   const res = await fetch(apiUrl('/admin/ops-events/playbook'), { headers: getAuthHeaders() })
   return parse(res)
 }
+
+export async function getLiveLessonLogs(query = {}) {
+  const params = new URLSearchParams(query).toString()
+  const res = await fetch(apiUrl(`/admin/live-lesson-logs?${params}`), { headers: getAuthHeaders() })
+  return parse(res)
+}
+
+export async function getLiveLessonLogSession(sessionId) {
+  const res = await fetch(apiUrl(`/admin/live-lesson-logs/${encodeURIComponent(sessionId)}`), {
+    headers: getAuthHeaders()
+  })
+  return parse(res)
+}
+
+export async function getSentryProjects() {
+  const res = await fetch(apiUrl('/admin/sentry/projects'), { headers: getAuthHeaders() })
+  return parse(res)
+}
+
+export async function getSentryIssues(query = {}) {
+  const params = new URLSearchParams(query).toString()
+  const res = await fetch(apiUrl(`/admin/sentry/issues?${params}`), { headers: getAuthHeaders() })
+  return parse(res)
+}
+
+export async function getSentryIssueEvents(issueId, query = {}) {
+  const params = new URLSearchParams(query).toString()
+  const res = await fetch(apiUrl(`/admin/sentry/issues/${encodeURIComponent(issueId)}/events?${params}`), {
+    headers: getAuthHeaders()
+  })
+  return parse(res)
+}
+
+export async function getSentryEvent(project, eventId) {
+  const res = await fetch(
+    apiUrl(`/admin/sentry/projects/${encodeURIComponent(project)}/events/${encodeURIComponent(eventId)}`),
+    { headers: getAuthHeaders() }
+  )
+  return parse(res)
+}

@@ -1,1 +1,1 @@
-export { default } from 'src/features/live-lessons/LiveLessonsPage'
+export { default } from 'src/features/live-ops/LiveOpsPage'

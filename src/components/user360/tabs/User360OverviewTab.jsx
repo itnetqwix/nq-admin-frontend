@@ -202,16 +202,6 @@ export default function User360OverviewTab({ userId, userData, onRefresh }) {
                       Revoke all devices
                     </Button>
                   ) : null}
-                  {userId ? (
-                    <Button
-                      size='small'
-                      component={Link}
-                      href={`/apps/logs?tab=login&userId=${userId}`}
-                      sx={{ textTransform: 'none' }}
-                    >
-                      Full login history →
-                    </Button>
-                  ) : null}
                 </Stack>
               </Stack>
               {sessions.length ? (

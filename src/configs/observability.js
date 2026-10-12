@@ -11,11 +11,17 @@ export function sentryIssuesUrl({ query } = {}) {
   const org = sentryOrg()
   const project = sentryProject()
   if (!org) return null
-  const base = project
-    ? `https://${org}.sentry.io/issues/?project=${encodeURIComponent(project)}`
-    : `https://${org}.sentry.io/issues/`
-  if (query) return `${base}&query=${encodeURIComponent(query)}`
-  return base
+  // Build the query string once so `?` / `&` are always right whichever params are present.
+  const params = new URLSearchParams()
+  if (project) params.set('project', project)
+  if (query) params.set('query', query)
+  const qs = params.toString()
+  return `https://${org}.sentry.io/issues/${qs ? `?${qs}` : ''}`
+}
+
+/** Errors tagged with a lesson id (the backend and apps tag events with session_id). */
+export function sentrySessionUrl(sessionId) {
+  return sessionId ? sentryIssuesUrl({ query: `session_id:${sessionId}` }) : sentryIssuesUrl()
 }
 
 export function sentryUserSearchUrl(userId) {

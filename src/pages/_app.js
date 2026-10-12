@@ -1,5 +1,5 @@
 // ** React Imports
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import { Router } from 'next/router'
 
@@ -58,6 +58,10 @@ import 'react-perfect-scrollbar/dist/css/styles.css'
 import 'src/iconify-bundle/icons-bundle-react'
 
 
+// ** Data fetching for the redesigned admin screens
+import { QueryClientProvider } from '@tanstack/react-query'
+import { createAdminQueryClient } from 'src/lib/queryClient'
+
 // ** Global css styles
 import '../../styles/globals.css'
 
@@ -101,6 +105,9 @@ const App = props => {
   const guestGuard = Component.guestGuard ?? false
   const aclAbilities = Component.acl ?? defaultACLObj
 
+  // One client per browser session; created in state so it is never shared between SSR requests.
+  const [queryClient] = useState(createAdminQueryClient)
+
   useEffect(() => {
     initSentry()
     initLogRocket()
@@ -122,6 +129,7 @@ const App = props => {
       </Head>
 
       <ReduxProvider store={store}>
+      <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <AdminRealtimeProvider>
           <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>
@@ -144,6 +152,7 @@ const App = props => {
           </SettingsProvider>
         </AdminRealtimeProvider>
       </AuthProvider>
+      </QueryClientProvider>
       </ReduxProvider>
     </CacheProvider>
 

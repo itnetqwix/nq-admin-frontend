@@ -1,4 +1,6 @@
-import { tokens } from 'src/theme/tokens'
+// MUI's alpha()/darken()/getContrastText() throw on var() colors, so the palette must be built
+// from literal values. Components use the var()-based `tokens` and follow the mode through CSS.
+import { rawTokens as tokens } from 'src/theme/tokens'
 
 /**
  * Match Desk palette — applied admin-wide.

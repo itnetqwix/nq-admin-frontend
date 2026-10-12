@@ -125,6 +125,14 @@ export async function adjustWallet(payload) {
   return postFinance('/admin/finance/wallet/adjust', payload)
 }
 
+/**
+ * Refund a wallet-funded lesson (or extension) back to the trainee's wallet.
+ * The server needs a reason and refuses a second refund for the same session + kind.
+ */
+export async function refundWalletSession({ sessionId, traineeId, kind = 'booking', reason }) {
+  return postFinance('/admin/finance/wallet/refund-session', { sessionId, traineeId, kind, reason })
+}
+
 export async function retryBookingRefund(bookingId, reason) {
   return postFinance(`/admin/finance/bookings/${bookingId}/retry-refund`, { reason })
 }

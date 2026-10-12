@@ -16,6 +16,7 @@ import ModeToggler from 'src/@core/layouts/components/shared-components/ModeTogg
 import UserDropdown from 'src/@core/layouts/components/shared-components/UserDropdown'
 import AdminCommandPalette from 'src/layouts/components/AdminCommandPalette'
 import AdminEnvBanner from 'src/layouts/components/AdminEnvBanner'
+import AlertBell from 'src/components/admin/AlertBell'
 import { useAdminRealtime } from 'src/context/AdminRealtimeContext'
 
 const AppBarContent = props => {
@@ -172,6 +173,7 @@ const AppBarContent = props => {
           </Box>
         </Tooltip>
 
+        <AlertBell />
         <AdminEnvBanner />
         <ModeToggler settings={settings} saveSettings={saveSettings} />
         <UserDropdown settings={settings} />

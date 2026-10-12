@@ -132,11 +132,11 @@ export function buildAdminRoleColumns({ canAssign, busyId, roleList, onAssign, o
       renderCell: p => (
         <Button
           component={Link}
-          href={`/apps/logs?tab=admin&userId=${p.row.id}`}
+          href={`/apps/audit-logs?userId=${p.row.id}`}
           size='small'
           sx={{ textTransform: 'none', fontSize: 12 }}
         >
-          Logs
+          Audit
         </Button>
       )
     },

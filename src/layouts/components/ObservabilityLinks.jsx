@@ -4,6 +4,7 @@ import {
   hasObservabilityLinks,
   logRocketSessionsUrl,
   sentryIssuesUrl,
+  sentrySessionUrl,
   sentryUserSearchUrl
 } from 'src/configs/observability'
 
@@ -13,7 +14,7 @@ export default function ObservabilityLinks({ userId, sessionId, dense }) {
 
   const sentryUser = userId ? sentryUserSearchUrl(userId) : null
   const sentrySession = sessionId
-    ? sentryIssuesUrl({ query: `sessionId:${sessionId}` })
+    ? sentrySessionUrl(sessionId)
     : sentryIssuesUrl()
   const lr = logRocketSessionsUrl({ userId })
 

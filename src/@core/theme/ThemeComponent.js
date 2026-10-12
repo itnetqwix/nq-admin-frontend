@@ -15,6 +15,9 @@ import themeOptions from './ThemeOptions'
 // ** Global Styles
 import GlobalStyling from './globalStyles'
 
+// ** Design tokens exposed to components as CSS variables
+import { tokenCssVars } from 'src/theme/tokens'
+
 const ThemeComponent = props => {
   // ** Props
   const { settings, children } = props
@@ -31,6 +34,10 @@ const ThemeComponent = props => {
     <ThemeProvider theme={theme}>
       <Direction direction={settings.direction}>
         <CssBaseline />
+        {/* theme.palette.mode is the effective mode ('semi-dark' resolves to light content). */}
+        <GlobalStyles
+          styles={{ ':root': { ...tokenCssVars(theme.palette.mode), colorScheme: theme.palette.mode } }}
+        />
         <GlobalStyles styles={() => GlobalStyling(theme)} />
         {children}
       </Direction>

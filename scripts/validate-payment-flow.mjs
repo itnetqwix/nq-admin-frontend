@@ -31,6 +31,9 @@ const CHECKS = [
       "migrateLegacyBalances",
       "releaseEscrowHold",
       "refundEscrowHold",
+      // Imported by FinanceDialogs, BookingDetailDrawer and the booking page. It was missing for a
+      // while and nothing noticed, because the other files only checked that the *name* appeared.
+      "export async function refundWalletSession",
     ],
   },
   {

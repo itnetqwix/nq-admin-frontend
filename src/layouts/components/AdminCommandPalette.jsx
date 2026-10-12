@@ -1,193 +1,167 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
-import Typography from '@mui/material/Typography'
+import { useQuery } from '@tanstack/react-query'
 import Box from '@mui/material/Box'
-import List from '@mui/material/List'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItemText from '@mui/material/ListItemText'
 import CircularProgress from '@mui/material/CircularProgress'
+import Dialog from '@mui/material/Dialog'
 import IconButton from '@mui/material/IconButton'
+import InputBase from '@mui/material/InputBase'
+import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { useTheme } from '@mui/material/styles'
 import Icon from 'src/@core/components/icon'
-import { searchAdminUsers } from 'src/services/adminOpsApi'
-import authConfig from 'src/configs/auth'
-import { requireApiBaseUrl } from 'src/utils/apiBase'
+import { AbilityContext } from 'src/layouts/components/acl/Can'
+import navigation from 'src/navigation/navItems'
+import { useEntityDrawer } from 'src/features/entity-drawers/EntityDrawerContext'
+import useDebouncedValue from 'src/hooks/useDebouncedValue'
+import { searchAdmin } from 'src/services/commandApi'
+import { queryKeys } from 'src/services/queryKeys'
+import { ops } from 'src/styles/opsSurface'
+import { buildPaletteItems, extraPages, moveIndex, pagesFromNav } from './commandPalette'
 
-const OID_RE = /^[a-f\d]{24}$/i
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i
+const GROUP_ICON = {
+  People: 'mdi:account-outline',
+  'Lessons & payments': 'mdi:video-account',
+  Errors: 'mdi:bug-outline',
+  'Go to path': 'mdi:subdirectory-arrow-right'
+}
 
-const STATIC_PAGES = [
-  { label: 'Home', path: '/home' },
-  { label: 'CMS', path: '/apps/cms' },
-  { label: 'Banners', path: '/apps/cms/banners' },
-  { label: 'Tips', path: '/apps/cms/tips' },
-  { label: 'Uploads', path: '/apps/cms/uploads' },
-  { label: 'Trainers', path: '/apps/manage-trainer' },
-  { label: 'Trainees', path: '/apps/manage-trainee' },
-  { label: 'Bookings', path: '/apps/booking' },
-  { label: 'Support tickets', path: '/apps/concern-by-user' },
-  { label: 'Ops center', path: '/apps/ops' },
-  { label: 'Failed jobs', path: '/apps/ops?tab=jobs' },
-  { label: 'Audit log', path: '/apps/audit-logs' },
-  { label: 'Call diagnostics', path: '/apps/ops?tab=calls' },
-  { label: 'Live lessons', path: '/apps/live-lessons' },
-  { label: 'Careers', path: '/apps/careers' },
-  { label: 'Broadcasts', path: '/apps/broadcasts' },
-  { label: 'Promo codes', path: '/apps/promo-codes' }
-]
-
+/**
+ * ⌘K. Type to search people, lessons, payment ids and pages at once; arrows + Enter to open.
+ * People and lessons open in the side drawer so you keep your place on the current page.
+ */
 export default function AdminCommandPalette({ open, onClose }) {
   const router = useRouter()
   const theme = useTheme()
+  const ability = useContext(AbilityContext)
+  const drawer = useEntityDrawer()
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   const [value, setValue] = useState('')
-  const [hits, setHits] = useState([])
-  const [busy, setBusy] = useState(false)
-  const [hint, setHint] = useState('')
+  const [active, setActive] = useState(0)
+  const listRef = useRef(null)
+  const debounced = useDebouncedValue(value.trim(), 250)
 
   useEffect(() => {
     if (!open) {
       setValue('')
-      setHits([])
-      setHint('')
+      setActive(0)
     }
   }, [open])
 
-  const goPath = useCallback(
-    path => {
-      void router.push(path)
-      onClose()
-    },
-    [router, onClose]
+  const can = (action, subject) => (ability ? ability.can(action, subject) : true)
+  const pages = useMemo(
+    () => [...pagesFromNav(navigation(), can), ...extraPages(can)],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [ability]
   )
 
-  const run = useCallback(async () => {
-    const q = value.trim()
-    if (!q) return
-
-    if (q.startsWith('/')) {
-      goPath(q)
-      return
-    }
-
-    if (OID_RE.test(q)) {
-      // Try booking detail first if path preference; User 360 is the common case
-      setBusy(true)
-      setHint('')
-      try {
-        const token = window.localStorage.getItem(authConfig.storageTokenKeyName)
-        const base = requireApiBaseUrl()
-        const bookingRes = await fetch(`${base}/admin/booking/${q}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-        const bookingJson = await bookingRes.json()
-        const bookingOk =
-          bookingRes.ok &&
-          String(bookingJson?.status ?? '').toLowerCase() !== 'fail' &&
-          (bookingJson?.result || bookingJson?.data)
-        if (bookingOk) {
-          goPath(`/apps/booking?bookingId=${q}`)
-          return
-        }
-      } catch {
-        /* fall through to user */
-      } finally {
-        setBusy(false)
-      }
-      goPath(`/apps/users/${q}`)
-      return
-    }
-
-    if (EMAIL_RE.test(q) || q.length >= 2) {
-      setBusy(true)
-      setHint('')
-      try {
-        const users = await searchAdminUsers(q, 8)
-        setHits(
-          users.map(u => ({
-            id: String(u._id || u.id),
-            primary: u.fullname || u.email || String(u._id),
-            secondary: `${u.account_type || ''} · ${u.email || ''}`.trim()
-          }))
-        )
-        if (!users.length) setHint('No users matched')
-      } catch (e) {
-        setHint(e?.message || 'Search failed')
-        setHits([])
-      } finally {
-        setBusy(false)
-      }
-      return
-    }
-
-    setHint('Enter ObjectId, email, or /path')
-  }, [value, goPath])
-
-  const pageHits = STATIC_PAGES.filter(p => {
-    const q = value.trim().toLowerCase()
-    if (!q || q.startsWith('/') || OID_RE.test(q) || EMAIL_RE.test(q)) return false
-    return p.label.toLowerCase().includes(q) || p.path.includes(q)
+  const wantsSearch = open && debounced.length >= 2 && !debounced.startsWith('/')
+  const search = useQuery({
+    queryKey: queryKeys.search(debounced),
+    queryFn: ({ signal }) => searchAdmin(debounced, signal),
+    enabled: wantsSearch,
+    staleTime: 30_000,
+    retry: false
   })
 
+  const items = useMemo(
+    () => buildPaletteItems({ query: value, pages, search: wantsSearch ? search.data : null }),
+    [value, pages, search.data, wantsSearch]
+  )
+
+  useEffect(() => setActive(0), [value, search.data])
+  useEffect(() => {
+    // Optional call: not every embedded webview (or jsdom) implements scrollIntoView.
+    listRef.current?.querySelector('[data-active="true"]')?.scrollIntoView?.({ block: 'nearest' })
+  }, [active, items])
+
+  const run = item => {
+    if (!item) return
+    onClose()
+    const { action } = item
+    if (action.type === 'path') void router.push(action.path)
+    else if (action.type === 'drawer') drawer.open(action.drawerType, action.id)
+    else if (action.type === 'external') window.open(action.url, '_blank', 'noopener,noreferrer')
+  }
+
+  const onKeyDown = e => {
+    if (e.key === 'ArrowDown') (e.preventDefault(), setActive(i => moveIndex(i, 1, items.length)))
+    else if (e.key === 'ArrowUp') (e.preventDefault(), setActive(i => moveIndex(i, -1, items.length)))
+    else if (e.key === 'Enter') (e.preventDefault(), run(items[active]))
+  }
+
+  let lastGroup = null
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth='sm' fullScreen={fullScreen}>
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
-        Jump to…
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth='sm' fullScreen={fullScreen} PaperProps={{ sx: { backgroundImage: 'none', alignSelf: 'flex-start', mt: fullScreen ? 0 : '12vh' } }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, px: 2, py: 1.25, borderBottom: `1px solid ${ops.hairline}` }}>
+        <Icon icon='mdi:magnify' fontSize={20} />
+        <InputBase
+          autoFocus
+          fullWidth
+          placeholder='Search people, lessons, payment ids, pages…'
+          value={value}
+          onChange={e => setValue(e.target.value)}
+          onKeyDown={onKeyDown}
+          inputProps={{ 'aria-label': 'Search', role: 'combobox', 'aria-expanded': true, 'aria-controls': 'palette-results' }}
+          sx={{ fontSize: 15 }}
+        />
+        {search.isFetching ? <CircularProgress size={16} /> : null}
         {fullScreen ? (
           <IconButton aria-label='Close' onClick={onClose} edge='end'>
             <Icon icon='mdi:close' />
           </IconButton>
         ) : null}
-      </DialogTitle>
-      <DialogContent>
-        <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
-          User id / email → User 360 · Booking ObjectId → bookings · path like{' '}
-          <code>/apps/ops</code>. ⌘/Ctrl+K.
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'stretch', flexDirection: { xs: 'column', sm: 'row' } }}>
-          <TextField
-            autoFocus
-            fullWidth
-            size='small'
-            label='Search'
-            value={value}
-            onChange={e => setValue(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && void run()}
-          />
-          <Button variant='contained' onClick={() => void run()} disabled={busy} sx={{ flexShrink: 0 }}>
-            {busy ? <CircularProgress size={18} color='inherit' /> : 'Go'}
-          </Button>
-        </Box>
-        {hint ? (
-          <Typography variant='caption' color='text.secondary' sx={{ mt: 1, display: 'block' }}>
-            {hint}
+      </Box>
+      <Box id='palette-results' ref={listRef} role='listbox' sx={{ maxHeight: fullScreen ? 'none' : 420, overflowY: 'auto', py: 0.5 }}>
+        {items.map((item, i) => {
+          const header = item.group !== lastGroup ? item.group : null
+          lastGroup = item.group
+          return (
+            <Box key={item.key}>
+              {header ? (
+                <Typography sx={{ px: 2, pt: 1.25, pb: 0.5, fontFamily: ops.mono, fontSize: 10.5, color: ops.mute, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  {header}
+                </Typography>
+              ) : null}
+              <Box
+                role='option'
+                aria-selected={i === active}
+                data-active={i === active}
+                onMouseEnter={() => setActive(i)}
+                onClick={() => run(item)}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.5,
+                  px: 2,
+                  py: 1,
+                  cursor: 'pointer',
+                  bgcolor: i === active ? ops.canvasSoft2 : 'transparent'
+                }}
+              >
+                <Icon icon={GROUP_ICON[item.group] || 'mdi:file-outline'} fontSize={18} />
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Typography sx={{ fontSize: 14, fontWeight: 500 }} noWrap>{item.label}</Typography>
+                  {item.secondary ? <Typography sx={{ fontSize: 12, color: 'text.secondary' }} noWrap>{item.secondary}</Typography> : null}
+                </Box>
+                {i === active ? <Typography sx={{ fontSize: 11, color: ops.mute }}>↵</Typography> : null}
+              </Box>
+            </Box>
+          )
+        })}
+        {!items.length ? (
+          <Typography sx={{ px: 2, py: 3, fontSize: 13, color: 'text.secondary', textAlign: 'center' }}>
+            {search.isFetching ? 'Searching…' : search.isError ? 'Search is unavailable right now.' : wantsSearch ? 'Nothing found. Try an email, an id, or part of a name.' : 'Type at least two characters.'}
           </Typography>
         ) : null}
-        {pageHits.length ? (
-          <List dense sx={{ mt: 1 }}>
-            {pageHits.map(p => (
-              <ListItemButton key={p.path} onClick={() => goPath(p.path)}>
-                <ListItemText primary={p.label} secondary={p.path} />
-              </ListItemButton>
-            ))}
-          </List>
-        ) : null}
-        {hits.length ? (
-          <List dense sx={{ mt: 1 }}>
-            {hits.map(h => (
-              <ListItemButton key={h.id} onClick={() => goPath(`/apps/users/${h.id}`)}>
-                <ListItemText primary={h.primary} secondary={h.secondary} />
-              </ListItemButton>
-            ))}
-          </List>
-        ) : null}
-      </DialogContent>
+      </Box>
+      <Box sx={{ px: 2, py: 1, borderTop: `1px solid ${ops.hairline}`, display: 'flex', gap: 2, fontSize: 11, color: ops.mute }}>
+        <span>↑↓ move</span>
+        <span>↵ open</span>
+        <span>esc close</span>
+        <Box sx={{ flex: 1 }} />
+        <span>emails · user / booking ids · pi_… · NETQWIX-API-1A · /path</span>
+      </Box>
     </Dialog>
   )
 }

@@ -295,8 +295,8 @@ export default function AdminRolesPage() {
           ) : null}
           <Chip
             component={Link}
-            href='/apps/logs?tab=admin'
-            label='Access log'
+            href='/apps/audit-logs'
+            label='Audit log'
             clickable
             variant='outlined'
             size='small'

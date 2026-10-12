@@ -1,8 +1,9 @@
 html,
 body {
   min-height: 100%;
-  background-color: #0B0F19;
-  color: #F8FAFC;
+  /* Follow the active theme; the dark fallbacks cover the first paint before ThemeComponent mounts. */
+  background-color: var(--nq-page-tint, #0B0F19);
+  color: var(--nq-ink, #F8FAFC);
 }
 
 #__next {

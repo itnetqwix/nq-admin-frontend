@@ -22,10 +22,12 @@ import OpsEventsTab from './tabs/OpsEventsTab'
 import OpsJobsTab from './tabs/OpsJobsTab'
 import OpsCallsTab from './tabs/OpsCallsTab'
 import OpsLoadTestsTab from './tabs/OpsLoadTestsTab'
+import OpsLiveLessonLogsTab from './tabs/OpsLiveLessonLogsTab'
 
 const TABS = [
   { value: 'health', label: 'Health' },
-  { value: 'events', label: 'Events' },
+  { value: 'events', label: 'Live lesson logs' },
+  { value: 'internal', label: 'Ops incidents' },
   { value: 'jobs', label: 'Failed jobs' },
   { value: 'calls', label: 'Calls' },
   { value: 'loadtests', label: 'Load tests' }
@@ -38,9 +40,14 @@ const TAB_COPY = {
     subtitle: 'Messaging channels, finance queues, and ops signals.'
   },
   events: {
-    eyebrow: 'Ops · events',
-    title: 'Ops events.',
-    subtitle: 'Actionable incidents (instant, calls, wallet, support). Resolve here — not in Platform logs.'
+    eyebrow: 'Ops · live lesson logs',
+    title: 'Live lesson logs.',
+    subtitle: 'Trace each lesson from selection through post-lesson processing, settlement, and Sentry root cause.'
+  },
+  internal: {
+    eyebrow: 'Ops · incidents',
+    title: 'Ops incidents.',
+    subtitle: 'Resolve live-lesson incidents retained in the Ops collection.'
   },
   jobs: {
     eyebrow: 'Ops · jobs',
@@ -74,7 +81,7 @@ export default function OpsHubPage() {
     if (!router.query.tab) {
       void router.replace({ pathname: '/apps/ops', query: { tab: 'health' } }, undefined, { shallow: true })
     }
-  }, [router.isReady, router.query.tab])
+  }, [router, router.isReady, router.query.tab])
 
   const setTab = next => {
     void router.replace({ pathname: '/apps/ops', query: { tab: next } }, undefined, { shallow: true })
@@ -85,7 +92,7 @@ export default function OpsHubPage() {
     try {
       if (tab === 'health') {
         setRefreshTick(t => t + 1)
-      } else if (tab === 'events') {
+      } else if (tab === 'events' || tab === 'internal') {
         dispatch(invalidateOpsStats())
         await dispatch(fetchOpsStats())
         await dispatch(
@@ -116,9 +123,6 @@ export default function OpsHubPage() {
       subtitle={copy.subtitle}
       actions={
         <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
-          <Button size='small' component={Link} href='/apps/logs' sx={{ textTransform: 'none' }}>
-            Logs hub →
-          </Button>
           <Button size='small' component={Link} href='/apps/audit-logs' sx={{ textTransform: 'none' }}>
             Audit log →
           </Button>
@@ -128,7 +132,8 @@ export default function OpsHubPage() {
     >
       <AdminTabs value={tab} onChange={setTab} tabs={TABS} sx={{ mb: 2, borderBottom: `1px solid ${ops.hairline}` }} />
       {tab === 'health' ? <OpsHealthTab hub refreshTick={refreshTick} /> : null}
-      {tab === 'events' ? <OpsEventsTab hub /> : null}
+      {tab === 'events' ? <OpsLiveLessonLogsTab /> : null}
+      {tab === 'internal' ? <OpsEventsTab hub /> : null}
       {tab === 'jobs' ? <OpsJobsTab hub /> : null}
       {tab === 'calls' ? <OpsCallsTab hub refreshTick={refreshTick} /> : null}
       {tab === 'loadtests' ? <OpsLoadTestsTab refreshTick={refreshTick} /> : null}

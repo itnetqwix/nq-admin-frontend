@@ -324,19 +324,11 @@ export default function RoleDialogs({
               </Button>
               <Button
                 component={Link}
-                href={`/apps/logs?tab=admin&userId=${devicesUser.id}`}
+                href={`/apps/audit-logs?userId=${devicesUser.id}`}
                 size='small'
                 sx={{ textTransform: 'none' }}
               >
                 Admin activity →
-              </Button>
-              <Button
-                component={Link}
-                href={`/apps/logs?tab=login&userId=${devicesUser.id}`}
-                size='small'
-                sx={{ textTransform: 'none' }}
-              >
-                Login history →
               </Button>
             </Stack>
           ) : null}

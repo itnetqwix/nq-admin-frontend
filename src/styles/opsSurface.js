@@ -22,12 +22,12 @@ export const CATEGORY_META = {
 
 export function categoryChipSx(category) {
   const map = {
-    logins: { bg: '#d3e5ff', color: '#0761d1' },
-    uploading: { bg: '#aaffec', color: '#29bc9b' },
-    booking: { bg: '#d8ccf1', color: '#4c2889' },
-    inviting: { bg: ops.softAmber, color: ops.clay },
+    logins: { bg: ops.infoBg, color: ops.infoFg },
+    uploading: { bg: ops.successBg, color: ops.successFg },
+    booking: { bg: ops.violetBg, color: ops.violetFg },
+    inviting: { bg: ops.warningBg, color: ops.warningFg },
     referring: { bg: ops.softIndigo, color: ops.indigo },
-    transactions: { bg: '#e8f0fe', color: ops.indigoDeep },
+    transactions: { bg: ops.infoBg, color: ops.infoFg },
     api: { bg: ops.canvasSoft2, color: ops.ink },
     admin: { bg: ops.canvasSoft2, color: ops.ink },
     profile: { bg: ops.canvasSoft2, color: ops.body },

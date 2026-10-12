@@ -150,7 +150,7 @@ export default function LogsHubPage() {
   useEffect(() => {
     if (!router.isReady) return
     if (tab === 'security' && !canSecurity) {
-      void router.replace({ pathname: '/apps/logs', query: { tab: 'overview' } }, undefined, { shallow: true })
+      void router.replace({ pathname: '/apps/ops', query: { tab: 'events' } }, undefined, { shallow: true })
     }
   }, [router.isReady, tab, canSecurity]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -160,7 +160,7 @@ export default function LogsHubPage() {
       if (v) q[k] = v
     })
     if (nextPage > 0) q.page = String(nextPage + 1)
-    void router.replace({ pathname: '/apps/logs', query: q }, undefined, { shallow: true })
+    void router.replace({ pathname: '/apps/ops', query: { tab: 'events', ...q } }, undefined, { shallow: true })
   }
 
   const setTab = next => {

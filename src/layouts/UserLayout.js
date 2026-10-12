@@ -19,6 +19,9 @@ import HorizontalAppBarContent from './components/horizontal/AppBarContent'
 // ** Hook Import
 import { useSettings } from 'src/@core/hooks/useSettings'
 
+// ** Deep-linkable side drawers (?drawer=type:id)
+import EntityDrawerProvider from 'src/features/entity-drawers/EntityDrawerProvider'
+
 const UserLayout = ({ children, contentHeightFixed }) => {
   // ** Hooks
   const { settings, saveSettings } = useSettings()
@@ -40,6 +43,7 @@ const UserLayout = ({ children, contentHeightFixed }) => {
   }
 
   return (
+    <EntityDrawerProvider>
     <Layout
       hidden={hidden}
       settings={settings}
@@ -79,6 +83,7 @@ const UserLayout = ({ children, contentHeightFixed }) => {
     >
       {children}
     </Layout>
+    </EntityDrawerProvider>
   )
 }
 

@@ -46,6 +46,7 @@ const defineRulesFor = (role, user) => {
     ['nav_library_submissions', 'admin-nav-library-submissions'],
     ['nav_platform_activity', 'admin-nav-platform-activity'],
     ['nav_ops_logs', 'admin-nav-ops-logs'],
+    ['nav_ops_logs', 'admin-nav-alerts'],
     ['nav_logs', 'admin-nav-logs'],
     ['nav_finance', 'admin-nav-finance'],
     ['nav_finance_connect', 'admin-nav-finance-connect'],

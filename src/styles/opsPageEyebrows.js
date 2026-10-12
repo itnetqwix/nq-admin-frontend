@@ -19,7 +19,6 @@ export const OPS_PAGE_EYEBROWS = {
   '/apps/platform-health': 'Operations · health',
   '/apps/failed-jobs': 'Ops · jobs',
   '/apps/platform-activity': 'Logs · platform',
-  '/apps/logs': 'Logs · hub',
   '/apps/admin-roles': 'Admin access · RBAC',
   '/apps/audit-logs': 'Logs · audit',
   '/apps/ops-logs': 'Logs · operations',
