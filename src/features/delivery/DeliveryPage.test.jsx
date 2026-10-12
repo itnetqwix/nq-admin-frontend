@@ -67,6 +67,30 @@ describe('DeliveryPage', () => {
     expect(within(screen.getByRole('table', { name: 'Delivery log' })).getByText('Failed')).toBeTruthy()
   })
 
+  it('shows confirmed delivery, bounces and the provider reason', async () => {
+    getDeliveryStats.mockResolvedValue({ ...stats, topErrors: [{ channel: 'email', status: 'bounced', error: 'Bounce: Permanent (General)', count: 4 }] })
+    listDeliveries.mockResolvedValue(
+      page([row({ status: 'delivered' }), row({ _id: 'r2', status: 'bounced', status_detail: 'Bounce: Permanent (General)', recipient_masked: 'zz***@x.com' })])
+    )
+    renderWithProviders(<DeliveryPage />)
+    await screen.findByText('zz***@x.com')
+    const table = screen.getByRole('table', { name: 'Delivery log' })
+    expect(within(table).getByText('Delivered')).toBeTruthy()
+    expect(within(table).getByText('Bounced')).toBeTruthy()
+    expect(within(table).getByText('Bounce: Permanent (General)')).toBeTruthy()
+    // The summary above the table names the kind of failure, not just the text.
+    expect(screen.getAllByText('Bounced').length).toBeGreaterThan(1)
+  })
+
+  it('accepts the new filters from the URL', async () => {
+    routerState.query = { status: 'problem' }
+    getDeliveryStats.mockResolvedValue(stats)
+    listDeliveries.mockResolvedValue(page([]))
+    renderWithProviders(<DeliveryPage />)
+    await waitFor(() => expect(listDeliveries).toHaveBeenCalled())
+    expect(listDeliveries.mock.calls[0][0]).toMatchObject({ status: 'problem' })
+  })
+
   it('searches after a short pause and passes the filters from the URL', async () => {
     routerState.query = { channel: 'sms', status: 'failed', hours: '168' }
     getDeliveryStats.mockResolvedValue(stats)

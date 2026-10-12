@@ -1,41 +1,29 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/router'
-import Button from '@mui/material/Button'
-import Link from 'next/link'
-import Chip from '@mui/material/Chip'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
-import ListItemText from '@mui/material/ListItemText'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import Stack from '@mui/material/Stack'
 import toast from 'react-hot-toast'
 import { AbilityContext } from 'src/layouts/components/acl/Can'
-import AdminRefreshButton from 'src/components/admin/AdminRefreshButton'
 import { useAdminConfirm } from 'src/components/admin/useAdminConfirm'
 import AdminPageShell from 'src/layouts/components/AdminPageShell'
-import { ops } from 'src/styles/opsSurface'
 import {
-  getFinanceLedger,
-  getEscrowHolds,
-  getEscrowSummary,
-  getPayoutQueue,
-  getFinancialAuditLog,
-  getRefundQueue,
-  searchFinanceTransactions,
-  getStuckTopUps,
   reconcileStuckTopUps,
   reconcileFailedRefunds,
   reconcileStuckReleasingHolds,
   backfillLegacyEscrowHolds,
-  getTopUpHistory,
-  getFinanceOpsDashboard,
   exportFinanceCsv
 } from 'src/services/financeApi'
 import { TAB, TAB_SLUG, runReconcile } from './constants'
 import { buildFinanceColumns } from './columns'
+import { buildExportRequest, stateFromQuery } from './financeTabs'
+import useFinanceData from './useFinanceData'
+import FinanceHeaderActions from './FinanceHeaderActions'
 import FinancePanel from './FinancePanel'
 import FinanceDialogs from './FinanceDialogs'
 
+/**
+ * Finance control room: owns the tab, the filters and the dialogs. What each tab asks the API for
+ * lives in financeTabs.js / financeTabData.js, how it loads in useFinanceData, and each table's
+ * columns in columns/.
+ */
 const FinancePage = () => {
   const router = useRouter()
   const ability = useContext(AbilityContext)
@@ -52,19 +40,6 @@ const FinancePage = () => {
   const allowReconcile = fullAccess || canReconcile
   const [tab, setTab] = useState(TAB.OVERVIEW)
   const [page, setPage] = useState(1)
-  const [total, setTotal] = useState(0)
-  const pageSize = 50
-  const [ledger, setLedger] = useState([])
-  const [transactions, setTransactions] = useState([])
-  const [escrow, setEscrow] = useState([])
-  const [escrowSummary, setEscrowSummary] = useState(null)
-  const [refunds, setRefunds] = useState([])
-  const [payouts, setPayouts] = useState([])
-  const [audit, setAudit] = useState([])
-  const [stuckTopUps, setStuckTopUps] = useState([])
-  const [topUpHistory, setTopUpHistory] = useState([])
-  const [opsDashboard, setOpsDashboard] = useState(null)
-  const [loading, setLoading] = useState(false)
   const [searchQ, setSearchQ] = useState('')
   const [refundStatus, setRefundStatus] = useState('')
   const [escrowStatus, setEscrowStatus] = useState('')
@@ -75,7 +50,6 @@ const FinancePage = () => {
   const [migrateBusy, setMigrateBusy] = useState(false)
   const [adjustOpen, setAdjustOpen] = useState(false)
   const [walletRefundOpen, setWalletRefundOpen] = useState(false)
-  const [opsMenuAnchor, setOpsMenuAnchor] = useState(null)
   const [adjustForm, setAdjustForm] = useState({
     walletAccountId: '',
     amount_minor: '',
@@ -90,146 +64,26 @@ const FinancePage = () => {
   })
 
   useEffect(() => {
-    const q = router.query?.userId
-    if (typeof q === 'string' && q.trim()) {
-      setSearchQ(q.trim())
-      setTab(TAB.TRANSACTIONS)
-    }
-    const sessionId = router.query?.sessionId
-    if (typeof sessionId === 'string' && sessionId.trim()) {
-      setSearchQ(sessionId.trim())
-      const tabKey = String(router.query?.tab || '').toLowerCase()
-      if (tabKey === 'escrow') {
-        setTab(TAB.ESCROW)
-      } else if (tabKey === 'ledger') {
-        setTab(TAB.LEDGER)
-      } else {
-        setTab(TAB.TRANSACTIONS)
-      }
-    }
-    const tabKey = String(router.query?.tab || '').toLowerCase()
-    if (tabKey === 'overview') setTab(TAB.OVERVIEW)
-    else if (tabKey === 'ledger') setTab(TAB.LEDGER)
-    else if (tabKey === 'transactions') setTab(TAB.TRANSACTIONS)
-    else if (tabKey === 'escrow') setTab(TAB.ESCROW)
-    else if (tabKey === 'refunds') setTab(TAB.REFUNDS)
-    else if (tabKey === 'payouts') setTab(TAB.PAYOUTS)
-    else if (tabKey === 'stuck_topups') setTab(TAB.STUCK_TOPUPS)
-    else if (tabKey === 'topups') setTab(TAB.TOPUPS)
-    else if (tabKey === 'audit') setTab(TAB.AUDIT)
-    const status = router.query?.status
-    if (typeof status === 'string' && status.trim()) {
-      setEscrowStatus(status.trim())
-    }
+    const fromUrl = stateFromQuery(router.query)
+    if (fromUrl.searchQ !== undefined) setSearchQ(fromUrl.searchQ)
+    if (fromUrl.tab !== undefined) setTab(fromUrl.tab)
+    if (fromUrl.escrowStatus !== undefined) setEscrowStatus(fromUrl.escrowStatus)
   }, [router.query?.userId, router.query?.sessionId, router.query?.tab, router.query?.status])
 
-  const load = useCallback(async () => {
-    setLoading(true)
-    try {
-      if (tab === TAB.OVERVIEW) {
-        const summary = await getEscrowSummary()
-        setEscrowSummary(summary)
-        setTotal(0)
-      } else if (tab === TAB.LEDGER) {
-        const r = await getFinanceLedger({
-          page,
-          limit: pageSize,
-          userId: searchQ || undefined,
-          referenceType: ledgerReferenceType || undefined,
-          sessionId: searchQ && searchQ.length === 24 ? searchQ : undefined
-        })
-        setLedger(r?.items ?? [])
-        setTotal(r?.total ?? 0)
-      } else if (tab === TAB.TRANSACTIONS) {
-        const query = searchQ.trim()
-        const isPi = query.startsWith('pi_')
-        const r = await searchFinanceTransactions({
-          page,
-          limit: pageSize,
-          q: query || undefined,
-          paymentIntentId: isPi ? query : undefined,
-          userId: !isPi && query && query.length === 24 ? query : undefined,
-          sessionId: !isPi && query && query.length === 24 ? query : undefined
-        })
-        setTransactions(r?.items ?? [])
-        setTotal(r?.total ?? 0)
-      } else if (tab === TAB.ESCROW) {
-        const [r, summary] = await Promise.all([
-          getEscrowHolds({
-            page,
-            limit: pageSize,
-            status: escrowStatus || undefined,
-            sessionId: searchQ && searchQ.length === 24 ? searchQ : undefined
-          }),
-          getEscrowSummary()
-        ])
-        setEscrow(r?.items ?? [])
-        setTotal(r?.total ?? 0)
-        setEscrowSummary(summary)
-      } else if (tab === TAB.REFUNDS) {
-        const r = await getRefundQueue({
-          page,
-          limit: pageSize,
-          status: refundStatus || undefined,
-          q: searchQ || undefined
-        })
-        setRefunds(r?.items ?? [])
-        setTotal(r?.total ?? 0)
-      } else if (tab === TAB.PAYOUTS) {
-        const r = await getPayoutQueue({ page, limit: pageSize })
-        setPayouts(r?.items ?? [])
-        setTotal(r?.total ?? 0)
-      } else if (tab === TAB.STUCK_TOPUPS) {
-        const r = await getStuckTopUps({ maxAgeMinutes: 30 })
-        setStuckTopUps(r?.items ?? [])
-        setTotal(r?.items?.length ?? 0)
-      } else if (tab === TAB.TOPUPS) {
-        const r = await getTopUpHistory({ page, limit: pageSize, userId: searchQ || undefined })
-        setTopUpHistory(r?.items ?? [])
-        setTotal(r?.total ?? 0)
-      } else if (tab === TAB.AUDIT) {
-        const r = await getFinancialAuditLog({ page, limit: pageSize })
-        setAudit(r?.items ?? [])
-        setTotal(r?.total ?? 0)
-      }
-    } catch (e) {
-      console.error(e)
-      toast.error(e?.message || 'Failed to load finance data')
-    } finally {
-      setLoading(false)
-    }
-  }, [tab, page, searchQ, refundStatus, escrowStatus, ledgerReferenceType])
-
-  useEffect(() => {
-    void getFinanceOpsDashboard()
-      .then(setOpsDashboard)
-      .catch(() => setOpsDashboard(null))
-  }, [])
-
-  useEffect(() => {
-    setPage(1)
-  }, [tab, searchQ, refundStatus, escrowStatus, ledgerReferenceType])
-
-  useEffect(() => {
-    load()
-  }, [load])
+  const { rows, total, loading, load, escrowSummary, opsDashboard, pageSize } = useFinanceData({
+    tab,
+    page,
+    searchQ,
+    refundStatus,
+    escrowStatus,
+    ledgerReferenceType,
+    setPage
+  })
 
   const cols = useMemo(
     () => buildFinanceColumns({ allowRefund, allowPayout, confirm, load, tab }),
     [allowRefund, allowPayout, confirm, load, tab]
   )
-
-  const rows = useMemo(() => {
-    if (tab === TAB.OVERVIEW) return []
-    if (tab === TAB.LEDGER) return ledger
-    if (tab === TAB.TRANSACTIONS) return transactions
-    if (tab === TAB.ESCROW) return escrow
-    if (tab === TAB.REFUNDS) return refunds
-    if (tab === TAB.PAYOUTS) return payouts
-    if (tab === TAB.STUCK_TOPUPS) return stuckTopUps
-    if (tab === TAB.TOPUPS) return topUpHistory
-    return audit
-  }, [tab, ledger, transactions, escrow, refunds, payouts, stuckTopUps, topUpHistory, audit])
 
   const syncTab = nextTab => {
     setTab(nextTab)
@@ -285,25 +139,14 @@ const FinancePage = () => {
       (opsDashboard.stuckTopUpsPending30m ?? 0) > 0)
 
   const exportCurrentTab = async () => {
-    if (tab === TAB.OVERVIEW) {
-      toast.error('Switch to a data tab to export')
-      return
-    }
-    const kind = TAB_SLUG[tab]
-    if (!kind || kind === 'overview') {
-      toast.error('Nothing to export on this tab')
+    const req = buildExportRequest(tab, { searchQ, refundStatus, escrowStatus, ledgerReferenceType })
+    if (req.error) {
+      toast.error(req.error)
       return
     }
     try {
       toast.loading('Exporting…', { id: 'finance-csv' })
-      await exportFinanceCsv(kind, {
-        q: searchQ || undefined,
-        userId: searchQ || undefined,
-        sessionId: searchQ && searchQ.length === 24 ? searchQ : undefined,
-        status: tab === TAB.ESCROW ? escrowStatus || undefined : tab === TAB.REFUNDS ? refundStatus || undefined : undefined,
-        referenceType: tab === TAB.LEDGER ? ledgerReferenceType || undefined : undefined,
-        maxAgeMinutes: tab === TAB.STUCK_TOPUPS ? 30 : undefined
-      })
+      await exportFinanceCsv(req.kind, req.params)
       toast.success('CSV downloaded', { id: 'finance-csv' })
     } catch (e) {
       toast.error(e?.message || 'Export failed', { id: 'finance-csv' })
@@ -318,88 +161,22 @@ const FinancePage = () => {
       title='Finance.'
       subtitle='Escrow, ledger, payouts, refunds — tabs sync to the URL. Money actions respect your RBAC.'
       actions={
-        <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap alignItems='center'>
-          <Chip component={Link} href='/apps/finance/connect' label='Stripe Connect' clickable variant='outlined' size='small' />
-          <Chip component={Link} href='/apps/pricing' label='Pricing' clickable variant='outlined' size='small' />
-          {tab !== TAB.OVERVIEW ? (
-            <Button size='small' variant='outlined' onClick={() => void exportCurrentTab()} sx={{ textTransform: 'none' }}>
-              Export CSV
-            </Button>
-          ) : null}
-          {allowAdjust ? (
-            <Button
-              size='small'
-              variant='contained'
-              onClick={() => setAdjustOpen(true)}
-              sx={{ textTransform: 'none', bgcolor: ops?.ink || '#171717' }}
-            >
-              Adjust wallet
-            </Button>
-          ) : null}
-          {allowRefund ? (
-            <Button size='small' variant='outlined' onClick={() => setWalletRefundOpen(true)} sx={{ textTransform: 'none' }}>
-              Wallet refund
-            </Button>
-          ) : null}
-          <Button
-            size='small'
-            variant='outlined'
-            endIcon={<ExpandMoreIcon />}
-            onClick={e => setOpsMenuAnchor(e.currentTarget)}
-            sx={{ textTransform: 'none' }}
-          >
-            More
-          </Button>
-          <Menu
-            anchorEl={opsMenuAnchor}
-            open={Boolean(opsMenuAnchor)}
-            onClose={() => setOpsMenuAnchor(null)}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-          >
-            <MenuItem component={Link} href='/apps/ops?tab=health' onClick={() => setOpsMenuAnchor(null)}>
-              <ListItemText primary='Platform health' secondary='Messaging & service checks' />
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                setOpsMenuAnchor(null)
-                setMigrateOpen(true)
-                setMigrateResult(null)
-              }}
-            >
-              <ListItemText primary='Migrate legacy balances' secondary='One-time wallet migration' />
-            </MenuItem>
-            {allowReconcile ? (
-              <>
-                <MenuItem
-                  onClick={() => {
-                    setOpsMenuAnchor(null)
-                    void runReconcile('Reconcile top-ups', () => reconcileStuckTopUps(30), load)
-                  }}
-                >
-                  <ListItemText primary='Reconcile top-ups' />
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    setOpsMenuAnchor(null)
-                    void runReconcile('Reconcile refunds', () => reconcileFailedRefunds(), load)
-                  }}
-                >
-                  <ListItemText primary='Reconcile refunds' />
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    setOpsMenuAnchor(null)
-                    void runReconcile('Reconcile releasing', () => reconcileStuckReleasingHolds(60), load)
-                  }}
-                >
-                  <ListItemText primary='Reconcile releasing holds' />
-                </MenuItem>
-              </>
-            ) : null}
-          </Menu>
-          <AdminRefreshButton onClick={() => void load()} loading={loading} />
-        </Stack>
+        <FinanceHeaderActions
+          showExport={tab !== TAB.OVERVIEW}
+          onExport={() => void exportCurrentTab()}
+          allowAdjust={allowAdjust}
+          onAdjust={() => setAdjustOpen(true)}
+          allowRefund={allowRefund}
+          onWalletRefund={() => setWalletRefundOpen(true)}
+          allowReconcile={allowReconcile}
+          onMigrate={() => {
+            setMigrateOpen(true)
+            setMigrateResult(null)
+          }}
+          onReconcile={handleOverviewReconcile}
+          onRefresh={() => void load()}
+          loading={loading}
+        />
       }
     >
       <FinancePanel

@@ -19,6 +19,8 @@ import { shortDay } from 'src/features/command-center/chartData'
 import { getGrowthCohorts, getGrowthFunnel, getGrowthOverview, getGrowthSegments, getGrowthSupply } from 'src/services/peopleApi'
 import { ops } from 'src/styles/opsSurface'
 import { formatInt, formatPct, timeAgo } from 'src/utils/format'
+import { BusinessHistory } from 'src/features/history/LongRangeTrends'
+import AcquisitionCard from './AcquisitionCard'
 import CohortHeatmap from './CohortHeatmap'
 import { cohortTable, overviewTiles, signupTrend, stageRows } from './growthView'
 
@@ -67,7 +69,15 @@ function Overview({ days }) {
         </ChartCard>
       </Grid>
 
+      <Grid item xs={12}>
+        <BusinessHistory />
+      </Grid>
+
       <Grid item xs={12} lg={5}>
+        <AcquisitionCard days={days} />
+      </Grid>
+
+      <Grid item xs={12} lg={7}>
         <ChartCard
           title='From signup to repeat customer'
           subtitle={f ? `People who joined in the last ${days} days${f.truncated ? ' (sample of the first 50,000)' : ''}` : undefined}

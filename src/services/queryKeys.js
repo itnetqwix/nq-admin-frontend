@@ -7,6 +7,7 @@ export const queryKeys = {
   commandCenterAll: ['command-center'],
   liveOps: ['live-ops'],
   systemHealth: ['system-health'],
+  permissionRollout: ['system-health', 'permission-rollout'],
   apiHealth: hours => ['system-health', 'api', hours],
   alerts: filters => ['alerts', filters],
   alertsAll: ['alerts'],

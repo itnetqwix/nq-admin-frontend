@@ -33,6 +33,18 @@ export default function User360JourneyTab({ userId }) {
         <StatusPill tone={stage.tone}>{stage.label}</StatusPill>
         <Typography sx={{ fontSize: 13, color: 'text.secondary' }}>{stage.help}</Typography>
       </Box>
+      <Typography sx={{ fontSize: 13, mb: 2 }}>
+        <Box component='span' sx={{ color: ops.mute }}>Signed up via </Box>
+        {t.acquisition?.known ? (
+          <>
+            <strong>{t.acquisition.summary}</strong>
+            {t.acquisition.referrerHost ? <Box component='span' sx={{ color: ops.mute }}> · from {t.acquisition.referrerHost}</Box> : null}
+            {t.acquisition.landingPath ? <Box component='span' sx={{ color: ops.mute }}> · landed on {t.acquisition.landingPath}</Box> : null}
+          </>
+        ) : (
+          <Box component='span' sx={{ color: ops.mute }}>unknown (the account is older than source tracking)</Box>
+        )}
+      </Typography>
       <Box sx={{ display: 'flex', mb: 3, p: 1.5, borderRadius: ops.radiusMd, bgcolor: ops.canvasSoft }}>
         <Stat label='Bookings' value={t.stats.bookings} />
         <Stat label='Completed' value={t.stats.completed} />

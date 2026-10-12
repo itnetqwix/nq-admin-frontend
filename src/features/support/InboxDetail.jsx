@@ -11,7 +11,7 @@ import EntityLink from 'src/components/admin/EntityLink'
 import StatusPill from 'src/components/admin/StatusPill'
 import { DrawerError, DrawerLoading, FactList, SectionTitle } from 'src/features/entity-drawers/drawers/shared'
 import { useEntityDrawer } from 'src/features/entity-drawers/EntityDrawerContext'
-import { getInboxItem, updateInboxItem } from 'src/services/inboxApi'
+import { getInboxItem, replyToInboxItem, updateInboxItem } from 'src/services/inboxApi'
 import { ops } from 'src/styles/opsSurface'
 import { timeAgo } from 'src/utils/format'
 import { assignmentAction, changesFor, relatedLinks, slaPill, STATUS_LABEL, statusOptionsFor, STATUS_TONE, TYPE_LABEL } from './inboxView'
@@ -22,6 +22,7 @@ export default function InboxDetail({ type, id, meId, canWrite }) {
   const queryClient = useQueryClient()
   const drawer = useEntityDrawer()
   const [note, setNote] = useState('')
+  const [reply, setReply] = useState('')
   const key = ['inbox', 'item', type, id]
   const q = useQuery({ queryKey: key, queryFn: () => getInboxItem(type, id) })
 
@@ -36,6 +37,19 @@ export default function InboxDetail({ type, id, meId, canWrite }) {
       refresh()
     },
     onError: e => toast.error(e?.message || 'Could not save')
+  })
+
+  const sendReply = useMutation({
+    mutationFn: text => replyToInboxItem(type, id, text),
+    onSuccess: r => {
+      setReply('')
+      toast.success(`Reply sent to ${r?.to || 'the person'}`)
+      refresh()
+    },
+    onError: e => {
+      toast.error(e?.message || 'Could not send the reply')
+      refresh() // a failed attempt is recorded on the item
+    }
   })
 
   if (q.isLoading) return <DrawerLoading />
@@ -158,6 +172,37 @@ export default function InboxDetail({ type, id, meId, canWrite }) {
       ) : null}
 
       <Box>
+        <SectionTitle>Replies to the person</SectionTitle>
+        {d.replies?.length ? (
+          <Box component='ul' sx={{ m: 0, mb: 1.5, p: 0, listStyle: 'none', display: 'grid', gap: 1 }}>
+            {d.replies.map(r => (
+              <li key={r.id}>
+                <Box sx={{ p: 1.25, borderRadius: ops.radiusMd, border: `1px solid ${r.outcome === 'failed' ? ops.dangerFg : ops.hairline}` }}>
+                  <Typography sx={{ fontSize: 13, whiteSpace: 'pre-wrap' }}>{r.text}</Typography>
+                  <Typography sx={{ fontSize: 11, color: r.outcome === 'failed' ? ops.dangerFg : ops.mute, mt: 0.5 }}>
+                    {r.outcome === 'failed' ? `Not sent${r.error ? ` (${r.error})` : ''}` : `Emailed to ${r.toMasked || 'the person'}`} · {r.by || 'Admin'} · {timeAgo(r.at)}
+                  </Typography>
+                </Box>
+              </li>
+            ))}
+          </Box>
+        ) : null}
+        {!d.reply?.allowed ? (
+          <Typography sx={{ fontSize: 13, color: 'text.secondary' }}>{d.reply?.reason || 'This item can’t be answered by email.'}</Typography>
+        ) : canWrite ? (
+          <>
+            <TextField fullWidth multiline minRows={3} size='small' label='Reply by email' placeholder='Plain text. The person receives this exactly as written.' value={reply} onChange={e => setReply(e.target.value)} inputProps={{ maxLength: 5000 }} />
+            <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}>
+              <Typography sx={{ fontSize: 11, color: ops.mute }}>Goes to {d.reply.toMasked}. Not sent to your team notes.</Typography>
+              <Button size='small' variant='contained' disabled={reply.trim().length < 2 || sendReply.isPending} onClick={() => sendReply.mutate(reply.trim())}>
+                {sendReply.isPending ? 'Sending…' : 'Send reply'}
+              </Button>
+            </Box>
+          </>
+        ) : null}
+      </Box>
+
+      <Box>
         <SectionTitle>Team notes</SectionTitle>
         {d.notes.length ? (
           <Box component='ul' sx={{ m: 0, mb: 1.5, p: 0, listStyle: 'none', display: 'grid', gap: 1 }}>
@@ -189,7 +234,7 @@ export default function InboxDetail({ type, id, meId, canWrite }) {
           </>
         ) : null}
         <Typography sx={{ mt: 1, fontSize: 11, color: ops.mute }}>
-          Notes are for your team. Replies to the person aren’t sent from here yet.
+          Notes are for your team only; the person never sees them.
         </Typography>
       </Box>
 

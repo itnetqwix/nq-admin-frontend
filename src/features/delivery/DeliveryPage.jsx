@@ -25,7 +25,7 @@ import useDebouncedValue from 'src/hooks/useDebouncedValue'
 import { getDeliveryStats, listDeliveries } from 'src/services/deliveryApi'
 import { ops } from 'src/styles/opsSurface'
 import { formatInt, timeAgo } from 'src/utils/format'
-import { CHANNEL_LABEL, CHANNEL_VALUES, CHANNELS, channelTile, RANGES, recipientLabel, STATUS_FILTERS } from './deliveryView'
+import { CHANNEL_LABEL, CHANNEL_VALUES, CHANNELS, channelTile, RANGES, recipientLabel, STATUS_FILTERS, STATUS_VALUES, statusMeta } from './deliveryView'
 
 const PAGE_SIZE = 30
 const one = v => (Array.isArray(v) ? v[0] : v)
@@ -33,7 +33,7 @@ const one = v => (Array.isArray(v) ? v[0] : v)
 export default function DeliveryPage() {
   const router = useRouter()
   const channel = CHANNEL_VALUES.includes(one(router.query.channel)) ? one(router.query.channel) : ''
-  const status = ['sent', 'failed'].includes(one(router.query.status)) ? one(router.query.status) : ''
+  const status = STATUS_VALUES.includes(one(router.query.status)) ? one(router.query.status) : ''
   const hours = RANGES.some(r => String(r.value) === one(router.query.hours)) ? Number(one(router.query.hours)) : 24
   const page = Math.max(1, Number(one(router.query.page)) || 1)
   const [search, setSearch] = useState('')
@@ -55,7 +55,7 @@ export default function DeliveryPage() {
   return (
     <AdminPageShell
       title='Delivery log'
-      subtitle='Every email, text and WhatsApp message the platform tried to send, and whether it went through. Recipients are masked; message contents are never stored.'
+      subtitle='Every email, text, WhatsApp and push notification the platform tried to send, and whether it arrived. “Sent” means the provider accepted it; “Delivered” is confirmed by the provider. Recipients are masked; message contents are never stored.'
       actions={
         <>
           <ToggleButtonGroup size='small' exclusive value={hours} onChange={(_, v) => v && set({ hours: v })} aria-label='Time range'>
@@ -88,10 +88,11 @@ export default function DeliveryPage() {
           <ChartCard title='Most common failures' subtitle={`Last ${RANGES.find(r => r.value === hours)?.label}`}>
             <Box component='ul' sx={{ m: 0, p: 0, listStyle: 'none', display: 'grid', gap: 0.75 }}>
               {stats.data.topErrors.map(e => (
-                <li key={`${e.channel}:${e.error}`}>
+                <li key={`${e.channel}:${e.status || ''}:${e.error}`}>
                   <Box sx={{ display: 'flex', gap: 1.25, alignItems: 'baseline' }}>
                     <Typography sx={{ fontSize: 13, fontWeight: 700, fontVariantNumeric: 'tabular-nums', minWidth: 32, textAlign: 'right' }}>{formatInt(e.count)}</Typography>
                     <StatusPill tone='neutral' size='sm'>{CHANNEL_LABEL[e.channel] || e.channel}</StatusPill>
+                    {e.status && e.status !== 'failed' ? <StatusPill tone={statusMeta(e.status).tone} size='sm'>{statusMeta(e.status).label}</StatusPill> : null}
                     <Typography sx={{ fontSize: 13 }}>{e.error}</Typography>
                   </Box>
                 </li>
@@ -133,12 +134,12 @@ export default function DeliveryPage() {
             <TableBody>
               {rows.map(r => (
                 <TableRow key={r._id}>
-                  <TableCell><StatusPill tone={r.status === 'sent' ? 'success' : 'danger'} size='sm'>{r.status === 'sent' ? 'Sent' : 'Failed'}</StatusPill></TableCell>
+                  <TableCell><StatusPill tone={statusMeta(r.status).tone} size='sm'>{statusMeta(r.status).label}</StatusPill></TableCell>
                   <TableCell>{CHANNEL_LABEL[r.channel] || r.channel}</TableCell>
                   <TableCell sx={{ fontFamily: ops.mono, fontSize: 12 }}>{recipientLabel(r)}</TableCell>
                   <TableCell sx={{ maxWidth: 260 }}><Typography sx={{ fontSize: 13 }} noWrap title={r.subject}>{r.subject || '—'}</Typography></TableCell>
-                  <TableCell sx={{ maxWidth: 280, color: r.error ? ops.dangerFg : 'text.secondary', fontSize: 12 }}>
-                    <Typography sx={{ fontSize: 12 }} noWrap title={r.error || r.provider_message_id}>{r.error || r.provider_message_id || '—'}</Typography>
+                  <TableCell sx={{ maxWidth: 280, color: r.error || r.status_detail ? ops.dangerFg : 'text.secondary', fontSize: 12 }}>
+                    <Typography sx={{ fontSize: 12 }} noWrap title={r.error || r.status_detail || r.provider_message_id}>{r.error || r.status_detail || r.provider_message_id || '—'}</Typography>
                   </TableCell>
                   <TableCell sx={{ whiteSpace: 'nowrap', color: 'text.secondary', fontSize: 12 }} title={new Date(r.createdAt).toLocaleString()}>{timeAgo(r.createdAt)}</TableCell>
                 </TableRow>

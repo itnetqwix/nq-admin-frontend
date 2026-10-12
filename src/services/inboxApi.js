@@ -8,3 +8,4 @@ export async function listInbox({ queue = 'open', type, q, page = 1, pageSize = 
 export const getInboxCounts = () => adminApi.get('/admin/support/counts')
 export const getInboxItem = (type, id) => adminApi.get(`/admin/support/${encodeURIComponent(type)}/${encodeURIComponent(id)}`)
 export const updateInboxItem = (type, id, changes) => adminApi.patch(`/admin/support/${encodeURIComponent(type)}/${encodeURIComponent(id)}`, changes)
+export const replyToInboxItem = (type, id, text) => adminApi.post(`/admin/support/${encodeURIComponent(type)}/${encodeURIComponent(id)}/reply`, { text })

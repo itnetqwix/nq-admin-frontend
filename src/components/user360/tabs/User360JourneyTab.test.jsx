@@ -22,6 +22,7 @@ describe('User360JourneyTab', () => {
     getUserTrajectory.mockResolvedValue({
       role: 'Trainee',
       stage: 'at_risk',
+      acquisition: { known: true, summary: 'Google · organic', referrerHost: 'google.com', landingPath: '/trainers/jane' },
       stats: { bookings: 4, completed: 3, cancelled: 1, refunds: 0 },
       milestones: [
         { key: 'signup', label: 'Signed up', at: ago(100), done: true, detail: 'Invited by another user' },
@@ -39,6 +40,8 @@ describe('User360JourneyTab', () => {
     const refund = screen.getByText('First refund')
     expect(refund.parentElement.textContent).toContain('not yet')
     expect(screen.getByText('From signing up to coming back.')).toBeTruthy()
+    expect(screen.getByText('Google · organic')).toBeTruthy()
+    expect(screen.getByText(/landed on \/trainers\/jane/)).toBeTruthy()
   })
 
   it('shows an undated milestone as done without inventing a date', async () => {
@@ -56,6 +59,8 @@ describe('User360JourneyTab', () => {
     expect(screen.getByText('Done')).toBeTruthy()
     expect(screen.queryByText('Invalid Date')).toBeNull()
     expect(screen.getByText('From signing up to teaching lessons.')).toBeTruthy()
+    // No record: say so rather than guess.
+    expect(screen.getByText(/unknown \(the account is older than source tracking\)/)).toBeTruthy()
   })
 
   it('explains a failure instead of crashing', async () => {

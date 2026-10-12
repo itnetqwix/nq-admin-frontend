@@ -22,10 +22,10 @@ vi.mock('src/layouts/components/AdminPageShell', () => ({
     </section>
   )
 }))
-vi.mock('src/services/inboxApi', () => ({ listInbox: vi.fn(), getInboxCounts: vi.fn(), getInboxItem: vi.fn(), updateInboxItem: vi.fn() }))
+vi.mock('src/services/inboxApi', () => ({ listInbox: vi.fn(), getInboxCounts: vi.fn(), getInboxItem: vi.fn(), updateInboxItem: vi.fn(), replyToInboxItem: vi.fn() }))
 
 import toast from 'react-hot-toast'
-import { getInboxCounts, getInboxItem, listInbox, updateInboxItem } from 'src/services/inboxApi'
+import { getInboxCounts, getInboxItem, listInbox, replyToInboxItem, updateInboxItem } from 'src/services/inboxApi'
 import InboxPage from './InboxPage'
 
 afterEach(() => {
@@ -45,6 +45,7 @@ const detail = (over = {}) => ({
   details: { reason: 'No show', refundRelated: 'yes', phone: null, company: null, pageUrl: null, appVersion: null, platform: null, flagType: null, reportedUserId: null },
   reporter: { id: 'u1', name: 'Tia Trainee', email: 'tia@x.com', accountType: 'Trainee', status: 'approved' },
   assignee: null, history: [{ status: 'open', note: null, at: ago(30), by: null }], notes: [{ id: 'n1', text: 'Checked their connection', at: ago(1), by: 'Admin Amy' }],
+  replies: [], reply: { allowed: true, toMasked: 'ti***@x.com', reason: null },
   firstResponseAt: null, resolvedAt: null, ...over
 })
 const counts = { open: 12, mine: 3, unassigned: 9, sla: 4, resolved: 40, byType: {} }
@@ -133,7 +134,7 @@ describe('InboxPage detail', () => {
     expect(screen.getByText('Urgent')).toBeTruthy()
     expect(screen.getByText('Open lesson →')).toBeTruthy()
     expect(screen.getByText('Refund or release payment →').getAttribute('href')).toBe('/apps/finance?sessionId=b1')
-    expect(screen.getByText(/Replies to the person aren’t sent from here yet/)).toBeTruthy()
+    expect(screen.getByText(/the person never sees them/)).toBeTruthy()
   })
 
   it('assigns to the signed-in admin', async () => {
@@ -182,6 +183,41 @@ describe('InboxPage detail', () => {
     expect(screen.getByText(/your role can’t change it/)).toBeTruthy()
     // They can still read everything.
     expect(screen.getByText('Checked their connection')).toBeTruthy()
+  })
+
+  it('sends a reply to the person, naming where it goes, and clears the box', async () => {
+    replyToInboxItem.mockResolvedValue({ sent: true, to: 'ti***@x.com', subject: 'Re: x' })
+    await open(undefined)
+    expect(screen.getByText(/Goes to ti\*\*\*@x\.com/)).toBeTruthy()
+    const send = screen.getByRole('button', { name: 'Send reply' })
+    expect(send.disabled).toBe(true) // nothing written yet
+    fireEvent.change(screen.getByLabelText('Reply by email'), { target: { value: '  We refunded you.  ' } })
+    fireEvent.click(send)
+    await waitFor(() => expect(replyToInboxItem).toHaveBeenCalledWith('concern', 'c1', 'We refunded you.'))
+    await waitFor(() => expect(screen.getByLabelText('Reply by email').value).toBe(''))
+  })
+
+  it('shows the thread, including an attempt that did not go out', async () => {
+    routerState.query = { item: 'concern:c1' }
+    listInbox.mockResolvedValue(page([item()]))
+    getInboxCounts.mockResolvedValue(counts)
+    getInboxItem.mockResolvedValue(
+      detail({ replies: [{ id: 'r1', text: 'We refunded you.', at: ago(1), outcome: 'sent', toMasked: 'ti***@x.com', by: 'Sam' }, { id: 'r2', text: 'Second try', at: ago(0.5), outcome: 'failed', error: 'Mailbox unavailable', by: 'Sam' }] })
+    )
+    renderWithProviders(withProviders(<InboxPage />, undefined))
+    expect(await screen.findByText('We refunded you.')).toBeTruthy()
+    expect(screen.getByText(/Emailed to ti\*\*\*@x\.com/)).toBeTruthy()
+    expect(screen.getByText(/Not sent \(Mailbox unavailable\)/)).toBeTruthy()
+  })
+
+  it('explains why an item cannot be answered instead of showing a reply box', async () => {
+    routerState.query = { item: 'feedback:f1' }
+    listInbox.mockResolvedValue(page([]))
+    getInboxCounts.mockResolvedValue(counts)
+    getInboxItem.mockResolvedValue(detail({ item: item({ id: 'f1', type: 'feedback', bookingId: null, sla: null }), reporter: null, reply: { allowed: false, toMasked: null, reason: 'This feedback was sent anonymously.' } }))
+    renderWithProviders(withProviders(<InboxPage />, undefined))
+    expect(await screen.findByText('This feedback was sent anonymously.')).toBeTruthy()
+    expect(screen.queryByLabelText('Reply by email')).toBeNull()
   })
 
   it('does not offer "resolve" for feedback, which has no such state', async () => {

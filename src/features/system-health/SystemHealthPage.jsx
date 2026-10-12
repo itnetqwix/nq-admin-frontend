@@ -28,6 +28,8 @@ import { getApiHealth, getSentryStats, getSystemHealth } from 'src/services/comm
 import { queryKeys } from 'src/services/queryKeys'
 import { ops } from 'src/styles/opsSurface'
 import { formatDuration, formatInt, formatPct, timeAgo } from 'src/utils/format'
+import { ApiHistory } from 'src/features/history/LongRangeTrends'
+import PermissionRolloutCard from './PermissionRolloutCard'
 import { cronView, OVERALL, queueLabel, queueView, webhookView, workerView } from './healthView'
 
 const Th = ({ children, align }) => (
@@ -246,6 +248,14 @@ export default function SystemHealthPage() {
               <ChartCard title='API latency' subtitle='Average response time, hourly' empty={!trend.categories.length} loading={api.isLoading}>
                 <AreaTrend series={trend.latency} categories={trend.categories} format='ms' height={220} />
               </ChartCard>
+            </Grid>
+
+            <Grid item xs={12}>
+              <ApiHistory />
+            </Grid>
+
+            <Grid item xs={12}>
+              <PermissionRolloutCard />
             </Grid>
 
             {canSeeErrors ? (

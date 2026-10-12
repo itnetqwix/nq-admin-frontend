@@ -16,6 +16,7 @@ import styles from 'styles/common.module.css'
 import AdminPageShell, { AdminPageSection } from 'src/layouts/components/AdminPageShell'
 import DeletePopup from 'src/pages/components/modal/DeletePopup'
 import PromoCodeFormDialog from 'src/features/promo/components/PromoCodeFormDialog'
+import PromoStatsPanel from 'src/features/promo/PromoStatsPanel'
 import { PromoFlowStrip } from 'src/features/promo/components/PromoFlowStrip'
 import { BOOKING_TYPE_OPTIONS, formatBookingTypes } from 'src/constants/revenueAdmin'
 import {
@@ -465,9 +466,10 @@ export default function PromoCodesPage() {
       {/* Usage Detail Dialog */}
       <Dialog open={usageOpen} onClose={() => setUsageOpen(false)} maxWidth='md' fullWidth>
         <DialogTitle>
-          Usage History {usageData?.code ? `- ${usageData.code}` : ''}
+          Results {usageData?.code ? `- ${usageData.code}` : ''}
         </DialogTitle>
         <DialogContent dividers>
+          {usageData?._id ? <PromoStatsPanel promoId={usageData._id} /> : null}
           {usageData && (
             <Box sx={{ mb: 2 }}>
               <Grid container spacing={2}>

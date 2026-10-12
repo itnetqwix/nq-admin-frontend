@@ -8,6 +8,7 @@ export const searchAdmin = (q, signal) => adminApi.get('/admin/search', { query:
 
 export const getLiveOps = (limit = 100) => adminApi.get('/admin/live-ops', { query: { limit } })
 export const getSystemHealth = () => adminApi.get('/admin/system/health')
+export const getPermissionRollout = (days = 7) => adminApi.get('/admin/system/permission-rollout', { query: { days } })
 export const getApiHealth = (hours = 24) => adminApi.get('/admin/system/api-health', { query: { hours } })
 
 export const listAlerts = ({ status = 'open', severity, stream, page = 1, pageSize = 25 } = {}) =>
