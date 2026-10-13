@@ -9,6 +9,11 @@ const getAuthHeaders = () => {
   }
 }
 
+const toQueryString = query =>
+  new URLSearchParams(
+    Object.entries(query || {}).filter(([, v]) => v !== undefined && v !== null && v !== '' && v !== 'undefined')
+  ).toString()
+
 const apiUrl = path => `${requireApiBaseUrl()}${path.startsWith('/') ? path : `/${path}`}`
 
 async function parseJsonResponse(res) {
@@ -79,7 +84,7 @@ export async function getEscrowSummary() {
 }
 
 export async function getEscrowHolds(query = {}) {
-  const params = new URLSearchParams(query).toString()
+  const params = toQueryString(query)
   const res = await fetch(apiUrl(`/admin/finance/escrow?${params}`), {
     headers: getAuthHeaders()
   })
@@ -88,7 +93,7 @@ export async function getEscrowHolds(query = {}) {
 }
 
 export async function getPayoutQueue(query = {}) {
-  const params = new URLSearchParams(query).toString()
+  const params = toQueryString(query)
   const res = await fetch(apiUrl(`/admin/finance/payouts?${params}`), {
     headers: getAuthHeaders()
   })
@@ -97,7 +102,7 @@ export async function getPayoutQueue(query = {}) {
 }
 
 export async function getFinancialAuditLog(query = {}) {
-  const params = new URLSearchParams(query).toString()
+  const params = toQueryString(query)
   const res = await fetch(apiUrl(`/admin/finance/audit-log?${params}`), {
     headers: getAuthHeaders()
   })
@@ -138,7 +143,7 @@ export async function retryBookingRefund(bookingId, reason) {
 }
 
 export async function getStuckTopUps(query = {}) {
-  const params = new URLSearchParams(query).toString()
+  const params = toQueryString(query)
   const res = await fetch(apiUrl(`/admin/finance/topups/stuck?${params}`), {
     headers: getAuthHeaders()
   })

@@ -20,15 +20,21 @@ const SLUGS = [
   { slug: 'terms', label: 'Terms & conditions' },
   { slug: 'privacy', label: 'Privacy policy' },
   { slug: 'cancellation', label: 'Cancellation policy' },
-  { slug: 'refund', label: 'Refund policy' }
+  { slug: 'refund', label: 'Refund policy' },
+  { slug: 'cookies', label: 'Cookie policy' },
+  { slug: 'coach-agreement', label: 'Coach agreement' }
 ]
+
+/** Published to web + app, but not part of the all-user consent record or the notify-by-email flow. */
+const DISPLAY_ONLY = new Set(['cookies', 'coach-agreement'])
 
 const WRITING_TIPS = [
   'Use short paragraphs (2–4 sentences) for mobile readability.',
   'Structure with <h2> section headings — users scan on phones.',
   'Link support emails with <a href="mailto:..."> for tap-to-email.',
   'Avoid inline styles; the app applies theme colors automatically.',
-  'Publish increments version — users see updates without a store release.'
+  'Publish increments version — users see updates without a store release.',
+  'Use {{SITE_URL}} for links to other policies (e.g. {{SITE_URL}}/privacy-policy) so staging and production each link to themselves.'
 ]
 
 export default function CmsLegalPage() {
@@ -160,7 +166,7 @@ export default function CmsLegalPage() {
           const d = docs[s.slug]
           const pending = Boolean(d?.has_unpublished_changes)
           return (
-            <Grid item xs={6} sm={3} key={s.slug}>
+            <Grid item xs={6} sm={4} md={2} key={s.slug}>
               <OpsMetricTile
                 icon='mdi:file-document-outline'
                 label={s.label}
@@ -271,7 +277,7 @@ export default function CmsLegalPage() {
             <Grid item xs={12} md={6}>
               <MobileFramePreview
                 label='App preview'
-                subtitle={`${SLUGS[tab].label} · Signup · Settings`}
+                subtitle={`${SLUGS[tab].label} · ${DISPLAY_ONLY.has(slug) ? 'Settings · Website footer' : 'Signup · Settings'}`}
                 dark={previewDark}
               >
                 <LegalDocumentPreview
