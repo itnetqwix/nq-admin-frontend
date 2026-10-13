@@ -1,4 +1,5 @@
 import authConfig from 'src/configs/auth'
+import adminApi from 'src/services/adminApi'
 import { requireApiBaseUrl } from 'src/utils/apiBase'
 
 const headers = () => ({
@@ -26,11 +27,15 @@ export async function listFailedJobs({ page = 1, limit = 25, search = '', queue 
     name: j.name,
     failedReason: j.failedReason || '—',
     attemptsMade: j.attemptsMade,
+    maxAttempts: j.maxAttempts,
+    errorType: j.errorType || 'Error',
     at: j.timestamp ? new Date(j.timestamp).toISOString() : null,
+    failedAt: j.finishedOn ? new Date(j.finishedOn).toISOString() : null,
     dataPreview: j.dataPreview || undefined
   }))
   return {
     available: !!data.available,
+    truncated: !!data.truncated,
     total: data.total ?? rows.length,
     page: data.page ?? page,
     limit: data.limit ?? limit,
@@ -47,6 +52,26 @@ export async function retryFailedJob(queue, jobId) {
   })
   const data = await res.json()
   if (!res.ok || data?.status === 0) throw new Error(data?.error || 'Retry failed')
+  return data
+}
+
+const jobPath = (queue, jobId) => `/admin/jobs/failed/${encodeURIComponent(queue)}/${encodeURIComponent(jobId)}`
+
+/** GET /admin/jobs/failed/:queue/:id — stack trace, redacted payload, timing, correlation ids. */
+export async function getFailedJob(queue, jobId) {
+  const body = await adminApi.get(jobPath(queue, jobId))
+  return body?.job
+}
+
+/** POST /admin/jobs/failed/discard — removes a failed job from its queue (audited). */
+export async function discardFailedJob(queue, jobId, reason) {
+  const res = await fetch(api('/admin/jobs/failed/discard'), {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({ queue, jobId, reason })
+  })
+  const data = await res.json()
+  if (!res.ok || data?.status === 0) throw new Error(data?.error || 'Discard failed')
   return data
 }
 

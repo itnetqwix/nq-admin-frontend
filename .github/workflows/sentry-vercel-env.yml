@@ -21,6 +21,8 @@ jobs:
           AUTH: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
           set -euo pipefail
+          mkdir -p .vercel
+          printf '{"orgId":"%s","projectId":"%s"}\n' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > .vercel/project.json
           set_var() {
             local key="$1" value="$2" env="$3"
             local vtype="${4:-secret}"
@@ -43,6 +45,8 @@ jobs:
           AUTH: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
           set -euo pipefail
+          mkdir -p .vercel
+          printf '{"orgId":"%s","projectId":"%s"}\n' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > .vercel/project.json
           set_var() {
             local key="$1" value="$2" env="$3"
             local vtype="${4:-secret}"

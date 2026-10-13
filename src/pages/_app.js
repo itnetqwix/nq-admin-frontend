@@ -45,6 +45,7 @@ import ReactHotToast from 'src/@core/styles/libs/react-hot-toast'
 import { createEmotionCache } from 'src/@core/utils/create-emotion-cache'
 import { initLogRocket } from 'src/lib/logrocket'
 import { initSentry } from 'src/lib/sentry'
+import AppErrorBoundary from 'src/components/admin/AppErrorBoundary'
 import { initClarity, reidentifyClarityPage } from 'src/lib/clarity'
 
 // ** Prismjs Styles
@@ -139,7 +140,7 @@ const App = props => {
                   <ThemeComponent settings={settings}>
                     <Guard authGuard={authGuard} guestGuard={guestGuard}>
                       <AclGuard aclAbilities={aclAbilities} guestGuard={guestGuard} authGuard={authGuard}>
-                        {getLayout(<Component {...pageProps} />)}
+                        <AppErrorBoundary>{getLayout(<Component {...pageProps} />)}</AppErrorBoundary>
                       </AclGuard>
                     </Guard>
                     <ReactHotToast>

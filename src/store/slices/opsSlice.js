@@ -30,6 +30,9 @@ const initialState = {
     filters: { ...defaultEventFilters }
   },
   jobs: {
+    queue: '',
+    queues: [],
+    truncated: false,
     items: [],
     total: 0,
     page: 1,
@@ -83,8 +86,9 @@ export const fetchFailedJobsList = createAsyncThunk('ops/fetchFailedJobs', async
   const page = patch?.page ?? state.page
   const limit = patch?.limit ?? state.limit
   const search = patch?.search ?? state.search
-  const data = await listFailedJobs({ page, limit, search })
-  return { ...data, page, limit, search }
+  const queue = patch?.queue ?? state.queue
+  const data = await listFailedJobs({ page, limit, search, queue })
+  return { ...data, page, limit, search, queue }
 })
 
 const opsSlice = createSlice({
@@ -102,6 +106,10 @@ const opsSlice = createSlice({
     },
     setFailedJobsSearch(state, action) {
       state.jobs.search = action.payload || ''
+      state.jobs.page = 1
+    },
+    setFailedJobsQueue(state, action) {
+      state.jobs.queue = action.payload || ''
       state.jobs.page = 1
     },
     setFailedJobsPage(state, action) {
@@ -159,6 +167,9 @@ const opsSlice = createSlice({
         state.jobs.page = action.payload.page
         state.jobs.limit = action.payload.limit
         state.jobs.search = action.payload.search
+        state.jobs.queue = action.payload.queue || ''
+        state.jobs.queues = action.payload.queues || []
+        state.jobs.truncated = !!action.payload.truncated
         state.jobs.items = (action.payload.rows || []).map(r => ({
           ...r,
           why: r.why || r.failedReason
@@ -176,6 +187,7 @@ export const {
   setOpsEventFilters,
   setOpsEventPage,
   setFailedJobsSearch,
+  setFailedJobsQueue,
   setFailedJobsPage,
   invalidateOpsStats
 } = opsSlice.actions

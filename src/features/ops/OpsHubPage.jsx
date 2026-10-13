@@ -23,12 +23,14 @@ import OpsJobsTab from './tabs/OpsJobsTab'
 import OpsCallsTab from './tabs/OpsCallsTab'
 import OpsLoadTestsTab from './tabs/OpsLoadTestsTab'
 import OpsLiveLessonLogsTab from './tabs/OpsLiveLessonLogsTab'
+import OpsTraceTab from './tabs/OpsTraceTab'
 
 const TABS = [
   { value: 'health', label: 'Health' },
   { value: 'events', label: 'Live lesson logs' },
   { value: 'internal', label: 'Ops incidents' },
   { value: 'jobs', label: 'Failed jobs' },
+  { value: 'trace', label: 'Trace' },
   { value: 'calls', label: 'Calls' },
   { value: 'loadtests', label: 'Load tests' }
 ]
@@ -52,7 +54,12 @@ const TAB_COPY = {
   jobs: {
     eyebrow: 'Ops · jobs',
     title: 'Failed jobs.',
-    subtitle: 'BullMQ dead-letter visibility — retry after fixing root cause. List omits raw job payloads.'
+    subtitle: 'BullMQ dead-letter visibility — open a job for its stack trace and payload, then retry or discard.'
+  },
+  trace: {
+    eyebrow: 'Ops · trace',
+    title: 'Trace anything.',
+    subtitle: 'Paste a request ref from an error message, a user, lesson or booking id, or an email.'
   },
   calls: {
     eyebrow: 'Ops · calls',
@@ -103,16 +110,23 @@ export default function OpsHubPage() {
           })
         )
       } else if (tab === 'jobs') {
-        await dispatch(
-          fetchFailedJobsList({ page: jobsState.page, limit: jobsState.limit, search: jobsState.search })
-        )
+        await dispatch(fetchFailedJobsList({ page: jobsState.page, limit: jobsState.limit, search: jobsState.search }))
       } else if (tab === 'calls' || tab === 'loadtests') {
         setRefreshTick(t => t + 1)
       }
     } finally {
       setRefreshing(false)
     }
-  }, [tab, dispatch, eventsState.page, eventsState.limit, eventsState.filters, jobsState.page, jobsState.limit, jobsState.search])
+  }, [
+    tab,
+    dispatch,
+    eventsState.page,
+    eventsState.limit,
+    eventsState.filters,
+    jobsState.page,
+    jobsState.limit,
+    jobsState.search
+  ])
 
   return (
     <AdminPageShell
@@ -135,6 +149,7 @@ export default function OpsHubPage() {
       {tab === 'events' ? <OpsLiveLessonLogsTab /> : null}
       {tab === 'internal' ? <OpsEventsTab hub /> : null}
       {tab === 'jobs' ? <OpsJobsTab hub /> : null}
+      {tab === 'trace' ? <OpsTraceTab /> : null}
       {tab === 'calls' ? <OpsCallsTab hub refreshTick={refreshTick} /> : null}
       {tab === 'loadtests' ? <OpsLoadTestsTab refreshTick={refreshTick} /> : null}
     </AdminPageShell>

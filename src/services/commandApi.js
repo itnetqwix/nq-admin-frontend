@@ -19,6 +19,8 @@ export const snoozeAlert = (id, minutes) => adminApi.post(`/admin/alerts/${encod
 
 export const getSentryStats = (range = '24h') => adminApi.get('/admin/sentry/stats', { query: { range } })
 export const searchSentry = query => adminApi.get('/admin/sentry/search', { query: { query } })
+/** One id (request id, user/lesson/booking id, email) -> API hits + ops events + Sentry issues. */
+export const traceLookup = q => adminApi.get('/admin/trace', { query: { q } })
 export const getSentryReleases = project => adminApi.get('/admin/sentry/releases', { query: { project } })
 
 // Per-lesson views (existing endpoints; shapes are read defensively by the drawer).

@@ -29,7 +29,8 @@ export default function AdminDataTable({
   extraFilters = null,
   height = 560,
   pageSizeOptions = [25, 50, 100],
-  emptyMessage = 'No rows'
+  emptyMessage = 'No rows',
+  onRowClick = null
 }) {
   const [localSearch, setLocalSearch] = useState(search)
   const timer = useRef(null)
@@ -116,6 +117,8 @@ export default function AdminDataTable({
           onPaginationModelChange={onPaginationModelChange}
           pageSizeOptions={pageSizeOptions}
           disableRowSelectionOnClick
+          onRowClick={onRowClick ? params => onRowClick(params.row) : undefined}
+          sx={onRowClick ? { '& .MuiDataGrid-row': { cursor: 'pointer' } } : undefined}
           slots={{
             noRowsOverlay: () => (
               <Stack height='100%' alignItems='center' justifyContent='center'>

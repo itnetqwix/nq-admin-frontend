@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+.next/
+coverage/
+.cache/
+*.log
+graphify-out/
+.expo/
+ios/Pods/
+android/.gradle/
+android/app/build/

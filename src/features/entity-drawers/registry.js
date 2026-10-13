@@ -8,6 +8,7 @@ export const ENTITY_DRAWERS = {
   user: { title: 'User', Component: dynamic(() => import('./drawers/UserDrawer'), { ssr: false }) },
   lesson: { title: 'Lesson', Component: dynamic(() => import('./drawers/LessonDrawer'), { ssr: false }) },
   dispute: { title: 'Dispute', Component: dynamic(() => import('./drawers/DisputeDrawer'), { ssr: false }) },
+  job: { title: 'Failed job', Component: dynamic(() => import('./drawers/JobDrawer'), { ssr: false }) },
   payment: { title: 'Payment', Component: dynamic(() => import('./drawers/PaymentDrawer'), { ssr: false }) }
 }
 

@@ -21,6 +21,9 @@ export const queryKeys = {
     events: id => ['lesson', id, 'events'],
     errors: id => ['lesson', id, 'errors']
   },
+  trace: q => ['trace', q],
+  failedJob: (queue, id) => ['failed-job', queue, id],
+  failedJobsGrouped: ['failed-jobs', 'grouped'],
   user: id => ['user', id],
   meta: ['admin-meta'],
   search: q => ['admin-search', q]
