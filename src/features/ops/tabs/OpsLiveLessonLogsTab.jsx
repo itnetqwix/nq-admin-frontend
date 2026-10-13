@@ -24,6 +24,17 @@ import {
 } from 'src/services/opsApi'
 import { ops } from 'src/styles/opsSurface'
 
+const formatSuspectFrame = event => {
+  const frame = event?.suspectFrame
+  if (frame?.filename || frame?.function) {
+    const loc = [frame.filename, frame.line != null ? `:${frame.line}` : ''].filter(Boolean).join('')
+    return [frame.function, loc].filter(Boolean).join(' @ ')
+  }
+  const tail = event?.frames?.slice(-5)
+  if (tail?.length) return JSON.stringify(tail, null, 2)
+  return 'No in-app stack frame (message-only event or native crash without symbolicated frames).'
+}
+
 const stateColor = state => {
   if (state === 'failed' || state === 'blocked') return { bgcolor: ops.errorSoft, color: ops.error }
   if (state === 'pending' || state === 'started') return { bgcolor: ops.softAmber, color: '#ab570a' }
@@ -91,7 +102,9 @@ export default function OpsLiveLessonLogsTab() {
       setSelected({ type: 'sentry', loading: true })
       const events = await getSentryIssueEvents(issue.id, { limit: 1 })
       const event = events?.items?.[0]
-      const detail = event?.id && issue.project ? await getSentryEvent(issue.project, event.id) : event
+      const projectSlug = issue.project || event?.project
+      const eventId = event?.id
+      const detail = eventId && projectSlug ? await getSentryEvent(projectSlug, eventId) : event
       setSelected({ type: 'sentry', issue, event: detail })
     } catch (error) {
       toast.error(error?.message || 'Could not load Sentry root cause')
@@ -220,11 +233,13 @@ export default function OpsLiveLessonLogsTab() {
               <Stack spacing={1.5}>
                 <Typography sx={{ fontWeight: 600 }}>{selected.issue?.title}</Typography>
                 <Typography sx={{ color: ops.onNightMuted, fontSize: 13 }}>
-                  {selected.event?.exceptionType || 'Unknown exception'}: {selected.event?.exceptionValue || 'No message'}
+                  {[selected.event?.exceptionType, selected.event?.exceptionValue].filter(Boolean).join(': ') ||
+                    selected.issue?.title ||
+                    'No exception details'}
                 </Typography>
                 <Typography sx={{ color: ops.lime, fontSize: 12, fontWeight: 600 }}>Suspect frame</Typography>
                 <Box component='pre' sx={{ whiteSpace: 'pre-wrap', fontFamily: ops.mono, fontSize: 11, color: ops.onNightMuted, bgcolor: ops.nightLift, p: 1.5, borderRadius: 1 }}>
-                  {JSON.stringify(selected.event?.suspectFrame || selected.event?.frames?.slice(-5), null, 2)}
+                  {formatSuspectFrame(selected.event)}
                 </Box>
                 {selected.event?.permalink ? <Button component='a' href={selected.event.permalink} target='_blank' rel='noreferrer' sx={{ color: ops.lime, textTransform: 'none' }}>Open in Sentry</Button> : null}
               </Stack>
