@@ -1,0 +1,54 @@
+name: Apply Sentry env (Vercel)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  vercel-env:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Push Sentry env — admin-portal
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          DSN: ${{ secrets.SENTRY_DSN_ADMIN }}
+          AUTH: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          set_var() {
+            local key="$1" value="$2" env="$3"
+            vercel env rm "$key" "$env" --yes --token "$VERCEL_TOKEN" 2>/dev/null || true
+            printf '%s' "$value" | vercel env add "$key" "$env" --yes --token "$VERCEL_TOKEN"
+          }
+          for env in preview production; do
+            set_var NEXT_PUBLIC_SENTRY_DSN "$DSN" "$env"
+            set_var NEXT_PUBLIC_SENTRY_ORG netqwix "$env"
+            set_var NEXT_PUBLIC_SENTRY_PROJECT 4512180160888832 "$env"
+            set_var SENTRY_AUTH_TOKEN "$AUTH" "$env"
+          done
+
+      - name: Push Sentry env — frontend-portal
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.SENTRY_VERCEL_PROJECT_ID_WEB }}
+          DSN: ${{ secrets.SENTRY_DSN_WEB }}
+          AUTH: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          set_var() {
+            local key="$1" value="$2" env="$3"
+            vercel env rm "$key" "$env" --yes --token "$VERCEL_TOKEN" 2>/dev/null || true
+            printf '%s' "$value" | vercel env add "$key" "$env" --yes --token "$VERCEL_TOKEN"
+          }
+          for env in preview production; do
+            set_var NEXT_PUBLIC_SENTRY_DSN "$DSN" "$env"
+            set_var SENTRY_DSN "$DSN" "$env"
+            set_var SENTRY_AUTH_TOKEN "$AUTH" "$env"
+          done
