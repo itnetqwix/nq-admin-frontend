@@ -53,6 +53,7 @@ export default function User360ReferralsTab({ userId }) {
             </Grid>
             <Grid item xs={12} sm={4}>
               <StatTile label='Points balance' value={data.points_balance ?? 0} tone='accent' />
+              <Typography sx={{ fontSize: 11, mt: 0.5 }}>Full ledger: Points → Ledger, user ID {userId}</Typography>
             </Grid>
             <Grid item xs={12} sm={4}>
               <OpsSurfaceCard>

@@ -39,6 +39,7 @@ const navigation = () => [
       link('Pricing', '/apps/pricing', 'mdi:currency-usd', 'admin-nav-pricing'),
       link('Promo codes', '/apps/promo-codes', 'mdi:tag-multiple-outline', 'admin-nav-promo-codes'),
       link('Referrals', '/apps/referrals', 'mdi:gift-outline', 'admin-nav-referrals'),
+      link('Points', '/apps/points', 'mdi:star-circle-outline', 'admin-nav-points'),
       link('Lesson packages', '/apps/package-credits', 'mdi:package-variant-closed', 'admin-nav-package-credits')
     ]
   },

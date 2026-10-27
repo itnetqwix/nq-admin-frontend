@@ -126,7 +126,7 @@ const ReferralsAdminPage = () => {
       eyebrow='Revenue · referrals'
       icon='mdi:account-arrow-right-outline'
       title='Referrals & points.'
-      subtitle='Invites, attributions, referral points, and wallet redemptions (100 pts = $5).'
+      subtitle='Invites, attributions, referral points, and wallet redemptions (rate and caps are editable below).'
       actions={<AdminRefreshButton onClick={load} loading={loading} />}
     >
       {error ? (
@@ -174,7 +174,7 @@ const ReferralsAdminPage = () => {
           Referral earn matrix (points).
         </Typography>
         <Typography sx={{ fontSize: 13, color: ops.body, mb: 2, lineHeight: 1.5 }}>
-          Redeem in the app: 100 points = $5 wallet credit. Per-action cap: 5 points.
+          Redemption rate and daily/monthly caps are configured on the Points page..
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
           {matrixChips.map(row => {

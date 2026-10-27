@@ -38,6 +38,7 @@ const required = [
   '/apps/pricing',
   '/apps/promo-codes',
   '/apps/referrals',
+  '/apps/points',
   '/apps/cms',
   '/apps/banners',
   '/apps/tips',

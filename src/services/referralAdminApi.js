@@ -34,3 +34,33 @@ export async function getReferralRewards(query = {}) {
   if (!res.ok) throw new Error(json?.error || 'Failed to load rewards')
   return unwrap(json)
 }
+
+async function pointsRequest(path, options = {}) {
+  const res = await fetch(apiUrl(`/admin/points${path}`), { headers: getAuthHeaders(), ...options })
+  const json = await res.json()
+  if (!res.ok) throw new Error(json?.error || 'Points request failed')
+  return unwrap(json)
+}
+
+export const getPointsConfig = () => pointsRequest('/config')
+
+export const updatePointsConfig = body =>
+  pointsRequest('/config', { method: 'PUT', body: JSON.stringify(body) })
+
+export const adjustUserPoints = body =>
+  pointsRequest('/adjust', { method: 'POST', body: JSON.stringify(body) })
+
+export const getPointsLedger = (query = {}) =>
+  pointsRequest(`/ledger?${new URLSearchParams(query).toString()}`)
+
+export const getPointsReconcile = () => pointsRequest('/reconcile')
+
+export const getPointsOverview = () => pointsRequest('/overview')
+
+export const getPointsHistory = () => pointsRequest('/config/history')
+
+export const revertPointsConfig = (id, reason) =>
+  pointsRequest(`/config/revert/${id}`, { method: 'POST', body: JSON.stringify({ reason }) })
+
+export const getPointsPreview = (query = {}) =>
+  pointsRequest(`/preview?${new URLSearchParams(query).toString()}`)

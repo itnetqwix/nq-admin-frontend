@@ -52,6 +52,7 @@ const defineRulesFor = (role, user) => {
     ['nav_finance_connect', 'admin-nav-finance-connect'],
     ['nav_pricing', 'admin-nav-pricing'],
     ['nav_referrals', 'admin-nav-referrals'],
+    ['nav_points', 'admin-nav-points'],
     ['nav_platform_health', 'admin-nav-platform-health'],
     ['nav_growth', 'admin-nav-growth']
   ]
@@ -86,6 +87,8 @@ const defineRulesFor = (role, user) => {
   }
   if (ok('can_assign_admin_roles')) can('update', 'admin-nav-admin-settings')
 
+  // Points: viewing needs nav_points; changing settings / adjusting balances needs points_write.
+  if (ok('points_write')) can('update', 'admin-nav-points')
   if (ok('support_write')) can('update', 'admin-nav-support-tickets')
   if (ok('can_manage_commission')) can('update', 'admin-action-commission')
   if (ok('can_process_refund') || ok('finance_refund')) can('update', 'admin-action-refund')

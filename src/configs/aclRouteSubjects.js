@@ -37,6 +37,7 @@ export const ACL_ROUTE_SUBJECTS = {
   '/apps/pricing': 'admin-nav-pricing',
   '/apps/promo-codes': 'admin-nav-promo-codes',
   '/apps/referrals': 'admin-nav-referrals',
+  '/apps/points': 'admin-nav-points',
   '/apps/broadcasts': 'admin-nav-broadcasts',
   '/apps/banners': 'admin-nav-banners',
   '/apps/tips': 'admin-nav-tips',
