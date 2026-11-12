@@ -762,7 +762,7 @@ export default function TrainerVerificationsPage() {
                     size='small'
                   />
                 }
-                label='Force confirm incomplete (ops override — expert still cannot go online without full bookability)'
+                label='Force confirm incomplete (ops override — expert still cannot go online without About, rate, and wallet PIN)'
               />
             ) : null}
 
