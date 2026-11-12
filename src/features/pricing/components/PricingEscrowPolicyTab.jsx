@@ -15,7 +15,7 @@ export default function PricingEscrowPolicyTab({ policy, canEdit, onPatch }) {
       <Alert severity='info'>
         Platform-wide. Disputed holds are skipped. Coach cash still lands in the NetQwix wallet — not a bank.
       </Alert>
-      <AdminPageSection title='Clearance & ratings'>
+      <AdminPageSection title='Clearance'>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
             <TextField
@@ -40,7 +40,7 @@ export default function PricingEscrowPolicyTab({ policy, canEdit, onPatch }) {
               value={p.ratingGraceDays ?? 7}
               onChange={e => onPatch({ ratingGraceDays: Number(e.target.value) || 0 })}
               disabled={!canEdit}
-              helperText='0 = require both ratings indefinitely'
+              helperText='Stored only. Payout does not wait on a review or this grace period.'
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
