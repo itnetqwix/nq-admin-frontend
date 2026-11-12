@@ -77,7 +77,7 @@ const ENTITLEMENT_GROUPS = [
     id: 'discovery',
     title: 'Discovery & tools',
     fields: [
-      { key: 'toolsPack', label: 'Tools pack (Practice Session gate)', type: 'select', options: ['basic', 'standard', 'pro', 'max'], role: 'both', enforced: true },
+      { key: 'toolsPack', label: 'Tools pack (label only — Practice is free for experts)', type: 'select', options: ['basic', 'standard', 'pro', 'max'], role: 'both', enforced: false },
       { key: 'analyticsLevel', label: 'Analytics level', type: 'select', options: ['basic', 'standard', 'advanced', 'full'], role: 'trainer', enforced: true },
       { key: 'featuredByNetqwix', label: 'Featured by NetQwix', type: 'bool', role: 'trainer', enforced: true },
       { key: 'listingBoost', label: 'Listing boost', type: 'number', role: 'trainer', enforced: true },
