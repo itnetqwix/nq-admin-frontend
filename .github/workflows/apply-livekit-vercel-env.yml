@@ -21,7 +21,7 @@ jobs:
           set_var() {
             local key="$1" value="$2" env="$3"
             vercel env rm "$key" "$env" --yes --token "$VERCEL_TOKEN" 2>/dev/null || true
-            printf '%s' "$value" | vercel env add "$key" "$env" --yes --type plaintext --token "$VERCEL_TOKEN"
+            printf '%s' "$value" | vercel env add "$key" "$env" --yes --type config --token "$VERCEL_TOKEN"
           }
           set_var NEXT_PUBLIC_LIVEKIT_URL "wss://livekit-staging.netqwix.com" preview
           set_var NEXT_PUBLIC_LIVEKIT_URL "wss://livekit.netqwix.com" production
