@@ -16,7 +16,7 @@ import moment from 'moment'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 import { useAdminConfirm } from 'src/components/admin'
-import { getAdminBookingDetail } from 'src/services/bookingApi'
+import { getAdminBookingDetail, setAdminBookingMediaEngine } from 'src/services/bookingApi'
 import { releaseEscrowHold, refundEscrowHold, refundWalletSession } from 'src/services/financeApi'
 import SessionTimelinePanel from 'src/pages/components/booking/SessionTimelinePanel'
 import { BookedSession, isCurrentDateBefore } from 'src/utils/utils'
@@ -244,6 +244,33 @@ export default function BookingDetailDrawer({
               Start refund
             </Button>
           ) : null}
+          {!s.actual_end_at && !s.both_joined_at ? (
+            <Button
+              size='small'
+              variant='outlined'
+              onClick={async () => {
+                const next = s.media_engine === 'livekit' ? 'p2p' : 'livekit'
+                const ok = await confirm({
+                  title: `Set media to ${next}?`,
+                  message:
+                    'Only before both parties join. LiveKit lessons do not fall back to P2P.',
+                  confirmLabel: `Use ${next}`,
+                  variant: 'warning'
+                })
+                if (!ok) return
+                try {
+                  await setAdminBookingMediaEngine(s._id, next)
+                  toast.success(`Media engine: ${next}`)
+                  loadDetail()
+                  onActionComplete?.()
+                } catch (e) {
+                  toast.error(e?.message || 'Could not change media')
+                }
+              }}
+            >
+              {s.media_engine === 'livekit' ? 'Force P2P' : 'Use LiveKit'}
+            </Button>
+          ) : null}
         </Stack>
       ) : null}
 
@@ -268,6 +295,11 @@ export default function BookingDetailDrawer({
             <DetailRow label='Type' value={s.is_instant ? 'Instant' : 'Scheduled'} />
             <DetailRow label='Instant phase' value={s.instant_phase} />
             <DetailRow label='Duration' value={s.duration_minutes ? `${s.duration_minutes} min` : null} />
+            <DetailRow label='Media engine' value={s.media_engine || 'p2p'} />
+            <DetailRow label='LiveKit egress id' value={s.livekit_egress_id} />
+            <DetailRow label='Egress status' value={s.livekit_egress_status} />
+            <DetailRow label='Egress error' value={s.livekit_egress_error} />
+            <DetailRow label='Recording status' value={s.recording_status} />
             <DetailRow label='Booked date' value={fmt(s.booked_date)} />
             <DetailRow label='Start' value={fmt(s.start_time || s.session_start_time)} />
             <DetailRow label='End' value={fmt(s.end_time || s.session_end_time)} />

@@ -1,0 +1,27 @@
+name: Apply LiveKit env (Vercel)
+
+# Public wss URL only — never add LIVEKIT_API_SECRET here.
+on:
+  workflow_dispatch:
+
+jobs:
+  vercel-env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Push NEXT_PUBLIC_LIVEKIT_URL — frontend-portal
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.SENTRY_VERCEL_PROJECT_ID_WEB }}
+        run: |
+          set -euo pipefail
+          npm install --global vercel@latest
+          mkdir -p .vercel
+          printf '{"orgId":"%s","projectId":"%s"}\n' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > .vercel/project.json
+          set_var() {
+            local key="$1" value="$2" env="$3"
+            vercel env rm "$key" "$env" --yes --token "$VERCEL_TOKEN" 2>/dev/null || true
+            printf '%s' "$value" | vercel env add "$key" "$env" --yes --type plaintext --token "$VERCEL_TOKEN"
+          }
+          set_var NEXT_PUBLIC_LIVEKIT_URL "wss://livekit-staging.netqwix.com" preview
+          set_var NEXT_PUBLIC_LIVEKIT_URL "wss://livekit.netqwix.com" production

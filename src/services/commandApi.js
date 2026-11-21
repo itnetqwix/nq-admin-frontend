@@ -26,6 +26,8 @@ export const getSentryReleases = project => adminApi.get('/admin/sentry/releases
 // Per-lesson views (existing endpoints; shapes are read defensively by the drawer).
 export const getBookingDetail = sessionId => adminApi.get(`/admin/booking/${encodeURIComponent(sessionId)}`)
 export const getLessonJourney = sessionId => adminApi.get(`/admin/live-lesson-logs/${encodeURIComponent(sessionId)}`)
+export const getLessonRecordingLog = sessionId =>
+  adminApi.get(`/admin/live-lesson-logs/${encodeURIComponent(sessionId)}/recording`)
 export const getCallQualitySummary = sessionId =>
   adminApi.get(`/admin/call-quality-summary/${encodeURIComponent(sessionId)}`)
 export const getSessionOpsEvents = sessionId => adminApi.get(`/admin/ops-events/session/${encodeURIComponent(sessionId)}`)

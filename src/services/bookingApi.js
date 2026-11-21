@@ -73,6 +73,15 @@ export async function cancelAdminBooking(bookingId, reason, split = {}) {
   return parseJson(res)
 }
 
+export async function setAdminBookingMediaEngine(bookingId, media, reason) {
+  const res = await fetch(apiUrl(`/admin/booking/${bookingId}/media-engine`), {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ media, reason: reason || 'ops media hatch' })
+  })
+  return parseJson(res)
+}
+
 export async function getPaymentIntentDetails(paymentIntentId) {
   const res = await fetch(apiUrl('/transaction/get-payment-intent'), {
     method: 'POST',

@@ -58,3 +58,5 @@ jobs:
             set_var SENTRY_DSN "$DSN" "$env" secret
             set_var SENTRY_AUTH_TOKEN "$AUTH" "$env" secret
           done
+          set_var NEXT_PUBLIC_LIVEKIT_URL "wss://livekit-staging.netqwix.com" preview config
+          set_var NEXT_PUBLIC_LIVEKIT_URL "wss://livekit.netqwix.com" production config

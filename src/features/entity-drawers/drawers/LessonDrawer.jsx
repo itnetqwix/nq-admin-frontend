@@ -12,11 +12,13 @@ import { getBookingDetail, getCallQualitySummary, getLessonJourney, getSessionOp
 import { queryKeys } from 'src/services/queryKeys'
 import { formatDuration, timeAgo } from 'src/utils/format'
 import { escrowTone, journeyChecklist, journeyHeadline, moneyRows, normalizeRttMs, qualityBand } from '../lessonView'
+import RecordingPane from './RecordingPane'
 import { DrawerError, DrawerLoading, FactList, SectionTitle } from './shared'
 
 const TABS = [
   { value: 'overview', label: 'Overview' },
   { value: 'journey', label: 'Journey' },
+  { value: 'recording', label: 'Recording' },
   { value: 'quality', label: 'Call quality' },
   { value: 'errors', label: 'Errors' },
   { value: 'money', label: 'Money' }
@@ -216,7 +218,7 @@ function Money({ id }) {
   )
 }
 
-const PANES = { overview: Overview, journey: Journey, quality: Quality, errors: Errors, money: Money }
+const PANES = { overview: Overview, journey: Journey, recording: RecordingPane, quality: Quality, errors: Errors, money: Money }
 
 export default function LessonDrawer({ id, initialTab = 'overview' }) {
   const [tab, setTab] = useState(initialTab)

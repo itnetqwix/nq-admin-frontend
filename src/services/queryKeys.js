@@ -17,6 +17,7 @@ export const queryKeys = {
   lesson: {
     booking: id => ['lesson', id, 'booking'],
     journey: id => ['lesson', id, 'journey'],
+    recording: id => ['lesson', id, 'recording'],
     quality: id => ['lesson', id, 'quality'],
     events: id => ['lesson', id, 'events'],
     errors: id => ['lesson', id, 'errors']
